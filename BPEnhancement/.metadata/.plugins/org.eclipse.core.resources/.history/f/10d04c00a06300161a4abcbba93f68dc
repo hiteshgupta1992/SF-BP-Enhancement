@@ -1,0 +1,64 @@
+<apex:component >
+	<style>
+	       .Price-info-overlay{
+	       		display: none;
+				background: #fff;
+				color: #707070;
+				min-width: 330px;
+				position: absolute;
+				top: 230px;
+				left: 20px;
+				z-index: 1000;
+				border-radius: 10px;
+				padding: 10px 20px;
+				-moz-box-shadow: 0 0 20px #222;
+				-webkit-box-shadow: 0 0 20px #222;
+				box-shadow: 0 0 20px #222;
+	       }
+	       .Price-info-overlay:before{
+				border-color: #fff transparent;
+				border-style: solid;
+				border-width: 0 15px 40px;
+				content: "";
+				right: 30px;
+				position: absolute;
+				top: -38px;
+				display: none;
+	       }
+	       .Price-info-overlay:after{
+				border-color: #fff transparent;
+				border-style: solid;
+				border-width: 40px 15px 0;
+				content: "";
+				right: 30px;
+				position: absolute;
+				top: 100%;
+				display: none;
+	       }
+	       .beforearrow:before{
+	       		display: block;
+	       }
+	       .afterarrow:after{
+	       		display: block;
+	       }
+	        .Price-info-overlay .row{
+	        	margin: 5px 0;
+	        }
+	</style>
+	<script>
+		$(document).ready(function () {
+		    $('.Price-info-overlay').mouseover(function() {
+		        $('.Price-info-overlay').show(); 
+		    })
+		    $('.Price-info-overlay').mouseout(function() {
+		        $('.Price-info-overlay').hide(); 
+		    })
+		});
+	</script>
+	   <div class="Price-info-overlay">
+	   		<div class="row" ng-repeat="priceItem in CustomerOrderModel.priceOverlay">
+	   			<div class="col-lg-8 col-md-8 text-left italic" ng-class="{'bold':$last}">{{priceItem.label}}</div>
+	   			<div class="col-lg-4 col-md-4 text-right bold" >{{priceItem.value}}</div>
+	   		</div>
+	   </div>
+</apex:component>

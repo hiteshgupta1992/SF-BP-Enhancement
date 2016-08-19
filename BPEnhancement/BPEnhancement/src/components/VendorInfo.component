@@ -1,0 +1,289 @@
+<apex:component controller="ViewVendorCtrl">
+        <style>
+              .Vendor-info-overlay{
+                display: none;                  
+                  background: #fff;
+                  color: #000;
+                  width: 630px;
+                  min-height: 215px;
+                  position: absolute;
+                  top: 20px;
+                  left: 195px;
+                  text-align: left;
+                  z-index: 1000;
+                  border-radius: 10px;
+                  padding: 10px 20px;
+                  -moz-box-shadow: 0 0 20px #222;
+                  -webkit-box-shadow: 0 0 20px #222;
+                  box-shadow: 0 0 20px #222;
+              }
+              
+              /* .Vendor-info-overlay:before{
+                  content: '';
+                  display: block;
+                  position: absolute;
+                  left: -120px;
+                  width: 120px;
+                  top: 52px;
+                  height: 170px;
+                  background: url('{!URLFOR($Resource.arrow)}') no-repeat !important;
+              } */
+              .Vendor-info-overlay .under-line-row{
+                  padding: 10px;
+                  border-bottom: 1px solid #939598;
+                  margin-left: 0px;
+              }
+              .customerInfoLine {
+                  float: left;
+                  width: 100%;
+                  margin: 24px 0;
+                  padding: 0;
+                  border-top: 1px solid #ECF0F1;
+              }
+              .savecancle_btncntnr {
+                  margin-right: 15px;
+              }  
+              .row.overlay-header {
+                  margin-top: 5px;
+                  margin-bottom: 10px;
+              }
+              
+        </style>
+        <script>
+            $(document).ready(function () {
+                $('.Vendor-info-overlay').mouseover(function() {
+                    $('.Vendor-info-overlay').show(); 
+                });
+                $('.Vendor-info-overlay').mouseout(function() {
+                    $('.Vendor-info-overlay').hide(); 
+                });
+                $('#Vendor-info-flyout .closeBtn').click(function() {
+                    $('.Vendor-info-overlay').hide(); 
+                });
+            }); 
+             var vendorInfo = angular.module("vendorInfo",[]);
+             vendorInfo.controller('vendorInfoCtrl', function ($scope, $q, VendorInfoService, $window) {
+                 
+                 if($scope.vendorInfo == undefined){
+                    $scope.vendorInfo = {};
+                    $scope.vendorInfo.VendorDetailRec = {};
+                    $scope.vendorInfo.VendorRelatedInfo = {};
+                    $scope.vendorInfo.VendorOverlay = [];
+                 }
+                 
+                 $scope.$on('VendorInfoPopUpEvent', function(event, vendorId) { 
+                    debug("inside load function");
+                    $scope.vendorInfo.VendorDetailRec = {};
+                    $scope.vendorInfo.VendorRelatedInfo = {};
+                    $scope.vendorInfo.VendorOverlay = [];
+                    $scope.vendorInfo.loadVendorInfo(vendorId);
+                    //angular.element('.Vendor-info-flyout').scrollTop = 0;  
+                 });
+                 
+                 $scope.vendorInfo.loadVendorInfo = function(vendorId){
+                        //var vendorId = 0012800000jiLXMAA2;
+                        VendorInfoService.getVendorInfo(vendorId).then(function(vendorRecord) {
+                            debug("service Result");
+                            debug("object :"+JSON.stringify(vendorRecord));
+                            if (vendorRecord.VendorDetailRec != undefined && vendorRecord.VendorRelatedInfo != undefined) {
+                                                            
+                           //if (vendorRecord.length > 0) {
+                                $scope.vendorInfo.VendorDetailRec = vendorRecord.VendorDetailRec;
+                                $scope.vendorInfo.VendorRelatedInfo = vendorRecord.VendorRelatedInfo;
+                                //alert("email  : "+ $scope.vendorInfo.VendorDetailRec.WorkEmail);
+                                debug("$scope.vendorInfo.VendorDetailRec : "+$scope.vendorInfo.VendorDetailRec);
+                                
+                                if ($scope.vendorInfo.VendorDetailRec.PreferredPhone == "") {
+                                    if ($scope.vendorInfo.VendorDetailRec.HomeNumber != "") {
+                                        $scope.vendorInfo.VendorDetailRec.PreferredPhone = $scope.vendorInfo.VendorDetailRec.HomeNumber;
+                                    } else if ($scope.vendorInfo.VendorDetailRec.WorkNumber != "") {
+                                        $scope.vendorInfo.VendorDetailRec.PreferredPhone = $scope.vendorInfo.VendorDetailRec.WorkNumber;
+                                    } else if ($scope.vendorInfo.VendorDetailRec.Mobile != "") {
+                                        $scope.vendorInfo.VendorDetailRec.PreferredPhone = $scope.vendorInfo.VendorDetailRec.Mobile;
+                                    }
+                                }
+                                if ($scope.vendorInfo.VendorDetailRec.PreferredEmail == "") {
+                                    if ($scope.vendorInfo.VendorDetailRec.HomeEmail != "") {
+                                        $scope.vendorInfo.VendorDetailRec.PreferredEmail = $scope.vendorInfo.VendorDetailRec.HomeEmail;
+                                    } else if ($scope.vendorInfo.VendorDetailRec.WorkEmail != "") {
+                                        $scope.vendorInfo.VendorDetailRec.PreferredEmail = $scope.vendorInfo.VendorDetailRec.WorkEmail;
+                                    } else if ($scope.vendorInfo.VendorDetailRec.OtherEmail != "") {
+                                        $scope.vendorInfo.VendorDetailRec.PreferredEmail = $scope.vendorInfo.VendorDetailRec.OtherEmail;
+                                    }
+                                }
+        
+                                /* $scope.vendorInfo.VendorOverlay = [{
+                                        label : 'Name',
+                                        value : $scope.vendorInfo.VendorDetailRec.VendorName
+                                    }, {
+                                        label : 'Phone Primary',
+                                        value : $scope.vendorInfo.VendorDetailRec.PreferredPhone
+                                    }, {
+                                        label : 'Phone Alt',
+                                        value : $scope.vendorInfo.VendorDetailRec.Mobile
+                                    }, {
+                                        label : 'Email',
+                                        value : $scope.vendorInfo.VendorDetailRec.PreferredEmail
+                                    }, {
+                                        label : 'Address',
+                                        value : $scope.vendorInfo.VendorDetailRec.BillingStreet1 + ' ' +$scope.vendorInfo.VendorDetailRec.BillingStreet2 +' ' +
+                                        $scope.vendorInfo.VendorDetailRec.BillingCity
+                                    }
+                                ]; */
+                            }
+                                
+                            
+                        }, function(errorSearchResult) {
+                            //$scope.VORModel.OverlayInfo = errorSearchResult;
+                        });
+                    }
+             });
+     
+      vendorInfo.service("VendorInfoService", function ($q) {
+            this.getVendorInfo = function(vendorId)
+            {   
+            	vendorId = encodeString(vendorId);
+            	
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.ViewVendorCtrl.getVendorInfo}',
+                        vendorId,
+                    function (result, event) {
+                       if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var vendorInfo = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            vendorInfo = vendorInfo.replace(re, '');
+                            deferred.resolve(JSON.parse(vendorInfo));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+            }
+        });
+        </script>
+        <div class="Vendor-info-overlay Vendor-info-flyout" id="Vendor-info-flyout" ng-controller="vendorInfoCtrl">
+        <div id="loading" class="PopupPanel" ng-show="vendorInfo.VendorDetailRec.length == 0">
+                            <table border="0" bordercolor="red" width="100%" height="100%">
+                                
+                                <tr>
+                                    <td valign="center" align="center">
+                                        <div id="preloader_1"> 
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                       </div> 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="loadingText"><b>{!$Label.Label_Loading}...</b></td>
+                                </tr>
+                            </table>
+                        </div>
+                       <div ng-show="vendorInfo.VendorDetailRec.length != 0">
+                            <div class="row overlay-header">
+                           
+                                <div class="col-md-3">
+                                    <img src="{!URLFOR($Resource.UserImage, 'profile-pic.jpg')}" style="height:120px; width:100%;"/>
+                                </div>
+                                 <div class="col-md-6 customer-name">
+                                     
+                                     <Strong class="T1 ng-binding">{{vendorInfo.VendorDetailRec.VendorName}}</Strong>
+                               <p class="T7"> <!-- "bob" --></p>
+                                <div style="float:left;background-color: #373c40; border-radius: 5px; padding: 1px; margin-right: 5px;">
+                                <img    src="{!URLFOR($Resource.Images, 'star.png')}" style="height:35px; width:35px; padding: 5px;" />
+                                </div>
+                                <p class="T7" style="margin-left:20px;padding-top:10px ;padding-left:24px"> {!$Label.Label_Gamification}</p>
+                                     
+                                     
+                                </div>
+                                   <div class="savecancle_btncntnr pull-right">
+                                   
+                                    <a class="btn btn-default grayBtn" href="{!$Page.NewViewVendor}?id={{vendorInfo.VendorRelatedInfo.POTypes[0].VendorId}}" target="_blank" >{!$Label.View_Label}</a>
+                                    <button class="btn btn-default grayBtn closeBtn" type="button"><i class="fa fa-times"></i></button>
+                                    
+                                </div>
+                                <div class="customerInfoLine"></div>
+                            <div class="ng-scope col-md-12 customerInfoPL0 "  ng-class-even="'C1'"> 
+                             <div class="col-md-12 P12 customerInfoPL0">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">{!$Label.Label_Name}</strong>
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope" ng-if="vendorInfo.VendorDetailRec.VendorName != '' || vendorInfo.VendorDetailRec.VendorName != undefined">
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.VendorName}}</span>
+                                    </div>
+                                    <div class="form-label italic col-lg-6 col-md-6" ng-if="vendorInfo.VendorDetailRec.VendorName == '' || vendorInfo.VendorDetailRec.VendorName == undefined">
+                                        <span>({!$Label.Label_None})</span>
+                                    </div>
+                                 </div>
+                            <div class="col-md-12 P12 customerInfoPL0" ng-if="vendorInfo.VendorDetailRec.WorkNumber != '' || vendorInfo.VendorDetailRec.WorkNumber != undefined">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">{!$Label.Label_Phone_Primary}</strong>
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope" >
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.WorkNumber}}</span>
+                                    </div>
+                                    <div class="form-label italic col-lg-6 col-md-6" ng-if="vendorInfo.VendorDetailRec.WorkNumber == '' || vendorInfo.VendorDetailRec.WorkNumber == undefined">
+                                        <span>({!$Label.Label_None})</span>
+                                    </div>
+                           </div>
+                           <div class="col-md-12 P12 customerInfoPL0" ng-if="vendorInfo.VendorDetailRec.OtherPhone != '' || vendorInfo.VendorDetailRec.OtherPhone != undefined">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">Phone Other</strong>
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope" >
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.OtherPhone}}</span>
+                                    </div>
+                                    <div class="form-label italic col-lg-6 col-md-6" ng-if="vendorInfo.VendorDetailRec.OtherPhone == '' || vendorInfo.VendorDetailRec.OtherPhone == undefined">
+                                        <span>({!$Label.Label_None})</span>
+                                    </div>
+                           </div>
+                           <div class="col-md-12 P12 customerInfoPL0"  ng-if="vendorInfo.VendorDetailRec.WorkEmail != '' || vendorInfo.VendorDetailRec.WorkEmail != undefined">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">{!$Label.Label_Email}</strong>  
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope">
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.WorkEmail}}</span>
+                                    </div>
+                                    <div class="form-label italic col-lg-6 col-md-6" ng-if="vendorInfo.VendorDetailRec.WorkEmail == '' || vendorInfo.VendorDetailRec.WorkEmail == undefined">
+                                        <span>({!$Label.Label_None})</span>
+                                    </div>
+                          </div>
+                          <div class="col-md-12 P12 customerInfoPL0"  ng-if="vendorInfo.VendorDetailRec.OtherEmail != '' || vendorInfo.VendorDetailRec.OtherEmail != undefined">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">Other Email</strong>  
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope">
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.OtherEmail}}</span>
+                                    </div>
+                                    <div class="form-label italic col-lg-6 col-md-6" ng-if="vendorInfo.VendorDetailRec.OtherEmail == '' || vendorInfo.VendorDetailRec.OtherEmail == undefined">
+                                        <span>({!$Label.Label_None})</span>
+                                    </div>
+                          </div>
+                          <div class="col-md-12 P12 customerInfoPL0" ng-if = "vendorInfo.VendorDetailRec.BillingStreet1!= '' || vendorInfo.VendorDetailRec.BillingStreet2 != '' || vendorInfo.VendorDetailRec.BillingStreet3!= ''">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">{!$Label.Label_Address}</strong>
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope">
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.BillingStreet1}}, {{vendorInfo.VendorDetailRec.BillingStreet2}}, {{vendorInfo.VendorDetailRec.BillingCity}}</span>
+                                    </div>
+                          </div>
+                            <div class="col-md-12 P12 customerInfoPL0" ng-if = "vendorInfo.VendorDetailRec.BillingCity!= '' || vendorInfo.VendorDetailRec.BillingState != '' || vendorInfo.VendorDetailRec.BillingCountry!= ''">
+                                    <div class="col-md-5 form-label">
+                                        <strong class="ng-binding T3">Address1</strong>
+                                    </div>
+                                    <div class="form-label col-lg-6 col-md-6 ng-scope">
+                                        <span class="ng-binding T7">{{vendorInfo.VendorDetailRec.BillingState}}, {{vendorInfo.VendorDetailRec.BillingCountry}}</span>
+                                    </div>
+                          </div>
+                                     
+                    </div>       
+                        </div>    
+                    </div>   
+        </div>
+</apex:component>

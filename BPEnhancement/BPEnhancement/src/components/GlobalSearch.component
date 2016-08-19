@@ -1,0 +1,512 @@
+<apex:component Controller="GlobalSearchCtrl">
+	<style>
+		.globalSearchKeyword	{
+			padding-left: 30px;
+		}
+		
+		.left-addon input.anguinputGlobalSearchStr	{
+			width: 100%;
+		}
+		
+		.left-addon input.globalSearchStr	{
+			padding-left: 0px;
+			width: 80%;
+		}
+		
+		.globalSearchKeywordSuggestions	{
+			width: 100%;
+		}
+		
+		.divObjectName	{
+			text-align: right;
+		}
+	</style>
+	<script>
+		var globalSearchModule = angular.module('globalSearchModule', []);
+		
+		globalSearchModule.factory('globalSearchservice', function ($q) {
+		
+			return {
+	            getGlobalSearchResult : function (globalSearchQueryJson) {
+					globalSearchQueryJson = encodeString(globalSearchQueryJson);
+					var deferred = $q.defer();
+	                // make AJAX request to the remote service
+	                Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.GlobalSearchCtrl.getGlobalSearchResults}' ,globalSearchQueryJson, 
+	                function (result, event) {
+	                    if (event.type == 'exception') {
+	                       	deferred.reject(event.message);
+	                    } else {
+	                    	//debug("global  search result")
+	                    	//debug(result)
+	                        var responseData = decodeString(result);
+	                        debug("global  search responseData")
+	                    	debug(responseData)
+	                        var find = '\'';
+	                        var re = new RegExp(find, 'g');
+	                        responseData = responseData.replace(re, '');
+	                        if(responseData != ''){
+	                        	deferred.resolve(JSON.parse(responseData));
+	                        } else {
+	                        	deferred.resolve(responseData);
+	                        }
+	                    }
+	                }, {
+	                    escape : true
+	                });
+	                return deferred.promise;
+	            }
+	        }
+        
+	        /* return {
+	            getGlobalSearchResult : function () {
+	                var resultRow = [
+								{
+	                                title : "title1",
+	                                originalObject : "originalObject1",
+	                                info: "info1"
+	                            },
+	                            {
+	                                title : "title2",
+	                                originalObject : "originalObject2",
+	                                info: "info2"
+	                            },
+	                            {
+	                                title : "title3",
+	                                originalObject : "originalObject3",
+	                                info: "info3"
+	                            },
+	                            {
+	                                title : "title4",
+	                                originalObject : "originalObject4",
+	                                info: "info4"
+	                            },
+	                            {
+	                                title : "title5",
+	                                originalObject : "originalObject5",
+	                                info: "info5"
+	                            }
+	                        ];
+	                return resultRow;
+	            }
+	        } */
+	    });
+	    
+		globalSearchModule.controller('globalSearchController', function ($scope, $timeout, globalSearchservice, $document) {
+			$document.click(function(e) {
+
+			   // check that your clicked
+			   // element has no id=globalSearchElement
+			   // and is not child of globalSearchElement
+			   if (e.target.id != 'globalSearchElement')	{
+			       $scope.globalSearchModal.hideTimer = $timeout(function () {
+	                        $scope.globalSearchModal.showDropdown = false;
+				           	$scope.globalSearchModal.results = [];
+	               }, $scope.pause);
+			   }
+			});
+			
+			$scope.$on('searchIconClickEvent', function (event, args) {
+				$scope.globalSearchModal.showDropdown = false;
+	            $scope.globalSearchModal.results = [];
+	            $scope.globalSearchModal.globalSearchStr = "";
+	            $scope.globalSearchModal.keywordValue = "";
+			});
+		
+	        $scope.globalSearchModal = {};
+	        $scope.globalSearchModal.lastSearchTerm = null;
+	        $scope.globalSearchModal.currentIndex = null;
+	        $scope.globalSearchModal.searchTimer = null;
+	        $scope.globalSearchModal.searching = false;
+	        $scope.globalSearchModal.pause = 500;
+	        $scope.globalSearchModal.minLength = 3;
+	        $scope.globalSearchModal.globalSearchStr = null;
+	        $scope.globalSearchModal.keywordValue = "";
+	        $scope.globalSearchModal.isKeyword = false;
+	        var isGlobalSearchStrBlank = "";
+	        $scope.globalSearchModal.keywordsList = [
+	        					"User",
+								"Customer",
+								"Merchandise",
+								"Labor",
+								"Vendor",
+								"CO",
+								"CI",
+								"Invoice",
+								"Service",
+								"Deal",
+								"Unit",
+								"COU",
+								"Stock",
+								"VO",
+								"VOU",
+								"VR",
+								"VI",
+								"Fee",
+								"Sublet",
+								"Tax",
+								"Kit",
+								"SKit",
+								"Category"   					
+							];
+			
+			
+			$scope.globalSearchModal.isNewSearchNeeded = function (newTerm, oldTerm) {
+	            return newTerm.length >= $scope.globalSearchModal.minLength && newTerm != oldTerm
+	        }
+	        
+	         $scope.globalSearchModal.GetIntialdata = function () {
+	         	if ($scope.globalSearchModal.hideTimer) {
+                    $timeout.cancel($scope.hideTimer);
+                } 
+	            if (!$scope.globalSearchModal.globalSearchStr) {
+	                $scope.globalSearchModal.globalSearchStr = null;
+	            }
+	        }
+	        
+        	$scope.globalSearchModal.processResults = function (responseData) {
+        		debug("responseData..........................................");
+	        	debug(responseData);
+	        	debug(responseData.length);
+	            if (responseData && responseData.length > 0) {
+	           		debug("responseData");
+	                $scope.globalSearchModal.results = [];
+	               	
+	               	for (var i = 0; i < responseData.length; i++) {
+	                    // Get title variables
+	                   //debug("......................................................id= "+responseData[i].Id)
+	                   // debug("......................................................responseData[i].Name= "+responseData[i].Name)
+	                    var resultRow = {
+	                    	Id: responseData[i].Id,
+	                        Type : responseData[i].Type,
+	                        ItemName : responseData[i].ItemName,
+	                        AdditionalInfo1: responseData[i].AdditionalInfo1,
+	                        AdditionalInfo2: responseData[i].AdditionalInfo2,
+	                        ObjectName: responseData[i].ObjectName
+	                    }
+	                    
+	                   
+                                                                                                
+                                                                                                
+	                    $scope.globalSearchModal.results[$scope.globalSearchModal.results.length] = resultRow;
+	                }
+				} /* else {
+					debug("responseData   else");
+					$scope.globalSearchModal.results = ["No Results Found"];
+				} */
+	        }
+    
+    		$scope.globalSearchModal.searchTimerComplete = function (str) {
+	            if (str != null) {
+	                if (str.length >= $scope.globalSearchModal.minLength) {
+	                    $scope.globalSearchModal.SearchSuggestion(str);
+	                }
+	            } else {
+	                $scope.globalSearchModal.SearchSuggestion("");
+	            }
+	        }
+	        
+	        $scope.globalSearchModal.SearchSuggestion = function (str) {
+	            //var responseData = [];
+	    		  
+	    		var globalSearchQueryJson = {
+							                "GlobalSearchText" : str,
+							                "GlobalSearchKeyword" : $scope.globalSearchModal.keywordValue
+							           }
+	            globalSearchQueryJson = JSON.stringify(globalSearchQueryJson);
+	            var responseData = "";
+	    
+	            globalSearchservice.getGlobalSearchResult(globalSearchQueryJson)
+	            .then(function (successfulGlobalSearchResult) {
+	                responseData = successfulGlobalSearchResult.searchRecords;
+	                $scope.globalSearchModal.searching = false;
+	                $scope.globalSearchModal.processResults((($scope.dataField) ? responseData[$scope.dataField] : responseData));
+	            },
+	            function (errorSearchResult) {
+	                responseData = errorSearchResult;
+	                $scope.globalSearchModal.searching = false;
+	            }); 
+            
+            
+	          //  var responseData = globalSearchservice.getGlobalSearchResult(str, $scope.globalSearchModal.keywordValue);
+	          //  $scope.globalSearchModal.processResults(responseData);
+	            /* .then(function (successfulSearchResult) {
+	                responseData = successfulSearchResult;
+	                $scope.searching = false;
+	                $scope.processResults((($scope.dataField) ? responseData[$scope.dataField] : responseData));
+	            },
+	            function (errorSearchResult) {
+	                responseData = errorSearchResult;
+	                $scope.searching = false;
+	            }); */
+	          //  $scope.globalSearchModal.searching = false;
+	          //  $scope.globalSearchModal.processResults(responseData);
+        	}
+        	$scope.globalSearchModal.checkIsKeyword = function(str) {
+        		var lastCharacter = str.substr(str.length - 1);
+        		if(lastCharacter === ":") {
+        			var tempStr = str.slice(0,(str.length - 1));
+        			
+        			
+        			if(($scope.globalSearchModal.keywordsList).indexOf(tempStr) >= 0) {
+        				$scope.globalSearchModal.isKeyword = true;
+        				$scope.globalSearchModal.keywordValue = tempStr;
+        				$scope.globalSearchModal.globalSearchStr = "";
+        				$scope.globalSearchModal.showDropdown = false;
+			            $scope.globalSearchModal.results = [];
+        				
+        			}
+        			else {
+        				$scope.globalSearchModal.isKeyword = false;
+        			}
+        			
+        		}
+        	}
+        	$scope.globalSearchModal.keyPressed = function (event) {
+        		if(isGlobalSearchStrBlank == "" && event.which == 8) {
+        			$scope.globalSearchModal.isKeyword = false;
+        			$scope.globalSearchModal.keywordValue = "";
+        		}
+	            if (!(event.which == 38 || event.which == 40 || event.which == 13)) {
+	                if (!$scope.globalSearchModal.globalSearchStr || $scope.globalSearchModal.globalSearchStr == "") {
+	                	isGlobalSearchStrBlank = $scope.globalSearchModal.globalSearchStr;
+	                    $scope.globalSearchModal.showDropdown = false;
+	                    $scope.globalSearchModal.lastSearchTerm = null
+	                } else if ($scope.globalSearchModal.isNewSearchNeeded($scope.globalSearchModal.globalSearchStr, $scope.globalSearchModal.lastSearchTerm)) {
+	                	
+	                	isGlobalSearchStrBlank = $scope.globalSearchModal.globalSearchStr;
+	                    $scope.globalSearchModal.lastSearchTerm = $scope.globalSearchModal.globalSearchStr;
+	                    $scope.globalSearchModal.showDropdown = true;
+	                    $scope.globalSearchModal.currentIndex = -1;
+	                    $scope.globalSearchModal.results = [];
+	                    $scope.globalSearchModal.checkIsKeyword($scope.globalSearchModal.globalSearchStr);
+	    
+	                    if ($scope.globalSearchModal.searchTimer) {
+	                        $timeout.cancel($scope.globalSearchModal.searchTimer);
+	                    }
+	                    $scope.globalSearchModal.searching = true;
+	    
+	                    $scope.globalSearchModal.searchTimer = $timeout(function () {
+	                            $scope.globalSearchModal.searchTimerComplete($scope.globalSearchModal.globalSearchStr);
+	                        }, $scope.globalSearchModal.pause);
+	                } else {
+	                	isGlobalSearchStrBlank = $scope.globalSearchModal.globalSearchStr;
+	                	$scope.globalSearchModal.checkIsKeyword($scope.globalSearchModal.globalSearchStr);
+	                }
+	            } else {
+	            	
+	            	
+	            	//$scope.globalSearchModal.checkIsKeyword($scope.globalSearchStr);
+	                event.preventDefault();
+	            }
+       		}
+	        
+	        var inputField = angular.element('#globalSearchStrInput');
+        	inputField.on('keyup', $scope.globalSearchModal.keyPressed);
+			/* var resultRow = [
+								{
+	                                title : "title1",
+	                                originalObject : "originalObject1",
+	                                info: "info1"
+	                            },
+	                            {
+	                                title : "title2",
+	                                originalObject : "originalObject2",
+	                                info: "info2"
+	                            },
+	                            {
+	                                title : "title3",
+	                                originalObject : "originalObject3",
+	                                info: "info3"
+	                            },
+	                            {
+	                                title : "title4",
+	                                originalObject : "originalObject4",
+	                                info: "info4"
+	                            },
+	                            {
+	                                title : "title5",
+	                                originalObject : "originalObject5",
+	                                info: "info5"
+	                            }
+	                        ]; */
+                            
+			angular.element('#globalSearchElement').on("keyup", function (event) {
+	            if (event.which === 40) {
+	                if ($scope.globalSearchModal.results && ($scope.globalSearchModal.currentIndex + 1) < $scope.globalSearchModal.results.length) {
+	                    $scope.globalSearchModal.currentIndex++;
+	                    $scope.$apply();
+	    
+	                    var inputFieldEle = angular.element('.angucomplete-row');
+	                    inputFieldEle.removeClass('angucomplete-selected-rowHover');
+	    
+	                    event.preventDefault;
+	                    event.stopPropagation();
+	                }
+	                $scope.$apply();
+	            } else if (event.which == 38) {
+	                if ($scope.globalSearchModal.currentIndex >= 1) {
+	                    $scope.globalSearchModal.currentIndex--;
+	                    var inputtextField = angular.element('#globalSearchStrInput');
+	                    
+	                    $scope.$apply();
+	                    event.preventDefault;
+	                    event.stopPropagation();
+	                }
+	            } else if (event.which == 13) {
+	                if ($scope.globalSearchModal.results && $scope.globalSearchModal.currentIndex >= 0 && $scope.globalSearchModal.currentIndex < $scope.globalSearchModal.results.length) {
+	                    $scope.globalSearchModal.selectResult($scope.globalSearchModal.results[$scope.globalSearchModal.currentIndex]);
+	                    //$scope.SaveMerchandiseSearchSource();
+	    
+	                    $scope.$apply();
+	                    event.preventDefault;
+	                    event.stopPropagation();
+	                } else {
+	                    $scope.globalSearchModal.showDropdown = true;
+	                    event.preventDefault;
+	                    event.stopPropagation();
+	                }
+	            } else if (event.which == 27) {
+	                $scope.globalSearchModal.results = [];
+	                $scope.globalSearchModal.showDropdown = false;
+	                $scope.$apply();
+	            } else if (event.which == 8) {
+	                if (($scope.globalSearchModal.lastSearchTerm == null || $scope.globalSearchModal.lastSearchTerm == "") && ($scope.globalSearchModal.testScopeVar == "0")) {
+	                    $scope.globalSearchModal.testScopeVar = 1;
+	                } else if (($scope.globalSearchModal.lastSearchTerm == null || $scope.globalSearchModal.lastSearchTerm == "") && ($scope.globalSearchModal.testScopeVar == "1")) {
+	                    $scope.globalSearchModal.testScopeVar = 0;
+	                }
+	                //$scope.selectedObject = null;
+	                $scope.$apply();
+	            }
+	        });
+	        	
+			$scope.globalSearchModal.selectResult = function (result) {
+				debug("!$Page.newViewCustomer.................................")
+				$scope.globalSearchModal.showDropdown = false;
+	            $scope.globalSearchModal.results = [];
+	            $scope.globalSearchModal.globalSearchStr = "";
+	            $scope.globalSearchModal.keywordValue = "";
+	            if(result.Type == 1)	{
+	            	debug("!$Page.newViewCustomer")
+	            	window.open("{!$Page.newViewCustomer}?id="+result.Id);
+	            } else if(result.Type == 2)	{
+	            	debug("!$Page.NewViewVendor")
+	            	window.open("{!$Page.NewViewVendor}?id="+result.Id);
+	            } else if(result.Type == 3)	{
+	            	debug("!$Page.newviewPart")
+	            	window.open("{!$Page.newviewPart}?id="+result.Id);
+	            } else if(result.Type == 4)	{
+	            	debug("!$Page.viewKit")
+	            	window.open("{!$Page.viewKit}?id="+result.Id);
+	            } else if(result.Type == 5)	{
+	            	debug("!$Page.viewFee")
+	            	window.open("{!$Page.viewFee}?id="+result.Id);
+	            } else if(result.Type == 6)	{
+	            	debug("!$Page.viewLabour")
+	            	window.open("{!$Page.viewLabour}?id="+result.Id);
+	            } else if(result.Type == 7)	{
+	            	//debug("!$Page.viewFee")
+	            	//window.open("{!$Page.newViewCustomer}?id="+feeInfo.FeeRec.Id);
+	            } else if(result.Type == 8)	{
+	            	debug("!$Page.NewCustomerOrder")
+	            	window.open("{!$Page.NewCustomerOrder}?id="+result.Id);
+	            } else if(result.Type == 9)	{
+	            	debug("!$Page.NewCustomerOrder")
+	            	window.open("{!$Page.NewCustomerOrder}?id="+result.Id);
+	            } else if(result.Type == 10)	{
+	            	debug("!$Page.NewVendorOrder")
+	            	window.open("{!$Page.NewVendorOrder}?id="+result.Id);
+	            } else if(result.Type == 11)	{
+	            	debug("!$Page.NewVendorOrderReceiving")
+	            	window.open("{!$Page.NewVendorOrderReceiving}?id="+result.Id);
+	            } else if(result.Type == 12)	{
+	            	debug("!$Page.NewVendorOrderInvoicing")
+	            	window.open("{!$Page.NewVendorOrderInvoicing}?id="+result.Id);
+	            } else if(result.Type == 13)	{
+	            	debug("!$Page.BlackPurlHome")
+	            	window.open("{!$Page.BlackPurlHome}?pageName=CategoryMgmt");
+	            } else if(result.Type == 14)	{
+	            	debug("!$Page.BlackPurlHome")
+	            	window.open("{!$Page.BlackPurlHome}?pageName=SystemSettings");
+	            } else if(result.Type == 15)	{
+	            	debug("!$Page.BlackPurlHome")
+	            	window.open("{!$Page.BlackPurlHome}?pageName=SystemSettings");
+	            } else if(result.Type == 16)	{
+	            	//debug("!$Page.viewFee")
+	            	//window.open("{!$Page.newViewCustomer}?id="+feeInfo.FeeRec.Id);
+	            } else if(result.Type == 17)	{
+	            	debug("!$Page.newCustomerOrder")
+	            	window.open("{!$Page.newCustomerOrder}?id="+result.Id);
+	            } 
+	        }
+	        
+	        /* $scope.globalSearchModal.hideDropdown = function(){
+	        	debug("hide dropdown-----------------------------------")
+	        	var isItemClicked = false;
+	        	angular.element("#globalSearchSelectedResult").click(function () {
+	        		debug("isItemClicked")
+	        		isItemClicked = true;
+	        	});
+	        	
+	        	if(isItemClicked == false)	{
+	        		debug("isItemClicked not")
+	        		$scope.globalSearchModal.hideTimer = $timeout(function () {
+                        $scope.globalSearchModal.showDropdown = false;
+			           	$scope.globalSearchModal.results = [];
+                    }, $scope.pause);
+	        	} else	{
+	        		debug("isItemClicked 1")
+	        	}
+	        	
+	        }*/
+	        
+	       
+        
+		}); 
+		
+		
+		
+		/* $(document).click(function(e) {
+
+		   // check that your clicked
+		   // element has no id=globalSearchElement
+		   // and is not child of globalSearchElement
+		   if (e.target.id != 'globalSearchElement')	{
+		       $scope.globalSearchModal.hideTimer = $timeout(function () {
+                        $scope.globalSearchModal.showDropdown = false;
+			           	$scope.globalSearchModal.results = [];
+               }, $scope.pause);
+		   }
+		}); */
+	</script>
+	<div class="angucomplete-holder" ng-controller="globalSearchController" id="globalSearchElement" >
+		<div class="form-control form-control-small">  
+			<span ng-if="globalSearchModal.isKeyword" ng-class="{'globalSearchKeyword': globalSearchModal.keywordValue}">{{ globalSearchModal.keywordValue }}:</span>
+            <input ng-class="{'globalSearchStr': globalSearchModal.keywordValue}" id="globalSearchStrInput" ng-model="globalSearchModal.globalSearchStr" class="anguinput anguinputGlobalSearchStr"   
+            	ng-focus="globalSearchModal.GetIntialdata()"  type="text" placeholder="Global Search Related" onclick="this.select();" 
+            	/><!-- ng-blur="globalSearchModal.hideDropdown()" -->
+        </div>    
+        
+        <div id="globalSearchStrInputSuggestions" class="angucomplete-dropdown globalSearchKeywordSuggestions" ng-if="globalSearchModal.showDropdown">
+        	<div class="angucomplete-searching" ng-show="globalSearchModal.searching">Searching...</div>
+        	
+        	<div class="angucomplete-searching" ng-show="!globalSearchModal.searching && (!globalSearchModal.results || globalSearchModal.results.length == 0)">No results found</div>
+        	
+        	
+        	<div  class="angucomplete-row" ng-repeat="result in globalSearchModal.results" id="globalSearchSelectedResult" ng-click="globalSearchModal.selectResult(result)" 
+                 ng-class="{'angucomplete-selected-row': $index == globalSearchModal.currentIndex}"
+                 ng-if="globalSearchModal.results.length > 0"><!-- ng-mouseover="globalSearchModal.hoverRow($index)" -->
+                <div id="SearchResult_{{$index}}" class="angucomplete-title titlestyle" >
+                	<div class="row">
+		               	<div class="col-md-6">{{result.ItemName}}</div> 
+		                <div class="col-md-6 divObjectName">> {{result.ObjectName}}</div>
+	                </div>
+	                <div class="row">
+	                	<div class="col-md-6" ng-if="result.AdditionalInfo1">({{result.AdditionalInfo1}})</div>
+	                	<div class="col-md-6" ng-if="result.AdditionalInfo2">({{result.AdditionalInfo2}})</div>
+                	</div>
+                </div>
+            </div>
+        </div>   
+	</div>
+</apex:component>

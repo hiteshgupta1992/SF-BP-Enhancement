@@ -1,0 +1,21 @@
+<apex:page showHeader="false" sidebar="false">
+<html>
+<head>
+    <title>Search Results</title>
+
+</head>
+<body>
+    <chatter:feed entityId="{!$CurrentPage.parameters.Id}"/>
+</body>
+<style type="text/css">
+.cxfeedinnerwrapper,.publishercontainer {
+    background: #F5F5F7;
+    padding: 10px 20px;
+}
+#richTextPlaceholderInput{
+    width: 76%;
+}
+    
+</style>    
+</html>
+</apex:page>

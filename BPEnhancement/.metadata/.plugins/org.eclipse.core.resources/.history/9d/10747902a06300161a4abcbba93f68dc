@@ -1,0 +1,127 @@
+<apex:page controller="BlackPurlContentCtrl" 
+            showHeader="false" sidebar="false" tabStyle="Sales_Tax__c">
+    
+    
+    <apex:form >
+        <script>
+            function removeRemotingError(){
+				$("[id$='oncomplete']").remove();
+            }
+        </script>
+        <!-- Action Functions -->
+        <apex:actionFunction name="initDisplaySWSSTPContent" action="{!initDisplaySWSContent}" rerender="refeshScriptPanel2,salesTaxesPanel,refeshScriptPanel" onComplete="removeRemotingError();stopLoading('ContentLoading');">
+            <apex:param name="selectedSWSLink" assignTo="{!selectedSWSLink}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="initDisplayPLPSWSContent" action="{!initDisplaySWSContent}" rerender="refeshScriptPanel2,priveLevelsPanel,refeshScriptPanel" onComplete="removeRemotingError();stopLoading('ContentLoading');">
+            <apex:param name="selectedSWSLink" assignTo="{!selectedSWSLink}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="initDisplaySWSCPContent" action="{!initDisplaySWSContent}" rerender="refeshScriptPanel2,countryStatesPanel,refeshScriptPanel" onComplete="removeRemotingError();stopLoading('ContentLoading');">
+            <apex:param name="selectedSWSLink" assignTo="{!selectedSWSLink}" value="" />
+        </apex:actionFunction>
+        <apex:actionFunction name="refreshSTComponent" reRender="salesTaxesPanel,refeshScriptPanel2" />
+        <apex:actionFunction name="refreshPLComponent" reRender="priveLevelsPanel,refeshScriptPanel2" />
+        <apex:actionFunction name="refreshCComponent" reRender="countryStatesPanel,refeshScriptPanel2" />
+        
+        <!-- System Wide Settings: Contents -->
+        <apex:outputPanel id="systemWideSettingsContent" styleClass="collapsePanel">
+            <div id="systemWideSettingsDiv" >
+                <!-- Sales Taxes -->
+                <h3 class='{!IF(displaySalesTaxes, "open", "close")}'>{!$Label.SystemWideSetting_SalesTaxesLabel}</h3>
+                <div><apex:outputPanel id="salesTaxesPanel" rendered="{!AND(isUserHasPermissionToAccessSalesTax, isUserHasPermissionToAccessSalesTaxItem)}">
+                    <apex:outputPanel id="salesTaxesPB" rendered="{!displaySalesTaxes}">
+                        <c:SalesTaxesList uniqueId="SalesTaxes_"/>
+                    </apex:outputPanel>
+                </apex:outputPanel></div>
+                
+                 <!-- Price Levels -->
+                <h3 class='{!IF(displayPriceLevels, "open", "close")}'>{!$Label.SystemWideSetting_PriceLevelsLabel}</h3>
+                <div><apex:outputPanel id="priveLevelsPanel" rendered="{!isUserHasPermissionToAccessPriceLevel}">
+                    <apex:outputPanel id="priceLevelPB" rendered="{!displayPriceLevels}">
+                        <c:PriceLevelsList uniqueId="PriceLevels_"/>
+                    </apex:outputPanel>
+                </apex:outputPanel></div>
+                
+                <!-- Country/State -->
+                <h3 class='{!IF(displayPriceLevels, "open", "close")}'>{!$Label.SystemWideSetting_CountryLabel}</h3>
+                <div><apex:outputPanel id="countryStatesPanel" rendered="{!isUserHasPermissionToAccessCountry}">
+                    <apex:outputPanel id="countryStatePB" rendered="{!displayCountries}">
+                        <c:CountriesList uniqueId="Countries_"/>
+                    </apex:outputPanel>
+                </apex:outputPanel></div>
+            </div>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="refeshScriptPanel">
+            <script>
+                function bindClickEvent(elem){
+                    
+                    
+                    startLoading("ContentLoading");
+                    var selectedSWSLink = elem.text;
+                    
+                    // Check if to process ajax
+                    var loadAJAX = true;
+                    if(selectedSWSLink == "{!JSENCODE($Label.SystemWideSetting_SalesTaxesLabel)}"){
+                        loadAJAX = !{!displaySalesTaxes};
+                        if(loadAJAX){
+                            initDisplaySWSSTPContent(selectedSWSLink);
+                        }else{
+                            stopLoading("ContentLoading");
+                        }
+                    }else if(selectedSWSLink == "{!JSENCODE($Label.SystemWideSetting_PriceLevelsLabel)}"){
+                        loadAJAX = !{!displayPriceLevels};
+                        if(loadAJAX){
+                        
+                            initDisplayPLPSWSContent(selectedSWSLink);
+                        }else{
+                            stopLoading("ContentLoading");
+                        }
+                        
+                    }else if(selectedSWSLink == "{!JSENCODE($Label.SystemWideSetting_CountryLabel)}"){
+                        loadAJAX = !{!displayCountries};
+                        if(loadAJAX){
+                        	initDisplaySWSCPContent(selectedSWSLink);
+                        }else{
+                            stopLoading("ContentLoading");
+                        }
+                        
+                    }
+                    
+                    
+                }
+            </script>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="refeshScriptPanel2">
+            <script>
+                removeRemotingError();
+            </script>
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="doNotRefeshScriptPanel">
+            <script>
+                $(document).ready(function () {
+                    
+                    $("#systemWideSettingsDiv").collapse({
+                        show: function() {
+                            // The context of "this" is applied to
+                            // the collapsed details in a jQuery wrapper 
+                            this.slideDown(100);
+                        },
+                        hide: function() {
+                            this.slideUp(100);
+                        },
+                        accordion: false,
+                        persist: false
+                    });
+                    
+                    $( ".collapsePanel #systemWideSettingsDiv h3 a" ).bind( "click", function() {
+                        bindClickEvent(this);
+                    });
+                });
+                
+            </script>
+        </apex:outputPanel>
+        
+    </apex:form>
+</apex:page>

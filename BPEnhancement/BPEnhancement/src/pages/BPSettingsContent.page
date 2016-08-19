@@ -1,0 +1,109 @@
+<!-- Content page for BlackPurl Settings page. -->
+<apex:page controller="BlackPurlContentCtrl" id="BlackPurlContentPage"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+	
+	<script>
+		// A map which define short texts for top level links name for quick processing purpose
+		var shortTextMap = {"SWS" : "System_Wide_Settings",
+							"DDC" : "Defaults_&_Customization",
+							"T" : "Tools",
+							"SP" : "Security_&_Permissions"
+							};
+	</script>
+	
+	
+	<apex:form >
+		<!-- Action Functions -->
+		<apex:actionFunction name="setDisplaySystemWideSettings" action="{!setDisplaySystemWideSettings}" rerender="contentPanel,refeshScriptPanel" />
+		<apex:actionFunction name="setDisplayDefaultsANDCustomization" action="{!setDisplayDefaultsANDCustomization}" rerender="contentPanel,refeshScriptPanel" />
+		<apex:actionFunction name="setDisplayTools" action="{!setDisplayTools}" rerender="contentPanel,refeshScriptPanel" />
+		<apex:actionFunction name="setDisplaySecurityANDPermission" action="{!setDisplaySecurityANDPermission}" rerender="contentPanel,refeshScriptPanel" />
+		
+		<apex:outputPanel id="contentPanel2">
+			<apex:outputPanel rendered="{!displaySystemWideSettings}">
+				<!-- Page top level navigation links -->
+				<div align="center">
+					<apex:outputLink title="System Wide Settings" id="systemWideSettingLink" onClick="return navigateTopLinks(shortTextMap.SWS);" >System Wide Settings</apex:outputLink>
+					&nbsp; | &nbsp;
+					<apex:outputLink title="Defaults & Customization" id="defaultsAndConfigLink" onClick="return navigateTopLinks(shortTextMap.DDC);" >Defaults And Customization</apex:outputLink>
+					&nbsp; | &nbsp;
+					<apex:outputLink title="Tools" id="toolsLink" onClick="return navigateTopLinks(shortTextMap.T);" >Tools</apex:outputLink>
+					&nbsp; | &nbsp;
+					<apex:outputLink title="Security & Permissions"  id="securitySettingLink" onClick="return navigateTopLinks(shortTextMap.SP);" >Security And Permissions</apex:outputLink>
+				</div>
+			</apex:outputPanel>
+		</apex:outputPanel>
+		<BR/><BR/>
+	</apex:form>
+	<apex:outputPanel id="contentPanel">
+		<!-- System Wide Settings: Contents -->
+		<apex:outputPanel id="systemWideSettingsContent" rendered="{!displaySystemWideSettings}">
+			<apex:include pageName="BPSWSContent" />
+		</apex:outputPanel>
+		
+		<!-- Defaults & Customization: Contents -->
+		<apex:outputPanel rendered="{!displayDefaultsANDCustomization}">
+			<apex:outputPanel id="defaultsANDCustomizationContent">
+				<div id="defaultsANDCustomizationDiv"></div>
+			</apex:outputPanel>
+		</apex:outputPanel>
+		
+		<!-- Tools: Contents -->
+		<apex:outputPanel rendered="{!displayTools}">
+			<apex:outputPanel id="toolsContent">
+				<div></div>
+			</apex:outputPanel>
+		</apex:outputPanel>
+		
+		<!-- Security & Permissions: Contents -->
+		<apex:outputPanel rendered="{!displaySecurityANDPermission}">
+			<apex:outputPanel id="securityANDPermissionContent">
+				<div></div>
+			</apex:outputPanel>
+		</apex:outputPanel>
+    </apex:outputPanel>
+	
+	<apex:outputPanel id="refeshScriptPanel">
+		<script>
+			// Bind/Unbind click of top level links
+			// If link is already not open, then only request ajax here
+			function navigateTopLinks(linkType){
+				startLoading("ContentLoading");
+				var topLevelLinksToRenderedMap = {};
+				topLevelLinksToRenderedMap[shortTextMap.SWS]	= {!displaySystemWideSettings};
+				topLevelLinksToRenderedMap[shortTextMap.DDC]	= {!displayDefaultsANDCustomization};
+				topLevelLinksToRenderedMap[shortTextMap.T]		= {!displayTools};
+				topLevelLinksToRenderedMap[shortTextMap.SP]		= {!displaySecurityANDPermission};
+				
+				var retVal = !topLevelLinksToRenderedMap[linkType];
+				if(retVal){
+					if(linkType == shortTextMap.SWS){
+						setDisplaySystemWideSettings();
+					}else if(linkType == shortTextMap.DDC){
+						setDisplayDefaultsANDCustomization();
+					}else if(linkType == shortTextMap.T){
+						setDisplayTools();
+					}else if(linkType == shortTextMap.SP){
+						setDisplaySecurityANDPermission();
+					}
+				}else{
+					stopLoading("ContentLoading");
+				}
+				return false;
+			}
+			stopLoading("ContentLoading");
+		</script>
+	</apex:outputPanel>
+	
+	<script>
+		/*
+    	function loadCustomersList() {
+    		initDisplayCustomers(true);
+    	}
+    	
+    	function loadSettings(){
+    		setDisplaySystemWideSettings();
+    	}
+    	*/
+    </script>
+</apex:page>

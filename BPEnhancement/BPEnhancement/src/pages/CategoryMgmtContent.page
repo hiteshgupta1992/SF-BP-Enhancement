@@ -1,0 +1,15 @@
+<!-- Customers management Frame page for BlackPurl site -->
+<apex:page controller="BlackPurlContentCtrl" id="HomePage" title="Category Management"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+	<style>
+    	table thead tr th {
+    		background-color:#00AEEF !important;
+    	}
+    </style>
+	<apex:outputPanel id="contentPanel">
+		<apex:outputPanel id="categoryGrid" >
+			<c:CategoryList uniqueId="Category_"/>
+	    </apex:outputPanel>
+    </apex:outputPanel>
+    
+</apex:page>

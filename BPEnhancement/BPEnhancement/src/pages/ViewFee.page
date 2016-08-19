@@ -1,0 +1,1032 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" controller="ViewFeeCtrl">
+    <html ng-app="viewFee">
+       
+
+
+        <head>
+            <title>View Fees</title>
+            
+            <apex:stylesheet value="{!URLFOR($Resource.fontawsome, 'css/font-awesome.css')}"/>
+            <c:Css_and_Js />
+            <c:NewViewCustomerStyle />
+            <c:NewDirPagination /> 
+            <style>
+            
+            
+            	::-webkit-scrollbar {
+                    width: 2px;
+                    height: 20px;
+                }
+                ::-webkit-scrollbar-button {
+                    background: #fff;
+                }
+                ::-webkit-scrollbar-track-piece {
+                    background: #fff;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background: #00AEEF;
+                }
+            
+                .content .sectionLabel {
+                    clear: both;
+                    float: left;
+                }
+                   .grid_container_row{
+                    margin-left: -20px;
+                    margin-right: -20px;
+                }
+                
+                
+                .cou_plus_icon {
+                    margin-left: 10px;
+                    color: #939CA9;
+                }
+               .gid_container_Customer .table {
+                    border: 0;
+                }
+                .main_section_COU_Header .actionRow .actionText {
+                    margin-left: 5px;
+                    color: #939CA9;
+                }
+                .first_img {
+                    height: 30px;
+                }
+                .gid_container_Customer .table th {
+                    border: none;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                }
+                .gid_container_Customer .table th.arrow-down{padding-left:25px;}
+                
+                .gid_container_Customer .table tbody {
+                    border: none;
+                }
+                .gid_container_Customer .table tbody > tr > td {
+                    border: none;
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                    vertical-align: middle;
+                }
+                .gid_container_Customer .table tbody .tddropdown td {
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                    vertical-align: middle;
+                }
+                .angucomplete-dropdown {
+                    width: 100%;
+                    margin-top: 28px;
+                }
+                .gid_container_Customer .tableHeader {
+                    margin-left: -15px;
+                    margin-right: -15px;
+                }
+                .gid_container_Customer .S2 {
+                    margin-left: 12px;
+                    margin-right: 12px;
+                }
+                .gid_container_Customer table tr.edit_panel {
+                    background: #fff;
+                }
+                .gid_container_Customer table tr.edit_panel,
+                .gid_container_Customer table tr.Editable_row {} .gid_container_Customer table tr.edit_panel.show_tr {
+                    display: table-row;
+                }
+                .gid_container_Customer table tr.edit_panel input[type="radio"] {
+                    float: left;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body .editform_btn {
+                    position: absolute;
+                    right: 20px;
+                    top: 87px;
+                    width: 50px;
+                }
+                .gid_container_Customer table tr.edit_panel td {
+                    overflow: hidden;
+                    height: 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box {
+                    border: 1px dashed #A8A8A8;
+                    margin: 10px 5px;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel.animate_tr td {
+                    border-left: 3px solid #939393;
+                    height: auto;
+                    padding: 4px;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box.ng-hide {
+                    height: 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box {
+                    transition: all 0.5s ease;
+                }
+                .edit_box {
+                    transition: .5s linear all;
+                    height: 130px;
+                }
+                .gid_container_Customer table tr.edit_panel.animate_tr {
+                    margin-top: 10px;
+                    transition: all 0.5s ease;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .its-heading {
+                    position: absolute;
+                    left: 24px;
+                    top: -15px;
+                    min-width: 175px;
+                    background: #fff;
+                    min-height: 30px;
+                    padding: 6px;
+                    font-size: 14px;
+                    color: #939CA9;
+                    font-weight: bold;
+                }
+                .gid_container_Customer .table .edite_btn{  
+                    height: 38px;
+                    width: 38px; 
+                    float: left;
+                    padding: 4px;
+                    margin: 4px 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body {
+                    margin: 26px;
+                }
+                .animate-showContent {
+                    opacity: 1;
+                }
+                .animate-showContent.ng-hide-add.ng-hide-add-active,
+                .animate-showContent.ng-hide-remove.ng-hide-remove-active {
+                    -webkit-transition: all ease-in-out 0.1s;
+                    transition: all ease-in-out 0.1s;
+                }
+                .animate-showContent.ng-hide {
+                    line-height: 0;
+                    opacity: 0;
+                    padding: 0 10px;
+                }
+                
+                .gid_container_Customer .headerRow{
+                	background-color: #E8E8E8;	
+                } 
+                
+                .gid_container_Customer .table .checkbox{
+                	margin-top: 0px;
+                }
+                
+                .smschkbox .chk_tick{
+                	width: 20px !important;
+				    height: 20px !important;
+				    border-radius: 4px;
+				    margin: 3px 6px;
+			        display: block;
+					float: left;
+					cursor: pointer;
+					border: 1px solid #CCC;
+                }
+				.smschkbox .chk_tick .chksqure {
+				    font-size: 0px;
+				    height: 12px;
+				    width: 12px;
+				    margin: 3px;
+				    border-radius: 2px;
+				    background: #D8D8D8;
+				}
+				.smschkbox .chked .chksqure {
+				    font-size: 0px !important;
+				    height: 12px;
+				    width: 12px;
+				    margin: 3px;
+				    border-radius: 2px;
+				    background: #71BF3E;
+				}
+				.statusRow .feeuserstatus{margin:0;float:left;padding-top:5px;}
+				
+				/* Added by pooja */
+				.searchToAdd_Fee_ML110	{
+					margin-left: 110px;
+				}
+				
+				.userNameblock_Fee_ML0	{
+					margin-left: 0px;
+				}
+
+				.main_section .actionRow .sectionText {
+				    font-weight: bold;
+				    color: #00AEEF;
+				}
+				
+				.ActionIcons {
+				    margin-left: 10px;
+				    margin-top: 8px;
+				}
+			
+				.main_section .rowGeneral {
+				    padding-right: 4%;
+				}
+				
+				.rowGeneral .subsectionGeneral_rightonly {
+				    padding-right: 10px;
+				}
+				
+				.rowGeneral .Active_Button_row {
+				    Padding-right: 0px;
+				    margin-top: 12px;
+				}
+				
+				.rowGeneral .Active_Button {
+				    Padding: 0px;
+				    height: 24px;
+				}
+				
+				.rowGeneral .general_info_part .row:nth-child(1) {
+				    margin-top: 12px;
+				}
+				
+				.part_general_column {
+				    padding-right: 1px;
+				}
+				
+				.round_btn {
+    				border-radius: 3pt;
+    			}
+    			
+    			.clickable_row .first_icon {
+	               margin-top: 9px;
+	            }
+    			
+            </style>
+
+            <script>
+                var viewFeeModule = angular.module('viewFee', ['BPGlobalHeader','dir.listPagination','searchToAddModule', 'ui-notification']);
+                viewFeeModule.controller('ViewFeeCtrl', function ($scope, $timeout, $rootScope, FeeInfoService,  Notification){
+                    $scope.viewFee = {};
+                    $scope.viewFee.currentPageSize = 1;
+			        $scope.viewFee.currentPageNumber = 1;
+			        $scope.viewFee.totalPages = 10;
+			        $scope.viewFee.sortJson = [];
+                    $scope.viewFee.searchedResult;
+                    
+                	// Map variable to hold order of sorting
+                    var sortOrderMap = {
+                        "ASC"   :   "DESC",
+                        "DESC"  :   ""
+                    };
+                    
+                    // Pagination and sort related JSON
+                    $scope.viewFee.ActiveOrderPageSortAttrsJSON = {};
+                    
+                    // Method to set default page sort attributes JSON
+                    $scope.viewFee.setDefaultPageSortAttrs = function() {
+                        $scope.viewFee.ActiveOrderPageSortAttrsJSON = {
+                            ChangesCount    :   0,
+                            CurrentPage     :   1,
+                            PageSize        :   10,
+                            Sorting :   [{
+                                FieldName       :   "LastModifiedDate",
+                                SortDirection   :   "DESC"
+                            }]
+                        };
+                        try{
+                            $scope.viewFee.ActiveOrderPageSortAttrsJSON.PageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+                        } catch (ex){}
+                        
+                    }
+                    
+                    
+                    $scope.viewFee.feeActiveOrder_paginationControlsAction = function(){
+                    	FeeInfoService.getFeeDetails($scope.viewFee.feeId, $scope.viewFee.ActiveOrderPageSortAttrsJSON)
+                            .then(function (feeInfo) {
+                               $scope.viewFee.ActiveOrderList = feeInfo.ActiveOrderList;
+                               $scope.viewFee.ShowContent = true;
+                               setTimeout(function () {
+                                	$scope.viewFee.ActiveOrderPageSortAttrsJSON.ChangesCount++;
+                            	}, 10);
+                        }, function (errorSearchResult) {
+                                responseData = errorSearchResult;
+                                 $scope.viewFee.ShowContent = false;
+                                Notification.error("Some error occured while fetching the records. Please refresh the page and try again.");
+                        });
+                    }
+                    
+                    $scope.viewFee.feeId = "{!JSENCODE(URLENCODE($CurrentPage.parameters.id))}";
+
+                    /*------------------------------START: SCROLL FUNCTIONS---------------------------*/
+                    $scope.viewFee.activeSidepanelink = '#ViewFeeInfoSection';
+                    
+                    angular.element(document).off("scroll");
+                    angular.element(document).on("scroll", function () {
+                        $scope.viewFee.onScroll();
+                    });
+                    
+                    $scope.viewFee.sidepanelLink = function (event, relatedContent) {
+                        event.preventDefault();
+                        //$scope.viewFee.displaySections[relatedContent] = true;
+                        angular.element(document).off("scroll");
+                        var target = angular.element(angular.element(event.target.closest('a'))).attr("href");
+                        angular.element('html, body').stop().animate({
+                            scrollTop : angular.element(target).offset().top - 120
+                        }, 500, function () {
+                            angular.element(document).on("scroll", function () {
+                                $scope.viewFee.onScroll();
+                            });
+                            $scope.viewFee.onScroll();
+                        });
+                    }
+                    
+                    $scope.viewFee.onScroll = function () {
+                        var activeSidepanelink;
+                        var scrollPos = angular.element(document).scrollTop();
+                        
+                        if (scrollPos < angular.element('#ViewFeeInfoSection').position().top + angular.element('#ViewFeeInfoSection').height() + 50) {
+                            activeSidepanelink = '#ViewFeeInfoSection';
+                        } else {
+                        	if($scope.viewFee.ActiveOrderList != undefined && $scope.viewFee.ActiveOrderList.length != 0) {
+                         		if (scrollPos < angular.element('#ViewFeeRelatedSection').position().top + angular.element('#ViewFeeRelatedSection').height() + 50) {
+                            
+		                        	activeSidepanelink = '#ViewFeeRelatedSection';
+	                        	} else {
+	                        		activeSidepanelink = '#ViewFeeRelatedSection';
+	                        	}
+	                        }
+	                        else {
+	                        	activeSidepanelink = '#ViewFeeInfoSection';
+	                        }
+                        } /* else if (scrollPos < angular.element('#ViewFeeStatisticsSection').position().top + angular.element('#ViewFeeStatisticsSection').height() + 50) {
+                            activeSidepanelink = '#ViewFeeStatisticsSection';
+                        }  *//* else if (scrollPos < angular.element('#ViewFeeActivitySection').position().top + angular.element('#ViewFeeActivitySection').height() + 50) {
+                            activeSidepanelink = '#ViewFeeActivitySection';
+                        } */
+                        
+                        $scope.viewFee.activeSidepanelink = activeSidepanelink;
+                        if (!$scope.$$phase) {
+                            $scope.$digest();
+                        }
+                    }
+                    /*------------------------------END: SCROLL FUNCTIONS---------------------------*/
+                    
+                    
+                      $scope.viewFee.editFeeDetails = function () {
+                      
+		                var feeId = $scope.viewFee.feeId;
+		                $scope.$broadcast('EditFeeEvent', feeId);
+		                debug("pages of edit");
+		            }
+                    
+                   
+                    
+                    $scope.viewFee.displaySections = {
+                        'Info' : true,
+                        'Related' : true,
+                        'Statistics' : true,
+                        'ActivityStream' : true
+                    };
+                   
+			                    
+                    
+                    $scope.viewFee.helpTooltips = {
+                        Info                : "Info section",
+                        Info_Gen            : "General info for Fee",
+                        Description         : "Fee description",
+                        Related             : "Related section",
+                        Related_Gen         : "Related info for Fee",
+                        Statistics          : "Statistics section",
+                        Statistics_Vital    : "Vital Stats for Fee",
+                        Statistics_Tele     : "Telementry Stats for Fee",
+                        Activity_Stream     : "Activity Stream section",
+                        Activity_Stream_Gen : "Activity Stream info for Fee"
+                    };
+                    
+                    
+                    
+                     $scope.viewFee.LoadFeeData = function() {
+                     	 $scope.viewFee.setDefaultPageSortAttrs();
+                        
+                         FeeInfoService.getFeeDetails($scope.viewFee.feeId, $scope.viewFee.ActiveOrderPageSortAttrsJSON)
+                            .then(function (feeInfo) {
+                            	debug(feeInfo);
+
+                               $scope.viewFee.feeInfo = feeInfo.FeeRec;
+                               $scope.viewFee.TotalActiveOrder = feeInfo.TotalActiveOrder;
+                               $scope.viewFee.ActiveOrderList = feeInfo.ActiveOrderList;
+                               $scope.viewFee.ShowContent = true;
+                               setTimeout(function () {
+	                                $scope.viewFee.ActiveOrderPageSortAttrsJSON.ChangesCount++;
+	                           }, 10);
+                            }, function (errorSearchResult) {
+                                responseData = errorSearchResult;
+                                 $scope.viewFee.ShowContent = false;
+                                Notification.error("Some error occured while fetching the records. Please refresh the page and try again.");
+                            });
+                        
+                    }
+                    
+                    
+                    
+                    
+                    $scope.viewFee.createNewFee = function() {
+                     $rootScope.$broadcast('AddFeeEvent');
+                     debug("pages");
+
+                    }
+                    
+                    
+                   $scope.feeRecordSaveCallback = function(FeeHeaderRec){
+                   debug(FeeHeaderRec);
+                    	if($scope.viewFee.feeId.substring(0,15) == FeeHeaderRec.Id.substring(0,15)){
+                            $scope.viewFee.feeInfo = FeeHeaderRec;
+                        }
+                    }
+                });
+                
+                
+                 viewFeeModule.service("FeeInfoService", function ($q) {
+                    this.getFeeDetails = function (FeeId, activeOrderPageSortAttrsJSON) {
+                        FeeId = encodeString(FeeId);
+                        activeOrderPageSortAttrsJSON = encodeString(angular.toJson(activeOrderPageSortAttrsJSON));
+                        var deferred = $q.defer();
+        
+                        // make AJAX request to the remote service
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewFeeCtrl.getFeeDetails}', FeeId, null, activeOrderPageSortAttrsJSON,
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+
+                            } else {
+                                var feeDetails = decodeString(result);
+
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                feeDetails = feeDetails.replace(re, '');
+                                deferred.resolve(JSON.parse(feeDetails));
+                            }
+                        }, {
+                            escape : true
+
+                        });
+                        return deferred.promise;
+                    }
+                });
+               
+            </script>
+            
+        </head>
+        <body ng-controller="ViewFeeCtrl" ng-cloak="ng-cloak" ng-init="viewFee.LoadFeeData()">
+            <c:BPGlobalHeader />
+            
+            <div class="content" ng-show="viewFee.ShowContent">
+                <div class="col-lg-2 col-md-2 sidePanel ">
+                    <div class="sidepaneluserinfo row">
+                       <!--  <div class="userimg">
+                            <div style="float:left;background-color: #373c40; border-radius: 5px; padding: 1px; margin-right: 5px;">
+                                    <img  src="{!URLFOR($Resource.Images, 'star.png')}" style="height:35px; width:35px; padding: 5px;"/>
+                            </div>
+                        </div> -->
+                        
+                        <div class="userNameblock userNameblock_Fee_ML0">
+	                        <p class="T3">
+	                        	<span> {{viewFee.feeInfo.Description}} </span>
+	                        </p>
+	                        <p class="customerNumber">{{viewFee.feeInfo.Code}}</p>
+	                    </div>
+                    
+                    
+                       <!--  <div class="userNameblock userNameblock_Fee_ML0">
+                            <p class="T3"> 
+                                <span>{{viewFee.feeInfo.Code}}</span>
+                            </p>
+                            <p class="customerNumber">{{viewFee.feeInfo.Price | currency}}</p>
+                        </div> -->
+                    </div>
+                    
+                    <div class="clearfix"></div>
+                    <div class="row statusRow">
+                        <span class="userStatus T3 feeuserstatus" ng-if="viewFee.feeInfo.IsActive">Active</span>
+                        <span class="userStatus T3 feeuserstatus" style="color:#E80000" ng-if="!viewFee.feeInfo.IsActive">Deactive</span>
+                    </div>
+                    
+                    
+                    <div class="leftPanelLinks">
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : viewFee.activeSidepanelink =='#ViewFeeInfoSection'}"  
+                            href="#ViewFeeInfoSection" ng-click="viewFee.sidepanelLink($event, 'Info')" ><span class="alphabetLetter">A</span>Info</a>
+                          
+                            
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : viewFee.activeSidepanelink =='#ViewFeeRelatedSection'}" 
+                        	ng-if="viewFee.ActiveOrderList.length != 0"
+                            href="#ViewFeeRelatedSection" ng-click="viewFee.sidepanelLink($event, 'Related')" ><span class="alphabetLetter">B</span>Related</a>
+        
+<!--                         <a class="row T10 mainSectionLink" ng-class="{'active' : viewFee.activeSidepanelink =='#ViewFeeStatisticsSection'}"  -->
+<!--                             href="#ViewFeeStatisticsSection" ng-click="viewFee.sidepanelLink($event, 'Related')" ><span class="alphabetLetter">C</span>Statistics</a> -->
+        
+<!--                             <a class="row T10 subSectionLink" href="#ViewFeeStatisticsSection" ng-click="viewFee.sidepanelLink($event, 'Related')"> -->
+<!--                                 <span class="alphabetLetter"></span>Vital Statistics</a> -->
+<!--                             <a class="row T10 subSectionLink" href="#ViewFeeTelementryStatisticsSection" ng-click="viewFee.sidepanelLink($event, 'Related')"> -->
+<!--                                 <span class="alphabetLetter"></span>Telementry</a> -->
+                        
+<!--                         <a class="row T10 mainSectionLink" ng-class="{'active' : viewFee.activeSidepanelink =='#ViewFeeActivitySection'}"  -->
+<!--                             href="#ViewFeeActivitySection" ng-click="viewFee.sidepanelLink($event, 'ActivityStream')" ><span class="alphabetLetter">D</span>Activity Stream</a> -->
+                    </div>
+                    
+                </div>
+                <div class="col-lg-10 col-md-10 mainSection" style="margin-top: 98px;">
+                    <div class=" sectionHeader row fixedRow" >
+                        <div class="col-lg-4 col-md-4" ng-show="viewFee.activeSidepanelink =='#ViewFeeInfoSection'"> 
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!viewFee.displaySections.Info"
+                                    ng-Click="viewFee.displaySections.Info = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="viewFee.displaySections.Info"
+                                    ng-Click="viewFee.displaySections.Info = false">  
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2 ng-binding">A INFO</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Info}}"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-4" ng-show="viewFee.activeSidepanelink =='#ViewFeeRelatedSection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!viewFee.displaySections.Related"
+                                    ng-Click="viewFee.displaySections.Related = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="viewFee.displaySections.Related"
+                                    ng-Click="viewFee.displaySections.Related = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2 ng-binding">B Related</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Related}}"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-4" ng-show="viewFee.activeSidepanelink =='#ViewFeeStatisticsSection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!viewFee.displaySections.Statistics"
+                                    ng-Click="viewFee.displaySections.Statistics = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="viewFee.displaySections.Statistics"
+                                    ng-Click="viewFee.displaySections.Statistics = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2 ng-binding">C Statistics</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Statistics}}"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        
+                        <div class="col-lg-4 col-md-4" ng-show="viewFee.activeSidepanelink =='#ViewFeeActivitySection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!viewFee.displaySections.ActivityStream"
+                                    ng-Click="viewFee.displaySections.ActivityStream = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="viewFee.displaySections.ActivityStream"
+                                    ng-Click="viewFee.displaySections.ActivityStream = false">
+                                </i>  
+                                <span class="divider">|</span>
+                                <span class="T2 ng-binding">D Activity Stream</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Activity_Stream}}"></i>
+                                </span> 
+                            </div>
+                        </div>
+                   
+                        <div class="col-lg-8 col-md-8 fixedContent">
+                            <button type="button" class="flatBtn" ng-click="viewFee.editFeeDetails();">EDIT</button>
+                            <!-- <div class="fa-icons">
+                                <i class="fa fa-floppy-o" ></i>
+                                <i class="fa fa-cog"></i>
+                            </div> -->
+                            <!-- <a class="newLink" ng-click="viewFee.createNewFee();">NEW</a> -->
+                            <div class="col-lg-8 col-md-7 searchToAdd searchToAdd_Fee_ML110">
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn C5 LabelBtn">
+                                        <span class="T5" style="color: #939CA9;">TO:</span>
+                                        <span style="color: #FFFFFF;">A Fee</span>
+                                        </button>
+                                        <button type="button" class="btn C5 dropdown-toggle caretBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Customer</a></li>
+                                            <li><a href="#">Merchandise</a></li>
+                                            <li><a href="#">Vendor</a></li>
+                                            <li><a href="#">User</a></li>
+                                            <li><a href="#">Category</a></li>
+                                            <li><a href="#">Fee</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a href="#">ADVANCED SEARCH</a></li>
+                                        </ul>
+                                    </div>
+                                    <!-- /btn-group -->
+                                    <div class="inner-addon right-addon">
+                                        <i class="fa fa-search fa-flip-horizontal"></i>
+                                        <c:SearchToAdd />
+                                        <!-- <input class="header-search form-control"  placeholder="search to Add Related" type="text" /> -->
+                                    </div>
+                                </div>
+                                <!-- /input-group -->
+                            </div> 
+                        </div>
+                    </div>
+                    
+                    <div id="ViewFeeInfoSection" >
+                         <div class="main_section row" ng-show="viewFee.displaySections.Info" >
+                            <div id="GeneralInfoSection" style="margin-bottom: 0px;">
+                               
+                               <p class="actionRow T2">
+		                            <span class="sectionText">Description</span>
+		                            <!-- <span class="actionText">{!$Label.Label_Actions}</span> -->
+		                            <span class="ActionIcons">
+		                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Description}}"></i>
+		                            </span> 
+		                        </p>
+		                        
+                                <div class="row rowGeneral" >
+                                   <!--  <div class="content "> -->
+                                        <!-- <div class="col-lg-12 col-md-12 Pl24" style="line-height: 30px;"> -->
+                                        <div class="col-md-4 col-lg-4 subsectionGeneral_rightonly">
+                                            <!-- Description -->
+                                           
+                                          	<!-- <div class="sectionLabel W20">
+                                                <label class="ng-binding T7">Description</label>
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Description}}" style="color: #939ca9;"></i>
+                                                
+                                            </div>  -->
+                                            
+                                            <div class="row" >
+				                                <div class="col-md-8 col-lg-8 " >
+				                                    <div  class="row ">
+				                                        <div class="col-md-12 col-lg-12">
+				                                            <span class="T1">
+				                                                {{viewFee.feeInfo.Description}}
+				                                            </span>
+				                                        </div>
+				                                    </div>
+				                                </div>
+				                                <div class="col-md-4 col-lg-4 " >
+				                                </div>
+				                            </div>
+                            
+                                           <!--  <div class="mycustvalue">
+                                                <span class="ng-binding T3 PL20 wordWrap">
+                                                    {{viewFee.feeInfo.Description}}
+                                                </span>
+                                            </div> -->
+                                            
+                                            
+                                             <div class="row" >
+				                                <div class="col-md-5 col-lg-5 " >
+				                                    <div  class="row ">
+				                                        <div class="col-md-12 col-lg-12">
+				                                            <span class="T7">
+				                                                {{viewFee.feeInfo.Code}}
+				                                            </span>
+				                                        </div>
+				                                    </div>
+				                                </div>
+				                                <div class="col-md-7 col-lg-7 " >
+				                                </div>
+				                            </div>
+                            
+                            
+                                            <div class="row" >
+				                                <div class="col-md-5 col-lg-5 " >
+				                                    <div  class="row ">
+				                                        <div class="col-md-12 col-lg-12 Active_Button_row ">
+				                                            <button class="form-control C10 T4 Active_Button round_btn text-uppercase" ng-if="viewFee.feeInfo.IsActive == true">{!$label.Label_Active}</button> 
+				                                            <button class="form-control C9 T4 Active_Button round_btn text-uppercase" ng-if="viewFee.feeInfo.IsActive ==false" >{!$label.Label_Deactive}</button>
+				                                        </div>
+				                                    </div>
+				                                </div>
+				                                <div class="col-md-7 col-lg-7 " >
+				                                </div>
+			                            	</div>
+			                            
+                            
+                                            <div class="general_info_part">
+                                            	 <!-- Price -->
+                                            	<div class="row">
+				                                    <div class="col-lg-5 col-md-5  part_general_column">
+				                                        <span>    
+				                                        <label class="T7 " for="labelFirstName">Price</label>
+				                                        </span>
+				                                    </div>
+				                                    <div  class="col-lg-7 col-md-7 " >
+				                                        <span class="blue T3"> {{viewFee.feeInfo.Price | currency}} </span>
+				                                    </div>
+				                                </div>
+				                                
+				                                <!-- Category -->
+				                                <div class="row">
+				                                    <div class="col-lg-5 col-md-5  part_general_column">
+				                                        <span>    
+				                                        <label class="T7 " for="labelFirstName">Category</label>
+				                                        </span>
+				                                    </div>
+				                                    <div  class="col-lg-7 col-md-7 " >
+				                                        <span class="blue T3"> {{viewFee.feeInfo.CategoryName}} </span>
+				                                    </div>
+				                                </div>
+				                                
+				                                <!-- Taxable -->
+				                                <div class="row">
+				                                    <div class="col-lg-5 col-md-5  part_general_column">
+				                                        <span>    
+				                                        <label class="T7 " for="labelFirstName">Taxable</label>
+				                                        </span>
+				                                    </div>
+				                                    <div  class="col-lg-7 col-md-7 " >
+				                                        <span class="blue T3" ng-if="viewFee.feeInfo.IsTaxable" >Yes</span>
+				                                         <span class="blue T3" ng-if="!viewFee.feeInfo.IsTaxable" >No</span>
+				                                    </div>
+				                                </div>
+				                                
+				                                <!-- Applicable Tax  -->
+				                                <div class="row">
+				                                    <div class="col-lg-5 col-md-5  part_general_column">
+				                                        <span>    
+				                                        <label class="T7 " for="labelFirstName">Applicable Tax</label>
+				                                        </span>
+				                                    </div>
+				                                    <div  class="col-lg-7 col-md-7 " >
+				                                        <span class="blue T3">{{viewFee.feeInfo.ApplicableTaxName}}</span>
+				                                    </div>
+				                                </div>
+                                
+                                            </div>
+                                            <!-- Price -->
+                                            <!-- <div class="sectionLabel W20">
+                                                <label class="ng-binding T7">Price</label>
+                                            </div>
+                                            <div class="mycustvalue">
+                                                <span class="ng-binding T3 PL20" >
+                                                    {{viewFee.feeInfo.Price | currency}}
+
+                                                </span>
+                                            </div> -->
+                                            
+                                            
+                                          
+                                            <!-- Category -->
+                                            <!-- <div class="sectionLabel W20">
+                                                <label class="ng-binding T7">Category</label>
+                                            </div>
+                                            <div class="mycustvalue">
+                                                <span class="ng-binding T3 PL20" >
+                                                      {{viewFee.feeInfo.CategoryName}}
+                                                </span>
+                                            </div> -->
+                                            
+                                            <!-- Taxable -->
+                                           <!--  <div class="sectionLabel W20">
+                                                <label class="ng-binding T7">Taxable</label>
+                                            </div>
+                                            <div class="mycustvalue">
+                                            
+                                            
+                                            
+                                                <span class="ng-binding T3 PL20" ng-if="viewFee.feeInfo.IsTaxable" >Yes</span>
+                                                 <span class="ng-binding T3 PL20" ng-if="!viewFee.feeInfo.IsTaxable" >No</span>
+                                            </div> -->
+                                            
+											<!-- Applicable Tax  -->
+                                            <!-- <div ng-if="viewFee.feeInfo.IsTaxable" >
+                                            	<div class="sectionLabel W20">
+	                                                <label class="ng-binding T7">Applicable Tax </label>
+	                                            </div>
+	                                            <div class="mycustvalue">
+	                                                <span class="ng-binding T3 PL20" >
+	                                                    {{viewFee.feeInfo.ApplicableTaxName}}
+	                                                </span>
+	                                            </div>
+                                            </div> -->
+                                       
+                                       
+                                        </div>
+                                  <!--   </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div ng-if="viewFee.ActiveOrderList.length != 0">
+                    
+	                    <div class="sectionHeader row">
+	                        <div class="col-lg-4 col-lg-5">
+	                            <div class="fixedHeaderText">
+	                                <span class="headerlabel">
+	                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+	                                    ng-show="!viewFee.displaySections.Related"
+	                                    ng-Click="viewFee.displaySections.Related = true">
+	                                </i> 
+	                                <i class="fa fa-angle-down" style="width:10px;"
+	                                    ng-show="viewFee.displaySections.Related"
+	                                    ng-Click="viewFee.displaySections.Related = false">
+	                                </i> 
+	                                <span class="divider">|</span>
+	                                <span class="T2 ng-binding">B Related</span>
+	                                </span>
+	                                <span class="ActionIcons pull-right">
+	                                <!-- <i class="fa fa-th"></i> -->
+	                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Related}}"></i>
+	                                </span> 
+	                            </div>
+	                        </div>
+	                    </div>
+	                    
+	                    <div id="ViewFeeRelatedSection">
+                        <div class="main_section row" ng-show="viewFee.displaySections.Related">
+                           <p class="actionRow T2">
+                                    <span class="sectionText">Active Orders
+                                        <!-- <i class="fa fa-plus cou_plus_icon"></i> -->
+                                    </span>
+                                    <!-- <span class="actionText">Actions</span> -->
+                                    <span class="ActionIcons">
+                                    <!-- <i class="fa fa-th"></i> -->
+                                    <i class="fa fa-question-circle"></i>
+                                    </span> 
+                                </p>
+                            <div class="row rowGeneral" >
+                       <div class="gid_container_Customer grid_container_row" id="Customer_Owned_Units" ng-show="viewFee.ActiveOrderList.length != 0">
+                                        <table class="table" id="CM_Owned_UnitsGrid">
+                                        	<col width="2%"  />
+                                            <col width="2%"  />
+                                            <col width="6%"  />
+                                            <col width="22%"  />
+                                            <col width="22%"  />
+                                            <col width="22%" />
+                                            <col width="22%"  />
+                                            <col width="2%"  />
+                                            <tr  class="tableHeader T3 C2">
+                                                <th></th>
+		                                        <th></th>
+		                                        <th class="arrow-down"><i class="fa fa-long-arrow-down"></i></th>
+		                                        <th>ORDER NUMBER</th>
+		                                        <th>CUSTOMER</th>
+		                                        <th>OWNER</th>
+		                                        <th>STATUS</th>
+		                                        <th></th>
+                                            </tr>
+                                            <tbody ng-repeat="ActiveOrder in viewFee.ActiveOrderList">
+                                                <!-- Display rows -->
+                                                <tr class="clickable_row" id="row1" rel="owned_unit_row{{$index}}_edit">
+                                                    <td style="background:#fff"></td>
+                                                    <td></td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_1_{{$index}}" >
+                                                        <a href="" class="edite_btn" rel="row1_edit">
+                                                            <i class="fa fa-list  Plr5 FC7 F18 first_icon"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_3_{{$index}}" class="T7 " >
+                                                    	<a href="{!$Page.NewCustomerOrder}?id={{ActiveOrder.COHeaderId}}" target="_blank"><u>{{ActiveOrder.COHeaderNumber}}</u></a>
+                                                    </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7">{{ActiveOrder.CustomerName}}</td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">{{ActiveOrder.OwnerName}} </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}"  class="T7">{{ActiveOrder.Status}}</td>
+                                                    <td style="background:#fff"></td>
+                                                </tr>
+                                                <!-- action editable Row -->
+                                            </tbody>
+                                        </table>
+                                           <div class="pagination_container" id="Receiving_For_Vendor_Orders_Pagination"  >
+                                				<list-pagination id-value ="fee_Active_Orders_Pagination_" 
+                                                 total-records-length = "viewFee.TotalActiveOrder"
+                                                 page-size = "viewFee.ActiveOrderPageSortAttrsJSON.PageSize"
+                                                 current-page = "viewFee.ActiveOrderPageSortAttrsJSON.CurrentPage"
+                                                 changes-count = "viewFee.ActiveOrderPageSortAttrsJSON.ChangesCount"
+                                                 pagination-control-method = "viewFee.feeActiveOrder_paginationControlsAction" />
+                            			</div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    </div>
+                    <!-- 
+                    
+                    <div class="sectionHeader row">
+                        <div class="col-lg-4 col-lg-5">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!viewFee.displaySections.Statistics"
+                                    ng-Click="viewFee.displaySections.Statistics = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="viewFee.displaySections.Statistics"
+                                    ng-Click="viewFee.displaySections.Statistics = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2 ng-binding">C Statistics</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Statistics}}"></i>
+                                </span> 
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="ViewFeeStatisticsSection">
+                        <div class="main_section row" ng-show="viewFee.displaySections.Statistics">
+                            <div id="ViewFeeVitalStatisticsSection" style="margin-bottom: 48px;">
+                                <p class="actionRow T2">
+                                    <span class="sectionText">Vital Statistics</span>
+                                    <span class="actionText">Actions</span>
+                                    <span class="ActionIcons">
+                                    <i class="fa fa-th"></i>
+                                    <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Statistics_Vital}}"></i>
+                                    </span> 
+                                </p>
+                                <div class="row rowGeneral" >
+                           
+                                </div>
+                            </div>
+                            <div id="ViewFeeTelementryStatisticsSection" style="margin-bottom: 48px;">
+                                <p class="actionRow T2">
+                                    <span class="sectionText">Telementry</span>
+                                    <span class="actionText">Actions</span>
+                                    <span class="ActionIcons">
+                                    <i class="fa fa-th"></i>
+                                    <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Statistics_Tele}}"></i>
+                                    </span> 
+                                </p>
+                                <div class="row rowGeneral" >
+                           
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sectionHeader row">
+                        <div class="col-lg-4 col-lg-5">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!viewFee.displaySections.ActivityStream"
+                                    ng-Click="viewFee.displaySections.ActivityStream = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="viewFee.displaySections.ActivityStream"
+                                    ng-Click="viewFee.displaySections.ActivityStream = false">
+                                </i>  
+                                <span class="divider">|</span>
+                                <span class="T2 ng-binding">D Activity Stream</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Activity_Stream}}"></i>
+                                </span> 
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ViewFeeActivitySection">
+                        <div class="main_section row" ng-show="viewFee.displaySections.ActivityStream">
+                            <p class="actionRow T2">
+                                <span class="sectionText">General</span>
+                                <span class="actionText">Actions</span>
+                                <span class="ActionIcons">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{viewFee.helpTooltips.Activity_Stream_Gen}}"></i>
+                                </span> 
+                            </p>
+                            <div class="row rowGeneral" >
+                       
+                            </div>
+                        </div>
+                    </div>
+                     -->
+                     
+                    <div style="height:700px; background: #E6EBEC; margin: 0 -15px;" />
+                </div>
+            </div>
+           
+        </body>
+    </html> 
+</apex:page>

@@ -1,0 +1,477 @@
+<apex:component controller="ViewVendorRelatedListCtrl">
+	<!-- Include Styles for component here -->
+    <c:AddEditPartsStyles UID="AddNewPOType"/>
+    
+    <!-- Include required directives -->
+    <!-- Directive for price fields -->
+	<c:dirNumberInput />
+   
+   <script type="text/javascript">
+        $(document).ready(function(){
+            $('.controls').hide();
+            $(".form-control").focus(function(){
+                $('.controls').hide();  
+                $('#'+ $(this).attr('rel')).show();
+                
+            });
+            
+            $(".anguinput").focus(function(){
+                $('.controls').hide();  
+                $('#'+ $(this).attr('rel')).show();
+                
+            })
+            
+            $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'}); 
+        })
+    </script>
+    
+    
+    
+    <script>
+	    var addEditPOTypeModule = angular.module('addEditPOTypeModule', ['dir.priceInput', 'ui-notification']);
+	    addEditPOTypeModule.controller('newEditPOTypeCtrl', function ($scope, AddEditPOTypeService, Notification) {
+	    	// START: Modals declaration
+	    	$scope.POTypeCompModal.POTypeModal = {};
+	    	$scope.POTypeCompModal.isValidForm = true;
+	    	$scope.POTypeCompModal.tabIndexValue = 0;
+	    	$scope.POTypeCompModal.POTypeModal = {};
+	    	//$scope.POTypeCompModal.saveButtonClicked = false;
+	    	
+	    	$scope.POTypeCompModal.helpText = {
+	    		Code		: 'Code',
+				Save		: 'Save infomation',
+				Cancel 		: 'Cancel all changes',
+				Lead_Time 	: 'Lead Time',
+				Discount 	: 'Discount applied',
+				Usage 		: 'Usage',
+				Landed_Cost_Adjustment : 'Cost adjustment'
+			};
+			
+	    	// Set default values for validation model
+            // Method to set default values for validation model
+            $scope.POTypeCompModal.setDefaultValidationModal = function () {
+				$scope.POTypeCompModal.poTypeFormValidationModal = {
+					Code : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Required'
+					}
+				};
+			}
+	    	// END: Modals declaration
+	    	
+	    	// START: Popup related methods
+            // Method to open self popup.
+            $scope.POTypeCompModal.openAddPOTypePopup = function (vendorId) {
+                $scope.POTypeCompModal.clearAllData();
+                $scope.POTypeCompModal.POTypeModal.vendorId = vendorId;
+                $scope.POTypeCompModal.openPopup();
+            }
+            
+            // Method to open self popup.
+            $scope.POTypeCompModal.openEditPOTypePopup = function (poTypeId, vendorId) {
+                // Get current POType id and fill the form with related information
+                $scope.POTypeCompModal.currentPOTypeId = poTypeId;
+                $scope.POTypeCompModal.POTypeModal.Id = poTypeId;
+                $scope.POTypeCompModal.POTypeModal.vendorId = vendorId;
+                
+                // Set default values
+                $scope.POTypeCompModal.setDataDefault();
+                //$scope.POTypeCompModal.saveButtonClicked = false;
+                $scope.POTypeCompModal.getCurrentPOTypeData();
+            }
+            
+            // Open popup box
+            $scope.POTypeCompModal.openPopup = function(){
+                angular.element('#AddNewPOType').modal({
+                    backdrop : 'static',
+                    keyboard : false
+                });
+                
+                setTimeout(function () {
+	            	angular.element(document.getElementById("AddNewPOType").querySelector('[tabindex="1"]')).focus();
+	            }, 1000);
+            }
+            
+            // Close popup box
+            $scope.POTypeCompModal.closePopup = function(){
+                angular.element('#AddNewPOType').modal('hide');
+            }
+            // END: Popup related methods
+            
+            // START: Reset and refresh form fields methods
+            // Method to clear all form fields and set default values
+            $scope.POTypeCompModal.clearAllData = function () {
+            	$scope.POTypeCompModal.currentPOTypeId = null;
+                $scope.POTypeCompModal.POTypeModal = {};
+                $scope.POTypeCompModal.POTypeModal.Discount = 0;
+                 $scope.POTypeCompModal.POTypeModal.LeadTime = 0;
+                $scope.POTypeCompModal.POTypeModal.LandedCostAdjustment = 0;
+                //$scope.POTypeCompModal.saveButtonClicked = false;
+                
+                // Set default values
+                $scope.POTypeCompModal.setDataDefault();
+            }
+            
+            // Set default data for new
+            $scope.POTypeCompModal.setDataDefault = function () {
+                $scope.POTypeCompModal.setDefaultValidationModal();
+            }
+            // END: Reset and refresh form fields methods
+            
+            // START: DOM event handler methods
+            // On click of cancel button, close the popup
+            $scope.POTypeCompModal.CancelPOTypeForm = function(event) {
+                $scope.POTypeCompModal.closePopup();
+            }
+            
+            // On click of Save button, save form data and close popup
+            $scope.POTypeCompModal.SavePOTypeForm = function() {
+                // By default set valid flag to true before starting validation
+                $scope.POTypeCompModal.isValidForm = true;
+                //$scope.POTypeCompModal.saveButtonClicked = true;
+                //debug($scope.POTypeCompModal.saveButtonClicked);
+                // Validate form
+                $scope.POTypeCompModal.validateForm();
+                if(!$scope.POTypeCompModal.isValidForm){
+                	//$scope.POTypeCompModal.saveButtonClicked = false;
+                	//debug($scope.POTypeCompModal.saveButtonClicked);
+                	//angular.element(".redborder")[0].focus();
+                	return;
+                }
+                //debug($scope.POTypeCompModal.saveButtonClicked);
+               	var poTypeRecords = [];
+               	debug($scope.POTypeCompModal.POTypeModal);
+               	if($scope.POTypeCompModal.POTypeModal.LeadTime == "" || $scope.POTypeCompModal.POTypeModal.LeadTime == null) {
+               		$scope.POTypeCompModal.POTypeModal.LeadTime = 0;
+               	}
+               	if($scope.POTypeCompModal.POTypeModal.Discount == "" || $scope.POTypeCompModal.POTypeModal.Discount == null) {
+               		$scope.POTypeCompModal.POTypeModal.Discount = 0;
+               	}
+               	if($scope.POTypeCompModal.POTypeModal.LandedCostAdjustment == "" || $scope.POTypeCompModal.POTypeModal.LandedCostAdjustment == null) {
+               		$scope.POTypeCompModal.POTypeModal.LandedCostAdjustment = 0;
+               	}
+                poTypeRecords.push($scope.POTypeCompModal.POTypeModal);
+                $scope.POTypeCompModal.savePOTypeData(poTypeRecords);
+                   
+                	
+            }
+            // END: DOM event handler methods
+            
+            // START: Form validation process
+            // Method to validate form
+            $scope.POTypeCompModal.validateForm = function () {
+                angular.forEach($scope.POTypeCompModal.poTypeFormValidationModal, function(value, key) {
+                    $scope.POTypeCompModal.validateFieldWithKey(key);
+                    debug(key);
+                    if($scope.POTypeCompModal.poTypeFormValidationModal[key].isError){
+                        $scope.POTypeCompModal.isValidForm = false;
+                    }
+                });
+            }
+            
+            // Validation method for a field with modelKey value
+            $scope.POTypeCompModal.validateFieldWithKey = function (modelKey) {
+            	var fieldValue = $scope.POTypeCompModal.POTypeModal[modelKey];
+                var numericRegex = /^[0-9]*$/;
+                var validateType = $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].Type;
+                
+                if (validateType.indexOf('Numeric') > -1) {
+                    if (fieldValue != '' && fieldValue != undefined && !numericRegex.test(fieldValue)) {
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].isError = true;
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].ErrorMessage = 'Invalid field Value';
+                    } else {
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].isError = false;
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].ErrorMessage = '';
+                    }
+                }
+                if (validateType.indexOf('Required') > -1) {
+                    if(fieldValue == undefined || fieldValue == null || $scope.POTypeCompModal.POTypeModal[modelKey] == ''){
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].isError = true;
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].ErrorMessage = 'Field is Required';
+                    } else {
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].isError = false;
+                        $scope.POTypeCompModal.poTypeFormValidationModal[modelKey].ErrorMessage = '';
+                    }
+                }
+                
+                // Set validation flag value
+                if($scope.POTypeCompModal.poTypeFormValidationModal[modelKey].isError == true){
+                    $scope.POTypeCompModal.isValidForm = false;
+                }
+            }
+            // END: Form validation process
+            
+            // START: Service call methods
+            // Get POType data from server and fill form
+            $scope.POTypeCompModal.getCurrentPOTypeData = function () {
+                AddEditPOTypeService.getPOTypeInfoById($scope.POTypeCompModal.currentPOTypeId).then(function(poTypeRecord) {
+                    $scope.POTypeCompModal.UpdateFormFieldsWithExistingPOType(poTypeRecord);
+                }, function(errorSearchResult) {
+                    Notification.error("Some error occurred while fetching the record. Please try again.");
+                });
+            }
+            
+            // Method to Save poType record data
+            $scope.POTypeCompModal.savePOTypeData = function (poTypeJSON) {
+                AddEditPOTypeService.savePOTypeInfo(poTypeJSON).then(function(newPOTypeDetails) {
+                    // If parent page has poType save callback method, then perform the method and close popup
+                    if(newPOTypeDetails.indexOf('Same VO Type Code already present for vendor') > -1){
+                    	 Notification.error(newPOTypeDetails);
+                    }
+                    
+                    else{
+                    	if($scope.$parent.ViewVendor.RelatedLists_recordSaveCallback != undefined){
+                        	$scope.$parent.ViewVendor.RelatedLists_recordSaveCallback("{!$ObjectType.PO_Type__c.label}", newPOTypeDetails);
+                    	}
+                    }
+                    
+                }, function(errorSearchResult) {
+                    Notification.error('Error while saving record.');
+                    $scope.$parent.POTypeCompModal.closePopup();
+                });
+            }
+            
+            // Set all the form fields with existing POType record
+            $scope.POTypeCompModal.UpdateFormFieldsWithExistingPOType = function (poTypeRecord){
+                $scope.POTypeCompModal.POTypeModal = poTypeRecord[0];
+                $scope.POTypeCompModal.openPopup();
+            }
+            // END: Service call methods
+	    });
+	    
+	    // START: Services definition for Part component
+        addEditPOTypeModule.service("AddEditPOTypeService", function ($q) {
+            // Get method for retrival of all field values of a POType by Id
+            this.getPOTypeInfoById = function(partId)
+            {
+                    partId = encodeString(partId);
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewVendorRelatedListCtrl.getPOTypeInfoById}',
+                        partId,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var poTypeRecord = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                poTypeRecord = poTypeRecord.replace(re, '');
+                                deferred.resolve(JSON.parse(poTypeRecord));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+            
+            // Save method for POType record
+            this.savePOTypeInfo = function(poTypeRecordJSON)
+            {
+                    poTypeRecordJSON = encodeString(angular.toJson(poTypeRecordJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewVendorRelatedListCtrl.addUpdatePOTypeToVendor}',
+                        poTypeRecordJSON,
+                        function (result, event) {
+                        	debug(result);
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                            	if(result.indexOf('Same VO Type Code already present for vendor') > -1) {
+									deferred.resolve(decodeString(result));
+								}
+								else{
+									debug(result);
+									var poTypeRecord = decodeString(result);
+	                                var find = '\'';
+	                                var re = new RegExp(find, 'g');
+	                                poTypeRecord = poTypeRecord.replace(re, '');
+	                                deferred.resolve(JSON.parse(poTypeRecord));
+								}
+                               
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+        });
+        // END: Services definition for POType component
+    </script>
+    
+    <!-- View poType for Add/Edit POType component -->
+    <div id="AddNewPOType" class="modal fade" ng-controller="newEditPOTypeCtrl">
+        <div class="modal-dialog" ng-init="POTypeCompModal.LoadPOTypeInfo()" >
+        	<div class="popup_container" >
+                <div class="popupinside">
+        			<div class="popupright col-lg-12 col-lg-12">
+        			
+        				<!-- Heading section -->
+        				<div class="right_heading_container col-lg-12 col-md-12">
+                            <h1 class="right_panel_heading" ng-show="POTypeCompModal.currentPOTypeId == null">{!$Label.New_Label} <!-- {!$ObjectType.PO_Type__c.label} --> Vendor Order Type</h1>
+                            <h1 class="right_panel_heading" ng-show="POTypeCompModal.currentPOTypeId != null">{!$Label.Edit_Label} <!-- {!$ObjectType.PO_Type__c.label} --> Vendor Order Type</h1>
+                             <div class="savecancle_btncntnr">
+	                                    <button type="button" id="closemodal" class="btn btn-default grayBtn"
+	                                    		ng-click="POTypeCompModal.CancelPOTypeForm($event);"
+	                                    		ng-enter="POTypeCompModal.CancelPOTypeForm($event);" 
+	                                    		ng-attr-tabindex="{{OTypeCompModal.tabIndexValue + 9}}">{!$Label.Cancel_Label}</button>
+	                                    <button type="button" class="btn btn-default greenBtn"
+	                                    		ng-click="POTypeCompModal.SavePOTypeForm();"
+	                                    		ng-enter="POTypeCompModal.SavePOTypeForm();" 
+	                                    		ng-attr-tabindex="{{POTypeCompModal.tabIndexValue + 8}}">
+	                                    		<!-- ng-disabled="POTypeCompModal.saveButtonClicked == true" -->
+	                                    		{!$Label.Save_Label}</button>
+	                                    		<!-- ng-class="{'greenBtn' : POTypeCompModal.saveButtonClicked == false, 'disabledButton': POTypeCompModal.saveButtonClicked == true}" -->
+	                                </div>
+                            
+                        </div>
+                        <div class="clearfix"></div>
+        				
+        				<!-- Edit fields content -->
+        				<div class="sub_content" style="margin-top: 25px;">
+        					<div class="tabconainer">
+        						<!-- <div class="form-group" style="float: right;padding-left: 88px;">
+                                    <label for="required" class="FC9">* {!$Label.Indicates_Required_Fields}</label>
+                                </div> -->
+        						<!-- Code value -->
+        						<div class="option_field">
+        							<div class="lable_fields">
+                                        <p  class="req-label">{!$ObjectType.PO_Type__c.fields.Code__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group midnew2">
+                                            <input type="text" class="form-control" id="code" placeholder="{!$ObjectType.PO_Type__c.fields.Code__c.label}" maxlength="80"
+                                                    ng-model="POTypeCompModal.POTypeModal.Code" rel="codeHelp" ng-attr-tabindex="{{POTypeCompModal.tabIndexValue + 1}}"
+                                                    ng-blur="POTypeCompModal.validateFieldWithKey('Code')" ng-class="{'redborder' : POTypeCompModal.poTypeFormValidationModal['Code']['isError'] == true}" 
+                                                    data-toggle="tooltip" title="{{POTypeCompModal.poTypeFormValidationModal['Code']['ErrorMessage']}}"/>
+                                        </div>
+                                        <div class="controls1 controls" id="codeHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{POTypeCompModal.helpText['Code']}}"></i>
+                                        </div>
+                                    </div>
+        						</div>
+        						
+        						<!-- Lead Time -->
+        						<div class="option_field">
+        							<div class="lable_fields">
+                                        <p >{!$ObjectType.PO_Type__c.fields.Lead_Time__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group midnew2">
+                                        	<price-only-input id-value = "LeadTime"
+                                                              class-value = "form-control medium"
+                                                              place-holder-value = "{!$ObjectType.PO_Type__c.fields.Lead_Time__c.label}"
+                                                              max-length = "3" 
+                                                              precision-length = "-1" 
+                                                              tab-index = "{{POTypeCompModal.tabIndexValue + 2}}"
+                                                              input-value = "POTypeCompModal.POTypeModal.LeadTime"
+                                                              validation-modal = "POTypeCompModal.poTypeFormValidationModal"
+                                                              validation-modal-key = "Lead_Time"
+                                                              input-model = "POTypeCompModal" 
+                                                              rel-value = "LeadTimeHelp"
+                                                              />
+                                        	<div class="divMiddleText">&#160; Days</div>
+                                        </div>
+                                        <div class="controls1 controls" id="LeadTimeHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{POTypeCompModal.helpText['Lead_Time']}}"></i>
+                                        </div>
+                                    </div>
+        						</div>
+        						
+        						<!-- Discount -->
+        						<div class="option_field">
+        							<div class="lable_fields">
+                                        <p>{!$ObjectType.PO_Type__c.fields.Discount__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group midnew2">
+                                        	<price-only-input id-value = "Discount"
+                                                              class-value = "form-control medium"
+                                                              place-holder-value = "{!$ObjectType.PO_Type__c.fields.Discount__c.label}"
+                                                              max-length = "3" 
+                                                              precision-length = "2" 
+                                                              tab-index = "{{POTypeCompModal.tabIndexValue + 3}}"
+                                                              input-value = "POTypeCompModal.POTypeModal.Discount"
+                                                              validation-modal = "POTypeCompModal.poTypeFormValidationModal"
+                                                              validation-modal-key = "Discount"
+                                                              input-model = "POTypeCompModal" 
+                                                              rel-value = "discountHelp"/>
+                                        	<div class="divMiddleText">&#160; %</div>
+                                        </div>
+                                        <div class="controls1 controls" id="discountHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{POTypeCompModal.helpText['Discount']}}"></i>
+                                        </div>
+                                    </div>
+        						</div>
+        						
+        						<!-- Landed cost adjustment -->
+        						<div class="option_field">
+        							<div class="lable_fields">
+                                        <p>{!$ObjectType.PO_Type__c.fields.Landed_Cost_Adjustment__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group midnew2">
+                                        	<price-only-input id-value = "Landed_Cost_Adjustment"
+                                                              class-value = "form-control medium"
+                                                              place-holder-value = "LCA"
+                                                              max-length = "3" 
+                                                              precision-length = "2" 
+                                                              tab-index = "{{POTypeCompModal.tabIndexValue + 4}}"
+                                                              input-value = "POTypeCompModal.POTypeModal.LandedCostAdjustment"
+                                                              validation-modal = "POTypeCompModal.poTypeFormValidationModal"
+                                                              validation-modal-key = "Landed_Cost_Adjustment"
+                                                              input-model = "POTypeCompModal" 
+                                                              rel-value = "Landed_Cost_AdjustmentHelp"/>
+                                        	<div class="divMiddleText">&#160; %</div>
+                                        </div>
+                                        <div class="controls1 controls" id="Landed_Cost_AdjustmentHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{POTypeCompModal.helpText['Landed_Cost_Adjustment']}}"></i>
+                                        </div>
+                                    </div>
+        						</div>
+        						
+        						<!-- Usage -->
+        						<div class="option_field">
+        							<div class="lable_fields">
+                                        <p >{!$ObjectType.PO_Type__c.fields.Usage__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left" style="margin-bottom: 50px">
+                                        <div class="form-group midnew2">
+                                        	<input type="text" class="form-control" id="Usage" placeholder="{!$ObjectType.PO_Type__c.fields.Usage__c.label}" maxlength="255"
+                                                    ng-model="POTypeCompModal.POTypeModal.Usage" rel="UsageHelp" ng-attr-tabindex="{{POTypeCompModal.tabIndexValue + 5}}"
+                                                    ng-class="{'redborder' : POTypeCompModal.poTypeFormValidationModal['Usage']['isError'] == true}" 
+                                                    data-toggle="tooltip" title="{{POTypeCompModal.poTypeFormValidationModal['Usage']['ErrorMessage']}}"/>
+                                        </div>
+                                        <div class="controls1 controls" id="UsageHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{POTypeCompModal.helpText['Usage']}}"></i>
+                                        </div>
+                                    </div>
+        						</div>
+        						
+        					</div>
+        				</div>
+        				<div class="right_heading_container col-lg-12 col-md-12">
+                             <div class="savecancle_btncntnr">
+	                                    <button type="button" id="closemodal" class="btn btn-default grayBtn"
+	                                    		ng-click="POTypeCompModal.CancelPOTypeForm($event);"
+	                                    		ng-enter="POTypeCompModal.CancelPOTypeForm($event);" 
+	                                    		ng-attr-tabindex="{{OTypeCompModal.tabIndexValue + 9}}">{!$Label.Cancel_Label}</button>
+	                                    <button type="button" class="btn btn-default greenBtn"
+	                                    		ng-click="POTypeCompModal.SavePOTypeForm();"
+	                                    		ng-enter="POTypeCompModal.SavePOTypeForm();" 
+	                                    		ng-attr-tabindex="{{POTypeCompModal.tabIndexValue + 8}}">
+	                                    		<!-- ng-disabled="POTypeCompModal.saveButtonClicked == true" -->
+	                                    		{!$Label.Save_Label}</button>
+	                                    		<!-- ng-class="{'greenBtn' : POTypeCompModal.saveButtonClicked == false, 'disabledButton': POTypeCompModal.saveButtonClicked == true}" -->
+	                                </div>
+                        </div>
+        				
+        			</div>
+        		</div>
+        	</div>
+        	<div class="clearfix"></div>
+		</div>
+	</div>
+</apex:component>

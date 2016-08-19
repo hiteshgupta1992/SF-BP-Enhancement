@@ -1,0 +1,76 @@
+/**
+ * Author: Richa Mittal
+ * Since: August 12, 2016
+ * Name: GlobalSearchCtrl
+ * Description: Controller class to handle methods for global Search
+**/
+global with sharing class GlobalSearchCtrl {
+    
+    
+    public Static Integer  MAX_RECORDS_TO_DISPLAY = 10;
+    
+    /**
+	 * Name: getGlobalSearchResults
+	 * Description: Function get records for the search
+	 * @Param: 
+	 * @Return: String - Search List String 
+	**/
+    @RemoteAction
+    global static String getGlobalSearchResults(String searchQueryJson) {
+    	searchQueryJson = BPUtility.getDecodedString(searchQueryJson);
+    	GlobalSearchResultsWrapper.GlobalQueryJSON globalQueryJSON = (GlobalSearchResultsWrapper.GlobalQueryJSON)System.JSON.deserialize(searchQueryJson, GlobalSearchResultsWrapper.GlobalQueryJSON.class);
+		
+		// serach text entered by the user
+    	String searchText = globalQueryJSON.GlobalSearchText;
+    	
+    	// keyword to search given by the user
+    	String searchKeyword = globalQueryJSON.GlobalSearchKeyword;
+    	
+    	// List to Hold all the query record
+    	List<Sobject> searchedResultsList = new List<Sobject>();
+    	
+    	// query to SOQL records
+    	String query;
+    	
+    	// variable to Hold object API Name
+    	String objectAPIName;
+    	for(String objectName : HomeSearchUtil.displayObjectNameToObjectAPINameMap.keySet()){
+    		objectAPIName = HomeSearchUtil.displayObjectNameToObjectAPINameMap.get(objectName);
+    		query = 'SELECT '; 
+	        for(String fieldsName : HomeSearchUtil.searchableObjectToFieldsMap.get(objectAPIName)){
+	        	fieldsName = BPUtility.escapeSingleQuotes(fieldsName);
+	            query += fieldsName + ', ';
+	        }
+	        query = query.substring(0, query.length()-2);
+	        query += ' FROM ' + Constants.NAMESPACE + objectAPIName;
+	        query += ' WHERE '+ HomeSearchReportInterface.getContainsCondition(objectName, searchText);
+	        //System.assert(false, query);
+	        /*
+	        if(objectAPIName == 'Account') {
+	            query += 'WHERE '; 
+	        }
+	        query += ' ORDER BY Default__c DESC, Name__c ASC';*/
+	        searchedResultsList.addAll((List<Sobject>)Database.query(query));
+    	}
+    	
+    	//Apply Sorting on Records
+    	// Need to Implement the logic of sorting
+    	List<HSSObjectInstance> HSSObjectList = new List<HSSObjectInstance>();
+    	for(Sobject sObj : searchedResultsList) {
+    		HSSObjectList.add(new HSSObjectInstance(sObj));
+    	}
+    	HSSObjectList.sort();
+    	
+    	searchedResultsList = new List<Sobject>();
+    	for(HSSObjectInstance HSSObject : HSSObjectList) {
+    		searchedResultsList.add(HSSObject.record);
+    	}
+    	
+    	// List to return the result 
+    	List<GlobalSearchResultsWrapper> globalSearchResultsList = new List<GlobalSearchResultsWrapper>();
+    	for(Sobject sObj : searchedResultsList) {
+    		globalSearchResultsList.add(new GlobalSearchResultsWrapper(sObj));
+    	}
+    	return BPUtility.getEncodedString(System.JSON.serialize(globalSearchResultsList));
+    }
+}

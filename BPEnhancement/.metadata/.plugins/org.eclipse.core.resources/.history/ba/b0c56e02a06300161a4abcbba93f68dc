@@ -1,0 +1,45 @@
+<!-- Content page for BlackPurl Error page. -->
+<apex:page controller="BlackPurlContentCtrl" id="BPErrorContent"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+	
+	<style>
+		.ErrorDiv{
+			margin: 0; 
+			padding: 20px; 
+			text-align:center; 
+			font-family:Arial, Helvetica, sans-serif; 
+			font-size:14px; 
+			color:#666666;
+		}
+		.error_page{
+			width: 600px; 
+			padding: 50px; 
+			margin: auto;
+		}
+		.error_page h1{
+			margin: 20px 0 0;
+		}
+		.error_page p{
+			margin: 10px 0; 
+			padding: 0;
+		}		
+		a{
+			color: #9caa6d; 
+			text-decoration:none;
+		}
+		a:hover{
+			color: #9caa6d; 
+			text-decoration:underline;
+		}
+	</style>
+	
+	<div class="ErrorDiv">
+		<div class="error_page">
+			<img alt="Page Not Found" src="{!URLFOR($Resource.Images, '/Error_Page.png')}" />
+			<h1>Page Not Found</h1>
+			<p>The page you are looking for cannot be found.</p>
+			<p><a href="{!$Page.BlackPurlHome}">Return to the homepage</a></p>
+		</div>
+	</div>
+	
+</apex:page>

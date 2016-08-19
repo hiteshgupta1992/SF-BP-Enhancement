@@ -1,0 +1,11 @@
+<!-- Customers management Frame page for BlackPurl site -->
+<apex:page controller="BlackPurlContentCtrl" id="HomePage" title="Make Management"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+	
+	<apex:outputPanel id="contentPanel">
+		<apex:outputPanel id="unitMakeGrid" >
+			<c:UnitMakeList uniqueId="Unit_Make_"/>
+	    </apex:outputPanel>
+    </apex:outputPanel>
+    
+</apex:page>

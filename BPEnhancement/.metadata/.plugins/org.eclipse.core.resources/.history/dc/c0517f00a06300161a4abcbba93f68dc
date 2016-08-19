@@ -1,0 +1,50 @@
+<apex:component id="SObjectFieldDropdown" >
+    <!-- Component Attributes -->
+    <!-- Required: TRUE -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for component here."/>
+    <apex:attribute name="elementId" required="true" type="String" description="HTML element Id on which to apply dropdown."/>
+    <apex:attribute name="sObjName" required="true" type="String" description="SObject API name."/>
+    <apex:attribute name="fieldName" required="true" type="String" description="Object field API name (Picklist field)."/>
+    
+    <!-- Required: FALSE -->
+    <apex:attribute name="disabled" required="false" type="boolean" default="false" description="If to set disabled after load."/>
+    <apex:attribute name="preSelectedValue" required="false" type="String" default="" description="Selected display value."/>
+    <apex:attribute name="callbackMethodName" required="false" type="String" default="" description="Callback JS method name for dropdown changes."/>
+    
+    <script>
+    	$(document).ready( function(){
+    		// Generate field values data JSON and populate "elementId" picklist datasource
+    		var callbackToPopulateDropdown = {!uniqueId}populateObjFieldPicklist;
+    		generateObjFieldPicklistJSON( "{!sObjName}", "{!fieldName}", callbackToPopulateDropdown );
+    	});
+    	
+    	// Method which populates object field values picklist datasource
+    	function {!uniqueId}populateObjFieldPicklist(fieldPicklistJSON){
+    		debug(fieldPicklistJSON);
+    		// create DropDownList from "elementId" input HTML element
+            $("#{!elementId}").kendoDropDownList({
+                dataTextField: "Name",
+                dataValueField: "Value",
+                dataSource: fieldPicklistJSON,
+                index: 0,
+                enable: !{!disabled},
+                change: {!uniqueId}onChangeDropDown
+            });
+            var drodownElement = $("#{!elementId}").data("kendoDropDownList");
+			drodownElement.wrapper.attr("title", $("#{!elementId}").attr("title"));
+			
+            var preSelectedValue = '{!preSelectedValue}';
+			if(preSelectedValue != null && preSelectedValue.trim().length != 0){
+				drodownElement.text(preSelectedValue);
+			}
+    	};
+    	
+    	// On-Change event method for dropdown
+    	function {!uniqueId}onChangeDropDown() {
+    		// Call back for page to track form changes
+			if("{!callbackMethodName}" != ""){
+				{!callbackMethodName}();
+			}
+		};
+    </script>
+</apex:component>

@@ -1,0 +1,974 @@
+<apex:component id="UnitModelComp" controller="UnitModelOverviewCtrl" allowDML="true">
+    
+    <!-- Component Attributes -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for components here."/>
+    
+    <body>
+        <span id="{!uniqueId}Notification"></span>
+        <div id="dropDownDiv" style="margin-top: -2.50%;">
+            <span id="{!uniqueId}NumberOfFilterRecords" style="color: #1abc9c;"> </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span> <b> Include Inactive </b> </span>
+            <input type="checkbox" id="{!uniqueId}IncludeInactiveCheckBox" onClick="{!uniqueId}BindGridData();"/> &nbsp;&nbsp;&nbsp;
+            <span> <b> Records Size : </b> </span>
+            <select id="{!uniqueId}dropDownList" onchange="{!uniqueId}setCustomSettingAndReloadGrid();">
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+            </select>
+        </div>
+  		
+	        <div>
+	             <div id="{!uniqueId}grid" style="width:100%; "></div>
+	             <apex:outputPanel id="NavigationPanel"> 
+	                <span id="NavigationDiv">
+	                    <span> Show </span>
+	                    <a href="" onclick="{!uniqueId}moreLinkClickAction();" id="{!uniqueId}MoreLink" > More </a>
+	                    <sapn> / </sapn>
+	                    <a href="" onclick="{!uniqueId}fewerLinkClickAction();" id="{!uniqueId}FewerLink" class="linkDisable"> Fewer </a>
+	                    <span> Records </span>
+	                </span>
+	            </apex:outputPanel>
+	        </div>
+                
+        <div class="{!uniqueId}waitingSearchDiv"> 
+           <!--  <img class="waitingImage" src="{!URLFOR($Resource.Images, '/loading.gif')}" title="Please Wait..." /> -->
+        </div>
+        
+        <div class="unit_model_scroll-to-add">  
+        </div>
+        
+    </body>
+    
+     <!-- <apex:form >
+        <apex:actionFunction name="{!uniqueId}setUnitModelCustomSetting" action="{!setCustomerCustomSetting}" rerender="dummy">
+            <apex:param name="dropDownSelectedNumber" assignTo="{!dropDownSelectedNumber}" value=""/>
+        </apex:actionFunction>
+    </apex:form> -->
+  
+    <style>
+        .bpGridAddButton {
+            float:left;
+            position:relative;
+        }
+        .bpGridRowSelected {
+            text-align:left;
+        }
+        .ob-center {
+            text-align:center;
+        }
+        .scroll-to-top {
+            position: fixed; 
+            background : url("{!URLFOR($Resource.Images,'/scrollToTop.png')}");
+            cursor: pointer; 
+            width:12px; 
+            height: 33px; 
+            bottom: 3.5em; 
+            padding-right: 1em; 
+            display: none; 
+            z-index: 999; 
+            margin-left: 79.10%;
+            border-radius: 13px !important;
+        }
+        .unit_model_scroll-to-add {
+            position: fixed; 
+            background : url("{!URLFOR($Resource.Images,'/scrollAdd.png')}");
+            cursor: pointer; 
+            width:23px; 
+            height: 30px; 
+            bottom: 1em; 
+            display: block;
+            padding-right: 1em; 
+            z-index: 999; 
+            margin-left: 78.06%;
+            border-radius: 13px !important;
+        }
+        #NavigationDiv a {
+            text-decoration : none;
+            color : blue;
+            cursor : pointer;
+        }
+        .linkDisable {
+            color: #a0a0a0 !important;
+            pointer-events: none;
+            cursor: default;
+        }
+        #NavigationDiv {
+            margin-left:40%;
+            position: absolute;
+            z-index: 1;
+            margin-top: -1.7%;
+        }
+        #dropDownDiv {
+            margin-top: -2.20%;
+        }
+        .k-tooltip-validation {
+            background-color : white !important;
+        }
+    </style>
+    
+    <script>
+        
+        // variable to show pop up notifications
+        var {!uniqueId}popupNotification;
+        
+        // Variable related to filters
+        var FilterKeys = [];
+        var FilterJsonData = '';
+        var startSugest = 0;
+        
+        // Category Grid Instance
+        var {!uniqueId}unitModelGrid = $("#{!uniqueId}grid").data("kendoGrid");
+        
+        var unitMakeId = '{!JSENCODE(unitMakeId)}';
+        
+        function {!uniqueId}setCustomSettingAndReloadGrid() {
+            var numberOfModelsToBeShown = document.getElementById('{!uniqueId}dropDownList');
+            setPageSizeInCaseOfModel(numberOfModelsToBeShown.value); 
+            {!uniqueId}BindGridData();
+        }
+        
+        if(document.getElementById('{!uniqueId}dropDownList') != null && '{!dropDownSelectedNumber}' != "") {
+            document.getElementById('{!uniqueId}dropDownList').value = '{!dropDownSelectedNumber}';
+        }
+        
+        /**
+         * Name: Document Ready Function
+         * Desc: Method executes as soon as the page load
+         * @param: 
+         * @return: 
+        **/
+        $(document).ready(function () {
+            // Notification Popup
+            {!uniqueId}popupNotification = $("#{!uniqueId}Notification").kendoNotification({
+                
+                // hide automatically after 2 seconds
+                autoHideAfter: 5000,
+                
+                // prevent accidental hiding for 100 mili-second
+                allowHideAfter: 100,
+                
+                // prevent to show a hide button
+                button: false,
+                
+                // allow hiding by clicking on the notification content
+                hideOnClick: true,
+                
+                // Set animation to false
+                animation: false
+            }).data("kendoNotification");
+            
+            dropDownNumber = document.getElementById('{!uniqueId}dropDownList').value;
+            isInactiveIncluded = document.getElementById('{!uniqueId}IncludeInactiveCheckBox').checked;
+            getUnitModelecords(unitMakeId, dropDownNumber, isInactiveIncluded, FilterJsonData, loadUnitModelCallback);
+            
+            jQuery('.unit_model_scroll-to-add').click(function(event) {
+                {!uniqueId}unitModelGridAddButtonClickEvent();
+                event.preventDefault();
+                return false;
+            })
+        });
+        
+        var {!uniqueId}currentRowIndex = -1;
+        var {!uniqueId}firstClickEvent = true;
+        var unitMakeDefaultConfirm = true;
+        var unitMakeDefaultClickEventName = '';
+        
+        var FilterKeys = [];
+        
+        function incresedUnitModelCallback(result) {
+        	var unitModel = result;
+        	if(unitModel.length < 21) {
+                $("#{!uniqueId}MoreLink").addClass("linkDisable");
+            }
+            
+            if(unitMakesGridTabPanel.select().children('a').text() == "Make") {
+				 $("#Unit_Make_dropDownDiv").hide();           
+            }
+             
+            if(unitModel.length > 0) {
+                $("#{!uniqueId}FewerLink").removeClass("linkDisable");
+            }
+            debug('outside pushing for ' + {!uniqueId}unitModelGrid.dataSource.view().length);
+            
+            var sorts = {!uniqueId}unitModelGrid.dataSource.sort();
+            {!uniqueId}unitModelGrid.dataSource.filter({});
+            {!uniqueId}unitModelGrid.dataSource.sort({});
+
+            for(var i = 0; i < 20 ; i++){
+                if(unitModel[i] != null) {
+                    debug('Inside pushing for ' + {!uniqueId}unitModelGrid.dataSource.view().length);
+                    {!uniqueId}unitModelGrid.dataSource.view().push(unitModel[i]);
+                }
+            }
+            debug('1st pushing for ' + {!uniqueId}unitModelGrid.dataSource.view().length);
+
+            {!uniqueId}unitModelGrid.dataSource.filter(FilterKeys);
+
+            debug('Filter data pushing for ' + FilterKeys);
+            debug('2nd pushing for ' + {!uniqueId}unitModelGrid.dataSource.view().length);
+            if(sorts != null) {
+                 {!uniqueId}unitModelGrid.dataSource.sort(sorts);
+            }
+            debug('bottom pushing for ' + {!uniqueId}unitModelGrid.dataSource.view().length);
+        }
+        
+        /**
+         * Name: {!uniqueId}moreLinkClickAction
+         * Desc: Method executes when more link is clicked and it added 20 more records to the current Grid
+         * @param: 
+         * @return: 
+        **/
+        function {!uniqueId}moreLinkClickAction() {
+            isInactiveIncluded = document.getElementById('{!uniqueId}IncludeInactiveCheckBox').checked;
+            getMoreUnitModelRecord(unitMakeId, {!uniqueId}unitModelGrid.dataSource.view().length + 21 , isInactiveIncluded, FilterJsonData, incresedUnitModelCallback);
+        }
+        
+        
+        /**
+         * Name: {!uniqueId}fewerLinkClickAction
+         * Desc: Method executes when fewer link is clicked and it removes last 20 records to the current Grid
+         * @param: 
+         * @return: 
+        **/
+        function {!uniqueId}fewerLinkClickAction() {
+            var gridLength = {!uniqueId}unitModelGrid.dataSource.view().length;
+            $("#{!uniqueId}MoreLink").removeClass("linkDisable");
+            if(gridLength <= +dropDownNumber + 1) {
+                $("#{!uniqueId}FewerLink").addClass("linkDisable");
+                if(gridLength <= +dropDownNumber) {
+                    return;
+                }
+            }
+
+            {!uniqueId}unitModelGrid.dataSource.filter({});
+            var sorts = {!uniqueId}unitModelGrid.dataSource.sort();
+            {!uniqueId}unitModelGrid.dataSource.sort({});
+
+            for(var i = gridLength-1; i > gridLength - 20 - 1 ; i--){
+                if(i == +dropDownNumber - 1) {
+                    $("#{!uniqueId}FewerLink").addClass("linkDisable");
+                    return;
+                } else if(i == +dropDownNumber) {
+                    $("#{!uniqueId}FewerLink").addClass("linkDisable");
+                }
+                {!uniqueId}unitModelGrid.dataSource.view().pop(i);
+            }
+            if(sorts!= null) {
+                {!uniqueId}unitModelGrid.dataSource.sort(sorts);
+            }
+             {!uniqueId}unitModelGrid.dataSource.filter(FilterKeys);
+        }
+        
+        function loadUnitModelCallback(result) {
+        	// Load Category grid here
+            {!uniqueId}loadUnitModelGrid(result);
+            
+            if(result.length == +dropDownNumber) {
+                $("#{!uniqueId}MoreLink").removeClass("linkDisable");
+            } else if(result.length < +dropDownNumber) {
+                $("#{!uniqueId}MoreLink").addClass("linkDisable");
+            }
+            
+            if({!uniqueId}unitModelGrid == null){
+                {!uniqueId}unitModelGrid = $("#{!uniqueId}grid").data("kendoGrid");
+            }
+            
+             // Load document click bindings
+            $(document).on('click', function (event) {
+                {!uniqueId}unitModel_DocOnClikcBindings(event);
+            });
+            
+            $("#{!uniqueId}unitModel_Add_Button", {!uniqueId}unitModelGrid.element).on("click", function (event) {
+                {!uniqueId}unitModelGridAddButtonClickEvent();
+                event.stopPropagation();
+            });
+            
+            $("#{!uniqueId}unitModel_Delete_Button", {!uniqueId}unitModelGrid.element).on("click", function (event) {
+                    {!uniqueId}unitModelGridDeleteButtonClickEvent();
+                    
+                    event.stopPropagation();
+                });
+            
+            {!uniqueId}unitModelGrid.element.on("click", "tbody>tr>td", "click", function (event) {
+                {!uniqueId}unitModelGridCellSingleClickEvent(this);
+                event.stopPropagation();
+            });
+            
+            
+            {!uniqueId}unitModelGrid.element.on("click", "tbody>tr>td>span.k-dropdown", "click", function (event) {
+                $(document).unbind('click');
+                event.stopPropagation();
+            });
+            
+            {!uniqueId}unitModelGrid.element.on("change", "tbody>tr>td>span.k-dropdown", "change", function (event) {
+                var delta = 200;
+                var timeout = false;
+                event.stopPropagation();
+                if (timeout === false) {
+                    setTimeout(callBinds, delta);
+                }
+            });
+            
+            function callBinds() {
+            	$(document).bind('click', function (event) {
+                    {!uniqueId}unitModel_DocOnClikcBindings(event);
+                });
+            }
+                
+        }
+        
+        /**
+         * Name: {!uniqueId}loadUnitMakeGrid
+         * Desc: Method to load the customer Grid when the component is loaded.
+         * @param: 
+         * @return: 
+        **/
+        function {!uniqueId}loadUnitModelGrid(result){
+            // Grid Data Source
+            var unitModelGridDataSource = new kendo.data.DataSource({
+                transport: {
+                    read: function (options) {
+                    	options.success(result);
+                    },
+                    create:function(e) {
+                        return false;
+                    },
+                    update:function(e) {
+                        return false;
+                    },
+                },
+                schema: {
+                    model: {
+                        Id: "Unit_Model_Id",
+                        fields: {
+                            Unit_Model_Name: {
+                                type: "string",
+                                validation : {
+                                    unitModelNameSpecialCharValidation: function (input, params) {
+                                        if (input.is("[name='Unit_Model_Name']") && input.val()) {
+                                            var a = !/[^a-zA-Z0-9_ ]/.test(input.val());
+                                            if(!a){
+                                               input.attr("data-unitModelNameSpecialCharValidation-msg", "Enter an alphanumeric value");
+                                               return false;
+                                            } else if(input.val().trim().length > 255) {
+                                               input.attr("data-unitModelNameSpecialCharValidation-msg", "Cannot exceed 255 characters");
+                                               return false;
+                                            } 
+                                        } else if(input.is("[name='Unit_Model_Name']")){
+                                        	input.attr("data-unitModelNameSpecialCharValidation-msg", "Unit Model Name is required");
+                                            return false;
+                                        }    
+                                        return true;
+                                    }
+                                } 
+                            },
+                            Unit_Model_VIN_Code: { 
+                                type: "string",
+                                validation : {
+                                    unitModelVINCodeLengthValidation : function (input, params) {
+                                        if ( input.is("[name='Unit_Model_VIN_Code']") && input.val() ) {
+                                            if(input.val().trim().length > 5
+                                            ) {
+                                                input.attr("data-unitModelVINCodeLengthValidation-msg", "VIN Code cannot exceed 5 characters");
+                                                return false;
+                                            }
+                                        }   
+                                        return true;
+                                    }
+                                }  
+                            },
+                            Unit_Model_Active : { type: "boolean"},
+                            Unit_Model_Category: { 
+                                type: "string"
+                            },
+                            Unit_Model_Model_Description: { 
+                                type: "string",
+                                validation : {
+                                    unitModelDescLengthValidation : function (input, params) {
+                                        if ( input.is("[name='Unit_Model_Model_Description']") && input.val() ) {
+                                            if(input.val().trim().length > 255) {
+                                                input.attr("data-unitModelDescLengthValidation-msg", "Model Description cannot exceed 255 characters");
+                                                return false;
+                                            }
+                                        }   
+                                        return true;
+                                    }
+                                }  
+                            },
+                            Unit_Model_Sub_Model: { 
+                                type: "string",
+                                validation : {
+                                    unitModelSubModelLengthValidation : function (input, params) {
+                                        if ( input.is("[name='unitModelSubModelLengthValidation']") && input.val() ) {
+                                            if(input.val().trim().length > 80) {
+                                                input.attr("data-unitModelDescLengthValidation-msg", "Sub Model cannot exceed 80 characters");
+                                                return false;
+                                            }
+                                        }   
+                                        return true;
+                                    }
+                                }  
+                            }
+                        }
+                    }
+                },
+                sortable: {
+                    mode: "single",
+                    allowUnsort: false
+                }
+            });
+            
+            // Method: Load Data Grid here
+            $("#{!uniqueId}grid").kendoGrid({
+                toolbar: [
+                    {
+                        name: "Add",
+                        template: '<img src="{!URLFOR($Resource.Images, '/add.jpg')}" class="bpGridAddButton" id="{!uniqueId}unitModel_Add_Button">',
+                        text: "Add New Unit Model Item",
+                        click: function(e){return false;}
+                    },
+                    {
+                        name: "my-extra",
+                        template: '<div class="rightFloatDiv"><div class="rightFloatDiv"><img src="{!URLFOR($Resource.Images, '/delete.png')}" class="my-delete-default" id="{!uniqueId}unitModel_Delete_Button"/></div></div>'
+                    }
+                ],
+                filterable: 
+                    {
+                        extra: false,
+                        operators: {
+                            string: {
+                                startswith: "Starts with",
+                                eq: "Is equal to",
+                                neq: "Is not equal to"
+                            }
+                        }
+                    },
+                columns: [
+                    {
+                        field:"Unit_Model_Name",title:"Model", width: "25%",
+                        filterable: {
+                            ui : unitModelNameFilter
+                        }, 
+                        template: '<span title=\'${Unit_Model_Name}\'>${Unit_Model_Name}</span>'
+                    },
+                    {
+                        field:"Unit_Model_Sub_Model",title:"Sub-Model", width: "25%",
+                        filterable: {
+                            ui : unitModelSubModelFilter
+                        }, 
+                        template: '<span title=\'${Unit_Model_Sub_Model}\'>${Unit_Model_Sub_Model}</span>'
+                    },
+                    {
+                        field:"Unit_Model_VIN_Code",title:"VIN Code", width: "15%",
+                        filterable: {
+                            ui : unitModelVINCodeFilter
+                        }, 
+                        template: '<span title=\'${Unit_Model_VIN_Code}\'>${Unit_Model_VIN_Code}</span>'
+                    },
+                    {
+                        field:"Unit_Model_Model_Description",title:"Model Desc", width: "30%",
+                        filterable: {
+                            ui : unitModelDescFilter
+                        }, 
+                        template: '<span title=\'${Unit_Model_Model_Description}\'>${Unit_Model_Model_Description}</span>'
+                    },
+                    {
+                        field:"Unit_Model_Category",title:"Category", width: "30%", editor: {!uniqueId}categoryDropDownEditor,
+                        filterable: {
+                            ui : unitModelCategoryFilter
+                        }, 
+                        template: "#={!uniqueId}getCategoryName(Unit_Model_Category)#"
+                    },
+                    {
+                        field: "Unit_Model_Active", title: "<span style=\'margin-left:48%\'>Active </span>", width: "20%", attributes:{ class:"ob-center" },
+                        filterable: {
+                            ui : unitModelNameFilter
+                        },
+                        template: '<div class="ob-center"><img #= Unit_Model_Active ? "src={!URLFOR($Resource.Images, '/Check_Selected.png')}" : "src=/img/checkbox_unchecked.gif"# ></div>'
+                    }
+                ],
+                dataSource: unitModelGridDataSource,
+                scrollable:false,
+                sortable: {
+                    mode: "single",
+                    allowUnsort: false
+                },
+                edit:function(e) {  
+                    e.sender.unbind('dataBound');
+                    {!uniqueId}firstClickEvent = true;
+                    var input = e.container.find("input[name='Unit_Model_Name']");      
+                    input.focus();
+                },
+                save:function(e) {
+                    this.editable.end();
+                },
+                reorderable: false,
+                dataBound: {!uniqueId}onUnitModelDataBound,
+                selectable: "single",
+                editable: {
+                    mode: "inline",
+                    confirmation: false,
+                    update: false
+                }
+            });
+            
+            // Called to bind auto-complete to filter
+            function unitModelNameFilter(element) {
+                element.kendoAutoComplete({
+                    ignoreCase: true ,
+                });
+                autoCompleteCall(element, 'autoUnitModelName', 'Unit_Model_Name'); 
+            }
+            
+            // Called to bind auto-complete to filter
+            function unitModelSubModelFilter(element) {
+                element.kendoAutoComplete({
+                    ignoreCase: true ,
+                });
+                autoCompleteCall(element, 'autoUnitModelSubModel', 'Unit_Model_Sub_Model'); 
+            }
+            
+            // Called to bind auto-complete to filter
+            function unitModelVINCodeFilter(element) {
+                element.kendoAutoComplete({
+                    ignoreCase: true ,
+                });
+                autoCompleteCall(element, 'autoUnitModelVINCode', 'Unit_Model_VIN_Code'); 
+            }
+            
+            // Called to bind auto-complete to filter
+            function unitModelDescFilter(element) {
+                element.kendoAutoComplete({
+                    ignoreCase: true ,
+                });
+                autoCompleteCall(element, 'autoUnitModelDesc', 'Unit_Model_Model_Description'); 
+            }
+            
+            // Called to bind auto-complete to filter
+            function unitModelCategoryFilter(element) {
+                element.kendoAutoComplete({
+                    ignoreCase: true ,
+                });
+                autoCompleteCall(element, 'autoUnitModelCategory', 'Unit_Model_Category'); 
+            }
+               
+        }
+        
+        function {!uniqueId}getCategoryName(category) {
+            if(category == null || category.trim().length == 0) {
+            	return '';
+            }
+            for (var idx = 0, length = {!uniqueId}categoryDatasource.length; idx < length; idx++) {
+                if ({!uniqueId}categoryDatasource[idx].Value === category) {
+                    return {!uniqueId}categoryDatasource[idx].Name;
+                }
+            }
+        }
+        
+        // Category picklist
+        var {!uniqueId}categoryDatasource = categoryPickListValues;
+        
+        var dropdownSelected = false;
+        function {!uniqueId}categoryDropDownEditor(container, options) {
+            $('<input data-bind="value:' + options.field + '"/>')
+            .appendTo(container)
+            .kendoDropDownList({      
+                    dataTextField: "Name",
+                    dataValueField: "Value",
+                    dataSource: {!uniqueId}categoryDatasource,
+                    change: function(e){
+                        dropdownSelected = true;
+                        e.preventDefault();
+                    }
+            });
+        }
+        
+        function autoCompleteCall(element, elementId, columnName) {
+            $(element).attr('id', elementId);
+            var delayUnitModelColumnInput = (function(){
+                var timer = 0;
+                return function(callback, ms){
+                    clearTimeout(timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();
+            
+            $(element).parents("div").children("select").children('option[value!="startswith"]').remove();
+            $(element).parents("div").children("select").prop('disabled', true);
+
+            $(element).parent().closest("div").find("button[type='submit']").on('click',function() {                            
+                var keyValue = $('#'+ elementId).val();
+                setFilterKeys(columnName,'startswith', keyValue);
+                debug(FilterJsonData);
+                {!uniqueId}BindGridData();
+            });
+
+            $(element).parent().closest("div").find("button[type='reset']").on('click',function() {                         
+                removeFilterKeys(columnName);
+                {!uniqueId}BindGridData();
+            });
+
+            $("input[data-role='autocomplete']").keyup(function(event) {
+                if($('#'+ elementId).val().length >= 3) {
+                    if((event.keyCode == 13) || (event.keyCode == 40)) {
+                        
+                    } else {
+                        delayUnitModelColumnInput(function(){
+                            getAutoCompleteSugestion(elementId, columnName);
+                        }, 400 );
+                    }
+                } else {
+                    startSugest = 0;
+                }
+            });
+        } 
+        
+        
+        function setFilterKeys(fieldValue, operatorValue, keyValue) {       
+            debug('operatorValue  ' + operatorValue + '\n\nfieldValue' + fieldValue);
+            var newFilter = { field: fieldValue, operator: operatorValue, value: keyValue};
+            if(keyValue.trim().length == 0) {
+            	FilterJsonData = '';
+            	return false;
+            }
+            var recordNo = 0;
+            if(FilterKeys.length == 0) {        
+                FilterKeys.push(newFilter);
+            } else {
+                for (var i = 0 ; i < FilterKeys.length ; i++) {
+                    if(FilterKeys[i]["field"] == fieldValue) {
+                        FilterKeys.splice(i, 1, newFilter);
+                        recordNo = 1;
+                    }
+                }
+                if(recordNo == 0) {
+                    FilterKeys.push(newFilter);
+                }
+            }
+            FilterJsonData = JSON.stringify(FilterKeys);        
+        }
+        
+        //Reset Filter Key To the Database
+        function removeFilterKeys(fieldValue) {
+            if(FilterKeys.length > 0) {     
+                for (var i = 0 ; i < FilterKeys.length ; i++) {
+                    if (FilterKeys[i]["field"] == fieldValue) {
+                        FilterKeys.splice(i, 1);
+                    }
+                }
+            }
+            FilterJsonData=JSON.stringify(FilterKeys);  
+        }
+        
+        function getAutoCompleteSugestion(elementId, columnName) {
+            var inputItem = $('#'+ elementId).val();
+            debug('getAutoCompleteSugestion ' + inputItem);
+            isInactiveIncluded = document.getElementById('{!uniqueId}IncludeInactiveCheckBox').checked;
+            
+            getAutoCompleteSuggestionUnitModel(unitMakeId, inputItem, columnName, isInactiveIncluded, autoCompleteSuggestionUnitModelCallback, elementId);
+        }
+        
+        function autoCompleteSuggestionUnitModelCallback(dataarray, elementId) {
+        	$('#'+ elementId).data("kendoAutoComplete").setDataSource(dataarray);
+	       	if(startSugest == 0) {
+	        	var searchKey = $('#' + elementId).val();
+	           	$('#' + elementId).data("kendoAutoComplete").search(searchKey);
+	           	startSugest = 1;
+	       	}
+        }
+        
+        function {!uniqueId}onUnitModelDataBound(e) {
+        	if({!uniqueId}unitModelGrid == null){
+                {!uniqueId}unitModelGrid = $("#{!uniqueId}grid").data("kendoGrid");
+            }
+            
+            $("#{!uniqueId}grid").find(".k-grid-toolbar").insertAfter($("#{!uniqueId}grid").children()[1]);
+            $(".k-grid-toolbar").css("background-color", "#ffffff");
+            $(".k-grid-toolbar").css("border-top", "none");
+            $(".k-grid-toolbar").css("height", "25px");
+            $(".k-grid-toolbar").css("vertical-align", "middle");
+            $(".bpGridAddButton").prop('title', 'Add');
+            {!uniqueId}unitModelGrid.bind('edit', {!uniqueId}gridChange);
+        }
+        
+        // Method: click bindings for document click
+        function {!uniqueId}unitModel_DocOnClikcBindings(event){
+            var isSuccessfullySaved = {!uniqueId}validateAndSaveRow();
+        }
+        
+        
+        function bindGridDataCallback(dataArray) {
+        	$("#{!uniqueId}grid").data("kendoGrid").dataSource.data(dataArray);
+                                
+            if(dataArray.length ==  +dropDownNumber) {
+                $("#{!uniqueId}MoreLink").removeClass("linkDisable");
+            } else if(dataArray.length <  +dropDownNumber) {
+                $("#{!uniqueId}MoreLink").addClass("linkDisable");
+            }
+            
+            if(FilterJsonData != '[]' && FilterJsonData != '') {
+                if(dataArray.length == 0) {
+                    $("#{!uniqueId}NumberOfFilterRecords").html('<i> No records found </i>');
+                } else {
+                    $("#{!uniqueId}NumberOfFilterRecords").html('<b>'+ dataArray[0].TotalFilteredRecords + '</b><i> records retrieved </i>');
+                }
+            } else {
+                $("#{!uniqueId}NumberOfFilterRecords").html('');        
+            }
+            
+            $("#{!uniqueId}FewerLink").addClass("linkDisable");
+        }
+        
+        
+        function {!uniqueId}BindGridData() {    
+            isInactiveIncluded = document.getElementById('{!uniqueId}IncludeInactiveCheckBox').checked;
+            dropDownNumber = document.getElementById('{!uniqueId}dropDownList').value;
+            
+            getUnitModelecords(unitMakeId, +dropDownNumber, isInactiveIncluded, FilterJsonData, bindGridDataCallback);
+        }
+        
+        
+        function {!uniqueId}gridChange(currElem){
+            {!uniqueId}currentRowIndex = this.select().index();
+        }   
+        
+        function {!uniqueId}unitModelGridCellSingleClickEvent(thisElem){
+            
+            // Check if selected row is alreadey in edited mode
+            if($(thisElem).parent().hasClass('k-grid-edit-row')) {
+                
+            } else {
+                var isSuccessfullySaved = true;
+                var hasEditedRow = {!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row");
+                if(hasEditedRow) {
+                    isSuccessfullySaved = {!uniqueId}validateAndSaveRow();
+                }
+                
+                if(isSuccessfullySaved) {
+                    {!uniqueId}toggleSelectedRowClass($(thisElem).parent());
+                    if({!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                        {!uniqueId}toggleUnitModelToolbarButtons(false);
+                    } else {
+                        $("#{!uniqueId}grid").data("kendoGrid").editRow($(thisElem).parent());
+                        {!uniqueId}toggleUnitModelToolbarButtons(true);
+                    } 
+                    
+                }else{
+                    if({!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                        var existingEditedCells = $("#{!uniqueId}grid .bpGridRowSelected");
+                        {!uniqueId}unitModelGrid.select( $(existingEditedCells[0]).parent() );
+                    }
+                }
+            }
+        }
+        
+        function {!uniqueId}unitModelGridDeleteButtonClickEvent(){
+        	if({!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+				{!uniqueId}toggleUnitModelToolbarButtons(false);
+			} else {
+				var a = $(this).closest('td');
+                $("#{!uniqueId}grid").data("kendoGrid").editRow($(a).parent());
+                {!uniqueId}toggleUnitModelToolbarButtons(true);
+			}
+			
+			var rowIndex = {!uniqueId}unitModelGrid.tbody.find(".k-grid-edit-row");
+        	if(rowIndex.length == 0) {
+        		isUnitModelSuccessfullySaved = false;
+        		return false;
+        	}
+        	
+        	if({!uniqueId}unitModelGrid.dataItem(rowIndex).Unit_Model_Id != null && {!uniqueId}unitModelGrid.dataItem(rowIndex).Unit_Model_Id != "") {
+	        	delete {!uniqueId}unitModelGrid.dataItem(rowIndex).Unit_Model_Unit_Make_Id;
+	        	var rowData = JSON.stringify({!uniqueId}unitModelGrid.dataItem(rowIndex));
+	        	deleteUnitModel(rowData, unitModelSaveCallback);
+	        } else {
+	        	unitModelSaveCallback();
+	        }
+		}
+        
+        function {!uniqueId}unitModelGridAddButtonClickEvent(){
+            if({!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                {!uniqueId}validateAndSaveRow();
+            } else {
+            	{!uniqueId}unitModelGrid.dataSource.filter({});
+                {!uniqueId}addNewDataRow(null);
+            }
+        }
+        
+        function {!uniqueId}addNewDataRow(){
+            var dataSource = {!uniqueId}unitModelGrid.dataSource;
+            var total = dataSource.data().length;
+            if(total > 0) {
+                {!uniqueId}unitModelGrid.dataSource.sort(null);
+            }
+           
+            dataSource.insert(total, {
+                "Unit_Model_Id": "",
+                "Unit_Model_Sub_Model" : "" ,
+                "Unit_Model_Name" : "" ,
+                "Unit_Model_VIN_Code" : "",
+                "Unit_Model_Model_Description" : "",
+                "Unit_Model_Category" : "",
+                "Unit_Model_Unit_Make_Id" : unitMakeId,
+                "Unit_Model_Active" : true
+            });
+            dataSource.page(dataSource.totalPages());
+            
+            var newRowToAdd = {!uniqueId}unitModelGrid.tbody.children().last();
+            
+            {!uniqueId}unitModelGrid.editRow(newRowToAdd);
+            
+            {!uniqueId}toggleUnitModelToolbarButtons(true);
+            {!uniqueId}toggleSelectedRowClass(newRowToAdd);
+            
+        }
+        
+        // Validate and Save row
+        function {!uniqueId}validateAndSaveRow(){
+        	var hasEditedRow = {!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row");
+            var isRowIsBlank;
+            if(hasEditedRow) {
+                isRowIsBlank = {!uniqueId}checkIfNewRowIsBlank();
+            }
+        
+        	if(!isRowIsBlank) {
+	            if( {!uniqueId}unitModelGrid.editable != null  && 
+	            		({!uniqueId}unitModelGrid.editable.validatable.validate())){
+	                
+	                {!uniqueId}saveUnitModel();
+	                if(isUnitModelSuccessfullySaved == false) {
+	                	return false;;
+	                } else if (FilterKeys.length > 0 && isCategorySuccessfullySaved != null){
+	                	{!uniqueId}unitModelGrid.dataSource.filter(FilterKeys);
+	                }
+	                return true;
+	            } else {
+	                return false;
+	            }
+            }
+        }
+        
+        
+        function {!uniqueId}checkIfNewRowIsBlank() {
+            if({!uniqueId}unitModelGrid == null) {
+                return false;
+            }
+            
+            var newRow = {!uniqueId}unitModelGrid.tbody.find(".k-grid-edit-row");
+            asd = newRow;
+            var newRowName = newRow.children().find("input[name='Unit_Model_Name']").val();
+            
+            var newRowSubModel = newRow.children().find("input[name='Unit_Model_Sub_Model']").val();
+            
+            var newRowVINCode = newRow.children().find("input[name='Unit_Model_VIN_Code']").val();
+            
+            var newRowModelDescription = newRow.children().find("input[name='Unit_Model_Model_Description']").val();
+            
+            var newRowCategory = newRow.children().find("input[data-bind='value:Unit_Model_Category']").val();
+            
+            var newRowActive = newRow.children().find("input[name='Unit_Model_Active']").is(":checked");
+            
+            var currRowCUid = newRow.attr('data-uid');
+            
+            var rowId = {!uniqueId}unitModelGrid.dataSource.getByUid(currRowCUid).Unit_Model_Id;
+            
+            if(rowId != "") {
+            	return false;
+            }
+            if(newRowCategory == 'undefined') {
+            	newRowCategory == "";
+            }
+            if(newRowName == "" && newRowSubModel == "" && newRowVINCode == "" && newRowModelDescription == ""  && newRowCategory == "" && newRowActive ) {
+                debug("No Change");
+                {!uniqueId}unitModelGrid.removeRow(newRow);
+                {!uniqueId}unitModelGrid.dataSource.remove(newRow);
+                return true;
+            }
+            return false;
+        }
+        
+        var isUnitModelSuccessfullySaved;
+        
+        function {!uniqueId}saveUnitModel(){
+            if({!uniqueId}unitModelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                if(({!uniqueId}unitModelGrid.editable.validatable.validate())) {
+                    var rowIndex = {!uniqueId}unitModelGrid.tbody.find(".k-grid-edit-row");
+                    if(rowIndex.length == 0) {
+                        isUnitModelSuccessfullySaved = false;
+                        return false;
+                    }
+                    
+                    if({!uniqueId}unitModelGrid.dataItem(rowIndex).Unit_Model_Id != null && {!uniqueId}unitModelGrid.dataItem(rowIndex).Unit_Model_Id != "") {
+                    	delete {!uniqueId}unitModelGrid.dataItem(rowIndex).Unit_Model_Unit_Make_Id;
+                    }
+                    var rowData = JSON.stringify({!uniqueId}unitModelGrid.dataItem(rowIndex));
+                    saveUnitModel(rowData, unitModelSaveCallback);
+                }
+            }
+        }
+        
+        function unitModelSaveCallback() {
+        	{!uniqueId}refreshGrid();
+        	isUnitModelSuccessfullySaved = true;
+        }
+        
+        // Refresh the grid:
+        function {!uniqueId}refreshGrid(){
+            getUnitModelecords(unitMakeId, +dropDownNumber, isInactiveIncluded, FilterJsonData, bindGridDataCallback);
+            
+            //{!uniqueId}unitModelGrid.dataSource.read();
+            {!uniqueId}unitModelGrid.refresh();
+            {!uniqueId}toggleUnitModelToolbarButtons(false);
+        }
+        
+        function {!uniqueId}toggleSelectedRowClass(selectedRow){
+            // If previouslySelectedRow
+            var selectedCellElem = $(selectedRow.children()[0]);
+            var previouslySelectedRow = (selectedCellElem.attr("class") == "bpGridRowSelected") ? true : false;
+            var lastColumnOfSelectedRow;
+            if(!previouslySelectedRow){
+                for(var i = 0; i < selectedRow.children().length; i++){
+                    lastColumnOfSelectedRow = $(selectedRow.children()[i]);
+                    lastColumnOfSelectedRow.addClass("bpGridRowSelected");
+                }
+            }
+        }
+        
+        // Display popup notiications:
+        function {!uniqueId}showPopupNotification(message, msgType){
+            {!uniqueId}popupNotification.hide();
+            {!uniqueId}popupNotification.show(kendo.toString(message), msgType);
+        }
+        
+        function {!uniqueId}toggleUnitModelToolbarButtons(makeActive) {
+			var tempMakeActive = makeActive;
+			if (makeActive == "TF") {
+				makeActive = true;
+			}
+			{!uniqueId}removePrevActive();
+			
+			var deleteButton = $("#{!uniqueId}unitModel_Delete_Button");
+		
+			if (makeActive) {
+				deleteButton.removeClass("my-delete-default");
+				deleteButton.addClass("my-delete-active");
+		
+				deleteButton.prop('title', 'Delete');
+			} else {
+				deleteButton.addClass("my-delete-default");
+				deleteButton.removeClass("my-delete-active");
+		
+				deleteButton.removeAttr('title');
+			}
+		}
+		
+		function {!uniqueId}removePrevActive() {
+			var deletedActive = $(".rightFloatDiv .my-delete-active");
+			for (var i = 0; i < deletedActive.length; i++) {
+				$(deletedActive[i]).removeClass("my-delete-active");
+				$(deletedActive[i]).addClass("my-delete-default");
+			}
+		}
+        var asd;
+    </script>
+</apex:component>

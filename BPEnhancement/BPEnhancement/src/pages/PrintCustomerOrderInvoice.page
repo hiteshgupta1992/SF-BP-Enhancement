@@ -1,0 +1,369 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" Controller="PrintCustomerOrderInvoiceCtrl">
+   <html ng-app="InvoicePrintPreviewModule" >
+        <head>
+            <title>Print Preview</title>
+            <apex:stylesheet value="{!URLFOR($Resource.fontawsome, 'css/font-awesome.css')}"/>
+            <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.Printcss)}" media="all" />
+            <c:Css_and_Js />
+            <c:PrintPreviewStyle />
+    		<script type="text/javascript">
+    			  var InvoicePrintPreviewModule = angular.module('InvoicePrintPreviewModule', ['ui-notification']);
+           		 	InvoicePrintPreviewModule.controller('InvoicePrintPreviewController', function($scope, $window, $q, $timeout, Notification, InvoicePrintPreviewInfoService) {
+            			if($scope.InvoicePrintPreviewModel == undefined) {
+	                    	$scope.InvoicePrintPreviewModel = {};
+	                    }
+                        $scope.parseFloat = parseFloat;
+            			$scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo=[];
+            			$scope.InvoicePrintPreviewModel.printview = function(){
+            				 $timeout($window.print, 0);
+            			}
+            			$scope.InvoicePrintPreviewModel.showContent = false;
+            			
+            			$scope.LoadPrintPreview = function () {
+                            $scope.InvoicePrintPreviewModel.customerInvoiceId = "{!JSENCODE(URLENCODE($CurrentPage.parameters.id))}";
+                            if($scope.InvoicePrintPreviewModel.customerInvoiceId == undefined){
+                                $scope.InvoicePrintPreviewModel.customerInvoiceId = '';
+                            }
+                            debug($scope.InvoicePrintPreviewModel.customerInvoiceId);
+                            InvoicePrintPreviewInfoService.InvoicePrintPreviewDetails($scope.InvoicePrintPreviewModel.customerInvoiceId)
+                                .then(
+                                    function (successfulSearchResult) {
+                                            debug(successfulSearchResult);
+                                            $scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo=successfulSearchResult;
+                                            debug("$scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo : "+JSON.stringify($scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo));
+                                            debug("$scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Merchandises : "+JSON.stringify($scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Merchandises));
+                                            debug("$scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Services : "+JSON.stringify($scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Services));
+                                        
+                                    	 if(Object.keys($scope.InvoicePrintPreviewModel.InvoicePrintPreviewInfo).length != 0){
+                                            $scope.InvoicePrintPreviewModel.showContent = true;
+                                        }
+                                        else{
+                                            Notification.error('Please check ID');
+                                        } 
+                                    },
+                                    function (errorSearchResult) {
+                                        responseData = errorSearchResult;
+                                    }
+                                );
+                        }
+            			
+            			
+          		  })
+          		  
+          		  
+          		    InvoicePrintPreviewModule.service("InvoicePrintPreviewInfoService", function ($q) {
+                    this.InvoicePrintPreviewDetails = function (InvoicePrintPreviewId) {
+                        InvoicePrintPreviewId = encodeString(InvoicePrintPreviewId);
+                        var deferred = $q.defer();
+        
+                        // make AJAX request to the remote service
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.PrintCustomerOrderInvoiceCtrl.getCOInvoiceDetails}',
+                                InvoicePrintPreviewId,
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var InvoicePrintPreview = decodeString(result);
+                                var find = '\''; 
+                                var re = new RegExp(find, 'g');
+                                InvoicePrintPreview = InvoicePrintPreview.replace(re, '');
+                                deferred.resolve(JSON.parse(InvoicePrintPreview));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    }
+            });
+    		
+    		</script>
+    
+    </head>
+        
+        <body ng-controller="InvoicePrintPreviewController" ng-init="LoadPrintPreview()">
+            <div class="content" ng-show="InvoicePrintPreviewModel.showContent">
+                <div class="PrintSection mainSection">
+                    <div id="PrintPreview">
+                        <div class="main_section row">
+                            <div class="row rowGeneral">
+                                <div class="content printpreview InfoMT customerOrderPrintPreview ">
+                                  <div class="col-md-12 customerOrderPrintPreviewLightBox" >
+	                                  <div class="lightbox pull-left">
+	                                  	<p class="placeholderForLogo">Place holder for store Logo</p>
+	                                  </div>
+	                                  <div class="storeInfo ">
+	                                  	<h3 class="col-md-12 M0 P0 text-center">store Name</h3>
+	                                  	<div class="width400">
+		                                  	<label class="T7" >store address</label>
+		                                  	<p></p>
+	                                  	</div>
+	                                  	<div class="width400">
+		                                  	<label class="T7" >store city/prov,postal</label>
+		                                  	<p >{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.StoreCityProv}}
+		                                  {{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.StorePostal}}
+		                                  	</p>
+	                                  	</div>
+	                                  	<div class="width400">
+		                                  	<label class="T7">store business#</label>
+		                                  	<p>{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.StoreBusinessNumber}}</p>
+		                                  	
+	                                  	</div>
+	                                  		<div class="width400">
+	                                  	<label class="T7">store website</label>
+		                                  	<p>{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.StoreWebsite}}</p>
+		                                  	</div>
+	                                  </div>
+	                                  
+	                                  <div class="lightbox pull-right">
+	                                  	<p class="placeholderForLogo">Place holder for store Logo</p>
+	                                  </div>
+                                  </div>
+                               	  
+                               	  <div class="col-md-12">
+                               	  
+                               	 	 <div class="customerinfo">
+	                               	  	<h3 class="text-capitalize">Customer</h3>
+	                               	  		<div class="lightbox pull-left">
+	                               	  			<ul class="col-md-12 P0">
+	                               	  				<li class="col-md-12 P0">
+	                               	  					<label class="col-md-6 T7"> Customer Name </label>
+	                               	  					<span class="col-md-5 T3 P0 breakword pull-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.CustomerName}}</span>
+	                               	  				</li>
+	                               	  				<li class="col-md-12 P0">
+	                               	  					<label class="col-md-6 T7"> Customer Address </label>
+	                               	  					<span class="col-md-5 T3 P0 breakword pull-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.CustomerAddress}}</span>
+	                               	  				</li>
+	                               	  				<li class="col-md-12 P0">
+	                               	  					<label class="col-md-6 T7"> Customer Address2 </label>
+	                               	  					<span class="col-md-5 T3 P0 breakword pull-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.CustomerAddress2}}</span>
+	                               	  				</li>
+	                               	  				<li class="col-md-12 P0">
+	                               	  					<label class="col-md-6 T7 PR0"> Customer city/Prov,Postal </label>
+	                               	  					<span class="col-md-5 T3 P0 breakword pull-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.CustomerCityProv}} <span ng-if="InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.CustomerPostal!=null">/</span>
+	                               	  										{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.CustomerPostal}}
+	                               	  					</span>
+	                               	  				</li>
+	                               	  			</ul>
+	                               	  		</div>
+	                               	 </div>
+                               	  	
+                               	 
+                           			 <div class="col-md-5 pull-right">
+                           			 	<h3  class="col-md-11 col-offset-md-1 text-capitalize P0"> customer invoice</h3>
+                           			 	<table class="col-md-12 table-bordered">
+                           			 		<tbody>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-5">invoice#</td>
+                           			 				<td class="T3 col-md-7">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.InvoiceNumber}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-5">invoice Date</td>
+                           			 				<td class="T3 col-md-7">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.InvoiceDate}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-5">status</td>
+                           			 				<td class="T3 col-md-7">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.Status}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-5">sold by</td>
+                           			 				<td class="T3 col-md-7 breakword">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SoldBy}}</td>
+                           			 			</tr>
+                           			 		</tbody>
+                           			 	</table>
+                           			 
+                           			 </div>
+                               
+                                </div>
+                                
+                                <!-- Merchandise section  -->
+                                 <div class="gid_container_Customer_Invoice" id="Merchandies_Print_Preview_gid_container" ng-if = "InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Merchandises.length>0">
+                                    <div class="grid_table_headding  P0">
+                                    	<p class="T3 col-md-6 pull-left PR0">Merchandise</p>
+                                    	<p class="T7 col-md-3 text-right pull-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.MerchandiseTotal | currency}}</p>
+                                    </div> 
+                                        <table class="table pull-left" id="Merchandies_Print_Preview_ItemGrid"  >
+                                            <col width="10%" />
+                                            <col width="35%" />
+                                            <col width="30%" />
+                                            <col width="15%" />
+                                            <col width="10%" />
+                                            
+                                            <thead>
+                                                <tr class="tableHeader T3 ">
+                                                    <th class="T3">Type</th>
+                                                   	<th class="T3">item/desc</th>
+                                                    <th class="T3">qty</th>
+                                                    <th class="T3">price</th>
+                                                    <th class="T3 ">total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat = "merchandiseinfo in InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Merchandises">
+                                            	<tr>
+                                            		<td class="T7">{{merchandiseinfo.Type}}</td>
+                                            		<td class="T7">{{merchandiseinfo.ItemDesc}}</td>
+                                            		<td class="T7">{{merchandiseinfo.Qty}}</td>
+                                            		<td class="T7">{{merchandiseinfo.Price | currency}}</td>
+                                            		<td class="T7">{{merchandiseinfo.Total | currency}}</td>
+                                            	</tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                               
+                              <!-- Merchandise section --> 
+                               
+                               <!-- Service-1 section -->
+                                <div class="gid_container_Customer_Invoice col-md-12 P0" id="Service_Print_Preview_gid_container" ng-repeat= "serviceInfo in InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Services" ng-if = "InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Services.length>0">
+                                    <div class="grid_table_headding col-md-12 P0">
+                                    	<p class="T3 col-md-6 pull-left PR0">{{serviceInfo.Name}}</p>
+                                    	<p class="T7 col-md-3 P0 text-right pull-right">{{serviceInfo.Total | currency}}</p>
+                                    </div> 
+                                    
+                                    <div class="col-md-12">
+                                    	<div class="services_section_unit">
+                                    		<ul class="P0">
+                                    			<li class="P0">
+                                    				<label class="T7 text-right  ">unit:</label>
+                                    				<span class=" T7">{{serviceInfo.Unit}}</span>
+                                    			</li>
+                                    			<li class="P0">
+                                    				<label class="T7 text-right  ">Concern: </label>
+                                    				<span class=" T7">{{serviceInfo.Concern}}</span>
+                                    			</li>
+                                    			<li class="P0">
+                                    				<label class="T7 text-right  ">Cause: </label>
+                                    				<span class=" T7">{{serviceInfo.Cause}}</span>
+                                    			</li>
+                                    			<li class="P0">
+                                    				<label class="T7 text-right  ">Correction:</label>
+                                    				<span class=" T7">{{serviceInfo.Correction}}</span>
+                                    			</li>
+                                    		</ul>
+                                    	</div>
+                                    	
+                                    	<div class="services_section_Mileage">
+                                    		<ul >
+                                    			<li >
+                                    				<label class="T7  text-right ">Mileage In:</label>
+                                    				<span class=" T7">{{serviceInfo.MileageIn}}</span>
+                                    			</li>
+                                    			<li >
+                                    				<label class="T7  text-right ">Mileage Out: </label>
+                                    				<span class=" T7">{{serviceInfo.MileageOut}}</span>
+                                    			</li>
+                                    		</ul>
+                                    	</div>
+                                    
+                                    </div>
+                                    
+                                        <table class="table pull-left" id="Print_Preview_ItemGrid">
+                                            <col width="10%" />
+                                            <col width="35%" />
+                                            <col width="30%" />
+                                            <col width="15%" />
+                                            <col width="10%" />
+                                            
+                                            <thead>
+                                                <tr class="tableHeader T3 ">
+                                                    <th class="T3">Type</th>
+                                                   	<th class="T3">item/desc</th>
+                                                    <th class="T3">qty</th>
+                                                    <th class="T3">price</th>
+                                                    <th class="T3">total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat = "serviceData in serviceInfo.ServiceItems">
+                                            	<tr>
+                                            		<td class="T7">{{serviceData.Type}}</td>
+                                            		<td class="T7">{{serviceData.ItemDesc}}</td>
+                                            		<td class="T7">{{serviceData.Qty}}</td>
+                                            		<td class="T7">{{serviceData.Price | currency}}</td>
+                                            		<td class="T7 ">{{serviceData.Total | currency}}</td>
+                                            	</tr>
+                                            </tbody>
+                                        </table>
+                        </div>
+                               
+                               
+                                <!-- Service-1 section -->
+                                
+                                
+                                      <div class="col-md-12">
+                                        	<div class="col-md-6 P0" ng-if="InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Transactions.length>0">
+                                        		 <div class="lightbox pull-left">
+	                                        		 <div class="grid_table_headding text-uppercase col-md-12 P0">
+				                                    	<p class="T3 col-md-12 pull-left PR0">PAYMENT/DEPOSITS</p>
+				                                    </div>
+                                        		 	<table class="col-md-12 ">
+			                           			 		<tbody ng-repeat = "paymentInfo in InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Transactions">
+			                           			 			<tr>
+			                           			 				<td class="T3 col-md-4">{{paymentInfo.Method}}</td>
+			                           			 				<td class="T3 col-md-4">{{paymentInfo.TransactionDate}}</td>
+			                           			 				<td class="T3 col-md-4 P0 text-right">{{paymentInfo.Amount | currency}}</td>
+			                           			 			</tr>
+			                           			 		</tbody>
+                           			 			</table>
+                                  		 </div>
+                                    </div>
+              						<div class="col-md-5 pull-right" ng-if= "InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Merchandises.length>0 || InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Transactions.length>0 || InvoicePrintPreviewModel.InvoicePrintPreviewInfo.Services.length>0">
+              							<table class="col-md-12 table-bordered">
+                           			 		<tbody>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-6">parts</td>
+                           			 				<td class="T3 col-md-6 text-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.TotalParts | currency}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-6">labour</td>
+                           			 				<td class="T3 col-md-6 text-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.TotalLabour | currency}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-6">sublet</td>
+                           			 				<td class="T3 col-md-6 text-right">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.TotalSublet | currency}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T7 col-md-6">fees</td>
+                           			 				<td class="T3 col-md-6 text-right BB0">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.TotalFees | currency}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T3 col-md-6 BR0">sub-Total</td>
+                           			 				<td class="T3 col-md-6 text-right TDB">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SubTotal | currency}}</td>
+                           			 			</tr>
+                           			 			<tr ng-if="!InvoicePrintPreviewModel.InvoicePrintPreviewInfo.IsTaxIncludingPricing">
+                           			 				<td class="T7 col-md-6">sales-Tax</td>
+                           			 				<td class="T3 col-md-6 text-right BB0">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SalesTax | currency}}</td>
+                           			 			</tr>
+                           			 			<tr>
+                           			 				<td class="T3 col-md-6 text-uppercase BR0">Total</td>
+                           			 				<td class="T3 col-md-6 text-right TDB totalBG text-uppercase">
+                           			 				<span ng-if="!InvoicePrintPreviewModel.InvoicePrintPreviewInfo.IsTaxIncludingPricing">{{(parseFloat(InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SubTotal) + parseFloat(InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SalesTax)) | currency}}</span>
+                									<span ng-if="InvoicePrintPreviewModel.InvoicePrintPreviewInfo.IsTaxIncludingPricing">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SubTotal | currency}}</span>
+                           			 				           			 				
+                           			 			</td>
+                           			 			</tr>
+                           			 			<tr ng-if="InvoicePrintPreviewModel.InvoicePrintPreviewInfo.IsTaxIncludingPricing">
+                           			 				<td class="T7 col-md-6">sales-Tax</td>
+                           			 				<td class="T3 col-md-6 text-right BB0">{{InvoicePrintPreviewModel.InvoicePrintPreviewInfo.COInvoice.SalesTax | currency}}</td>
+                           			 			</tr>
+                           			 		</tbody>
+                           			 	</table>
+              						
+              						
+              						
+              						
+              						</div>                          
+                                        
+                             </div>
+                      
+                                
+                                <button ng-click="InvoicePrintPreviewModel.printview()" class="btn C11 T4 addmoreinfoBtn active_btn pull-right MT25">Print</button>
+                               
+                               
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        </body>
+    </html>
+</apex:page>

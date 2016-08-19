@@ -1,0 +1,102 @@
+<apex:page showHeader="false" sidebar="false" controller="CustomerOverview">
+<!--     <c:GridStyles /> -->
+<!--     <c:GridStaticResources /> -->
+    
+    <script>
+        // Customer preferred contact drop down list item values in format: <li><a>value</a></li>
+        var CustomerPreferredContactsOptions = "{!JSENCODE(CustomerPreferredContactsOptions)}";
+        
+        // Dropdown list item values for Price Level records
+        var PriceLevelListItems = "{!JSENCODE(PriceLevelListItems)}";
+        
+        // Dropdown list item values for Sales Tax records
+        var SalesTaxListItems = "{!JSENCODE(SalesTaxListItems)}";
+        
+        // All the states / Provinces in the system
+        var CountryToStatesMap = "{!JSENCODE(OrgStates)}";
+        
+        // Default state value in system
+        var systemDefaultState = "{!JSENCODE(defaultState)}";
+        
+        // All the Contries in the system
+        var AllCountries = "{!JSENCODE(OrgCountries)}";
+        
+        // Default country value in system
+        var systemDefaultCountry = "{!JSENCODE(defaultCountry)}";
+        
+        // Default country value in system
+        var defaultPriceLId = "{!JSENCODE(defaultPriceLId)}";
+        
+        // Default country value in system
+        var defaultPriceLName = "{!JSENCODE(defaultPriceLName)}";
+        
+        // Default country value in system
+        var defaultSalesTId = "{!JSENCODE(defaultSalesTId)}";
+        
+        // Default country value in system
+        var defaultSalesTName = "{!JSENCODE(defaultSalesTName)}";
+    </script>
+    
+    <body>
+        <br/>
+        <div id="{!currentPN}customerTabstrip" class="tabstrip-vertical">
+            <ul>
+                <li class="k-state-active">Customer Details</li>
+                <li >Chatter Feeds</li>
+                <li >Contacts</li>
+                <li >Owned Units</li>
+                <li >Active Parts Orders</li>
+                <li >Active Service orders</li>
+                <li >Parts history</li>
+                <li >Service History</li>
+            </ul>
+            <div>
+                <div id="customerDetails">
+                    <c:CustomerDetailForm uniqueId="{!currentPN}" customer="{!customer}" accountFieldsMap="{!COMAPANY_CUSTOMER_FIELDS_TO_JSON_MAPPING}" contactFieldsMap="{!INDIVIDUAL_CUSTOMER_FIELDS_TO_JSON_MAPPING}"/>
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="customerContacts" style="height: 515px;">
+                    
+                </div>
+            </div>
+        </div>
+    </body>
+    
+    <script>
+        var {!JSENCODE(currentPN)}customerGridTabPanel = $("#{!JSENCODE(currentPN)}customerTabstrip").kendoTabStrip({
+            animation: false
+        }).data("kendoTabStrip");
+        {!JSENCODE(currentPN)}customerGridTabPanel.select(0);
+    </script>
+</apex:page>

@@ -1,0 +1,1640 @@
+<apex:page standardStylesheets="false" controller="ViewPartCtrl"
+            showChat="false" showHeader="false" sidebar="false">
+    
+<html ng-app="viewPart">
+    <head>
+        <title>{!$Label.View_Part_Page_Title}</title>  
+    </head>
+    
+    <!-- Styles -->
+    <c:PageStyle />      
+    <style>
+        .gid_container table tr th.nopaddingleftright{
+            padding-left : 0;
+            padding-right : 0px;
+            
+        }
+        td.T7.nopaddingleftright.textleft{
+            text-align:left;
+        }
+        .textleft{
+            text-align:left;
+        }
+        td.T7.nopaddingleftright{
+            padding-left : 0;
+            padding-right : 0px;
+            
+        }
+    </style>
+    <!-- Scripts -->
+   
+    <c:Css_and_Js ></c:Css_and_Js>
+    <apex:includeScript value="{!URLFOR($Resource.AngularResources, 'js/googlemapapiv3.js') }" />
+    <apex:includeScript value="{!$Resource.AngularMap}"/>
+    <apex:includeScript value="{!$Resource.niceScroll}"/>
+    <apex:includeScript value="{!$Resource.d3}"/>  
+    <apex:stylesheet value="{!URLFOR($Resource.simpleCalender, 'assets/css/style.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.simpleCalender, 'assets/js/simplecalendar.js') }" />
+   
+    
+    <!-- Various components -->
+    <c:Price_mini_page_layout ></c:Price_mini_page_layout>
+    <c:Customer_mini_page_layout />
+    <c:CustomerPageStyle />
+    <c:ViewPartRelatedListJS />
+    <c:NewPartPopUpOnVendorOrder />
+    <c:PartAdjustmentInStock />
+    <c:ModifyCostSource />
+
+    <c:NewPopupStyle />
+     <c:ModifyCostSummary />
+
+    <c:ResolveOversold />
+    <script>
+            var orderName = '';
+            var top_for_scroll = 0;
+            $(document).ready(function () {
+                $('#collapsible-header .navbar-header').hide();
+                $('#collapsible-header #bs-example-navbar-collapse-1>div').hide();
+                $('#collapsible-header #bs-example-navbar-collapse-1>ul').hide();
+                $('#headerHidebtn').hide();
+                $('#headershowbtn').show();
+                
+                
+                
+                setTimeout(function () {
+                    $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'}); 
+                    $("body").niceScroll({
+                        mousescrollstep : 50
+                    });
+            
+                    top_for_scroll = $('#collapsible-header').height() + $('#fixed-seacrh-row').height() + $('#sticky-heading').height();
+            
+                    $('#headerHidebtn').click(function () {
+                        $('#collapsible-header .navbar-header').hide();
+                        $('#collapsible-header #bs-example-navbar-collapse-1>div').hide();
+                        $('#collapsible-header #bs-example-navbar-collapse-1>ul').hide();
+            
+                        $('#headerHidebtn').hide();
+                        $('#headershowbtn').show();
+                        $('#workflow-sidepanel').css('top', $('#collapsible-header').height());
+                        $('#fixed-seacrh-row').css('top', $('#collapsible-header').height());
+                        $('#sticky-heading').css('top', $('#collapsible-header').height() + $('#fixed-seacrh-row').height());
+                        top_for_scroll = $('#collapsible-header').height() + $('#fixed-seacrh-row').height() + $('#sticky-heading').height();
+                    })
+                    $('#headershowbtn').click(function () {
+                        $('#collapsible-header .navbar-header').show();
+                        $('#collapsible-header #bs-example-navbar-collapse-1>div').show();
+                        $('#collapsible-header #bs-example-navbar-collapse-1>ul').show();
+            
+                        $('#headershowbtn').hide();
+                        $('#headerHidebtn').show();
+                        $('#workflow-sidepanel').css('top', $('#collapsible-header').height());
+                        $('#fixed-seacrh-row').css('top', $('#collapsible-header').height());
+                        $('#sticky-heading').css('top', $('#collapsible-header').height() + $('#fixed-seacrh-row').height());
+                        top_for_scroll = $('#collapsible-header').height() + $('#fixed-seacrh-row').height() + $('#sticky-heading').height();
+                    })
+            
+                    $(document).on("scroll", onScroll);
+            
+                    $('.sections-link a[href*=#]:not([href=#])').click(function (e) {
+                        e.preventDefault();
+                        $(document).off("scroll");
+                        var target = $(this).attr("href");
+                          var extraHeigth = 0;
+                        if(target == '#Cost_Tracking'){
+                            extraHeigth = 50;
+                        }
+                        //$($(this).attr("rel")).show();
+                        $('html, body').stop().animate({
+                            scrollTop : $(target).offset().top - top_for_scroll - 50 + extraHeigth
+                        }, 1000, function () {
+                            //window.location.hash = target;
+                            $(document).on("scroll", onScroll);
+                            onScroll();
+                            return false;
+                        });
+                    })
+            
+                }, 1000);
+            });
+            
+            function onScroll(event) {
+                var heading = '';
+                var scrollPos = $(document).scrollTop();
+                try {
+                    if (scrollPos < $('#Info_Section').position().top + $('#Info_Section').height() - 75) {
+                        heading = '<span class="heading_icon" ng-click="ViewCustomer.hidePanel($event, \'Info_block\')"><i class="fa fa-chevron-right"></i></span> A Info ';
+                    } else if (scrollPos < $('#Statistics_Section').position().top + $('#Statistics_Section').height() - 75) {
+                        heading = '<span class="heading_icon"><i class="fa fa-chevron-right"></i></span> B Statistics ';
+                    } else if (scrollPos < $('#Related').position().top + $('#Related').height() - 75) {
+                        heading = '<span class="heading_icon"><i class="fa fa-chevron-right"></i></span> C Related';
+                    }else if (scrollPos < $('#Cost_Tracking').position().top + $('#Cost_Tracking').height() - 75) {
+                        heading = '<span class="heading_icon"><i class="fa fa-chevron-right"></i></span> D Cost Tracking ';
+
+                    }  
+                } catch(err) {
+                
+                }
+                debug(heading);
+                $('#sticky-heading').addClass('backgroundOrange');
+                $('#sticky-heading h1').html(heading);
+            }
+            
+            // Module app for angular controller of ViewCustomer page
+            var viewPart = angular.module(  'viewPart', 
+                                           ['BPGlobalHeader', 'searchToAddModule', 'viewPartRelatedListModule', 'ngAnimate', 'ui-notification','partsChart', 'PartPopUpModule','addPartAdjustModel','resolveOversoldModel', 'modifyCostSummaryModel','modifyCostSourceModel']);
+
+
+            
+            // Angular controller for ViewCustomer page
+            viewPart.controller('viewPartController', function ($scope, $timeout, $rootScope, PartInfoService,Notification){
+                // ViewCustomer page variable
+                $scope.ViewPart = {};
+                $scope.CustomerModal = {};
+                $scope.COUModal = {};
+                $scope.ViewPart.disableModifyCostSummary = false;
+
+                
+                $scope.ViewPartRelatedListModal = {};
+                
+                $scope.SearchToadd = {};
+                $scope.SearchableObjects = 'Part__c,Sales_Tax_Item__c';
+                $scope.typeToSearch = "";
+                $scope.PreferredObject = "Merchandise";
+
+                $scope.ViewPart.adjustPart = {};
+                $scope.ViewPart.adjustPart.showAdjustPreview = true;
+                $scope.ViewPart.adjustPart.isPreviewActive = true;
+                $scope.ViewCustomer = {};
+                $scope.modifyCostSoourceeditMode = true;
+                $scope.currentSelectedBucket={};
+
+                $scope.ViewPart.OverSold = [];
+
+                $scope.ViewPart.toggle = false;
+
+                $scope.ViewPart.partId = "{!JSENCODE(URLENCODE($CurrentPage.parameters.id))}";
+                $scope.ViewPart.modifyCostSummaryModel = {};
+                $scope.ViewPart.modifyCostSummaryModel.showPreview = true; 
+
+
+
+                $scope.ViewPart.adjustPart.SelectedInStock = 'select'
+    
+    
+                // declaration temporary for graph to initalise data
+                    $scope.labelDataValue = {   
+                                        QtyComitted :0 , 
+                                        QtyAvalable :0, 
+                                        Instock : 0,
+                                        QtyOnOrder : 0,
+                                        ReOrderMin:0,
+                                        ReOrderMax:0,
+                                        maxPoint:0,
+                                    };  
+                
+            $scope.partChartsDetails ={ 
+                                        
+                                        QtyComitted : {startAngle:0 , endAngle :0  } ,
+                                        QtyAvalable : {startAngle:0, endAngle :0}, 
+                                        Instock :{startAngle:0 , endAngle : 0},
+                                        QtyOnOrder :{startAngle:0 , endAngle : 0},
+                                    };  
+        
+                $scope.chartData=   {
+                                        QtyComitted : {Angle :4.3617251235193315  } ,
+                                        QtyAvalable : { Angle : 6.397068040872217}, 
+                                        Instock :{Angle : 6.397068040872217},
+                                        QtyOnOrder :{Angle : 7.0},
+                                        minPoint:{Angle:2.827433388230814},
+                                        maxPoint:{Angle:12.00741192144774},
+                                        ReOrderMin :{Angle:0},
+                                        ReOrderMax :{Angle:0}
+                                                
+                                        };  
+        
+                // START: Subhrant section
+                
+                $scope.ViewPart.helpText = {    General         :   '{!JSENCODE($Label.General_Help_Text)}',
+                                                Stocking        :   '{!JSENCODE($Label.Stocking_Help_Text)}',
+                                                Statistics      :   '{!JSENCODE($Label.Statistics_Help_Text)}',
+                                                VitalStatistics :   '{!JSENCODE($Label.VitalStatistics_Help_Text)}',
+                                                Telemetry       :   '{!JSENCODE($Label.Telemetry_Help_Text)}',
+                                                Related         :   '{!JSENCODE($Label.Related_Help_Text)}',
+                                                ActiveOrders    :   '{!JSENCODE($Label.ActiveOrders_Help_Text)}',
+                                                ActiveSalesOrders   :   '{!JSENCODE($Label.ActiveSalesOrders_Help_Text)}',
+                                                AlternateParts  :   '{!JSENCODE($Label.AlternateParts_Help_Text)}',
+                                                TaxExemptions   :   '{!JSENCODE($Label.TaxExemptions_Help_Text)}'
+                                    };
+            
+                $scope.ViewPart.hidePanel = function(event, id){
+                    var targetelement = angular.element(event.target).closest('h1').find('.fa:first');
+                    if(targetelement.hasClass('fa-chevron-right')){
+                        targetelement.removeClass('fa-chevron-right');
+                        targetelement.addClass('fa-chevron-down');
+                    } else {
+                        targetelement.removeClass('fa-chevron-down');
+                        targetelement.addClass('fa-chevron-right');
+                    }
+                    $('#'+id).toggle();
+                }
+                
+                $scope.ViewPart.getLocations = function() {
+                    if($scope.ViewPart.PartInfo != undefined && $scope.ViewPart.PartInfo.PartDetailRec.Location != null) {
+                        return $scope.ViewPart.PartInfo.PartDetailRec.Location.split(';');
+                    }
+
+                }
+                
+                // Load Customer Infomration
+                $scope.ViewPart.loadPartInfo = function(){
+                    var partId = $scope.ViewPart.partId;
+                    PartInfoService.getPartInfo(partId).then(function(partInfo) {
+                        debug(partInfo);
+
+                        $scope.ViewPart.bindPartData(partInfo);
+
+                        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    }, function(errorSearchResult) {
+                        $scope.ViewPart.PartInfo = errorSearchResult;
+                    });
+                }
+                
+                
+                $scope.ViewPart.bindPartData = function(partInfo){
+                    $scope.ViewPart.PartInfo = partInfo;
+                    $scope.ViewPart.ShowContent = true;
+                    
+                    // View Part related list modals load
+                    $scope.ViewPartRelatedListModal.PartRelatedInfo = partInfo.PartRelatedInfo;
+                    $scope.ViewPart.PartInfo.PartFIFOBucketList = partInfo.PartFIFOBucketList;
+
+                    for(var i=0;i<$scope.ViewPart.PartInfo.PartFIFOBucketList.length;i++){
+                    	$scope.ViewPart.PartInfo.PartFIFOBucketList[i].isEdit = false;
+                    	debug($scope.ViewPart.PartInfo.PartFIFOBucketList.length==0 || $scope.ViewPart.PartInfo.PartFIFOBucketList[i].SourceName.replace(' ','') == 'VendorReceiving' || $scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty == 0);
+						if($scope.ViewPart.PartInfo.PartFIFOBucketList.length==0 || $scope.ViewPart.PartInfo.PartFIFOBucketList[i].SourceName.replace(' ','') == 'VendorReceiving' || $scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty == 0){
+	            				$scope.ViewPart.disableModifyCostSummary = true;
+	            			}
+                    }
+
+
+                    $scope.ViewPartRelatedListModal.PartId = $scope.ViewPart.partId;
+                    $scope.ViewPartRelatedListModal.PartIsTaxable = $scope.ViewPart.PartInfo.PartDetailRec.IsTaxable;
+                    $scope.ViewPartRelatedListModal.initModals();
+                    $scope.SearchToAddCallback = $scope.ViewPartRelatedListModal.searchToAddCallback;
+                    
+                    $scope.ViewPart.loadChartData();
+
+
+
+                } 
+                
+
+                  // part popup
+                       $scope.applyCssOnPartPopUp = function (event, className) {
+                        var targetEle = angular.element(event.target);
+                        var elementWidth = targetEle.width();
+                        if (targetEle.width() > targetEle.parent().width()) {
+                            elementWidth = targetEle.parent().width() - 15;
+
+                        }
+                        angular.element(className).css('top', targetEle.offset().top);
+                        angular.element(className).css('left', event.clientX);
+                        setTimeout(function(){  angular.element(className).show(); }, 1000); 
+                    }
+                    
+                     var timer;
+                    $scope.ViewPart.openpartpopup = function (event, partId) {
+                         timer = $timeout(function () {
+                            //var partId = $scope.CustomerOrderModel.VORLineItemGroupList[index].PartId;
+                            debug(partId);
+                            $scope.$broadcast('PartPopUpEvent',  partId);
+                            $scope.applyCssOnPartPopUp(event, '.PartPopupOnVenderOrder');
+                         }, 1000);
+                     }
+                    
+                      $scope.ViewPart.hidePartPopUp =function(){
+                         $timeout.cancel(timer);
+                         angular.element('.Vendor-Order-Part-Popup').hide();
+                     }
+                     
+                
+                
+                
+                $scope.ViewPart.loadChartData = function(){
+                
+                        
+                                        
+                                                var index = [];
+                                                
+                                                    var MaxOrder= $scope.ViewPart.PartInfo.PartDetailRec.AutoReorderTo;
+                                                    MaxOrder = MaxOrder + ( MaxOrder *.1 );
+                                                    
+                                                    $scope.partChartsDetails.MaxOrder=MaxOrder;
+                                                    
+                                                
+                                            /*  $scope.partChartsDetails ={QtyComitted : {startAngle:2.827433388230814 , endAngle :4.3617251235193315  } ,
+                                                 QtyAvalable : {startAngle:4.3617251235193315 , endAngle : 6.397068040872217}, 
+                                                    Instock :{startAngle:2.827433388230814 , endAngle : 6.397068040872217},
+                                                    QtyOnOrder :{startAngle:6.397068040872217 , endAngle : 7.0},
+                                                    };  */
+            
+                                                $scope.chartData=   {QtyComitted : {Angle :4.3617251235193315  } ,
+                                                     QtyAvalable : { Angle : 6.397068040872217}, 
+                                                    Instock :{Angle : 6.397068040872217},
+                                                    QtyOnOrder :{Angle : 7.0},
+                                                    minPoint:{Angle:2.827433388230814},
+                                                    maxPoint:{Angle:12.00741192144774},
+                                                    ReOrderMin :{Angle:0},
+                                                    ReOrderMax :{Angle:0}
+                                                    
+                                                    
+                                                    };  
+                                                    
+                                                    
+                                                    
+                                                $scope.labelDataValue = {   
+                                                            QtyComitted : $scope.ViewPart.PartInfo.PartDetailRec.QtyCommited , 
+                                                            QtyAvalable :$scope.ViewPart.PartInfo.PartDetailRec.QtyAvailable, 
+                                                            Instock : $scope.ViewPart.PartInfo.PartDetailRec.InStockQty,
+                                                            QtyOnOrder : $scope.ViewPart.PartInfo.PartDetailRec.QtyOnOrder,
+                                                            ReOrderMin:$scope.ViewPart.PartInfo.PartDetailRec.AutoReorderAt,
+                                                            ReOrderMax:$scope.ViewPart.PartInfo.PartDetailRec.AutoReorderTo,
+                                                            maxPoint:$scope.partChartsDetails.MaxOrder
+                                                        };      
+                                                    
+                                                    
+                                                
+                                                index.splice(1, 0, {
+                                                        key:'QtyComitted',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.QtyCommited,
+                                                        lastAngle:'init'
+                                                
+                                                });
+                                                
+                                                
+                                                
+                                                
+                                                
+                                                index.splice(2, 0,{
+                                                        key:'QtyAvalable',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.QtyAvailable,
+                                                        lastAngle:'QtyComitted'
+                                                
+                                                })
+                                                
+                                                index.splice(3, 0,{
+                                                        key:'Instock',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.InStockQty,
+                                                        lastAngle:'init'
+                                                
+                                                })
+                                                index.splice(4, 0,{
+                                                        key:'QtyOnOrder',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.QtyOnOrder,
+                                                        lastAngle:'QtyAvalable'
+                                                
+                                                })
+                                                
+                                                index.splice(5, 0,{
+                                                        key:'maxOrder',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.AutoReorderTo,
+                                                        lastAngle:'QtyOnOrder'
+                                                
+                                                })
+                                                
+                                                index.splice(6, 0,{
+                                                        key:'ReOrderMin',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.AutoReorderAt,
+                                                        lastAngle:'ReOrderMin'
+                                                
+                                                })
+                                                
+                                                index.splice(7, 0,{
+                                                        key:'ReOrderMax',
+                                                        value:$scope.ViewPart.PartInfo.PartDetailRec.AutoReorderTo,
+                                                        lastAngle:'ReOrderMax'
+                                                
+                                                })
+                                                
+                                                
+                                                
+                                                $scope.temp={}
+                                                
+                                                
+                                                for( i =0 ; i < index.length ;i++){
+                                                        
+                                                        var  firstangle =  index[i].value;
+                                                        var  lastangle = index[i].lastAngle;
+                                                         var key=index[i].key;
+                                                        
+                                                        if(lastangle== 'init')
+                                                        {
+                                                        
+                                                            var maxOrder=$scope.partChartsDetails.MaxOrder;
+                                                            
+                                                            
+                                                            var  endAngleVal= (( .45 * Math.PI * 2 ) + ((Math.PI * 2)*( 0.009 * ((firstangle/maxOrder) * 100))));
+                                                            
+                                                            $scope.temp[key]=
+                                                            { startAngle :2.827433388230814 ,endAngle :endAngleVal}
+                                                            
+                                                            $scope.chartData[key]={Angle:endAngleVal}
+                                                            
+                                                            
+                                                            
+                                                        }
+                                                        else{
+                                                                
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                    
+                                                                    if( key == lastangle )
+                                                                    {
+                                                                                
+                                                                                var angleValue = ( ( .45 * Math.PI * 2 ) + (Math.PI * 2)*( 0.009 * ((firstangle/maxOrder) * 100)))
+                                                                                $scope.chartData[key]={Angle:angleValue};
+                                                                    }
+                                                                    else{
+                                                                    
+                                                                    var startAngleVal= $scope.temp[lastangle].endAngle;
+                                                                    var   endAngleval= (startAngleVal  + 
+                                                                                        ((Math.PI * 2)*( 0.009 * ((firstangle/maxOrder) * 100))));
+                                                                                        
+                                                                                        
+                                                                                        
+                                                                    
+                                                                    $scope.temp[key] = {  startAngle :startAngleVal , endAngle: endAngleval }
+                                                                    
+                                                                    
+                                                                    $scope.chartData[key]={Angle:$scope.temp[key].endAngle};
+                                                                    
+                                                                    }
+                                                        }
+
+
+
+
+
+                                                
+                                                }
+                                                
+                                                
+                                                     
+                                                 $scope.chartData['minPoint']={Angle:2.827433388230814};
+                                                 $scope.chartData['maxPoint']={Angle:8.482300164692441};
+                                                 
+                                                    
+                                                 angular.copy($scope.temp, $scope.partChartsDetails);
+                                                
+                                                
+                                                
+                                                /*if(key=='QtyComitted'){
+                                                    debug(    ( .45 * Math.PI * 2 ) + ((Math.PI * 2)*( 0.009 * ((500/800) * 100) )));
+                                                }
+                                                else
+                                                {
+                                                        debug(( .45 * Math.PI * 2 ) + ((Math.PI * 2)*( 0.009 * ((500/800) * 100) )) );
+                                                        
+                                                        debug(( .45 * Math.PI * 2 ) + ((Math.PI * 2)*( 0.009 * ((505/800) * 100) )));
+                                                }*/
+
+
+
+
+                
+                }
+                // Set focus on search text box
+                // used when to add related records via page level search box
+                $scope.ViewPart.setFocusToSearchBox = function (typeToSearch) {
+                    $scope.typeToSearch = typeToSearch;
+                    $scope.PreferredObject = typeToSearch;
+                    angular.element('#SearchToaddCutomer').focus();
+                }
+                
+                // Reset the search object in serch autocomplete
+                $scope.ViewPart.resetSearchBox = function () {
+                    $scope.typeToSearch = "";
+                    $scope.PreferredObject = "";
+                }
+                
+                // START: PART POPUP ATTRS AND METHODS
+                
+                // Modals for Add/Edit Part component
+                $scope.ViewPart.createPart = function(){
+                    $rootScope.$broadcast('AddPartEvent');
+                }
+                
+                $scope.ViewPart.editPart = function(){
+                    $rootScope.$broadcast('EditPartEvent', {partId : $scope.ViewPart.partId});
+                }
+                
+                $scope.partRecordSaveCallback = function() {
+                    $scope.ViewPart.loadPartInfo();
+                }
+                 $scope.ViewPart.adjustStock = function(){
+
+
+                    var stockAdjsutmentList = [];
+                    for(var i=0;i<$scope.ViewPart.PartInfo.PartFIFOBucketList.length;i++){
+                        if($scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty > 0 ){
+                            stockAdjsutmentList.push($scope.ViewPart.PartInfo.PartFIFOBucketList[i]);
+                        }
+                    }
+                    $scope.$broadcast('AdjustStockEvent', $scope.ViewPart.partId, stockAdjsutmentList);
+
+
+                }
+                $scope.ViewPart.openResolveOversoldPopup = function(event, partId){
+                    $scope.ViewPart.OverSold = [];
+                    $scope.ViewPart.OverSold.Total = 0;
+                    $scope.ViewPart.OverSold.Quantity = 0;
+                    for(var i=0;i<$scope.ViewPart.PartInfo.PartFIFOBucketList.length;i++){
+                        if($scope.ViewPart.PartInfo.PartFIFOBucketList[i].SourceName == 'Oversold' && $scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty < 0){
+                            $scope.ViewPart.OverSold.Total += -($scope.ViewPart.PartInfo.PartFIFOBucketList[i].Total);
+                            $scope.ViewPart.OverSold.Quantity +=  -($scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty);
+                            $scope.ViewPart.OverSold.push($scope.ViewPart.PartInfo.PartFIFOBucketList[i]);
+                            
+                        }
+                     }
+                        debug('Hii');
+                        debug($scope.ViewPart.OverSold);
+                        if($scope.ViewPart.OverSold.length == 0){
+                             Notification.error("No Line item is there please add line item");
+                        }
+                        else{
+                            $scope.$broadcast('resolveOversoldEvent', $scope.ViewPart.OverSold  );
+
+                        }
+
+                    } 
+                    $scope.ViewPart.showHideRecords = function(){
+                $scope.ViewPart.toggle = !$scope.ViewPart.toggle;
+                    PartInfoService.showHideFifoRecords($scope.ViewPart.partId, $scope.ViewPart.toggle).then(function (successfulSearchResult) {
+                    debug(successfulSearchResult);
+                    $scope.ViewPart.PartInfo.PartFIFOBucketList = successfulSearchResult;
+                    
+                                
+                        },
+                        function (errorSearchResult) {
+                            responseData = errorSearchResult;  
+                        });
+                
+                }
+                $scope.$on('OversoldUpdate', function(event, args) {  
+                    $scope.ViewPart.bindPartData(args);
+                    $scope.ViewPart.toggle = false;
+                    
+                 });
+                $scope.$on('ModifyCostSourceUpdateBucketEvent',function(event,args){
+                    $scope.currentSelectedBucket = {};
+                    $scope.modifyCostSoourceeditMode= true;
+                })
+                  $scope.ViewPart.updateFifoBucketLineItem = function(FifoBucketHeaderIndex){
+                    debug("fifo bucket");
+                    debug(FifoBucketHeaderIndex)
+                     for(var i=0;i<$scope.ViewPart.PartInfo.PartFIFOBucketList.length;i++){
+                     if(i!=FifoBucketHeaderIndex){
+                            $scope.ViewPart.PartInfo.PartFIFOBucketList[i].isEdit = false;
+                      }
+                      else{
+                         $scope.ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].isEdit = !$scope.ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].isEdit;
+                      } 
+                     }
+                   
+                    debug( $scope.ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].isEdit);
+                    if($scope.ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].SourceName !='Vendor Receiving' && $scope.ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].SourceName !='Vendor recieving'  && $scope.ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].SourceName !='Oversold'){
+                        $scope.modifyCostSoourceeditMode= false;
+                   }
+                }
+                
+
+
+
+
+
+
+
+               /*  $scope.ViewPart.showPreview = function(partId, qty, cost,FifoPartJSON){
+                    $scope.ViewPart.adjustPart.showAdjustPreview = false;
+                     PartInfoService.increaseAdjustInStock(partId, qty, cost,JSON.stringify(FifoPartJSON)).then(function (successfulSearchResult) {
+
+                                debug(successfulSearchResult);
+                        },
+                        function (errorSearchResult) {
+                            responseData = errorSearchResult;  
+                        });
+                
+
+
+                } */
+              /*   $scope.ViewPart.adjustclosePopup = function() {
+                    $scope.ViewPart.adjustPart.showAdjustPreview = true;
+                    $scope.ViewPart.adjustPart.SelectedInStock = 'select'
+                    $scope.ViewPart.adjustPart.isPreviewActive = true;
+                    $scope.ViewPart.adjustPart.QtyIn = undefined;
+                    $scope.ViewPart.adjustPart.cost = undefined;
+                    angular.element('#addNewPartAdjust').modal('hide');
+
+
+                } */
+                
+
+
+
+
+
+             /*    $scope.ViewPart.PreviewActive = function(SelectedInStock, QtyIn, cost){
+                    debug(QtyIn);
+                    debug(cost);
+
+                    if(SelectedInStock == 'Increase'){
+                        if((QtyIn != undefined  && QtyIn != "" && QtyIn >= 0) && (cost != undefined && cost != "" && cost >= 0 )  ){
+                            $scope.ViewPart.adjustPart.isPreviewActive = false;
+                        }else{
+                            $scope.ViewPart.adjustPart.isPreviewActive = true;
+                        }
+                    }else if( SelectedInStock == 'Decrease'){
+                        if( QtyIn!= undefined && QtyIn != "" && QtyIn>=0){
+                            $scope.ViewPart.adjustPart.isPreviewActive = false;
+
+
+                        }else{
+                            $scope.ViewPart.adjustPart.isPreviewActive = true;
+                        }
+                    
+                    }
+                    else{
+                        $scope.ViewPart.adjustPart.isPreviewActive = true;
+                    }
+
+
+
+
+
+                } */
+                
+                $scope.ViewPart.openModifyCostSourcePopup = function(event){
+                        for(var index= 0;index <  $scope.ViewPart.PartInfo.PartFIFOBucketList.length;index++){
+                            var fifobucket = $scope.ViewPart.PartInfo.PartFIFOBucketList[index];
+                            debug(fifobucket);
+                            debug('fifobucket');
+                            if(fifobucket.isEdit == true){
+                                $scope.currentSelectedBucket = fifobucket;
+                            }
+                        }
+                        debug($scope.currentSelectedBucket === {});
+                        debug(JSON.stringify($scope.currentSelectedBucket) == '{}');
+                        if(JSON.stringify($scope.currentSelectedBucket) == '{}' || $scope.currentSelectedBucket == null ||  angular.isUndefined($scope.currentSelectedBucket)){
+                                    $scope.modifyCostSoourceeditMode=true;
+                                    debug('$scope.modifyCostSoourceeditMode')
+                        }
+                        debug($scope.modifyCostSoourceeditMode)
+                        if($scope.currentSelectedBucket != null &&  angular.isDefined($scope.currentSelectedBucket) && JSON.stringify($scope.currentSelectedBucket) != '{}'){
+                            if($scope.currentSelectedBucket.SourceName =='Oversold' || $scope.currentSelectedBucket.SourceName =='Vendor Receiving' || $scope.currentSelectedBucket.SourceName =='Vendor recieving'){
+                                $scope.modifyCostSoourceeditMode=true;
+                            }
+                            else{
+                                $scope.modifyCostSoourceeditMode=false;
+                            }
+                            if(!$scope.modifyCostSoourceeditMode){
+                                $scope.$broadcast('ModifyCostSourceEvent',  {selectedbucket : $scope.currentSelectedBucket});
+                            }
+                            if($scope.currentSelectedBucket.SourceName =='Vendor Receiving' || $scope.currentSelectedBucket.SourceName =='Vendor recieving'){
+                                    Notification.error('Cost cannot be adjusted when Receivings have not been matched with Vendor Invoices');
+                            }
+                                                        
+                        }
+                        if(JSON.stringify($scope.currentSelectedBucket) == '{}'){
+                                    $scope.modifyCostSoourceeditMode=true;
+                        }
+                    }
+                
+                
+                 $scope.ViewPart.openModifyCostSummaryPopup = function(event, partId){
+
+
+
+
+
+
+                        debug("inside summary part popuop");
+                        var ModifyCostSummaryList = [];
+                        
+                        for(var i =0; i< $scope.ViewPart.PartInfo.PartFIFOBucketList.length;i++){
+                            if($scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty>0 && $scope.ViewPart.PartInfo.PartFIFOBucketList[i].SourceName != 'Vendor Receiving'){
+                                ModifyCostSummaryList.push($scope.ViewPart.PartInfo.PartFIFOBucketList[i]);
+                            }
+                        }
+                        if(ModifyCostSummaryList.length == 0){
+                             Notification.error("No Line item is there please add line item");
+                        }
+                        else{
+
+
+                            $scope.$broadcast('ModifyCostSummaryEvent',  ModifyCostSummaryList);
+                        }
+                         
+                }
+
+
+                 $scope.$on('modifyCostUpdate', function(event, args) {  
+                      $scope.ViewPart.bindPartData(args);
+                      $scope.ViewPart.toggle = false;
+                 });
+                 
+                 
+                 $scope.$on('stockAdjustment', function(event, args) {  
+                    $scope.ViewPart.bindPartData(args);
+                    $scope.ViewPart.toggle = false;
+                 });
+                 $scope.$on('modifyCostSourceAdjustment', function(event, args) {  
+                    $scope.ViewPart.bindPartData(args);
+                    $scope.ViewPart.toggle = false;
+                 });
+                    
+
+
+
+
+                
+                /*  for(var i=0; i<$scope.ViewPart.PartInfo.PartFIFOBucketList.length; i++){
+                    $scope.ViewPart.modifyCostSummary.remaining +=  $scope.ViewPart.PartInfo.PartFIFOBucketList[i].RemainingQty;
+                    $scope.ViewPart.modifyCostSummary.total +=   $scope.ViewPart.PartInfo.PartFIFOBucketList[i].Total;
+                  }
+                  if($scope.ViewPart.modifyCostSummary.remaining != 0 ){
+                        $scope.ViewPart.modifyCostSummary.cost = $scope.ViewPart.modifyCostSummary.total / $scope.ViewPart.modifyCostSummary.remaining;
+                  } */
+                // END: PART POPUP ATTRS AND METHODS
+                
+                $scope.ViewPart.ShowMessage = function(){
+                    Notification.error('First resolve the oversold situation by selecting the â€œResolve Oversoldâ€� action');
+                }
+            }); 
+            
+            
+            viewPart.service("PartInfoService", function ($q) {
+                this.getPartInfo= function(partId)
+                {
+                		partId = encodeString(partId);
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewPartCtrl.getPartInfo}',
+                                partId,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.reject(event.message);
+                                } else {
+                                    var partInfo = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    partInfo = partInfo.replace(re, '');
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                }
+                 /* this.increaseAdjustInStock= function(partId, qty, cost,FifoPartJSON)
+
+              {
+              		  partId = encodeString(partId);
+              		  qty = encodeString(qty);
+              		  cost = encodeString(cost);
+              		  FifoPartJSON = encodeString(FifoPartJSON);
+                      var deferred = $q.defer();
+                      Visualforce.remoting.Manager.invokeAction(
+                          '{!$RemoteAction.ViewPartCtrl.increaseAdjustInStock}',
+                              partId,qty, cost,FifoPartJSON,
+                          function (result, event) {
+                             if (event.type == 'exception') {
+                                  deferred.reject(event.message);
+                              } else {
+                                  var partInfo = decodeString(result);
+                                  var find = '\'';
+                                  var re = new RegExp(find, 'g');
+                                  partInfo = partInfo.replace(re, '');
+                                  deferred.resolve(JSON.parse(partInfo));
+                              }
+                          }, {
+                              escape : true
+                      });
+                      return deferred.promise;
+
+
+                } */
+                this.showHideFifoRecords= function(partId, showHide)
+                {
+                	  partId = encodeString(partId);
+                      var deferred = $q.defer();
+                      Visualforce.remoting.Manager.invokeAction(
+                          '{!$RemoteAction.ViewPartCtrl.getHistoryRecords}',
+                              partId, showHide,
+                          function (result, event) {
+                             if (event.type == 'exception') {
+                                  deferred.reject(event.message);
+                              } else {
+                                  var partInfo = decodeString(result);
+                                  var find = '\'';
+                                  var re = new RegExp(find, 'g');
+                                  partInfo = partInfo.replace(re, '');
+                                  deferred.resolve(JSON.parse(partInfo));
+                              }
+                          }, {
+                              escape : true
+                      });
+                      return deferred.promise;
+                }
+
+            });
+        
+        </script>
+     
+     <body ng-controller="viewPartController" ng-init="ViewPart.loadPartInfo()" class="ng-cloak">
+        <c:BPGlobalHeader />
+         
+        <!-- content start here -->
+        <div ng-if="true">
+            <div class="row" >
+                
+                <!-- Side panel start -->   
+                <div class="col-lg-2 col-md-2 col-sm-2 sidepanel" id="workflow-sidepanel">
+                    <div class="row customerAvatar leftpanelrow">
+                        <h2>
+                            <img src="{!URLFOR($Resource.Images, 'gold.png')}" />
+                        </h2>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                    </div>
+                    
+                    <div class="row customerAvatar customerStatus leftpanelrow" style="margin-top: 3px;">
+                        <span ng-if="ViewPart.PartInfo.PartDetailRec.Active" style="text-transform: uppercase"><b>{!$Label.Label_Active}</b></span>
+                        <span ng-if="!ViewPart.PartInfo.PartDetailRec.Active" style="text-transform: uppercase"><b>{!$Label.Label_Inactive}</b></span>
+                    </div>
+                    
+                    <div class="row leftpanelrow nameDiv">
+                        <h3 title="{{ViewPart.PartInfo.PartDetailRec.Description}}" style="font-weight: bold; font-size: 23px;"> {{ViewPart.PartInfo.PartDetailRec.Description}}</h3>
+                    </div>
+                    
+                    <div class="row leftpanelrow nameDiv" style="height: 5px;">
+                        <p title="{{ViewPart.PartInfo.PartDetailRec.VendorName}}" style="margin-top: -10px;"> {{ViewPart.PartInfo.PartDetailRec.VendorName}} ({{ViewPart.PartInfo.PartDetailRec.VendorCode}})</p>
+                    </div>
+                    
+                    <div class="row leftpanelrow nameDiv" 
+                         ng-class="{'green' : ViewPart.PartInfo.PartDetailRec.Status == '{!$Label.Part_Object_Status_InStock}', 'red' : (ViewPart.PartInfo.PartDetailRec.Status == '{!$Label.Part_Object_Status_Required}' || ViewPart.PartInfo.PartDetailRec.Status == '{!$Label.Part_Object_Status_OutofStock}'), 'blue' : ViewPart.PartInfo.PartDetailRec.Status == '{!$Label.Part_Object_Status_Committed}', 'gray': alternateOrder.Status == '{!$Label.Part_Object_Status_OnOrder}'}">
+                        <h3 title="{{ViewPart.PartInfo.PartDetailRec.Status}}" style="color: #01DF01;"> {{ViewPart.PartInfo.PartDetailRec.Status}} </h3>
+                    </div>
+                    
+                    <div class="row sections-link" id="workflow-actions" style="width: 220px;">
+                        <div class="heading">
+                            <a href="#Info_block_part" rel="#Info_Section" ng-click="ViewCustomer.setHighlightedSection = 'Info'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Info'}">A &nbsp; {!$Label.Page_Section_Info} </span>
+                            </a>
+                        </div>
+                        <div class="sub-heading">
+                            <a href="#Info_block_part" rel="#Info_Section" ng-click="ViewCustomer.setHighlightedSection = 'General'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'General'}">{!$Label.Page_Section_General}</span>
+                            </a>
+                        </div>
+                        <div class="sub-heading">
+                            <a href="#Info_Stocking" rel="#Info_Section" ng-click="ViewCustomer.setHighlightedSection = 'Stocking'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Stocking'}">{!$Label.Page_Section_Stocking}</span>
+                            </a>
+                        </div>
+
+                        <div class="heading">
+                            <a href="#Vital_Statistics" rel="#Statistics_Section" ng-click="ViewCustomer.setHighlightedSection = 'Statistics'">
+                                <span ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Statistics'}">B &nbsp; {!$Label.Page_Section_Statistics} </span>
+                            </a>    
+                        </div>
+                        
+                        <div class="sub-heading">
+                            <a href="#Vital_Statistics" rel="#Statistics_Section" ng-click="ViewCustomer.setHighlightedSection = 'VitalStatistics'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'VitalStatistics'}">{!$Label.Page_Section_VitalStatistics}</span>
+                            </a>
+                        </div>
+                        <div class="sub-heading">
+                            <a href="#Telemetry" rel="#Statistics_Section" ng-click="ViewCustomer.setHighlightedSection = 'Telementry'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Telementry'}">{!$Label.Page_Section_Telemetry}</span>
+                            </a>
+                        </div>
+                        
+                        <div class="heading">
+                            <a href="#VP_Active_Orders_block_heading_panel" rel="#Related" ng-click="ViewCustomer.setHighlightedSection = 'Related'">
+                                <span ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Related'}">C &nbsp; {!$Label.Page_Section_Related} </span>
+                            </a>
+                        </div>
+                        <div class="sub-heading">
+                            <a href="#VP_Active_Orders_block_heading_panel" rel="#Related" ng-click="ViewCustomer.setHighlightedSection = 'ActiveOrder'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'ActiveOrder'}">{!$Label.Page_Section_ActiveOrder}</span>
+                            </a>
+                        </div>
+                        
+                        <div class="sub-heading">
+                            <a href="#VP_Active_Sales_Orders_block_heading_panel" rel="#Related" ng-click="ViewCustomer.setHighlightedSection = 'ActiveSalesOrder'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'ActiveSalesOrder'}">{!$Label.Active_Sales_Orders}</span>
+                            </a>
+                        </div>
+                        
+                        <div class="sub-heading">
+                            <a href="#VP_Alternate_Parts_block_heading_panel" rel="#Related" ng-click="ViewCustomer.setHighlightedSection = 'AlternateParts'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'AlternateParts'}">{!$Label.Page_Section_AlternateParts}</span>
+                            </a>
+                        </div>
+                        
+                        <div class="sub-heading">
+                            <a href="#VP_Tax_Exemptions_block_heading_panel" rel="#Related" ng-click="ViewCustomer.setHighlightedSection = 'TaxExemptions'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'TaxExemptions'}">{!$Label.Page_Section_TaxExemptions}</span>
+                            </a>
+                        </div>
+                         <div class="heading">
+                            <a href="#Cost_Tracking" rel="#Cost_Tracking" ng-click="ViewCustomer.setHighlightedSection = 'Cost Tracking'">
+                                <span ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Cost Tracking'}">D &nbsp; Cost Tracking </span>
+                            </a>    
+                        </div>
+                         <div class="sub-heading">
+                            <a href="#Cost_Summary" rel="#Cost_Summary" ng-click="ViewCustomer.setHighlightedSection = 'Cost Summary'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Cost Summary'}"> Cost Summary</span>
+                            </a>
+                        </div>
+                         <div class="sub-heading">
+                            <a href="#Cost_Details" rel="#Cost_Details" ng-click="ViewCustomer.setHighlightedSection = 'Cost Details'">
+                                <span class="link" ng-class="{'orange': ViewCustomer.setHighlightedSection == 'Cost Details'}"> Cost Details</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Left Pannel End -->
+                
+                
+                <!-- Top Bar Starts -->
+                <div class="col-lg-10 col-md-10 col-sm-10 topPadding" style="position: absolute; top: 30px; right: 0;">
+                    <div class="row sub-search-row" id="fixed-seacrh-row">
+                        <div class="col-lg-4 col-md-4 order-number">
+                            <h2>{{ViewPart.PartInfo.PartDetailRec.PartNumber}}</h2>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 sub-search">
+                             <div class="padded-row" style="width:100%">
+                                 <c:SearchToAdd />
+                            </div>  
+
+                        </div>
+                        <div class="new-div">
+                            <a href="#" ng-click="ViewPart.createPart()">{!$Label.New_Label}</a>
+                        </div>
+                        <div class="editBtn">
+                            <button class="square-btn bold white orange-back" ng-click="ViewPart.editPart()">{!$Label.Edit_Label}</button>
+                        </div>
+                        <div class="icons-div pull-right">
+                            <div>
+                                <a href=""><i class="fa fa-floppy-o"></i></a>
+                            </div>   
+                            <div>
+                                <a aria-expanded="false" class="dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+                                    <span class="fa fa-cog"></span>
+                                </a>
+                                <ul class="link_dropdown dropdown-menu" role="menu">
+                                    <li><a href="">{!$Label.Convert_To_Quote}</a></li>
+                                    <li><a href="">{!$Label.Delete_Label} {!$Label.Part_Object_Display_Label}</a></li>
+                                </ul>
+                            </div>    
+                        </div>
+                    </div>
+                    
+                    <!-- Top Bar End -->
+                    <div class="clearfix" style="height:25px;"></div>
+                    
+                    
+                    <!-- Main Body Starts -->
+                    
+                    <div class="row dynamic_heading heading_panel" id="sticky-heading" style="top:112px;"> 
+                        <div class="left_heading col-lg-12 col-md-12">
+                             <h1>
+                                 <span class="heading_icon handCursor" ng-click="ViewPart.hidePanel($event, 'Info_block_part')">
+                                     <i class="fa fa-chevron-right"></i>
+                                 </span>
+                                 A {!$Label.Page_Section_Info} 
+                                 <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['Info']}}" style="font-size: 26px"></i>
+                                 <i class="fa fa-cog" style="float: right; margin-right: 7px;"> </i>
+                             </h1>
+                         </div>
+                    </div>
+                 
+                 
+                 
+                 <div class="content" id="scrollable">
+                     
+                     <!-- Info Section Starts -->
+                        <div id="Info_Section">
+                                <div id="Info_block_part" class="heading_panel_sub" style="padding-left: 20px;"> 
+                                    <div class="row" style="width: 99.6%;">
+                                        <div class="left_sub col-lg-5 col-md-5" >
+                                            <h1>
+                                                <span class="subheading_text">{!$Label.Page_Section_General} </span>
+                                            </h1>
+                                        </div>
+                                        
+                                        <div class="col-lg-7 col-md-7">
+                                            <div class="right_sub pull-right" id="CM_Owned_Units_block_heading_panel_right_sub">
+                                                <i class="fa fa-cog" style="margin-right: 7px;"> </i>
+                                                <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['General']}}"></i>
+                                            </div>
+                                        </div>
+                                        <div class="horizontal_line"></div>
+                                    </div>
+                                    
+                                    <div class="row" style="margin-top : 20px;"> 
+                                        <div class="col-lg-8 col-md-8">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 form-group">
+                                                    <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.MSRP__c.Label} </label>
+                                                    <p class="numberFieldValue">{{ViewPart.PartInfo.PartDetailRec.MSRP | currency}} </p>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 form-group">
+                                                    <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Category__c.Label} </label>
+                                                    <p> <a href="/{{CategoryId}}" style="color:black;"> {{ViewPart.PartInfo.PartDetailRec.CategoryName}}</a> </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 form-group">
+                                                    <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Retail_Price__c.Label} </label>
+                                                    <p class="numberFieldValue"> {{ViewPart.PartInfo.PartDetailRec.Retail | currency}}</p>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 form-group">
+                                                    <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Superseded_By__c.Label} </label>
+                                                    <p> <a style="color:black;" ng-mouseover="ViewPart.openpartpopup($event, ViewPart.PartInfo.PartDetailRec.ReplacedById);" ng-mouseleave="ViewPart.hidePartPopUp();">{{ViewPart.PartInfo.PartDetailRec.ReplacedByName}} </a></p>
+                                                </div>
+                                            </div>
+                                            
+                                             <div class="row">
+                                                <div class="col-lg-6 col-md-6 form-group">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 form-group">
+                                                            <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Enviro_Fee__c.Label} </label>
+                                                            <p class="numberFieldValue">{{ViewPart.PartInfo.PartDetailRec.EnviroFee | currency}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 form-group">
+                                                            <label for="labelFirstName" style="text-transform: uppercase"> {!$Label.Part_Object_Pricing_Method} </label>
+                                                            <p class="numberFieldValue"> {{ViewPart.PartInfo.PartDetailRec.PriceMethod}}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 form-group">
+                                                            <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Taxable__c.Label} </label>
+                                                            <p ng-if="ViewPart.PartInfo.PartDetailRec.IsTaxable"> {!$Label.Label_Yes} </p>
+                                                            <p ng-if="!ViewPart.PartInfo.PartDetailRec.IsTaxable"> {!$Label.Label_No} </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-lg-6 col-md-6 form-group">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-12 form-group">
+                                                            <label for="labelFirstName" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Location__c.Label}S </label>
+                                                            <div ng-repeat="location in ViewPart.getLocations()"> 
+                                                                <i class="fa fa-caret-up"></i> <span style="margin-left: 5px;"> {!$ObjectType.Part__c.fields.Location__c.Label}: {{location}} </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-9 col-md-9 form-group">
+                                                            
+                                                        
+                                                        </div>
+                                                        <div class="col-lg-3 col-md-3 form-group">
+                                                        
+                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        <div class="col-lg-4 col-md-4" style="text-align: center;">
+                                             <label for="labelFirstName" style="text-transform: uppercase"> {!$Label.Activity_Dates} </label>
+                                             <!-- CALENDAR -->
+                                                    <div class="calendar-container" style="left: 0; width: 80%; margin-left: 10%;">
+                                                        <div class="calendar">
+                                                            <header>
+                                                                <h2 class="month"></h2>
+                                                                <a class="btn-prev fontawesome-angle-rigt" href="#">
+                                                                <i  class="fa fa-chevron-left orange" style="position: relative;margin-top: 3px;margin: 13px;"></i>
+                                                                </a>
+                                                                <a class="btn-next fontawesome-angle-right" href="#">
+                                                                <i  class="fa fa-chevron-right orange" style="position: relative;margin-top: 3px;margin: 13px;"></i>
+                                                                </a>
+                                                            </header>
+                                                            <table>
+                                                                <thead class="event-days">
+                                                                    <tr></tr>
+                                                                </thead>
+                                                                <tbody class="event-calendar">
+                                                                    <tr class="1"></tr>
+                                                                    <tr class="2"></tr>
+                                                                    <tr class="3"></tr>
+                                                                    <tr class="4"></tr>
+                                                                    <tr class="5"></tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                    
+                                              <!-- Calendar End -->     
+                                        </div>
+                                    </div>
+                              
+                                  <div id="Info_Stocking" class="heading_panel_sub"> 
+                                    <div class="Info_block_part">
+                                        <div class="row">
+                                            <div class="left_sub col-lg-5 col-md-5" >
+                                                <h1>
+                                                    <span class="subheading_text">{!$Label.Page_Section_Stocking} </span>
+                                                </h1>
+                                            </div>
+                                            <div class="col-lg-7 col-md-7">
+                                                <div class="right_sub pull-right" id="CM_Owned_Units_block_heading_panel_right_sub">
+                                                    <i class="fa fa-cog" style="margin-right: 7px;"> </i>
+                                                    <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['Stocking']}}"></i>
+                                                </div>
+                                            </div>
+                                            <div class="horizontal_line"></div>
+                                             </div>
+                                            
+                                            <div class="row stcoking_detail">
+                                                <div class="col-lg-9 col-md-9" >
+                                                             <parts-chart chart-data="chartData" part-charts-details="partChartsDetails" label-data-value="labelDataValue" >
+                                                             </parts-chart>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3" >
+                                                          <div class="row">
+                                                              <div class=" form-group col-lg-12 col-md-12">
+                                                                  <label for="labelforOrderLot" style="text-transform: uppercase"> {!$Label.Order_In_Lots_Of}</label>
+                                                                  <p>{{ViewPart.PartInfo.PartDetailRec.OrderLots}}</p>
+                                                              </div>  
+                                                          </div>  
+                                                          
+                                                          <div class="row">
+                                                          
+                                                              <div class="form-group col-lg-6 col-md-6" > 
+                                                                  <label for="labelforQty" style="text-transform: uppercase"> {!$ObjectType.Part__c.fields.Package_Qty__c.Label} </label>
+                                                                  <p> {{ViewPart.PartInfo.PartDetailRec.PackagedQty}}</p> 
+                                                              </div>
+                                                              <div class="form-group col-lg-6 col-md-6"  ng-show="ViewPart.PartInfo.PartDetailRec.PackagedUnit != 'NULL'"> 
+                                                                  <label for="labelforQty" style="text-transform: uppercase"> {!$Label.Label_Unit} </label>
+                                                                  <p > {{ViewPart.PartInfo.PartDetailRec.PackagedUnit}}</p> 
+                                                              </div>
+                                                           </div>
+                                                           <div class="row">
+                                                              <div class=" form-group col-lg-12 col-md-12">
+                                                                  <label for="labelforItemCost" style="text-transform: uppercase"> {!$Label.Label_Cost}({!$Label.Label_Item})</label>
+                                                                  <p>{{ViewPart.PartInfo.PartDetailRec.Cost | currency}}</p>
+                                                              </div>  
+                                                          </div>
+                                                           <div class="row">
+                                                              <div class=" form-group col-lg-12 col-md-12">
+                                                                  <label for="labelforPackageCost" style="text-transform: uppercase"> {!$Label.Label_Cost}({!$Label.Label_Package})</label>
+                                                                  <p>{{ViewPart.PartInfo.PartDetailRec.PackagedCost | currency}}</p>
+                                                              </div>  
+                                                          </div>
+                                                          
+                                                          <div  style="margin-top: 5px"><b>{!$Label.Profitability_Label}</b></div>
+                                                          <div class="row" style="width : 200%">
+                                                              <div style="float: left; margin-left: 4%; margin-top: 1%;" class="hiddenlabel" ng-class="{'green' : ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost >= 0, 'red' : ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost < 0}">
+                                                                  <i class="fa fa-arrow-up" ng-if="ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost >= 0"> </i>
+                                                                  <i class="fa fa-arrow-down" ng-if="ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost < 0"> </i>
+                                                              </div>
+                                                              <div style="float: left; margin-left: 2%;" class="hiddenlabel" ng-class="{'green' : ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost >= 0, 'red' : ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost < 0}">
+                                                                  {!$Label.Currency_Symbol}{{ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost | number : 3}}
+                                                              </div>
+                                                              <div style="float: left;" class="hiddenlabel" ng-class="{'green' : PartCompModal.PartModal.Retail - PartCompModal.PartModal.Cost >= 0, 'red' : PartCompModal.PartModal.Retail - PartCompModal.PartModal.Cost < 0}">
+                                                                  ({{(ViewPart.PartInfo.PartDetailRec.Retail - ViewPart.PartInfo.PartDetailRec.Cost) * (100) / ViewPart.PartInfo.PartDetailRec.Retail | number : 3}}%)
+                                                              </div>
+                                                         </div>
+                                                </div>
+                                        </div>
+                                     </div>   
+                                  </div> 
+                               </div>      
+                           </div>                
+                           
+                          <!-- End Info Section -->
+                          <div class="clearfix" style="height:15px;"></div>
+                          
+                          <!-- Statistics Section Start -->
+                          <div id="Statistics_Section" class="row statisticsSection">
+                            <div class="heading_panel row">
+                                <div class="left_heading col-lg-12 col-md-12">
+                                    <h1>
+                                        <span class="heading_icon handCursor" ng-click="ViewPart.hidePanel($event, 'Vital_Statistics')">
+                                            <i class="fa fa-chevron-right"></i>
+                                        </span>
+                                        B {!$Label.Page_Section_Statistics}
+                                        <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['Statistics']}}" style="font-size: 26px"></i>
+                                        <i class="fa fa-cog" style="float: right; margin-right: 7px;"> </i>
+                                    </h1>
+                                </div>
+                            </div>
+                            
+                            <div id="Vital_Statistics" class="heading_panel_sub col-lg-12 col-md-12" style="padding-left: 20px;">
+                                <div class="row" style="width: 100.4%;">
+                                    <div class="left_sub col-lg-5 col-md-5" >
+                                        <h1>
+                                            <span class="subheading_text">{!$Label.Page_Section_VitalStatistics} </span>
+                                        </h1>
+                                    </div>
+                                    
+                                    <div class="col-lg-7 col-md-7">
+                                        <div class="right_sub pull-right" id="CM_Owned_Units_block_heading_panel_right_sub">
+                                            <i class="fa fa-cog" style="margin-right: 7px;"> </i>
+                                            <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['VitalStatistics']}}"></i>
+                                        </div>
+                                    </div>
+                                    <div class="horizontal_line"></div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-lg-2 col-md-2 tiles">
+                                        <div class="innerTiles">
+                                            <h3> 85% </h3>
+                                            <p> {!$Label.Count_Confidence} </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-2 col-md-2 tiles">
+                                        <div class="innerTiles">
+                                            <h3> {{ViewPart.PartInfo.SoldLifeTime | number : 0}} </h3>
+                                            <p> {!$Label.Sold_Lifetime} </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-2 col-md-2 tiles">
+                                        <div class="innerTiles">
+                                            <h3> {{ViewPart.PartInfo.RevenueLifeTime | currency}} </h3>
+                                            <p> {!$Label.Revenue_Lifetime}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-2 col-md-2 tiles">
+                                        <div class="innerTiles">
+                                            <h3> 35% </h3>
+                                            <p> {!$Label.Special_Order} </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-2 col-md-2 tiles">
+                                        <div class="innerTiles">
+                                            <h3> {{ViewPart.PartInfo.LastSold}}</h3>
+                                            <p> {!$Label.Last_Sold} </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-2 col-md-2 tiles">
+                                        <div class="innerTiles">
+                                            <h3> 1m 4d </h3>
+                                            <p> {!$Label.Last_Ordered} </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="height: 50px;">
+                                
+                                </div>
+                                
+                                <div class="row" id="Telemetry" style="width: 100.4%;">
+                                    <div class="left_sub col-lg-5 col-md-5"  >
+                                        <h1>
+                                            <span class="subheading_text">{!$Label.Page_Section_Telemetry} </span>
+                                        </h1>
+                                    </div>
+                                    
+                                    <div class="col-lg-7 col-md-7">
+                                        <div class="right_sub pull-right" id="CM_Owned_Units_block_heading_panel_right_sub">
+                                            <i class="fa fa-cog" style="margin-right: 7px;"> </i>
+                                            <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['Telemetry']}}"></i>
+                                        </div>
+                                    </div>
+                                    <div class="horizontal_line"></div>
+                                </div>
+                            </div>
+                        </div>          
+                       
+                       <!-- End Statistics Section -->
+                       
+                       <div class="clearfix" style="height:15px;"></div>          
+                        
+                        <c:ViewPartRelatedList />
+                        
+                        <div class="clearfix" style="height:15px;"></div>
+                         
+                         
+                         <div id="Cost_Tracking" class="row Cost_Tracking">
+                            <div class="heading_panel row">
+                                <div class="left_heading col-lg-12 col-md-12">
+                                    <h1>
+                                        <span class="heading_icon handCursor" ng-click="ViewPart.hidePanel($event, 'cost_tracking_header')">
+                                            <i class="fa fa-chevron-right"></i>
+                                        </span>
+                                        D Cost Tracking
+                                        <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPart.helpText['Statistics']}}" style="font-size: 26px"></i>
+                                        <span class ="dropdown pull-right" style="display: inline-block;">
+                                        <i class="fa fa-cog dropdown-toggle"  data-toggle="dropdown" style="float: right; margin-right: 7px;"> </i>
+                                         <ul class="dropdown-menu" style="right: 30px;">
+
+                                            <li ng-click = "ViewPart.showHideRecords()"><a ng-if = "!ViewPart.toggle">Show History</a><a ng-if = "ViewPart.toggle">Hide History</a></li>
+                                            <li ng-click = "ViewPart.adjustStock()" ng-if = "ViewPart.PartInfo.OversoldQty == 0"><a>Adjust In-Stock</a></li>
+                                            <li class = "modifyCostSummary" ng-if = "ViewPart.PartInfo.OversoldQty == 0" ng-click="!ViewPart.disableModifyCostSummary && ViewPart.openModifyCostSummaryPopup()"  ng-class="{'disabledModifyCostSummary' : ViewPart.disableModifyCostSummary}"> <a>Modify Cost Summary</a></li>
+                                            <li ng-click="ViewPart.openModifyCostSourcePopup()"  ng-if = "ViewPart.PartInfo.OversoldQty == 0" ng-class="{'mutedgray' : modifyCostSoourceeditMode || angular.toJson(currentSelectedBucket) == '{}'}"><a>Modify Cost Source</a></li>
+                                            
+                                            
+                                            <li ng-click = "ViewPart.ShowMessage()" ng-if = "ViewPart.PartInfo.OversoldQty != 0"><a>Adjust In-Stock</a></li>
+                                            <li class = "modifyCostSummary"  ng-if = "ViewPart.PartInfo.OversoldQty != 0" ng-click="ViewPart.ShowMessage()"  ng-class="{'disabledModifyCostSummary' : ViewPart.disableModifyCostSummary}"> <a>Modify Cost Summary</a></li>
+                                            <li ng-click="ViewPart.ShowMessage()"  ng-if = "ViewPart.PartInfo.OversoldQty != 0" ng-class="{'mutedgray' : modifyCostSoourceeditMode}"><a>Modify Cost Source</a></li>
+                                            
+                                            <li ng-click="ViewPart.openResolveOversoldPopup()"><a>Resolve  Oversold</a></li>
+                                      </ul>
+                                      </span>
+                                    </h1>
+                                </div>
+                            </div>
+                             <div id = "cost_tracking_header">
+                             <div class="heading_panel_sub row" id="Cost_Summary" style="width: 99.6%;margin-left: -3px;">
+                                <div class="left_sub col-lg-5 col-md-5" >
+                                    <h1 >
+                                        <span class="subheading_text" >Cost Summary</span> 
+                                    </h1>
+                                </div>
+                                <div class="col-lg-7 col-md-7">
+                                    <div class="right_sub pull-right" >
+                                        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" > </i>
+                                        <i class="fa fa-question-circle question_mark" data-toggle="tooltip" ></i>
+                                    </div>
+                                </div>
+                                <div class="horizontal_line" style="clear: both"></div>
+                                <div class="row" ng-if = "ViewPart.PartInfo.OversoldQty != 0">
+                                        <div class="col-lg-7 col-md-7" >
+                                            <div class=" form-group  col-lg-5 col-md-5 MT10">
+                                                <label class="pull-left PR15 Requiredtd " style="width: 125px">Oversold Valuation</label>  
+                                                 <span class="pull-right Requiredtd ">{{ViewPart.PartInfo.OversoldValuation| currency}}</span>
+                                            </div>  
+                                        </div> 
+                                </div>
+                                <div class="row" ng-if = "ViewPart.PartInfo.OversoldQty != 0" >
+                                        <div class="col-lg-7 col-md-7" >
+                                            <div class=" form-group  col-lg-5 col-md-5 MT10">
+                                                <label class="pull-left PR15 Requiredtd " style="width: 125px">Oversold Qty</label>  
+                                                 <span class="pull-right Requiredtd ">{{ViewPart.PartInfo.OversoldQty}}</span>
+                                            </div>  
+                                        </div> 
+                                </div>
+                                <div class="row">
+                                        <div class="col-lg-7 col-md-7" >
+                                            <div class=" form-group  col-lg-5 col-md-5 MT10">
+                                                <label class="pull-left PR15" style="width: 125px">Total Valuation</label>  
+
+                                                 <span class="pull-right">{{ViewPart.PartInfo.TotalValuation| currency}}</span>
+                                            </div>  
+                                        </div> 
+                                </div>
+                                
+                                    <div class="row">
+                                     <div class="col-lg-7 col-md-7" >
+                                        <div class=" form-group  col-lg-5 col-md-5 MT10">
+                                            <label class="pull-left PR15" style="width: 125px">Qty In Stock</label> 
+                                            <span class="pull-right">{{ViewPart.PartInfo.QtyInStock}}</span>
+
+                                        </div>
+                                      </div>  
+                                    </div> 
+                                    <div class="row">
+                                         <div class="col-lg-7 col-md-7" >
+                                            <div class=" form-group  col-lg-5 col-md-5 MT10">
+                                                <label class="pull-left PR15" style="width: 125px">Average Cost =~</label> 
+                                                <span class="pull-right">{{ViewPart.PartInfo.AverageCost| currency}}</span>
+
+                                            </div>  
+                                        </div>  
+                                    </div>
+
+
+                            </div>
+                             <div class="heading_panel_sub row" id="Cost_Details" style="width: 99.6%;margin-left: -3px;">
+                                <div class="left_sub col-lg-5 col-md-5" >
+                                    <h1 >
+                                        <span class="subheading_text" >Cost Details</span> 
+                                    </h1>
+                                </div>
+                                <div class="col-lg-7 col-md-7">
+                                    <div class="right_sub pull-right" >
+                                        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" > </i>
+                                        <i class="fa fa-question-circle question_mark" data-toggle="tooltip" ></i>
+                                    </div>
+                                </div>
+                                <div class="horizontal_line"></div>
+
+                                  
+                               <div class="gid_container" 
+                                    ng-show="ViewPart.PartInfo.PartFIFOBucketList.length  == 0 && ViewPart.PartInfo.TotalFIFORecords > 0  ">
+
+                                    Select Show/Hide History to see details
+                                </div> 
+                                <div class="gid_container" 
+                                    ng-show="ViewPart.PartInfo.PartFIFOBucketList.length  == 0 && ViewPart.PartInfo.TotalFIFORecords == 0  ">
+                                    No Costing Activity for this part
+                                </div> 
+                                
+                                <div ng-show="ViewPart.PartInfo.PartFIFOBucketList.length != 0" >
+                                    <div class="gid_container"  >
+                                        <table class="table" id="CM_Owned_ItemGrid">
+                                          <col width="5%"  />
+                                            <col width="10%"  />
+                                            <col width="10%" />
+                                            <col width="10%"  />
+                                            <col width="10%" />
+                                            <col width="10%"  />
+                                            <col width="10%"  />
+                                            <col width="10%" />
+                                            <col width="10%"  />
+                                            <col width="10%" />
+                                            <col width="10%"  />
+                                            <thead>
+                                            <tr  class="tableHeader T3 C2">
+                                              <th></th>
+                                                <th class="nopaddingleftright">Source</th>
+                                                <th class="nopaddingleftright">Date</th>
+                                                <th class="nopaddingleftright" style="text-align : left">Id#</th>
+                                                <th class="nopaddingleftright" style="text-align : left">Reference</th>
+                                                <th class="nopaddingleftright">Qty In</th>
+                                                <th class="nopaddingleftright ">Qty Out</th>
+                                                <th class="nopaddingleftright">Remaining</th>
+                                                <th class="nopaddingleftright">cost</th>
+                                                <th class="text-center">Total</th>
+                                            </tr>       
+                                            </thead>  
+                                            <tbody ng-repeat="FifoBucket in ViewPart.PartInfo.PartFIFOBucketList " class="parentBody" ng-init="FifoBucketHeaderIndex = $index">
+                                                <tr  ng-click="ViewPart.updateFifoBucketLineItem( FifoBucketHeaderIndex)">
+
+                                                     <td class ="T7 nopaddingleftright"></td>
+                                                    <td class ="T7 nopaddingleftright">{{FifoBucket.SourceName}}</td>
+                                                    <td class ="T7 nopaddingleftright">{{FifoBucket.CreatedDate}}</td>
+                                                    <td class ="T7 nopaddingleftright textleft"><a href= "javascript:void(0)">{{FifoBucket.UniqueId}}</a></td>
+                                                    <td class ="T7 nopaddingleftright textleft">{{FifoBucket.Reference}} </td>
+                                                    <td class ="T7 text-center">{{FifoBucket.QtyIn}}</td>
+                                                    <td class ="T7 text-center">{{FifoBucket.QtyOut}}  </td>
+                                                    <td class ="T7 text-center">{{FifoBucket.RemainingQty}}  </td>
+                                                    <td class ="T7 text-center">{{FifoBucket.Cost| currency}}</td>
+                                                    <td class ="T7 text-center">{{FifoBucket.Total| currency}}</td> 
+                                                </tr>
+                                                <tr style="display: table-row;"  ng-show="ViewPart.PartInfo.PartFIFOBucketList[FifoBucketHeaderIndex].isEdit" class="Editable_row" ng-repeat-start="FifoBucketLineItem in FifoBucket.PartFIFOActivityLineItemList" >
+
+                                                <td class ="T7"></td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7 nopaddingleftright">{{FifoBucketLineItem.CreatedDate}}</td>
+                                                <td class ="T7 nopaddingleftright textleft"><a href = "javascript:void(0)">{{FifoBucketLineItem.UniqueId}}</a></td>
+                                                <td class ="T7 nopaddingleftright textleft">{{FifoBucketLineItem.Reference}}</td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7">{{FifoBucketLineItem.QtyOut}}</td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7 text-left"></td>
+                                                     
+                                                </tr>
+                                                <tr ng-repeat-end="ng-repeat-end" ></tr>
+                                               
+                                            </tbody>
+                                        </table>
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            </div>
+                        </div>          
+                      
+                       <div style="height: 500px;" />
+
+                    </div>
+
+                    
+              </div>
+       </div>
+</div>
+<c:partschart />
+     </body>
+     
+     <style>
+
+
+        .mutedgray{
+             opacity: .65;
+        }
+        .nameDiv h3 {
+              width: 95%;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap !important;
+        }
+        @-moz-document url-prefix() {
+            .order-number{
+                margin-top : 0%;
+            }
+        }
+        .backgroundOrange {
+            background-color: orange !important;
+            width: 82.4%;
+        }
+        .divDisplayNone {
+            display : none;
+        }
+        .divDisplayNone .row {
+            display : block;
+        }
+        .green {
+            color : green;
+        }
+        .red {
+            color : red;
+        }
+        .blue {
+            color : blue;
+        }
+        .heading_panel_sub .Info_block_part{
+            position: relative;
+        }
+        .heading_panel_sub .right_sub .question_mark {
+            color: orange;
+            font-size: 20px;
+        }
+        .form-group {
+            margin-bottom : 5px;
+        }
+        .heading_panel_sub .row .row {
+            min-height: 50px;
+        }
+        .fa {
+            cursor : pointer;
+        }
+        .right_sub i.fa.fa-cog {
+            margin-right: 4px;
+            font-size: 20px;
+            color: orange;
+        }
+        .horizontal_line {
+            border-bottom : 1px solid black; 
+            margin-top: 27px; 
+            width: 100%;
+        }
+        .numberFieldValue {
+            font-size: 20px;
+            margin-left: 17px;
+        }
+        i.fa.fa-caret-up {
+            font-size : 18px;
+        }
+        .sections-link .sub-heading{
+            border-left:none;
+
+
+        }
+        .Cost_Tracking{
+            margin-left: 0px;
+        }
+        .PR15{
+            padding-right: 15px;
+        }
+        .gid_container .table thead tr th:hover{
+            background: #ffffff;
+        }
+        .disabledModifyCostSummary{
+             opacity: .65;
+        }
+        .disabledModifyCostSummary a{
+            cursor: default;
+        }
+     </style>
+</html>
+</apex:page>

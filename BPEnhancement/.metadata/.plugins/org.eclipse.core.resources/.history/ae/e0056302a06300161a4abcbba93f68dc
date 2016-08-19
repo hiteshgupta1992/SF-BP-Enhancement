@@ -1,0 +1,37 @@
+<!-- Settings Frame page for BlackPurl site -->
+<apex:page controller="BlackPurlHomeCtrl" id="HomePage" title="Page Not Found"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+	
+	<c:BPLoading compId="ContentLoading" />
+	
+	<!--Sections in the page: 
+		Header Section (top-pane): It will contain navigation tabs on the page on top
+		Content Section (middle-pane): It will contain Side-bar, all related grids and help panel. It will internally include a Horizontal section panel
+		Footer Section (bottom-pane): It will contain navigation and various informations in footer section of the page
+	-->
+	<div id="verticalSections">
+	
+		<!-- Header Section -->
+		<div id="top-pane">
+			<div class="pane-content">
+				<apex:include pageName="BlackPurlHeader" />
+			</div>
+		</div>
+		
+		<!-- Content Section -->
+		<div id="middle-pane">
+			<div id="horizontalSections" >
+				<div id="left-pane">
+					<div class="pane-content">
+						<apex:include pageName="BlackPurlSidePanel" />
+					</div>
+				</div>
+				<div id="center-pane">
+					<div class="pane-content">
+						<apex:include pageName="BPErrorContent" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</apex:page>

@@ -1,0 +1,30 @@
+<apex:component >
+	<!-- Component Attributes -->
+    
+    <!-- CSS and JS components -->
+	<c:GridStyles />
+	<c:GridStaticResources />
+	<c:GridStaticJS />
+	
+	<!-- In Page script -->
+	<script>
+		$(document).ready(function () {
+			$("#verticalSections").kendoSplitter({
+				orientation: "vertical",
+				panes: [
+					{ collapsible: false , size: "75px"},
+					{ collapsible: false, size: "475px" },
+					{ collapsible: false, resizable: false, size: "60px" }
+				]
+			});
+			
+			$("#horizontalSections").kendoSplitter({
+				panes: [
+					{ collapsible: true, size: "15%" },
+					{ collapsible: false,size:"65%" },
+					{ collapsible: false, size: "10%" }
+				]
+			});
+		});
+	</script>
+</apex:component>

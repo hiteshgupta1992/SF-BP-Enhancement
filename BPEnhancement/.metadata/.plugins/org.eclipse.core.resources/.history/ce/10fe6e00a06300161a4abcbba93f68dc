@@ -1,0 +1,426 @@
+<apex:component controller="ViewPartCtrl">
+	<c:NewPopupStyle />
+	<style>
+.modal-content .kit_popup_container .popupinside .min_overflow {
+	height: 270px;
+	overflow: auto;
+	float: left;
+}
+
+.modal-content .kit_popup_container .popupinside .max_overflow {
+	height: 900px;
+	overflow: auto;
+	float: left;
+}
+.highlightremaining{
+	background-color : #BCE2F1;
+}
+.modal-content .kit_popup_container .popupright {
+	min-height: 370px;
+}
+
+.modal-content .kit_popup_container .popupleft .goldbox .rightgoldbox {
+	width: 160px;
+}
+
+.modal-content .kit_popup_container .popupleft .popupleft_container#topsection
+	{
+	min-height: 0;
+}
+
+.kit_popup_container .popupright .tabconainer form .controls1 {
+	top: -45px;
+}
+
+.kit_popup_container .popupright .tabconainer form .form-group .txtbox:focus
+	{
+	border: none;
+}
+
+.kit_popup_container .popupright .tabconainer form .form-group .smschkbox .chk_tick
+	{
+	margin-left: 0;
+}
+
+.popup_container .resolveOversoldPopup {
+	border-left: none !important;
+}
+
+.popup_container .resolveOversoldPopup .tabconainer form .lable_fields {
+	width: 15% !important;
+}
+
+.popup_container .resolveOversoldPopup .tabconainer form .form_fields {
+	width: 18% !important;
+	float: left;
+}
+
+.popup_container .resolveOversoldPopup .tabconainer form .form-group.MB {
+	width: 100%;
+}
+
+.popup_container .resolveOversoldPopup .tabconainer .option_field {
+	width: 100%;
+	float: left;
+}
+
+.popup_container .resolveOversoldPopup .tabconainer .increaseOptionField {
+	margin-left: 7.5%;
+	width: 100%;
+}
+
+.MR5 {
+	margin-right: 5px;
+}
+
+.MT10 {
+	margin-top: 10px;
+}
+
+.popup_container .resolveOversoldPopup .tabconainer {
+	width: 90%;
+	margin-left: 5%;
+	border-bottom: 1px solid #000;
+}
+
+.PartAdjustHeadding {
+	color: #00AEEF;
+	font-weight: bold;
+	text-transform: capitalize;
+	margin-top: 10px;
+}
+
+.gid_container_Customer .table {
+	border: 0;
+}
+
+.gid_container_Customer .table th {
+	border: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.gid_container_Customer .table tbody {
+	border: none;
+}
+
+.part_Adjust_gid_container .table tbody>tr>td {
+	border: none;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	vertical-align: middle;
+}
+
+.gid_container_Customer .table tbody .tddropdown td {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	vertical-align: middle;
+}
+
+.gid_container_Customer .tableHeader {
+	margin-left: -15px;
+	margin-right: -15px;
+}
+
+.part_Adjust_gid_container .table th:hover {
+	background: #F6F7F9;
+	cursor: inherit;
+}
+</style> 
+	<script type="text/javascript">
+        var resolveOversoldModel = angular.module("resolveOversoldModel",[]);
+        
+        
+        
+        
+        
+        
+        resolveOversoldModel.controller("resolveOversoldModelCtrl", function($scope, Notification, ResolveOversoldService) {
+             if($scope.resolveOversoldModel == undefined){
+                $scope.resolveOversoldModel = {};
+            }
+           $scope.resolveOversoldModel.showPreview = true;
+           $scope.oversoldJson ={};
+            $scope.$on('resolveOversoldEvent', function (event, oversoldJson) {  
+            	debug(oversoldJson);
+                $scope.resolveOversoldModel.openResolveOversoldModelPopup(oversoldJson);
+                
+                
+                
+
+            });
+            
+            $scope.resolveOversoldModel.showApplyBtn = function(){
+            	$scope.resolveOversoldModel.showPreview = false;
+            }
+            $scope.resolveOversoldModel.openResolveOversoldModelPopup = function (oversoldJson) {
+                //$scope.partAdjustModal.clearAllData();
+                $scope.resolveOversoldModel.openPopup();
+                $scope.oversoldJson = [];
+                $scope.resolvedJson = [];
+                $scope.oversoldJson = oversoldJson;
+                $scope.resolvedJson = angular.copy(oversoldJson);
+                debug($scope.oversoldJson);
+                var monthNames = [
+					  "Jan", "Feb", "Mar",
+					  "Apr", "May", "Jun", "Jul",
+					  "Aug", "Sep", "Oct",
+					  "Nov", "Dec"
+					];
+					
+					var date = new Date();
+					var day = date.getDate();
+					day = day <= 9 ? '0'+day : day;
+					var monthIndex = date.getMonth();
+					var year = date.getFullYear();
+                
+                
+                
+                
+                for(var i=0; i < $scope.resolvedJson.length; i++){
+                	var lineitem = {};
+                	$scope.resolvedJson[i].QtyOut = $scope.resolvedJson[i].QtyIn;
+                	$scope.resolvedJson[i].RemainingQty = 0;
+                	$scope.resolvedJson[i].Total = 0;
+                	lineitem.CreatedDate = monthNames[monthIndex] + ' ' + day + ', ' + year;
+                	lineitem.UniqueId = 'TBD';
+                	lineitem.Reference = 'Count Adjustment';
+                	lineitem.IsCountAdjustment = true;
+                	lineitem.QtyOut = oversoldJson[i].RemainingQty;
+                	$scope.resolvedJson[i].PartFIFOActivityLineItemList.push(lineitem);
+                }
+                
+                
+                
+                setTimeout(function(){ 
+                    angular.element('#feeCodeInput').focus();
+                }, 1000);
+            }
+            
+            $scope.resolveOversoldModel.ResolveOversold= function(){
+	     		debug("Hiii");
+	     		debug($scope.oversoldJson);
+	     		
+	      		ResolveOversoldService.getResolveOversoldInStock(JSON.stringify($scope.oversoldJson)).then(function (successfulSearchResult) {
+                debug(successfulSearchResult);
+                $scope.resolveOversoldModel.closePopup();
+                $scope.$emit('OversoldUpdate', successfulSearchResult);
+                
+	                         
+                 },
+                 function (errorSearchResult) {
+                     responseData = errorSearchResult;  
+                 });  
+				
+			}
+            
+            
+            // Open popup box
+            $scope.resolveOversoldModel.openPopup = function() {
+                angular.element('.controls').hide(); 
+                angular.element('#resolveOversold').modal({  
+                    backdrop : 'static',
+                    keyboard : false
+                });
+            }
+            
+            // Close popup box
+            $scope.resolveOversoldModel.closePopup = function() {
+            	$scope.resolveOversoldModel.showPreview = true;
+                angular.element('#resolveOversold').modal('hide');
+            }
+            
+            
+           });
+           
+            resolveOversoldModel.service("ResolveOversoldService", function ($q) {
+            	this.getResolveOversoldInStock = function(ResolveOrderJson)
+                {
+                	ResolveOrderJson = encodeString(ResolveOrderJson);
+                	var deferred = $q.defer();
+                      Visualforce.remoting.Manager.invokeAction(
+                          '{!$RemoteAction.ViewPartCtrl.resolveOversoldInStock}',
+                              ResolveOrderJson,
+                          function (result, event) {
+                             if (event.type == 'exception') {
+                                  deferred.reject(event.message);
+                              } else {
+                                  var partInfo = decodeString(result);
+                                  var find = '\'';
+                                  var re = new RegExp(find, 'g');
+                                  partInfo = partInfo.replace(re, '');
+                                  deferred.resolve(JSON.parse(partInfo));
+                              }
+                          }, {
+                              escape : true
+                      });
+                      return deferred.promise;
+                }
+           	 });
+           
+           
+           
+           
+    </script>
+
+	<div id="resolveOversold" class="modal fade" role="dialog"
+		ng-controller="resolveOversoldModelCtrl">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content col-md-12">
+				<div class="modal-body popup_container kit_popup_container">
+					<div class="popupinside col-md-12 popupright resolveOversoldPopup ">
+						<div class="right_heading_container col-md-12">
+							<h1 class="right_panel_heading">Resolve Oversold Stock</h1>
+							<div class="savecancle_btncntnr">
+								<button type="button" id="closemodal"
+									class="btn btn-default grayBtn"
+									ng-click="resolveOversoldModel.closePopup()">Cancel</button>
+								<button type="button" class="btn btn-default greenBtn" ng-click = "resolveOversoldModel.ResolveOversold()">Apply</button>
+							</div>
+						</div>
+						<div class="col-md-12 P0 main_container_partAdjust"  ng-if = "oversoldJson.length == 0">
+							<p class="PartAdjustHeadding">Oversold Details</p>
+							No Such Records
+							</div>
+						
+						
+						<div class="col-md-12 P0 main_container_partAdjust"  ng-if = "oversoldJson.length > 0">
+							<p class="PartAdjustHeadding">Oversold Details</p>
+							<div class="gid_container_Customer part_Adjust_gid_container"
+								id="part_Adjust_gid_container">
+								<table class="table pull-left" id="part_Adjust_ItemGrid">
+									<col width = "2%"/>
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<thead>
+										<tr class="tableHeader T3 C2 ">
+											<th></th>
+											<th class="text-uppercase  T3">SOURCE</th>
+											<th class=" T3 text-uppercase">DATE</th>
+											<th class=" T3 text-uppercase">ID#</th>
+											<th class=" T3 text-uppercase ">REFERENCE</th>
+											<th class=" T3 text-uppercase text-center">QTY IN</th>
+											<th class="T3 text-uppercase text-center">QTY OUT</th>
+											<th class=" T3 text-uppercase text-center">REMAINING</th>
+											<th class=" T3 text-uppercase text-center">COST</th>
+											<th class=" T3 text-uppercase text-center">TOTAL</th>
+										</tr>
+									</thead>
+									<tbody class="parentBody printChild" ng-repeat = " FifoBucket in oversoldJson " ng-class-even="'C2'">
+										<tr >
+											<td></td>
+											<td class="T7">{{FifoBucket.SourceName}}</td>
+											<td class="T7">{{FifoBucket.CreatedDate}}</td>
+											<td class="T7"><a href="javascript:void(0)">{{FifoBucket.UniqueId}}</a></td>
+											<td class="T7">{{FifoBucket.Reference}}</td>
+											<td class="T7 text-center">{{FifoBucket.QtyIn}}</td>
+											<td class="T7 text-center">{{FifoBucket.QtyOut}}</td>
+											<td class="T7 text-center">{{FifoBucket.RemainingQty}}</td>
+											<td class="T7 text-center">{{FifoBucket.Cost | currency}}</td>
+											<td class="T7 text-center">{{FifoBucket.Total| currency}}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="tabconainer">
+						<form>
+						<div class="clearfix"></div>            
+						<div class="option_field ">
+                           <div class="increaseOptionField">
+	                       		<span class="fontB pull-left MR5 MT10">Total Quantity oversold is</span> <span class="pull-left fontB MR5  MT10">{{oversoldJson.Quantity}}</span>
+								<span class="fontB pull-left MR5 MT10">with a total cost of</span>
+								<span class="pull-left fontB MR5  MT10">{{oversoldJson.Total | currency}}</span>
+							</div>
+						</div>
+						</form>
+						</div>
+						
+						<div class="col-md-12 P0 main_container_partAdjust"
+							ng-show="!modifyCostSourceModel.showPreview"  ng-if = "oversoldJson.length > 0" >
+							<p class="PartAdjustHeadding">Resolved Details</p>
+							
+							<div class="gid_container_Customer part_Adjust_gid_container"
+								id="part_Adjust_gid_container">
+								<table class="table pull-left" id="part_Adjust_ItemGrid">
+									<col width = "2%"/>
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<thead>
+										<tr class="tableHeader T3 C2 ">
+											<th></th>
+											<th class="text-uppercase  T3">SOURCE</th>
+											<th class=" T3 text-uppercase">DATE</th>
+											<th class=" T3 text-uppercase">ID#</th>
+											<th class=" T3 text-uppercase ">REFERENCE</th>
+											<th class=" T3 text-uppercase text-center">QTY IN</th>
+											<th class=" T3 text-uppercase text-center">QTY OUT</th>
+											<th class=" T3 text-uppercase text-center">REMAINING</th>
+											<th class=" T3 text-uppercase text-center">COST</th>
+											<th class=" T3 text-uppercase text-center">TOTAL</th>
+										</tr>
+									</thead>
+									<tbody class="parentBody printChild" ng-repeat = " FifoBucket in resolvedJson " >
+										<tr ng-class-even="'C2'">
+											<td></td>
+											<td class="T7">{{FifoBucket.SourceName}}</td>
+											<td class="T7">{{FifoBucket.CreatedDate}}</td>
+											<td class="T7"><a href="javascript:void(0)">{{FifoBucket.UniqueId}}</a></td>
+											<td class="T7">{{FifoBucket.Reference}}</td>
+											<td class="T7 text-center">{{FifoBucket.QtyIn}}</td>
+											<td class="T7 text-center">{{FifoBucket.QtyOut}}</td>
+											<td class="T7 text-center">{{FifoBucket.RemainingQty}}</td>
+											<td class="T7 text-center">{{FifoBucket.Cost | currency}}</td>
+											<td class="T7 text-center">{{FifoBucket.Total | currency}}</td>
+										</tr>
+										<tr ng-repeat-start="FifoBucketLineItem in FifoBucket.PartFIFOActivityLineItemList" >
+											<td></td>
+	                                        <td class ="T7"></td>
+	                                        <td ng-class="{'T3': FifoBucketLineItem.IsCountAdjustment, 'T7' : !FifoBucketLineItem.IsCountAdjustment}">{{FifoBucketLineItem.CreatedDate}}</td>
+	                                        <td ng-class="{'T3': FifoBucketLineItem.IsCountAdjustment, 'T7' : !FifoBucketLineItem.IsCountAdjustment}"><a href="javascript:void(0)">{{FifoBucketLineItem.UniqueId}}</a></td>
+	                                        <td ng-class="{'T3': FifoBucketLineItem.IsCountAdjustment, 'T7' : !FifoBucketLineItem.IsCountAdjustment}">{{FifoBucketLineItem.Reference}}</td>
+	                                        <td class ="T7 text-center"></td>
+	                                        <td class ="text-center " ng-class="{'T3': FifoBucketLineItem.IsCountAdjustment, 'T7' : !FifoBucketLineItem.IsCountAdjustment}">{{FifoBucketLineItem.QtyOut}}</td>
+	                                        <td class ="T7 text-center"></td>
+	                                        <td class ="T7 text-center"></td>
+	                                        <td class ="T7 text-center"></td>
+	                                             
+	                                        </tr>
+	                                        <tr ng-repeat-end="ng-repeat-end" ></tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="right_heading_container col-md-12">
+							<div class="savecancle_btncntnr">
+								<button type="button" id="closemodal"
+									class="btn btn-default grayBtn"
+									ng-click="resolveOversoldModel.closePopup()">Cancel</button>
+								<button type="button" class="btn btn-default greenBtn" ng-click = "resolveOversoldModel.ResolveOversold()" >Apply</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+</apex:component>

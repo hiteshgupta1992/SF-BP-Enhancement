@@ -1,0 +1,984 @@
+<apex:component >
+
+ <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for components here."/>
+ <apex:attribute name="PartId" required="true" type="String" description="unique Id for components here."/>
+<style>
+	.Errormsg
+	{
+		border: solid 1px red;
+	}
+	#errmsg
+	{
+	color:red;
+	}
+	</style>
+<script>  
+	//global variable declarations
+	
+	
+		
+				var  {!uniqueId}pagePartTabId = "{!PartId}" ;
+				var  {!uniqueId}DetailDataJson='' ;
+				var  {!uniqueId}pagePartTabVendorId='' ;
+				var  {!uniqueId}pagePartTabSupersededPartId='' ;
+				
+		
+				$("#{!uniqueId}Part").attr("tabindex", 1);
+				$("#{!uniqueId}VendorAutocomplete").attr("tabindex", 2);
+				$("#{!uniqueId}Description").attr("tabindex", 3);
+				$("#{!uniqueId}InStock").attr("tabindex", 4);
+				$('#{!uniqueId}Committed').attr("tabindex", 5);
+				$('#{!uniqueId}onOrder').attr("tabindex", 6);
+				$('#{!uniqueId}MSRP').attr("tabindex", 7);
+				
+				//Shipping
+				$('#{!uniqueId}Retail').attr("tabindex", 8);
+				$('#{!uniqueId}enviroFree').attr("tabindex", 9);
+				$('#{!uniqueId}lastCost').attr("tabindex", 10);
+				$('#{!uniqueId}ReorderMin').attr("tabindex", 11);
+				$('#{!uniqueId}Reordermax').attr("tabindex", 12);
+				
+				$('#{!uniqueId}packaged').attr("tabindex", 13);
+				$('#{!uniqueId}packagedQty').attr("tabindex", 14);
+				$('#{!uniqueId}OrderLots').attr("tabindex", 15);
+				$("#{!uniqueId}lastCounted").attr("tabindex", 16);
+				$('#{!uniqueId}LastStocked').attr("tabindex", 17);
+				
+				
+	
+				$('#{!uniqueId}PartAutocomplete').attr("tabindex", 19);
+				$('#{!uniqueId}Location').attr("tabindex", 20);
+				$('#{!uniqueId}categoryAutocomplete').attr("tabindex", 21);
+				$('#{!uniqueId}activeparts').attr("tabindex", 22);
+				$('#{!uniqueId}partTaxable').attr("tabindex", 23);
+				$('#{!uniqueId}Notes').attr("tabindex", 24);
+				$('#{!uniqueId}btnsave').attr("tabindex", 25);
+		
+ 
+		   		var {!uniqueId}IsFormModified = false;
+		   		
+		   		function {!uniqueId}preRemoveSelecedTab(selectedTab, Part_ID){
+		   			{!uniqueId}CompareData();
+		    		anyChangesInCustomerClosingTab = {!uniqueId}IsFormModified;
+		    		removeSelecedTab(selectedTab, Part_ID, anyChangesInCustomerClosingTab);
+		    	}
+		    	
+		    	function {!uniqueId}assignvalue(detailJson){
+		    	
+		    		$.each(detailJson, function(index,jsonObject){
+						    $.each(jsonObject, function(key,val){
+						        debug("key : "+key+" ; value : "+val);
+						    });
+						});
+		    		
+						if(detailJson !=null)
+						{
+							{!uniqueId}DetailDataJson=detailJson;
+							$('#{!uniqueId}Part').val(detailJson[0].Part_Part_Number);
+							
+							$('#{!uniqueId}VendorAutocomplete').val(detailJson[0].Part_Vendor_Name_And_Code);
+							$('#{!uniqueId}VendorAutocompleteId').val({!uniqueId}DetailDataJson[0].Part_Vendor);
+							{!uniqueId}VendorOriginalResultId = $('#{!uniqueId}VendorAutocompleteId').val();
+							
+							$('#{!uniqueId}Description').val(detailJson[0].Part_Description  );
+							$('#{!uniqueId}InStock').val(detailJson[0].Part_Qty_In_Stock     );
+							$('#{!uniqueId}MSRP').val(detailJson[0].Part_MSRP      );
+							$('#{!uniqueId}lastCost').val(detailJson[0].Part_Last_Cost    );
+							$('#{!uniqueId}Committed').val(detailJson[0].Part_Qty_Committed);
+							$('#{!uniqueId}Retail').val(detailJson[0].Part_Retail_Price  );
+							$('#{!uniqueId}enviroFree').val(detailJson[0].Part_Enviro_Fee       );
+							$('#{!uniqueId}onOrder').val(detailJson[0].Part_Qty_On_Order );
+							$('#{!uniqueId}ReorderMin').val(detailJson[0].Part_Auto_reorder_Min       );
+							
+							$('#{!uniqueId}PartAutocompleteId').val(detailJson[0].Part_Superseded_By_Id);
+							$('#{!uniqueId}PartAutocomplete').val(detailJson[0].Part_Superseded_By);
+							{!uniqueId}PartOriginalResultId = $('#{!uniqueId}PartAutocompleteId').val();
+							
+							$('#{!uniqueId}Reordermax').val(detailJson[0].Part_Auto_reorder_Max     );
+							$('#{!uniqueId}Location').val(detailJson[0].Part_Location      );
+							$('#{!uniqueId}packaged').prop('checked',detailJson[0].Part_Packaged_Part); 
+							$('#{!uniqueId}activeparts').prop('checked',detailJson[0].Part_Active);
+							$('#{!uniqueId}packagedQty').val(detailJson[0].Part_Package_Qty);
+							$('#{!uniqueId}OrderLots').val(detailJson[0].Part_Order_Lots );
+				    		
+
+				    		$('#{!uniqueId}partTaxable').prop('checked',detailJson[0].Part_Taxable);
+				    		$('#{!uniqueId}LastStocked').val(detailJson[0].Part_Last_Stocked);
+				    		$('#{!uniqueId}lastCounted').val(detailJson[0].Part_Last_Counted);
+				    		$('#{!uniqueId}Notes').val(detailJson[0].Part_Notes);
+				    		
+				    		$('#{!uniqueId}categoryAutocomplete').val(detailJson[0].Part_Category);
+				    		debug('cid'+detailJson[0].Part_CategoryId );
+				    		$('#{!uniqueId}CategoryAutocompleteId').val(detailJson[0].Part_CategoryId);
+				    		debug($('#{!uniqueId}PartAutocompleteId').val());
+				    		{!uniqueId}categoryOriginalResultId = $('#{!uniqueId}CategoryAutocompleteId').val();
+				    		
+				    		$('#{!uniqueId}Available').val(	((detailJson[0].Part_Qty_In_Stock !='') ?  detailJson[0].Part_Qty_In_Stock : 0)-((detailJson[0].Part_Qty_Committed !='') ?  detailJson[0].Part_Qty_Committed : 0));
+				    		{!uniqueId}DetailDataJson[0].Part_Vendor;
+				    		{!uniqueId}pagePartTabSupersededPartId={!uniqueId}DetailDataJson[0].Part_Superseded_By_Id;
+				    		
+				    		if($('#{!uniqueId}packaged').prop('checked')==true)
+									{
+										$('#{!uniqueId}packagedQty').addClass('Requiredfield');
+										$('#{!uniqueId}packagedQty').addClass('{!uniqueId}requiredData');
+										$('#{!uniqueId}packagedQty').addClass('k-state-disabled');
+										$('#{!uniqueId}packagedQty').removeAttr('disabled');
+										
+									}
+									else
+									{
+										$('#{!uniqueId}packagedQty').RemoveClass('requiredField');
+										$('#{!uniqueId}packagedQty').RemoveClass('k-state-disabled');
+										$('#{!uniqueId}packagedQty').RemoveClass('{!uniqueId}requiredData');
+										$('#{!uniqueId}packagedQty').attr('disabled','disable');
+									
+									
+									}
+	
+				    	}
+				    	
+		    	}
+		    	 function {!uniqueId}savePartRecord()
+		    	 {
+		    		
+				    	 var Savevalidate={!uniqueId}validateOnsave();
+				    	 if(Savevalidate)
+				    	 {
+				    	 	
+				    	 	{!uniqueId}DetailDataJson[0].Part_Part_Number=$('#{!uniqueId}Part').val();
+				    		 
+				    	 	{!uniqueId}DetailDataJson[0].Part_Vendor=$('#{!uniqueId}VendorAutocompleteId').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Superseded_By_Id=$('#{!uniqueId}PartAutocompleteId').val();
+				    	 	
+				    	 	
+
+				    	 	{!uniqueId}DetailDataJson[0].Part_Description=$('#{!uniqueId}Description').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Qty_In_Stock=$('#{!uniqueId}InStock').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_MSRP=$('#{!uniqueId}MSRP').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Last_Cost=$('#{!uniqueId}lastCost').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Qty_Committed=$('#{!uniqueId}Committed').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Retail_Price=$('#{!uniqueId}Retail').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Enviro_Fee=$('#{!uniqueId}enviroFree').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Qty_On_Order=$('#{!uniqueId}onOrder').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Auto_reorder_Min=$('#{!uniqueId}ReorderMin').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Superseded_By=$('#{!uniqueId}SuppressedBy').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Location=$('#{!uniqueId}Location').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Packaged_Part=$('#{!uniqueId}packaged').prop('checked');
+				    	 	
+				    	 	{!uniqueId}DetailDataJson[0].Part_Order_Lots=$('#{!uniqueId}OrderLots').val();
+				    	 	
+				    	 	{!uniqueId}DetailDataJson[0].Part_Auto_reorder_Max=$('#{!uniqueId}Reordermax').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Active=$('#{!uniqueId}activeparts').prop('checked');
+				    	 	{!uniqueId}DetailDataJson[0].Part_Package_Qty=$('#{!uniqueId}packagedQty').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Category=$('#{!uniqueId}Category').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_CategoryId=$('#{!uniqueId}CategoryAutocompleteId').val();
+				    	 	
+				    	 		
+				    		
+				    	 	{!uniqueId}DetailDataJson[0].Part_Taxable=$('#{!uniqueId}partTaxable').prop('checked');
+				    	 	{!uniqueId}DetailDataJson[0].Part_Last_Counted=$('#{!uniqueId}lastCounted').val();
+				    	 	{!uniqueId}DetailDataJson[0].Part_Notes=$('#{!uniqueId}Notes').val();
+				    	 	
+				    		
+				    	
+				    	 	 
+				    	 	savePartRecordData({!uniqueId}pagePartTabId, {!uniqueId}DetailDataJson, {!uniqueId}PartSaveCallBack);
+				    	 	
+				    	
+		    	 
+		    	 	
+		    			}
+		    	 	
+		    	 
+		    	 	
+		    	 
+		    	 }
+		    	 
+		    	 function {!uniqueId}CompareData()
+		    	 {			
+		    	 			if($('#{!uniqueId}Part').val() != {!uniqueId}DetailDataJson[0].Part_Part_Number){
+		    	 				 {!uniqueId}IsFormModified = true;
+		    	 			}
+		    	 			else if(	$('#{!uniqueId}Description').val() != {!uniqueId}DetailDataJson[0].Part_Description ){
+		    	 					 {!uniqueId}IsFormModified = true;
+		    	 			}
+		    	 			else if(	$('#{!uniqueId}VendorAutocompleteId').val() != {!uniqueId}DetailDataJson[0].Part_Vendor) {
+		    	 				{!uniqueId}IsFormModified = true;	
+		    	 			}
+		    	 			else if($('#{!uniqueId}InStock').val() != {!uniqueId}DetailDataJson[0].Part_Qty_In_Stock   ){
+		    	 				{!uniqueId}IsFormModified = true;
+		    	 			}  
+		    	 			else if( $('#{!uniqueId}MSRP').val() != {!uniqueId}DetailDataJson[0].Part_MSRP ){
+		    	 				{!uniqueId}IsFormModified = true;
+		    	 			}
+		    	 			else if($('#{!uniqueId}lastCost').val() != {!uniqueId}DetailDataJson[0].Part_Last_Cost){
+		    	 					{!uniqueId}IsFormModified = true;
+		    	 			}
+		    	 			else if( $('#{!uniqueId}enviroFree').val() != {!uniqueId}DetailDataJson[0].Part_Enviro_Fee){
+		    	 					{!uniqueId}IsFormModified = true;
+		    	 			}
+							
+							else if($('#{!uniqueId}onOrder').val() != {!uniqueId}DetailDataJson[0].Part_Qty_On_Order )
+							{
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}ReorderMin').val() != {!uniqueId}DetailDataJson[0].Part_Auto_reorder_Min )
+							{
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}PartAutocompleteId').val() != {!uniqueId}DetailDataJson[0].Part_Superseded_By_Id)
+							{
+									{!uniqueId}IsFormModified = true;
+							
+							}else if($('#{!uniqueId}Reordermax').val() != {!uniqueId}DetailDataJson[0].Part_Auto_reorder_Max ){
+									
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}Location').val() != {!uniqueId}DetailDataJson[0].Part_Location){
+								{!uniqueId}IsFormModified = true;
+							}
+						
+							else if($('#{!uniqueId}packagedQty').val() != {!uniqueId}DetailDataJson[0].Part_Package_Qty){
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}OrderLots').val( ) != {!uniqueId}DetailDataJson[0].Part_Order_Lots){
+									{!uniqueId}IsFormModified = true;
+							}
+						
+							else if($('#{!uniqueId}LastStocked').val()!= {!uniqueId}DetailDataJson[0].Part_Last_Stocked){
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}lastCounted').val() != {!uniqueId}DetailDataJson[0].Part_Last_Counted){
+										{!uniqueId}IsFormModified = true;
+							
+							}
+							else if($('#{!uniqueId}Notes').val() != {!uniqueId}DetailDataJson[0].Part_Notes){
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}CategoryAutocompleteId').val() != {!uniqueId}DetailDataJson[0].Part_CategoryId){
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}partTaxable').prop('checked') !={!uniqueId}DetailDataJson[0].Part_Taxable){
+									{!uniqueId}IsFormModified = true;
+							}
+							
+							else if($('#{!uniqueId}packaged').prop('checked') != {!uniqueId}DetailDataJson[0].Part_Packaged_Part ){
+									{!uniqueId}IsFormModified = true;
+							}
+							else if($('#{!uniqueId}activeparts').prop('checked') != {!uniqueId}DetailDataJson[0].Part_Active){
+									{!uniqueId}IsFormModified = true;
+							}
+							else{ 
+									{!uniqueId}IsFormModified = false;
+							}
+							
+							
+							
+		    	 	
+		    	 
+
+
+		    	 }
+		    	
+		    	
+		    	 
+		    	 function validateFormdataRegister()
+		    	 {
+		    	 	
+			    	 			var partValidator= $('.{!uniqueId}requiredData');
+			    	 			
+			    	 			var decimalregex	=/^[0-9]{1,12}(\.[0-9]{1,3})?$/
+			    	 			var twodecimalregex	=/^[0-9]{1,13}(\.[0-9]{1,2})?$/
+			    	 			var nodecimalregex	=/^[0-9]{1,16}$/
+			    	 			
+
+		    	  		
+		    	  				var partThreedecimalValidator= $('.{!uniqueId}threedecimal');
+		    	  				var partTwodecimalValidator= $('.{!uniqueId}twodecimal');
+		    	  				var parttNodecimalValidator= $('.{!uniqueId}noDecimal');
+			    	 			
+			    	 			 for(var ValidCount = 0; ValidCount < partValidator.length ; ValidCount++ )
+			    	 			 {
+			    	 			 
+					    	 			 	$('#'+partValidator[ValidCount].id).focusout(function(){
+					    	 			 			
+					    	 			 			if($(this).val()== '')
+					    	 			 			{
+					    	 			 				
+					    	 			 					if($(this).hasClass("ErrormsgReq"))
+					    	 			 					{
+					    	 			 					
+					    	 			 						
+					    	 			 					}
+					    	 			 					else
+					    	 			 					{
+								    	 			 				$(this).addClass("ErrormsgReq");
+								    	 			 				$("<font>", {id: this.id+'reqvalidate', class: "errDiv", text: 'Required', click: function () {}}).insertAfter(this);
+								    	 			 				
+					    	 			 					}
+					    	 			 			}
+					    	 			 			else
+					    	 			 			{
+					    	 			 			
+					    	 			 					
+					    	 			 						
+					    	 			 						$(this).removeClass("ErrormsgReq");
+					    	 			 						$('#'+this.id+'reqvalidate').remove();
+					    	 			 					
+					    	 			 					
+					    	 			 					
+					    	 			 				
+					    	 			 			
+					    	 			 			}
+					    	 			 	});
+			    	 			 		
+			    	 			 
+			    	 			 }
+			    	 			 
+			    	 			 
+		    	  		
+				    	  		for(var ValidCount = 0; ValidCount < partTwodecimalValidator.length ; ValidCount++ )
+				    	  		{
+				    	  		
+				    	  		
+				    	  			$('#'+partTwodecimalValidator[ValidCount].id).focusout(function(){
+					    	 			 	if($(this).val()!='')
+					    	 			 	{	
+			    	 			 					if(twodecimalregex.test($(this).val()))
+					    	 			 			{
+						    	 			 				$(this).removeClass("Errormsg");
+						    	 			 				$('#'+this.id+'numbervalidate').remove();
+					    	 			 			
+					    	 			 					
+					    	 			 			}
+					    	 			 			else
+					    	 			 			{
+					    	 			 				if($(this).hasClass("Errormsg"))
+					    	 			 					{
+					    	 			 					
+					    	 			 						
+					    	 			 					}
+					    	 			 					else
+					    	 			 					{
+								    	 			 				$(this).addClass("Errormsg");
+								    	 			 				$("<font>", {id: this.id+'numbervalidate', class: "errDiv", text: 'Invalid', click: function () {}}).insertAfter(this);
+								    	 			 				
+					    	 			 					}
+					    	 			 				
+					    	 			 			}
+					    	 			 		}
+					    	 			 	});
+				    	  			
+				    	  		}
+				    	  		for(var ValidCount = 0; ValidCount < parttNodecimalValidator.length ; ValidCount++ )
+				    	  		{
+				    	  		
+				    	  		
+				    	  			$('#'+parttNodecimalValidator[ValidCount].id).focusout(function(){
+					    	 			 	if($(this).val()!='')
+					    	 			 	{		
+			    	 			 				if(nodecimalregex.test($(this).val()))
+					    	 			 			{
+						    	 			 				$(this).removeClass("Errormsg");
+						    	 			 				
+						    	 			 				$('#'+this.id+'numbervalidate').remove();
+					    	 			 			
+					    	 			 					
+					    	 			 			}
+					    	 			 			else
+					    	 			 			{
+					    	 			 					debug($(this).hasClass("Errormsg"));
+					    	 			 					debug($(this));
+					    	 			 					if($(this).hasClass("Errormsg"))
+					    	 			 					{
+					    	 			 							
+					    	 			 						
+					    	 			 					}
+					    	 			 					else
+					    	 			 					{
+								    	 			 				$(this).addClass("Errormsg");
+								    	 			 				$("<font>", {id: this.id+'numbervalidate', class: "errDiv", text: 'Invalid', click: function () {}}).insertAfter(this);
+								    	 			 				
+					    	 			 					}
+					    	 			 				
+					    	 			 			}
+					    	 			 	}		
+					    	 		});
+					    	 			 	
+					    	 	}
+					    	 			 	
+								for(var ValidCount = 0; ValidCount < partThreedecimalValidator.length ; ValidCount++ )
+				    	  		{
+				    	  		
+				    	  		
+				    	  			$('#'+partThreedecimalValidator[ValidCount].id).focusout(function(){
+					    	 			 			//debug(decimalregex.test($(this).val()));
+					    	 			 			if($(this).val()!='')
+					    	 			 			{
+				    	 			 					if(decimalregex.test($(this).val()))
+						    	 			 			{
+							    	 			 				$(this).removeClass("Errormsg");
+							    	 			 				
+							    	 			 				$('#'+this.id+'numbervalidate').remove();
+						    	 			 			
+						    	 			 					
+						    	 			 			}
+						    	 			 			else
+						    	 			 			{
+						    	 			 			if($(this).hasClass("Errormsg"))
+						    	 			 					{
+						    	 			 					
+						    	 			 						
+						    	 			 					}
+						    	 			 					else
+						    	 			 					{
+									    	 			 				$(this).addClass("Errormsg");
+									    	 			 				$("<font>", {id: this.id+'numbervalidate', class: "errDiv", text: 'Invalid', click: function () {}}).insertAfter(this);
+									    	 			 				
+						    	 			 					}
+						    	 			 				
+						    	 			 			}
+					    	 			 			}
+					    	 			 	});
+				    	  			
+				    	  		}
+				    	  		
+				    	  						$('#{!uniqueId}Part').focusout(function(){
+				    	  		
+				    	  							 var regex = new RegExp("^[a-zA-Z0-9\#]+$");
+				    	  				
+				    	 			 					if(regex.test($(this).val()))
+						    	 			 			{
+							    	 			 				$(this).removeClass("Errormsg");
+							    	 			 				$('#'+this.id+'aphavalidate').remove();
+						    	 			 			
+						    	 			 					
+						    	 			 			}
+						    	 			 			else
+						    	 			 			{
+						    	 			 					if($(this).hasClass("Errormsg"))
+						    	 			 					{
+						    	 			 					
+						    	 			 						
+						    	 			 					}
+						    	 			 					else
+						    	 			 					{
+									    	 			 				$(this).addClass("Errormsg");
+									    	 			 				$("<font>", {id: this.id+'aphavalidate', class: "errDiv", text: 'Invalid', click: function () {}}).insertAfter(this);
+									    	 			 				
+						    	 			 					}
+						    	 			 				
+						    	 			 			}
+					    	 			
+				    	  			
+				    	  			
+				    	  		});
+				    	  		
+			    	 		
+		    	
+		    	 		
+		    	 		
+		    	 }
+		    	  function {!uniqueId}validateOnsave()
+		    	  {
+		    	  
+		    	  		var ValidaterequredFields={!uniqueId}validateRequiredFiels();
+		    	  		var validateNumberFields={!uniqueId}validateValue();
+		    	  		if(ValidaterequredFields ==false){
+		    	  			return false;
+		    	  		}
+		    	  		
+		    	  		else if(validateid==false)
+		    	  		{
+		    	  			return false;
+		    	  		}
+		    	  		else if(validateNumberFields==false)
+		    	  		{
+		    	  			return false;
+		    	  		}
+		    	  		else{
+		    	  			return true;
+		    	  		 }
+		    	  		 
+
+		    	  
+		    	  }
+		    	  function validateid()
+		    	  {
+		    	  	if({!uniqueId}pagePartTabVendorId !=null)
+		    	  	{
+		    	  		return true;
+		    	  	}
+		    	  }
+		    	  function {!uniqueId}validateRequiredFiels()
+		    	  {			
+		    	  			var partValidator= $('.{!uniqueId}requiredData');
+		    	  			var decimalregex	=/^[0-9]{1,12}(\.[0-9]{1,3})?$/
+			    	 		var twodecimalregex	=/^[0-9]{1,13}(\.[0-9]{1,2})?$/
+			    	 		var nodecimalregex	=/^[0-9]{1,16}$/
+			    	 			
+		    	  			var result =true
+		    	  			for(var ValidCount = 0; ValidCount < partValidator.length ; ValidCount++ )
+								{
+												if($('#'+partValidator[ValidCount].id).val()=='')
+												{
+														result=false;
+													if($('#'+partValidator[ValidCount].id).hasClass("Errormsg"))
+													{
+												
+													}
+													else
+													{
+															$('#'+partValidator[ValidCount].id).addClass("Errormsg")
+															$("<font>", {id:  partValidator[ValidCount].id +'reqvalidate', class: "errDiv", text: 'Required', click: function () {}}).insertAfter('#'+ partValidator[ValidCount].id);
+															
+													}
+												}
+												else
+												{
+														$('#'+partValidator[ValidCount].id).removeClass("Errormsg");
+														$('#'+partValidator[ValidCount].id+'reqvalidate').remove();
+												
+												}
+					    	 			 			
+								
+								}
+								return result;
+		    	  
+		    	  	
+		    	  
+		    	  }
+		    	  
+		    	   function {!uniqueId}validateValue(){
+		    	   			
+		    	   			var Data=$('#{!uniqueId}IndividualNameDiv').find('.Errormsg');
+		    	   				var DataReq=$('#{!uniqueId}IndividualNameDiv').find('.ErrormsgReq');
+		    	   				
+		    	   				if(Data.length>0)
+		    	   				{
+		    	   					return false;
+		    	   					
+		    	   				}	
+		    	   				else if( DataReq.length >0)
+		    	   				{	
+		    	   					return false;
+		    	   				}
+		    	   				else 
+		    	   				{	
+		    	   					return true;
+		    	   				}
+		    					
+		    	  	}
+
+		    	  
+
+		    	
+		    	 
+		    	 function {!uniqueId}PartSaveCallBack(savedpartId){
+		    	 		var PartArray=savedpartId.split('|');
+		    	 		debug();
+    					{!uniqueId}pagePartTabId = PartArray[0];
+    					$("#{!uniqueId}TabNameDiv").text( PartArray[1]);
+    					$("#{!uniqueId}TabNameDiv").attr('title', PartArray[1]);
+    				}
+    				
+    		
+    			
+		    	
+		    	
+		    	$(document).ready( function()
+		    	{
+		    		var  uniqueId= {!uniqueId}assignvalue;
+		    		 $("#{!uniqueId}lastCounted").kendoDatePicker({
+		    		 	format:"MM/dd/yyyy"
+		    		 });
+		    		 $("#{!uniqueId}lastCounted").bind("focus", function(){
+							        $(this).data("kendoDatePicker").open();                    
+					  });
+					  $("#{!uniqueId}lastCounted").keypress(function (e)
+					  	{		if(e.keyCode !=9)
+					  			{
+					  				return false;
+					  			} 
+							                          
+					  });
+		    		if({!uniqueId}pagePartTabId ==''){
+
+		    			{!uniqueId}pagePartTabId =''
+
+		    			populatePartdetails({!uniqueId}pagePartTabId,uniqueId);
+		    		} else {
+
+
+
+		    			populatePartdetails({!uniqueId}pagePartTabId,uniqueId);
+		    		}
+		    		validateFormdataRegister();
+
+			    	$(".{!uniqueId}numericOnly").keypress(function (e) {
+						     //if the letter is not digit then display error and don't type anything
+						     if (e.which != 8 && e.which != 0   && (e.which <46 || e.which > 57) && (e.which < 48 || e.which > 46)) {
+
+
+								               return false;
+							}
+						 });
+					//{!uniqueId}callVendorAutoComplete();	
+					//{!uniqueId}callSupesededPartAutoComplete();		 
+		    		
+		    	});
+		    	
+		    	$('#{!uniqueId}packaged').change(function(){
+		    	   var Checkedvalue =this.checked;
+		    	   debug(Checkedvalue)
+		    	   if(Checkedvalue==true)
+		    	   {
+						$('#{!uniqueId}packagedQty').addClass('Requiredfield');
+						$('#{!uniqueId}packagedQty').addClass('k-state-disabled');
+						$('#{!uniqueId}packagedQty').addClass('{!uniqueId}requiredData');
+						$('#{!uniqueId}packagedQty').removeAttr('disabled');
+			    	   		
+		    	   }
+		    	   else
+		    	   {
+			    	   	$('#{!uniqueId}packagedQty').removeClass('Requiredfield');
+			    	   	$('#{!uniqueId}packagedQty').removeClass('k-state-disabled');
+						$('#{!uniqueId}packagedQty').removeClass('{!uniqueId}requiredData');
+						$('#{!uniqueId}packagedQty').attr('disabled','disabled');
+									
+		    	   
+		    	   }		    		
+		    	});
+		    	
+
+    	
+    	
+</script>
+ 		  <div id="{!uniqueId}IndividualNameDiv"  style="width:100%;">
+			
+			<table width="100%"  style="width:100%" cellspacing="5">
+	    			<col width="12%" />
+		    		<col width="21%" />
+		    		<col width="12%" />
+		    		<col width="21%" />
+		    		<col width="12%" />
+		    		<col width="20%" />
+		    		<tr>
+		    			<td colspan="6">
+		    			<b>Part Details</b>
+		    			</td>
+		    		
+		    		</tr>
+		    		<tr>
+		    			<td colspan="6">
+		    			</td>
+		    		</tr>
+		    		<tr>
+				    		<td >
+				    			Part#
+				    		</td>
+				    		<td >
+					    		<input type="text" id="{!uniqueId}Part" class="k-input  k-textbox requiredField {!uniqueId}requiredData AlPhanumeric " 
+				    						placeholder="Part" accApi="Part" conApi="Part" maxlength="50"/>
+				    		</td>
+				    		<td>
+				    			Vendor 
+				    		</td>
+				    		<td  colspan="2" >
+					    		<input id="{!uniqueId}VendorAutocompleteId"  style="display:none" class="{!uniqueId}requiredData"/>
+		    					<c:CustomAutoComplete uniqueId="{!uniqueId}Vendor" resultElemId="{!uniqueId}VendorAutocompleteId" objName="Vendor" required="true" defaultClass="k-input  k-textbox"/>
+
+
+				    		</td>
+				    		
+				    		<td>
+				    		</td>
+				    		
+		    		</tr>	
+		    		
+				 	<tr>
+				    		<td >
+				    			Description
+				    		</td>
+				    		<td >
+					    		<input type="text" id="{!uniqueId}Description" class="k-input  k-textbox   requiredField {!uniqueId}requiredData " 
+				    						placeholder="Description" accApi="Description" conApi="Description" maxlength="255"/>
+				    		</td>
+				    		
+				    		
+		    		</tr>	
+		    		<tr>
+				    		<td colspan="6" >
+					    		<div  style="width:98%">
+					    			<hr  style="border:solid 1px #F0F0F0"/>
+					    		</div>
+				    		</td>
+		    		
+		    		</tr>
+		    		<tr>
+				    		<td colspan="2">
+				    			<b>	Quantities</b>
+				    		</td>
+				    		<td colspan="2">
+				    			<b>	Pricing</b>
+				    		</td>
+				    		<td colspan="2">
+				    			<b>	Costing</b>
+				    		</td>
+		    		</tr>	
+		    		<tr>
+		    			<td colspan="6">
+		    		</td>
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				In Stock
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}InStock" class="k-input  k-textbox  {!uniqueId}numericOnly {!uniqueId}twodecimal"  maxlength="19"
+				    						placeholder="In Stock" accApi="InStock" conApi="InStock" />
+		    			</td>
+		    			<td>
+		    				M.S.R.P.
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}MSRP" class="k-input  k-textbox  {!uniqueId}numericOnly {!uniqueId}threedecimal" 
+				    						placeholder="MSRP" accApi="MSRP" conApi="MSRP"  maxlength="20"/>
+		    			</td>
+		    			<td>
+		    				Last Cost
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}lastCost" class="k-input  k-textbox  {!uniqueId}numericOnly {!uniqueId}threedecimal" 
+				    						placeholder="Last Cost" accApi="lastCost" conApi="lastCost"  maxlength="20"/>
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				 Committed
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}Committed" class="k-input  k-textbox k-state-disabled" 
+				    						placeholder="Committed" accApi="Committed" conApi="Committed"  maxlength="20" disabled="disabled" style="color:#a0a0a0" />
+		    			</td>
+		    			<td>
+		    				Retail
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}Retail" class="k-input  k-textbox  {!uniqueId}numericOnly" 
+				    						placeholder="Retail" accApi="Retail" conApi="Retail"  maxlength="20"/>
+		    			</td>
+		    			<td>
+		    				Avg Cost
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}avgCost" class="k-input  k-textbox k-state-disabled {!uniqueId}numericOnly {!uniqueId}threedecimal" 
+				    						placeholder="Avg Cost" accApi="avgCost" conApi="avgCost"  maxlength="20" disabled="disabled" style="color:#a0a0a0" />
+		    			</td>
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				Available
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}Available" class="k-input  k-textbox k-state-disabled {!uniqueId}numericOnly {!uniqueId}threedecimal" 
+				    				disabled="disabled"	placeholder="Available" accApi="Available" conApi="Available"  maxlength="20"/>
+		    			</td>
+		    			<td>
+		    				Enviro Fee
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}enviroFree" class="k-input  k-textbox  {!uniqueId}numericOnly {!uniqueId}threedecimal" 
+				    						placeholder="enviroFee" accApi="enviroFree" conApi="enviroFree" maxlength="20"/>
+		    			</td>
+		    			
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    			On Order	
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}onOrder" class="k-input  k-textbox k-state-disabled" 
+				    						placeholder="onOrder" accApi="onOrder" conApi="onOrder" maxlength="20" disabled="disabled" style="color:#a0a0a0" />
+		    			</td>
+		    		</tr>
+		    		<tr>
+				    		<td colspan="6" >
+					    		<div  style="width:98%">
+					    			<hr  style="border:solid 1px #F0F0F0"/>
+					    		</div>
+				    		</td>
+		    		
+		    		</tr>
+		    		<tr>
+				    		<td colspan="2">
+				    			<b>	Ordering Information</b>
+				    		</td>
+				    		<td colspan="2">
+				    			<b>	Activity Dates</b>
+				    		</td>
+				    		<td colspan="2">
+				    			<b>	Other Information</b>
+				    		</td>
+		    		</tr>	
+		    		<tr>
+		    				<td colspan="6">
+		    				</td>
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				Reorder Min	 
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}ReorderMin" class="k-input  k-textbox  {!uniqueId}noDecimal {!uniqueId}numericOnly" 
+				    						placeholder="Reorder Min" accApi="ReorderMin" conApi="ReorderMin" maxlength="16"/>
+		    			</td>
+		    			<td>
+		    				Last Stocked 
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}LastStocked" class="k-input  k-textbox k-state-disabled" 
+				    						placeholder="Last Stocked" accApi="LastStocked" conApi="LastStocked" disabled="disabled" style="color:#a0a0a0" />
+		    			</td>
+		    			<td>
+		    				Superseded By
+
+		    			</td>
+		    			<td>
+		    					<input id="{!uniqueId}PartAutocompleteId"  style="display:none" />
+		    					<c:CustomAutoComplete uniqueId="{!uniqueId}Part" resultElemId="{!uniqueId}PartAutocompleteId" objName="Part__c" defaultClass="k-input  k-textbox"/>
+		    				
+
+
+		    			</td>
+		    		
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    			Reorder Max	 
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}Reordermax" class="k-input  k-textbox  {!uniqueId}noDecimal {!uniqueId}numericOnly" 
+				    						placeholder="Reorder Max" accApi="Reordermax" conApi="Reordermax"  maxlength="16"/>
+		    			</td>
+		    			<td>
+		    				Last Sold
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}LastSold" class="k-input  k-textbox  disabled k-state-disabled" 
+				    						placeholder="Last Stocked" accApi="LastSold" conApi="LastSold" disabled="disabled" style="color:#a0a0a0" />
+		    			</td>
+		    			<td>
+		    				Location
+		    			</td>
+		    			<td>
+		    				<input type="text" id="{!uniqueId}Location" class="k-input  k-textbox  " 
+				    						placeholder="Location" accApi="Location" conApi="Location" />
+		    			</td>
+		    		
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				Packaged
+		    			</td>
+		    			<td>
+		    				<input type="checkbox" id="{!uniqueId}packaged" class="k-input  " 
+				    						placeholder="Packaged" accApi="packaged" conApi="packaged"/>
+		    			</td>
+		    			<td>
+		    				Last Counted
+		    			</td>
+		    			<td>
+		    			<div class="display-picker">
+		    				<input type="text" id="{!uniqueId}lastCounted"
+				    						placeholder="Last Counted" accApi="LastCounted" conApi="LastCounted" width="150px" />
+				    						</div>
+		    			</td>
+		    			<td>
+		    				Category
+		    			</td>
+		    			<td>
+		    			<div  style="width:200px">
+		    					<input id="{!uniqueId}CategoryAutocompleteId"  style="display:none" class="{!uniqueId}requiredData" />
+		    					<c:CustomAutoComplete uniqueId="{!uniqueId}category" resultElemId="{!uniqueId}CategoryAutocompleteId" objName="Category__c" required="true" defaultClass="k-input  k-textbox"/>
+		    					
+		    			</div>
+							
+		    				<!-- <input type="text" id="{!uniqueId}Category" class="k-input  k-textbox  requiredField {!uniqueId}requiredData " 
+				    						placeholder="Category" accApi="Category" conApi="Category"/> -->
+		    			</td>
+		    		
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				Packaged Qty
+		    			</td>
+		    			<td>
+		    				<input type="textbox" id="{!uniqueId}packagedQty" class="k-input  k-textbox {!uniqueId}noDecimal {!uniqueId}numericOnly" 
+				    						placeholder="Packaged Qty" accApi="packagedQty" conApi="packagedQty" maxlength="16" />
+		    			</td>
+		    			<td>
+		    				
+		    			</td>
+		    			<td>
+		    				
+		    			</td>
+		    			<td>
+		    					Active Parts
+		    			</td>
+		    			<td>
+		    				<input type="checkbox" id="{!uniqueId}activeparts" class="k-input  k-checkbox " 
+				    						placeholder="Active Parts" accApi="activeparts" conApi="activeparts"/>
+		    			</td>
+		    		
+		    		</tr>
+		    		<tr>
+		    			<td>
+		    				Order Lots
+		    			</td>
+		    			<td>
+		    				<input type="textbox" id="{!uniqueId}OrderLots" class="k-input  k-textbox requiredField  {!uniqueId}noDecimal {!uniqueId}numericOnly" 
+				    						placeholder="Order Lots Qty" accApi="OrderLots" conApi="OrderLots"/>
+		    			</td>
+		    			<td colspan="2">
+		    			</td>
+		    			<td>
+		    		    	Taxable		 
+		    			</td>
+		    			<td>
+		    			<input type="checkbox" id="{!uniqueId}partTaxable" class="k-input  k-checkbox " 
+				    					accApi="partTaxable" conApi="partTaxable"/>
+		    			</td>
+		    			
+		    			
+		    		</tr>
+		    		
+		    		<tr>
+				    		<td colspan="6" >
+					    		<div  style="width:98%">
+					    			<hr  style="border:solid 1px #F0F0F0"/>
+					    		</div>
+				    		</td>
+		    		
+		    		</tr>
+		    </table>
+		    <div  style="width:70%;  float:left">
+		    	<div style="width:10%;float:left;text-align:left; ">
+		    			<p style="margin-top:20%;">Notes</p>
+		    	</div >
+		    		
+		    	<div style="width:80%;float:left;">
+		    		<textarea  rows="1" id="{!uniqueId}Notes" class="k-input  k-textbox "  style="width:100%"
+				    						placeholder=" Write Note" accApi="notes" conApi="notes" maxlength="1000"/>
+		    	</div>
+		    </div>
+		    <div style="float :right; margin-right:5%; width:8%; margin-top:2%" >
+		    		<input type="button" id="{!uniqueId}btnsave" onClick="{!uniqueId}savePartRecord();" class="k-input  k-button "  value="Save Part"
+				    						placeholder=" Write Note" accApi="btnsave" conApi="btnsave"  style="width:80px"/>
+		    </div>
+		    
+			
+   		</div>
+   		
+ 
+</apex:component>

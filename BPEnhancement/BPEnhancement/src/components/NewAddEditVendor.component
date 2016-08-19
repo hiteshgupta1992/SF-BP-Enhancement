@@ -1,0 +1,2757 @@
+<apex:component controller="ViewVendorCtrl">
+	<style>
+	    .modal-dialog {
+	        width: 1100px;
+	        -moz-box-shadow: 10px 10px 5px #6F6868;
+	        -webkit-box-shadow: 10px 10px 5px #6F6868;
+	        box-shadow: 10px 10px 5px #6F6868;
+	    }
+	
+	    .modal-backdrop.in{
+	        height: 2000px !important;
+	    }
+	    .form-control{
+	        width: 100%; 
+	    }
+	    .bg_container{
+	        min-height:650px;
+	    }
+	    .popup_container{
+	      	border: 1px solid #cccccc;
+	      	font-family:Arial;
+	      	left: 5%;
+ 	 		right: 5%;
+	    }
+	    .popup_container_edit{
+	      	border: 1px solid #cccccc !important;
+	      	font-family:Arial !important;
+	      	left: 20% !important;
+ 	 		right: 20% !important;
+	    }
+	    .popup_container .popupleft .popupleft_container {
+	      overflow: hidden;
+	      /*border-bottom: 1px solid #cccccc;*/
+	      padding-bottom: 40px;
+	      transition: all 0.5s ease; 
+	    }
+	    .popup_container .popupleft .popupleft_container#topsection{
+	        min-height:618px;
+	    }
+	    .popup_container .popupright{
+	        
+	       padding-bottom:5px;
+	       border-left: 1px solid #cccccc;
+	    }
+	    .popup_container .popupleft h1.letpanel_heading{
+	        font-size:18px;
+	        font-weight:bold;
+	        color:#f89420;
+	        float:left;
+	        width: 85%;
+	    }
+	    .popup_container .popupleft h1.letpanel_heading .helptip {
+	      position: absolute;
+	      right: 49px;
+	      top: -5px;
+	      font-size: 24px;
+	    }
+	
+	    /* .vendor_container .popup_container .popupleft .goldbox{
+	        min-height:84px;
+	        border:2px solid #666666;
+	        padding: 0;
+	        margin-top: 3px;
+	        /*max-width: 271px;*/
+	    } */
+	    .popup_container .popupleft .goldbox {
+            min-height: 96px;
+            border : none;
+            border-top: 1px solid #F6F7F9;
+            padding: 20px;
+            max-width: initial;
+        }
+        
+        .popup_container .popupleft .goldbox:hover{
+            background-color: #ECF0F1;
+        }
+        
+	    /* .popupright .right_panel_heading{
+	        font-weight:bold;
+	        font-size:25px;
+	        float:left;
+	    }
+	    .popupright .right_heading_container{
+	        padding-left:0;
+	        padding-right:0;
+	    } */
+	    
+	    .popupright .right_panel_heading {
+            float: left;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: lighter !important;
+            text-transform: capitalize;
+            font-size: 22px !important;
+            color: #414449;
+        }
+        
+        .popupright .right_heading_container {
+            padding-left: 0;
+            padding-right: 0;
+            margin-bottom: 10px;
+        }
+        
+	    .popupright .tabconainer{
+	        clear:left;
+	        /*border-bottom: 1px solid #cccccc;*/
+	
+	        padding-bottom:10px;
+	    }
+	    .popupright .tabconainer .addmoreinfo{
+	        background:#f79420;
+	        width:100%;
+	        margin-top:10px;
+	    }
+	    .popupright .tabconainer.noborder{
+	        border-bottom: 0px solid #cccccc;
+	    }
+	    .popupright .tabconainer .option_field{
+	        clear:both;
+	    }
+	    /* .popupright .tabconainer .option_field.hideit{
+	        display:none;
+	    } */
+	    .popupright .tabconainer form .form-group{
+	        width: 43%;
+	        float:left;
+	        margin:2px;
+	        position:relative;
+	    }
+	    .popupright .tabconainer form .form-group.small{
+	        width: 10%;
+	    }
+	    .popupright .tabconainer form .form-group.small2{
+	          width: 22%;
+	      color: #D2D2D2;
+	      font-size: 15px;
+	      padding-top: 8px;
+	    }
+	    .popupright .tabconainer form .form-group.half{
+	        width: 43%;
+	    }
+	    .popupright .tabconainer form .form-group.large{
+	        width: 87%;
+	    }
+	    .popupright .tabconainer form .form-group.medium{
+	        width:53%;
+	    }
+	    .popupright .tabconainer form .form-group input[type="text"], .popupright .tabconainer form .form-group input[type="email"], .popupright .tabconainer form .form-group select{
+	        border-radius:0;
+	    }
+	    .popupright .tabconainer form .form-group select{
+	        padding-left:5px;
+	    }
+	    .popupright .tabconainer form .form-group .checkbox{
+	        display:block;
+	    }
+	    .popupright .tabconainer form .form-group .checkbox .chksqure{
+	        font-size: 43px;
+	        margin-top: -7px;
+	        margin-left: -3px;
+	        color:#f79420;
+	    }
+	    .popupright .tabconainer form .form-group .checkbox .chk_tick{
+	        display:block;
+	        float:left;
+	        width: 32px;
+	        height: 29px;
+	        overflow: hidden;
+	        border:1px solid #cccccc;
+	        cursor:pointer;
+	    }
+	    .popupright .tabconainer form .form-group .checkbox .chk_tick.chked .chksqure{
+	        display:block;
+	    }
+	    .popupright .tabconainer form .form-group .checkbox .chk_tick .chksqure{
+	        display:none;
+	    }
+	    .popupright .tabconainer form .form-group .checkbox .chk_txt{
+	        display:block;
+	        float:left;
+	        padding-top: 5px;
+	        padding-left: 8px;
+	    }
+	    .popupright .tabconainer form .lable_fields.chkbox p{
+	        padding-top:10px;
+	    }
+	    .popupright .tabconainer form .lable_fields{
+	        float:left;
+	        width:34% !important;
+	        margin-top:5px;
+	    }
+	    /* .popupright .tabconainer form .lable_fields .form_lable_icons{
+	        display:block;
+	        float:left;
+	        width:30px;
+	        height:30px;
+	        background-image: url('{!URLFOR($Resource.Images, 'circlefornumber.png')}') no-repeat;
+	    }
+	    .popupright .tabconainer form .lable_fields .form_lable_icons.text{
+	        font-size: 10px;
+	      padding-top: 9px;
+	    }
+	    .popupright .tabconainer form .lable_fields .form_lable_icons{
+	      color: #f89420;
+	      text-align: center;
+	      padding-top: 7px;
+	      font-size: 16px;
+	    } */
+	    .popupright .tabconainer form .lable_fields p{
+	          padding: 8px 5px 5px 5px;
+		      font-weight: bold;
+		      float: left;
+		      font-size : 12px;
+	    }
+	    .popupright .tabconainer form .form_fields{
+	        float:right;
+	        width: 66% !important;
+	        position: relative;
+	    }
+	    .popupright .tabconainer form .form_fields .helplink{
+	        position: absolute;
+	      right: 13px;
+	      top: -2px;
+	      color: #f89420;
+	      font-size: 20px;
+	    }
+	    .popupright .tabconainer form .form_fields{
+	        position:relative;
+	    }
+	    .popupright .tabconainer form .form_fields a.bookmarklink{
+	        position: absolute;
+	      right: 6px !important;
+	      top: 6px;
+	      font-size: 19px;
+	      color: #f1f1f1;
+	    }
+	    .popupright .tabconainer form .form-group .form-control:focus {
+	      border-color: #f89420;
+	      outline: 1;
+	      border: 2px solid #f89420;
+	      -webkit-box-shadow: none;
+	      -moz-box-shadow: none;
+	      box-shadow: none;
+	    }
+	    .grayBtn,
+        .grayBtn:hover,
+        .grayBtn:focus,
+        .grayBtn:active {
+            background: #727983;
+            color: #ffffff;
+            border: none !important;
+            font-weight: bold;
+            border-radius : 1px;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        }
+	    .greenBtn,
+        .greenBtn:hover,
+        .greenBtn:focus,
+        .greenBtn:active {
+            background: #71BF3E;
+            color: #ffffff;
+            border: none !important;
+            font-weight: bold;
+            border-radius : 1px;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        }
+	    .popupright .savecancle_btncntnr{
+	        float:right;
+	        margin-top:17px;
+	    }
+	    .popupright .tabbtn_container{
+	        clear:both;
+	        text-align: left;
+	        padding: 0;
+	    }
+	    .popupright .tabbtn_container .btn{
+	        width:49%;
+	    }
+	    /* edit due to left panel style change by dinesh 19-01-2016*/
+	    /* .vendor_container .popup_container .popupleft .goldbox .leftgoldbox{
+	        width: 80px;
+	        height: 65px;
+	        background: #f79420;
+	        padding: 4px;
+	        float:left;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox{
+	        float:left;
+	        color:#000;
+	        position:relative;
+	        width: 175px;
+	        margin-left:5px;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox.type2{
+	        width: 60%;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .leftgoldbox .star_container{
+	        text-align:center;
+	        font-size:25px;
+	        color:#fff;
+	        width: 70px;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox p {
+	      padding: 0 2px;
+	      margin: 0; 
+	      font-size:13px;
+	      color:#54a8dd;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox.exists .leftgoldbox{
+	        padding: 0px;
+	        background: none;
+	        width: 79px;
+	        height: 76px;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox.exists .leftgoldbox img{
+	        width: 105%;
+	        height: 105%;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox p.cust_name{
+	        font-size:18px;
+	        color:#333333;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox p.cust_name.address{
+	        font-size:10px;
+	        color:#333333;
+	        margin-left: 10px;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox p.cust_name.address .titletxt{
+	        font-size:16px;
+	        text-decoration:underline;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox .boxedit{
+	      position: absolute;
+	      right: 7px;
+	      top: 5px;
+	      display: block;
+	      width: 21px;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox .boxedit img {
+	        max-width: 100%;
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .rightgoldbox .boxenum{
+	        position: absolute;
+	      right: 5px;
+	      top: 31px;
+	      display: block;
+	      width: 30px;
+	      height: 30px;
+	      background-image: url('{!URLFOR($Resource.Images, 'circlefornumber.png')}') no-repeat;
+	      background-size: 100%;
+	      color: #f79420;
+	      font-weight: bold;
+	      font-size: 12px;
+	      text-align: center;
+	      text-decoration: none;
+	      padding-top: 8px;
+	
+	
+	    }
+	    .vendor_container .popup_container .popupleft .goldbox .bottomgoldbox{
+	        width:100%;
+	        height:15px;
+	        background:#666666;
+	        clear:both;
+	        color:#fff;
+	        font-size:11px;
+	        text-align:right;
+	    } */
+	    /* edit due to left panel style change by dinesh 19-01-2016*/
+	    
+	    
+	    .popup_container .popupleft .goldbox .leftgoldbox {
+            width: 32px;
+            height: 32px;
+            background: #FFF;
+            padding: 0px;
+            float: left;
+        }
+        
+        .popup_container .popupleft .goldbox .leftgoldbox .starimg{
+            height: 35px; 
+            width: 35px; 
+            padding: 5px; 
+            border-radius: 5px; 
+            background: #373C40;
+            margin-left: 2px;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox {
+            float: left;
+            color: #000;
+            position: relative;
+            width: 180px;
+            margin-left: 30px;
+        }
+        
+        /* Added by richa */
+        .popup_container .popupleft .goldbox .rightgoldboxML {
+            margin-left: 0px;
+        }
+        /* Added by richa */
+        
+        .popup_container .popupleft .goldbox .rightgoldbox.type2 {
+            width: 60%;
+        }
+        
+        .popup_container .popupleft .goldbox .leftgoldbox .star_container {
+            width: 50px;
+            text-align: center;
+            font-size: 25px;
+            color: #fff;
+            margin-left: 5px;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox p {
+            padding: 0 2px;
+            margin: 0;
+            font-size: 11px;
+            color: #939CA9;
+        }
+        
+        .popup_container .popupleft .goldbox.exists .leftgoldbox {
+            width: 44px;
+            height: 44px;
+            background: #FFF;
+            padding: 0px;
+            float: left;
+        }
+        
+        .popup_container .popupleft .goldbox.exists .leftgoldbox .starimg{
+            height: 44px; 
+            width: 44px; 
+            padding: 5px; 
+            border-radius: 5px; 
+            background: #373C40;
+            margin-left: 2px;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox p.cust_name {
+            font-size: 18px;
+            color: #939CA9;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox p.cust_name.address {
+            margin-left: 10px;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            text-transform: capitalize;
+            font-size: 13px;
+            color: #939CA9;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox p.cust_name.address .titletxt
+            {
+            font-size: 16px;
+            text-decoration: underline;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox .boxedit {
+            position: absolute;
+            right: -24px;
+            top: 5px;
+            display: block;
+            width: 21px;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox .boxedit img {
+            max-width: 100%;
+        }
+        
+        .popup_container .popupleft .goldbox .rightgoldbox .boxenum {
+            position: absolute;
+            right: -26px;
+            top: 31px;
+            display: block;
+            width: 30px;
+            height: 30px;
+            background-image: url('{!URLFOR($Resource.Images, 'circlefornumber.png')}') no-repeat;
+            background-size: 100%;
+            color: #f79420;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            text-decoration: none;
+            padding-top: 8px;
+        }
+        
+        .popup_container .popupleft .goldbox .bottomgoldbox {
+            width: 100%;
+            height: 15px;
+            background: #666666;
+            clear: both;
+            color: #fff;
+            font-size: 11px;
+            text-align: right;
+        }
+	    
+	    
+	    .popupright .tabconainer form .controls{
+	        position: absolute;
+	        right: -146px;
+	        height: 33px;
+	        width: 200px;
+	        margin-top: 2px;
+	        font-size: 18px;
+	        padding: 4px 0;
+	        display:none;
+	        
+	    }
+	    
+	    .popupright .tabconainer form .controls1{
+	          position: relative;
+	          right: -91%;
+	          top: -31px;
+	         
+	    }
+	    .popupright .tabconainer form .controls .fa-question-circle{
+	        color:orange;
+	    }
+	    
+	    .popupright .tabconainer form .controls .fa-times{
+	        color:#9E9E9E;
+	    }
+	    
+	    .add_info_dropdown{
+	        top: 96%;
+	        right: 0;
+	    }
+	    .add_info_dropdown li a{
+	        text-decoration: none;
+	        padding: 10px 20px;
+	    }
+	    .popupright .tabconainer form .form-group.onehalf{
+		    width:25%;
+		}
+		.popupright .tabconainer form .form-group.threehalf{
+		    width:64%;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom{
+		    overflow:hidden;
+		    border: 1px solid #cccccc;
+		    max-width: 100px;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom.disabled .leftchked.checked{
+		  background-image: url('{!URLFOR($Resource.Images, 'chkpngleft_trimmed_disabled.png')}') no-repeat;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 9px;
+		  padding-right: 5px;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom.disabled .leftchked{
+		  background: none;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 9px;
+		  padding-right: 5px;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom.disabled .rightchked.checked{
+		  background-image: url('{!URLFOR($Resource.Images, 'chkpngleft_trimmed_disabled.png')}') no-repeat;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 10px;
+		  padding-left: 5px;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom.disabled .rightchked{
+		   background: none;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 10px;
+		  padding-left: 5px;    
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom .leftchked{
+		    width:55%;
+		    float:left;
+		    height:34px;
+		    background-image: url('{!URLFOR($Resource.Images, 'chkpngleft_trimmed_disabled.png')}') no-repeat;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 9px;
+		  padding-right: 5px;
+		  cursor:pointer;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom .rightchked{
+		  width:55%;
+		  float:left;
+		  height:34px;
+		  background-image: url('{!URLFOR($Resource.Images, 'chkpngleft_trimmed_disabled.png')}') no-repeat;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 10px;
+		  padding-left: 5px;
+		  cursor:pointer;
+		  margin-left: -10px;
+		    margin-top: -1px;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom .leftchked.checked{
+		  background-image: url('{!URLFOR($Resource.Images, 'chkpngleft_trimmed.png')}') no-repeat;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 9px;
+		  padding-right: 5px;
+		}
+		.popupright .tabconainer form .form-group .chkbox_custom .rightchked.checked{
+		  background-image: url('{!URLFOR($Resource.Images, 'chkpngleft_trimmed.png')}') no-repeat;
+		  color: #FFFFFF;
+		  background-size: 100% 100%;
+		  font-size: 12px;
+		  font-weight: bold;
+		  text-align: center;
+		  padding-top: 10px;
+		  padding-left: 5px;
+		}
+		.popupright .tabconainer form .form-group .smschkbox{
+	        margin-top: 0px;    
+	    }
+    
+	    .popupright .tabconainer form .form-group .smschkbox .chk_tick{
+	        width: 37px;
+	        height: 34px;
+	    }
+	    .popupright .tabconainer form .form-group .smschkbox .chk_tick.chked .chksqure{
+	        font-size: 46px;
+	    }
+	    .redborder{
+	        border : 2px solid red;
+	    }
+	    .orange{
+	        color:orange;
+	    }
+	    label {
+	    	font-size: 12px;
+	    }
+	    .req-label:after {
+			content:" *";
+			color:red;
+		}
+		.noLeftBoder {
+			border-left: 0px solid !important;
+		}
+		
+		/** dd more info button **/
+		
+		.right-inner-addon {
+            position: relative;
+        }
+        .right-inner-addon input {
+            padding-right: 30px;
+        }
+        .right-inner-addon i {
+            position: absolute;
+            right: 0px;
+            padding: 8px 12px;
+            pointer-events: none;
+        }
+        
+		.addMoreInfoSection{
+            width: 60%;
+            margin-left: 34%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .addmoreinfoBtn, 
+        .addmoreinfoBtn:hover, 
+        .addmoreinfoBtn:focus, 
+        .addmoreinfoBtn:active{
+            border: none;
+            color: #ffffff;
+            font-weight: bold;
+            border-radius: 1px;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+            outline: none;
+            width: 205px;
+            background: #00AEEF;
+                    
+        }
+    </style>
+    
+    <style>
+    	.Customer-Suggestion-overlay {
+	        display: none;
+	        background: #fff;
+	        color: #000;
+	        width: 350px;
+	        min-height: 100px;
+	        position: absolute;
+	        text-align: left;
+	        z-index: 1000;
+	        border-radius: 10px;
+	        padding: 10px 20px;
+	        -moz-box-shadow: 0 0 20px #222;
+	        -webkit-box-shadow: 0 0 20px #222;
+	        box-shadow: 0 0 20px #222;
+		}
+		.Customer-Suggestion-overlay .under-line-row{
+		    padding: 10px;
+		    border-bottom: 1px solid #939598;
+		    margin-left: 0px;
+		}
+		.Customer-Suggestion-overlay .text{
+			font-size: 14px;
+			font-weight: bold;
+			margin-bottom: 20px;
+
+		}
+		.ConfirmBox-overlay {
+			display: none;
+			width:400px;
+			position:absolute;
+			z-index:1000;
+			left:20%;
+		}
+		.Customer-Suggestion-overlay:before {
+			content: '';
+			display: block;
+			position: absolute;
+			z-index: -1;
+			top: 13px;
+			left: -13px;
+			height: 30px;
+			width: 30px;
+			-moz-box-shadow: -3px 3px 5px 0px #7a7a7a;
+			-webkit-box-shadow: -3px 3px 5px 0px #7a7a7a;
+			-o-box-shadow: -3px 3px 5px 0px #7a7a7a;
+			box-shadow: -3px 3px 5px 0px #7a7a7a;
+			transform: rotate(45deg);
+			-ms-transform: rotate(45deg);
+			-webkit-transform: rotate(45deg);
+			background-color: #fff;
+		}
+		/*  .sameBillineAddress{
+	        height: 0px;
+	        -webkit-transition: height .5s; 
+	        transition: height .5s;
+		}
+		.differentBillingAddress{
+			 height: 261px;
+	        -webkit-transition: height .5s; 
+	        transition: height .5s;
+		}
+		.popupright .tabconainer .option_field .MT21{
+			margin-top: 21px;
+		} */
+		.popupinside .popupright .tabconainer form .MT25{
+			margin-top: 25px;
+		}
+		.starimgMarkFav {
+			height: 18px;
+    		cursor: pointer;
+		}
+	</style>
+        
+    <script>
+         $(document).ready(function () {
+             $('.Customer-Suggestion-overlay').mouseover(function() {
+                 $('.Customer-Suggestion-overlay').show(); 
+             })
+             $('.Customer-Suggestion-overlay').mouseout(function() {
+                 $('.Customer-Suggestion-overlay').hide(); 
+             })
+         });
+    </script>
+	
+	
+	<!-- Angular Module Start -->
+	
+	
+	<script>
+        var addEditVendorModule= angular.module('addEditVendorModule', [] );//['ui-notification']
+        
+        addEditVendorModule.controller('addEditVendorController', function ($scope, Notification, addEditVendorService, $timeout, $q) {
+	        
+	        $scope.handler = 'pop';
+	        $scope.selectedObject = {};   
+	        $scope.selectedObject.ChangeRecords = 0;
+            
+            if($scope.VendorModal == undefined){
+            	$scope.VendorModal = {};
+            }
+            
+            // START: Popup related methods
+            // Method to open self popup.
+            $scope.VendorModal.openAddVendorPopup = function () {
+                $scope.VendorModal.loadVendorMasterData();
+                $scope.VendorModal.IsEditMode = false;
+                $scope.VendorModal.openPopup();
+            }
+            
+            // Method to open self popup.
+            $scope.VendorModal.openEditVendorPopup = function (vendorId) {
+                // Get current COU id and fill the form with related information
+                $scope.VendorModal.currentVendorId = vendorId;
+                $scope.VendorModal.IsEditMode = true;
+                
+                // Set default values
+                //$scope.VendorModal.setDataDefault();
+                $scope.VendorModal.loadVendorMasterData();
+            }
+            
+            // Open popup box
+            $scope.VendorModal.openPopup = function(){
+                angular.element('#newVendor').modal({
+                    backdrop : 'static',
+                    keyboard : false
+                });
+            }
+            
+            // Close popup box
+            $scope.VendorModal.closePopup = function(){
+            	$scope.VendorModal.ClearAllData();
+                angular.element('#newVendor').modal('hide');
+            }
+            
+            // added by hitesh gupta
+            // END: Popup related methods
+            $scope.$on('AddVendorEvent', function () {    
+                  $scope.VendorModal.openAddVendorPopup();
+            });
+            $scope.$on('EditVendorEvent', function (event, args) {    
+                  $scope.VendorModal.openEditVendorPopup(args.vendorId);
+            });
+            
+            $scope.VendorModal.helpText =  {
+											VendorName : 'Provide Company Name',
+											VendorAccountNumber : 'Account number provided by Vendor',
+											WorkEmail : 'Add work email',
+											OtherEmail : 'Add alternative email',
+											Phone : 'Provide phone number',
+											OtherPhone : 'Provide alternative phone number',
+											Fax : 'Provide fax number',
+											Website : 'Add Website',
+											Facebook : 'Add facebook profile link',
+											Linkedin : 'Add linkedin profile link',
+											Twitter : 'Add twitter profile link',
+											PartCategory : 'Provide part category for the Vendor',
+											PriceMethod : 'Provide pricing method for the Vendor',
+											PurchaseTaxLevel : 'Purchase Tax Level for the Vendor',
+											SalesPriceLevel : 'Sales Price Level for the Vendor',
+											ForiegnCurrency : 'Provide currency details for the Vendor'
+								};
+            
+            
+            
+            // START: Event listeners
+            // Event listener when a record is selected from Search bar in autocomplete
+            /*$scope.$on('autoCompleteSelectCallback', function (event, args) {
+                debug(args);  
+                var obejctType = args.ObejctType.toUpperCase();
+                var searchResult = args.SearchResult;
+                var validationKey = args.ValidationKey;
+                var objectsMapping = [{
+                            CATEGORY : {
+                                Id      :   "PartCategoryId",
+                                Name    :   "PartCategoryName",
+                                selectMethod : null
+                            }
+                        }];
+                       
+               	if(objectsMapping[0][obejctType] != null){
+                    $scope.VendorModal.VendorInfo[objectsMapping[0][obejctType]["Id"]]     =   searchResult.originalObject.Value;
+                    $scope.VendorModal.VendorInfo[objectsMapping[0][obejctType]["Name"]]   =   searchResult.originalObject.Name;
+             	}         
+                    debug($scope.VendorModal.VendorInfo);
+               	//$scope.PartCompModal.validateFieldWithKey(validationKey);
+                
+                if($scope.PartCompModal.PartFormValidationModal[validationKey].isError==false) {
+                        if(objectsMapping[0][obejctType].selectMethod != null){
+                            objectsMapping[0][obejctType].selectMethod(searchResult);
+                        }
+                }
+                          
+
+                
+            });*/
+            // END: Event listeners
+                          
+            $scope.VendorModal.showInfoOverlay = function(event,index) {
+                 var targetEle = angular.element('#' + event + index);
+                 var scrolledTop = -($('.modal-content').offset().top - 30);
+                 //debug(targetEle);
+                 var elementWidth = targetEle.width();
+                 debug(targetEle);
+                 debug(targetEle.offset().top);
+                 /*if(targetEle.width() > targetEle.parent().width()){
+                     elementWidth = targetEle.parent().width() - 15;
+                 }*/
+                 //debug("width:--- "+elementWidth);
+                 angular.element('.Vendor-Suggestion-overlay').css('top',targetEle.offset().top + scrolledTop - 40);
+                 angular.element('.Vendor-Suggestion-overlay').css('left','280px');
+                 angular.element('.Vendor-Suggestion-overlay').show();
+                 
+                 $scope.VendorModal.SimilarVendorSelect={
+	                 Value : $scope.VendorModal.SimilarVendors[index].Id,
+	                 Name : $scope.VendorModal.SimilarVendors[index].VendorName
+                 }
+                 debug($scope.VendorModal.SimilarVendorSelect);
+            }
+             
+			$scope.VendorModal.hideVendorInfoOverlay = function() {
+			    angular.element('.Vendor-Suggestion-overlay').hide();
+			}
+            
+                                                
+			$scope.VendorModal.loadVendorMasterData = function() {
+            	addEditVendorService.getVendorAllMasterData()
+            		.then(function (VendorMasterData) {
+		                //declaration
+		                $scope.VendorModal.VendorMasterData = VendorMasterData;
+		                $scope.VendorModal.ClearAllData();
+		                if($scope.VendorModal.IsEditMode) {
+		                	$scope.VendorModal.getCurrentVendorData();
+		                }
+	                },
+                    function (errorSearchResult) {          
+                        responseData = errorSearchResult;  
+                   	});
+           	}
+           	
+           	$scope.VendorModal.getCurrentVendorData = function() {
+                addEditVendorService.getVendorInfoById($scope.VendorModal.currentVendorId).then(function(vendorRecord) {
+                	
+                    $scope.VendorModal.VendorInfo = vendorRecord.VendorDetailRec;
+                    $scope.VendorModal.SetVendorFormDefault();
+                    
+                    debug($scope.VendorModal.VendorInfo);
+                    $scope.VendorModal.openPopup();
+                }, function(errorSearchResult) {
+                    //$scope.ViewCustomer.CustomerInfo = errorSearchResult;
+                });
+            }
+            
+            $scope.VendorModal.tabIndexValue = 5000;  
+             
+            $scope.VendorModal.adjustTabIndex = function(e){
+            	if(e.which == 9){
+            		$('#vendorName').focus();
+            		e.preventDefault();
+            	}
+            }
+            $scope.VendorModal.tabIndexValue = 5000;  
+             
+            $scope.VendorModal.adjustTabIndex = function(e){
+            	if(e.which == 9){
+            		$('#vendorName').focus();
+            		e.preventDefault();
+            	}
+            }
+            $scope.VendorModal.ClearAllData = function() {
+                            
+	           	$scope.VendorModal.Country = $scope.VendorModal.VendorMasterData.CountryList;
+	            $scope.VendorModal.ShippingCountry = $scope.VendorModal.VendorMasterData.CountryList;
+	            
+	            $scope.VendorModal.SalesPriceLevel = $scope.VendorModal.VendorMasterData.PriceLevelList;
+	            $scope.VendorModal.PurchaseTaxLevel = $scope.VendorModal.VendorMasterData.SalesTaxList;
+	            $scope.VendorModal.PartCategory = $scope.VendorModal.VendorMasterData.CategoryList;
+	            
+	            $scope.VendorModal.SimilarVendors = [];
+	            
+	            $scope.VendorModal.SetDafaultBillingCountry();
+	            $scope.VendorModal.SetDafaultBillingState();
+	            $scope.VendorModal.SetDafaultShippingCountry();
+				$scope.VendorModal.SetDafaultShippingState();
+	            $scope.VendorModal.SetDafaultSalesPriceLevel();
+	            $scope.VendorModal.SetDafaultPurchaseTaxLevel();
+	            $scope.VendorModal.SetDafaultPartCategory();
+	            $scope.VendorModal.VendorSelectedSalesTax = {};
+                                          
+				$scope.VendorModal.AdditionalFieldsInfo = {
+					OtherPhone : {isPrimary: false, label: 'Other Phone', fieldId: 'otherPhoneId'},
+					OtherEmail : {isPrimary: false, label:'Other Email', fieldId:'otherEmail'},
+					Fax : {isPrimary: false, label:'Fax', fieldId:'fax'},
+					ProductAndServices : {isPrimary: false, label: 'Products & Services', fieldId:'ProductAndServicesId'},
+					Website : {isPrimary: false, label: 'Website'},
+					FacebookLink : {isPrimary: false, label: 'Facebook', fieldId:'facebookLink'},
+					TwitterLink : {isPrimary: false, label: 'Twitter', fieldId:'twitterLink'},
+					LinkedInLink : {isPrimary: false, label: 'LinkedIn', fieldId:'LinkedinLink'},
+					PartCategory : {isPrimary: false, label: 'Part Category', fieldId:'partCategoryDropDown'},
+					PriceMethod : {isPrimary: false, label: 'Price Method', fieldId:'priceMethodId'},
+					PurchaseTaxLevel  : {isPrimary: false, label: 'Purchase Tax Level', fieldId:'purchaseTaxLevel'},
+					SalesPriceLevel : {isPrimary: false, label: 'Sales Price Level', fieldId:'salesPriceLevel'},
+					ForeignCurrency : {isPrimary: false, label: 'Foreign Currency', fieldId:'foreignCurrency'},
+					Active : {isPrimary: false, label:'Active', fieldId:'activeId'}
+				} 
+                                            
+                $scope.VendorModal.VendorValidation = {
+	                VendorName: {isError : false, ErrorMessage:'', Type:'required,Maxlength,Minlength', Maxlength: 80, Minlength: 2},
+	                WorkEmail : {isError : false, ErrorMessage:'', Type:'email'},
+	                OtherEmail : {isError : false, ErrorMessage:'', Type:'email'},
+	                WorkNumber : {isError : false, ErrorMessage:'',  Type:'phone,Maxlength,Minlength', Maxlength: 10, Minlength: 10},
+	                OtherPhone : {isError : false, ErrorMessage:'',  Type:'phone,Maxlength,Minlength', Maxlength: 10, Minlength: 10},
+	                Fax : {isError : false, ErrorMessage:'',  Type:'phone,Maxlength,Minlength', Maxlength: 10, Minlength: 10},
+	                BillingPostalCode : {isError : false, ErrorMessage:'',  Type:'PostalCode,Maxlength', Maxlength: 10},
+                    ShippingPostalCode : {isError : false, ErrorMessage:'',  Type:'PostalCode,Maxlength', Maxlength: 10}
+             	}
+                                
+                                   
+				$scope.VendorModal.VendorInfo = {};
+				$scope.VendorModal.VendorInfo = { IsBothAddressSame : true,
+													 IsVendor : true, 
+													 Active : true,
+													 WorkNumberSMS : false,
+													 MobileNumberSMS : false,
+													 HomeNumberSMS : false, 
+													 IsCustomer : false,
+													 IsClaimsForServiceWork : false,
+													 IsFlooringCompany : false,
+													 IsPartPurchases : false,
+													 IsSubletPurchases : false, 
+													 IsUnitPurchases : false,
+													 IsWarrantyPlans : false,
+													};
+													
+			/* 	angular.element("#sameAsBA").addClass("chked");
+				angular.element("#billingaddress").slideUp(); */
+				
+				debug($scope.VendorModal.VendorInfo);
+      		}
+                          
+			//Correct
+			$scope.VendorModal.ManageAdditionalFields = function(key){
+				var result = false;
+				if(!$scope.VendorModal.AdditionalFieldsInfo[key].isPrimary){
+				    result  = true;
+				}
+				return result;
+			}
+                        
+                      
+			$scope.VendorModal.SetVendorFormDefault = function() {
+				if($scope.VendorModal.VendorInfo.BillingCountry != '') {
+					debug($scope.VendorModal.VendorMasterData);
+					
+					for(var i = 0; i < $scope.VendorModal.VendorMasterData.CountryList.length ; i++) {
+						if($scope.VendorModal.VendorMasterData.CountryList[i].CountryName == $scope.VendorModal.VendorInfo.BillingCountry) {
+							$scope.VendorModal.SelectedCountry = $scope.VendorModal.VendorMasterData.CountryList[i];
+						}
+					}
+					$scope.VendorModal.State = $scope.VendorModal.VendorMasterData.StateList[0].countryNameToStateMap[$scope.VendorModal.SelectedCountry.CountryName];
+					for(var i = 0; i < $scope.VendorModal.State.length; i++) {
+						if($scope.VendorModal.State[i].StateName == $scope.VendorModal.VendorInfo.BillingState) {
+							$scope.VendorModal.SelectedState = $scope.VendorModal.State[i];
+						}
+					}
+				}
+				if($scope.VendorModal.VendorInfo.IsBothAddressSame) {
+					/* angular.element("#sameAsBA").addClass("chked");
+                    angular.element("#billingaddress").slideUp(); */
+				} else {
+					/* angular.element("#sameAsBA").removeClass("chked");
+                    angular.element("#billingaddress").slideDown(); */
+                    for(var i = 0; i < $scope.VendorModal.VendorMasterData.CountryList.length; i++) {
+                    	if($scope.VendorModal.VendorMasterData.CountryList[i].CountryName == $scope.VendorModal.VendorInfo.ShippingCountry ) {
+                    		$scope.VendorModal.SelectedShippingCountry = $scope.VendorModal.VendorMasterData.CountryList[i];
+                    	}
+                    }
+                    $scope.VendorModal.ShippingState = $scope.VendorModal.VendorMasterData.StateList[0].countryNameToStateMap[$scope.VendorModal.SelectedShippingCountry.CountryName];
+                    for(var i=0; i < $scope.VendorModal.ShippingState.length; i++) {
+                    	if($scope.VendorModal.ShippingState[i].StateName == $scope.VendorModal.VendorInfo.ShippingState) {
+                    		$scope.VendorModal.SelectedShippingState=$scope.VendorModal.ShippingState[i];
+                    	}
+                    }
+				}
+				
+				if($scope.VendorModal.VendorInfo.SalesPriceLevelId != null ){
+					for(var i = 0; i < $scope.VendorModal.SalesPriceLevel.length ; i++) {
+						if($scope.VendorModal.SalesPriceLevel[i].Id == $scope.VendorModal.VendorInfo.SalesPriceLevelId) {
+							$scope.VendorModal.SelectedSalesPriceLevel = $scope.VendorModal.SalesPriceLevel[i];
+						}
+					}
+					$scope.VendorModal.AdditionalFieldsInfo['SalesPriceLevel'].isPrimary = true;
+				}
+				
+				if($scope.VendorModal.VendorInfo.PurchaseTaxLevelId != null ){
+					for(var i = 0; i < $scope.VendorModal.PurchaseTaxLevel.length ; i++) {
+						if($scope.VendorModal.PurchaseTaxLevel[i].Id == $scope.VendorModal.VendorInfo.PurchaseTaxLevelId) {
+							$scope.VendorModal.SelectedPurchaseTaxLevel = $scope.VendorModal.PurchaseTaxLevel[i];
+						}
+					}
+					$scope.VendorModal.AdditionalFieldsInfo['PurchaseTaxLevel'].isPrimary = true;
+				}
+				/*
+				if($scope.VendorModal.VendorInfo.SalesTaxLevelId != null ){
+					for(var i = 0; i < $scope.VendorModal.SalesTaxLevel.length ; i++) {
+						if($scope.VendorModal.SalesTaxLevel[i].Id == $scope.VendorModal.VendorInfo.SalesTaxLevelId) {
+							$scope.VendorModal.SelectedSalesTaxLevel = $scope.VendorModal.SalesTaxLevel[i];
+						}
+					}
+					$scope.VendorModal.AdditionalFieldsInfo['SalesTaxLevel'].isPrimary = true;
+				}*/
+				
+				
+				
+				if($scope.VendorModal.VendorInfo.PartCategoryId != null ){
+					for(var i = 0; i < $scope.VendorModal.PartCategory.length ; i++) {
+						if($scope.VendorModal.PartCategory[i].Id == $scope.VendorModal.VendorInfo.PartCategoryId) {
+							$scope.VendorModal.SelectedPartCategory = $scope.VendorModal.PartCategory[i];
+						}
+					}
+					$scope.VendorModal.AdditionalFieldsInfo['PartCategory'].isPrimary = true;
+				}
+				
+				angular.forEach( $scope.VendorModal.AdditionalFieldsInfo, function(value, key) {
+					if($scope.VendorModal.VendorInfo[key] != null && $scope.VendorModal.VendorInfo[key] !=''){
+						$scope.VendorModal.AdditionalFieldsInfo[key].isPrimary = true;
+					}
+				});
+				
+				angular.forEach($scope.ProductAndServicesMap, function(value, key) {
+					debug(value + '  ' + key);
+					if($scope.VendorModal.VendorInfo[value] == true){
+						$scope.VendorModal.AdditionalFieldsInfo.ProductAndServices.isPrimary = true;
+					}
+				});
+				
+				$scope.VendorModal.AdditionalFieldsInfo.Active.isPrimary = true;
+			}
+                        
+                      
+                        
+                        // Functions
+
+                        $scope.VendorModal.isFeildDisplay = function(fieldLabel){
+                            for(i=0; i<$scope.VendorModal.PrimaryFields.length; i++){
+                                if($scope.VendorModal.PrimaryFields.label == fieldLabel){
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }   
+                        
+                        $scope.VendorModal.AddSimilarCustomer=function()
+                        {
+                            
+                            
+                                addEditCustomerService.addCustomer($scope.selectedObject.coHeaderId,$scope.VendorModal.SimilarCustomerSelect.Value)
+                                          .then(function (sucessCustomerResult) {
+                                                
+                                                angular.copy($scope.VendorModal.SimilarCustomerSelect,  $scope.selectedObject.Customer);
+                                                 $scope.selectedObject.ChangeRecords=0;
+                                                 angular.element('#pop').modal('hide');
+                                 },
+
+                                 function (errorSearchResult) {          
+                                     responseData = errorSearchResult; 
+                                });
+
+                            
+                            
+                             
+                        }
+                        
+                        $scope.VendorModal.OnFocus = function(targetId){  
+                                debug(targetId) ;                         
+
+
+                            angular.element('.controls').hide();
+                            angular.element('#'+targetId).show();
+    
+
+                        }
+                        
+                       $scope.VendorModal.OnBlurVin = function(value){                            
+                        
+                                 $scope.VendorModal.getSimilarCOUs(value);
+
+    
+
+                        }
+                        
+						// Correct
+             			$scope.VendorModal.ClearAndRemoveField = function(fieldrel, targetIdToFocus) {
+                        	var fieldsToClearOrRemove = $scope.VendorModal.ManageIconVendorDetails[0][fieldrel];
+                        	debug(fieldsToClearOrRemove);
+                             
+                            for(i = 0; i < fieldsToClearOrRemove.value.length; i++) {
+	                            var key = fieldsToClearOrRemove.value[i].val ;
+	                            if(fieldsToClearOrRemove.value[i].fieldType == 'text') {
+	                            	$scope.VendorModal.VendorInfo[key] = "";
+	                            } else if (fieldsToClearOrRemove.value[i].fieldType == 'boolean') {
+	                              	$scope.VendorModal.VendorInfo[key] = false;
+	                            } else if (fieldsToClearOrRemove.value[i].fieldType == 'lookup') {
+	                               	$scope.VendorModal.VendorInfo[key] = null;
+	                            } else if(fieldsToClearOrRemove.value[i].fieldType == 'dropdown') {
+	                            	
+	                            }
+	                            if(fieldrel == 'CityState') {
+	                               	$scope.VendorModal.SetDafaultBillingState();
+	                            } else if(fieldrel == 'CountryPostal'){
+	                            	$scope.VendorModal.SetDafaultBillingCountry();
+	                            	$scope.VendorModal.SetDafaultBillingState();
+	                            } else if(fieldrel == 'ShippingCityState') {
+	                               	$scope.VendorModal.SetDafaultShippingState();
+	                            } else if(fieldrel == 'CountryPostalShipping') {
+	                               	$scope.VendorModal.SetDafaultShippingCountry();
+	                               	$scope.VendorModal.SetDafaultShippingState();
+	                            } else if (fieldrel == 'SalesPriceLevel') {
+                                  	$scope.VendorModal.SetDafaultSalesPriceLevel();
+                                } else if (fieldrel=='PurchaseTaxLevel') {
+                                  	$scope.VendorModal.SetDafaultPurchaseTaxLevel();
+                              	} else if (fieldrel=='PartCategory') {
+                                  	$scope.VendorModal.SetDafaultPartCategory();
+                              	}
+	                        }
+	                        if(fieldsToClearOrRemove.isPrimary == false) {
+	                        	$scope.VendorModal.AdditionalFieldsInfo[key].isPrimary = false;
+	                        }
+                            angular.element('#' + targetIdToFocus).focus();           
+                     	}
+                         
+
+				$scope.VendorModal.getOtherSimilarVendor = function(){
+              		var similarVendorJson = {};
+                   	angular.copy($scope.VendorModal.VendorInfo, similarVendorJson);
+                    //debug($scope.VendorModal.VendorInfo);
+					
+    				addEditVendorService.getOtherSimilarVendor(JSON.stringify(similarVendorJson))
+               				.then(function (similarVendor) {
+		             	debug(similarVendor);
+		              	$scope.VendorModal.SimilarVendors = similarVendor;
+                   	},
+                    function (errorSearchResult) {          
+                         responseData = errorSearchResult; 
+                    });
+           		}
+                         
+	           	$scope.VendorModal.validateForm = function(modelKey){
+	              	var validationObj = $scope.VendorModal.VendorValidation[modelKey];
+	              	var isError = false;
+	              	var ErrorMessage = '';
+	              	var phoneRegEx = /^([0-9\(\)\/\+ \-]*)$/;
+	              	var emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+	              	var postalCodeRegEx = /^[a-zA-Z\d\s\-]+$/;
+	              
+                    var validateType = validationObj.Type; 
+                    //debug('validateType=  '+validateType);
+                    
+                    if(validateType.indexOf('Minlength') > -1){
+                        if($scope.VendorModal.VendorInfo[modelKey] != undefined && $scope.VendorModal.VendorInfo[modelKey]!= '' && $scope.VendorModal.VendorInfo[modelKey].length < validationObj.Minlength){
+                            isError = true;
+                            ErrorMessage = 'Min length should be '+validationObj.Minlength;
+                        }
+                    }
+
+                    if(validateType.indexOf('Maxlength') > -1){
+                        if($scope.VendorModal.VendorInfo[modelKey] != undefined && $scope.VendorModal.VendorInfo[modelKey]!= '' && $scope.VendorModal.VendorInfo[modelKey].length > validationObj.Maxlength){
+                            isError = true;
+                            ErrorMessage = 'Max length should be '+validationObj.Maxlength;
+                        }
+                    }
+                    
+                    if(validateType.indexOf('phone') > -1){
+                        if($scope.VendorModal.VendorInfo[modelKey] != undefined && $scope.VendorModal.VendorInfo[modelKey]!= '' && !phoneRegEx.test($scope.VendorModal.VendorInfo[modelKey])){
+                            isError = true;
+                            ErrorMessage = 'Invalid Phone Number';
+                        }
+                    }
+
+                    if(validateType.indexOf('email') > -1){
+                        debug('validating email');
+                        if($scope.VendorModal.VendorInfo[modelKey] != undefined && $scope.VendorModal.VendorInfo[modelKey]!= '' && !emailRegEx.test($scope.VendorModal.VendorInfo[modelKey])){
+                            isError = true;
+                            ErrorMessage = 'Invalid Email Id';
+                        }
+                    }
+                    
+                    if(validateType.indexOf('PostalCode') > -1){
+                        debug('validating postal code');
+
+                        if($scope.VendorModal.VendorInfo[modelKey] != undefined && $scope.VendorModal.VendorInfo[modelKey]!= '' && !postalCodeRegEx.test($scope.VendorModal.VendorInfo[modelKey])){
+                            isError = true;
+                            ErrorMessage = '{!JSENCODE($Label.Label_Invalid)} {!JSENCODE($Label.Label_Postal)}';
+
+                        }
+                        debug(isError);
+                    }
+
+                    if(validateType.indexOf('required') > -1){
+                        if($scope.VendorModal.VendorInfo[modelKey] == undefined || $scope.VendorModal.VendorInfo[modelKey] == ''){
+                            isError = true;
+                            ErrorMessage = 'Field is Required';
+                        }
+                    }
+                    $scope.VendorModal.VendorValidation[modelKey]['isError'] = isError;
+                    $scope.VendorModal.VendorValidation[modelKey]['ErrorMessage'] = ErrorMessage;
+                    return (!isError);
+	           }
+	           
+
+                         
+                       //Modals  
+
+                       
+                       $scope.VendorModal.ManageIconVendorDetails =
+                       [ 
+                            {
+                                VendorName:{value:[{val:'VendorName', fieldType:'text'}],isPrimary:true},
+                                VendorCode:{value:[{val:'VendorCode', fieldType:'text'}],isPrimary:true},
+                                VendorAccountNumber:{value:[{val:'VendorAccountNumber', fieldType:'text'}], isPrimary:true},
+                                WorkEmail:{value:[{val:'WorkEmail', fieldType:'text'}],isPrimary:true },
+                                WorkNumber:{value:[{val:'WorkNumber', fieldType:'text'}],isPrimary:true },
+                                BillingAddLine1:{value:[{val:'BillingStreet1', fieldType:'text'}],isPrimary:true},
+                                BillingAddLine2:{value:[{val:'BillingStreet2', fieldType:'text'}],isPrimary:true},
+                                
+                                CityState : {value:[{val:'BillingCity', fieldType:'text'},{val:'BillingState', fieldType:'lookup'}],isPrimary:true},
+                                CountryPostal:{value:[{val:'BillingCountry', fieldType:'lookup'},{val:'BillingPostalCode', fieldType:'text'}],isPrimary:true},
+                                ShippingAddLine1:{value:[{val:'ShippingStreet1', fieldType:'text'}],isPrimary:true},
+                                ShippingAddLine2:{value:[{val:'ShippingStreet2', fieldType:'text'}],isPrimary:true},
+                                ShippingCityState : {value:[{val:'ShippingCity', fieldType:'text'},{val:'ShippingState', fieldType:'lookup'}],isPrimary:true},
+                                CountryPostalShipping : {value:[{val:'ShippingPostalCode', fieldType:'text'},{val:'ShippingCountry', fieldType:'lookup'}],isPrimary:true},
+                                Fax:{value:[{val:'Fax', fieldType:'text'}],isPrimary:false},
+                                LinkedInLink:{value:[{val:'LinkedInLink', fieldType:'text'}],isPrimary:false},
+                                TwitterLink:{value:[{val:'TwitterLink', fieldType:'text'}],isPrimary:false},
+                                FacebookLink:{value:[{val:'FacebookLink', fieldType:'text'}],isPrimary:false},
+                                Website:{value:[{val:'Website', fieldType:'text'}],isPrimary:false},
+                                
+                                PartCategory :{value:[{val:'PartCategory', fieldType:'lookup'}],isPrimary:false},
+                                PurchaseTaxLevel :{value:[{val:'PurchaseTaxLevel', fieldType:'lookup'}],isPrimary:false},
+                                SalesPriceLevel : {value:[{val:'SalesPriceLevel', fieldType:'lookup'}],isPrimary:false},
+                                ForeignCurrency : {value:[{val:'ForeignCurrency', fieldType:'lookup'}],isPrimary:false},
+                                PriceMethod : {value:[{val:'PriceMethod', fieldType:'lookup'}],isPrimary:false},
+                                
+                                OtherPhone : {value:[{val:'OtherPhone', fieldType:'text'}],isPrimary:false},
+                                OtherEmail : {value:[{val:'OtherEmail', fieldType:'text'}],isPrimary:false},
+                                IsVendor: {value:[{val:'IsVendor', fieldType:'boolean'}],isPrimary:false},
+                                Active:{value:[{val:'Active', fieldType:'boolean'}],isPrimary:false},
+                            }
+
+                       ];
+                       
+
+                           
+                        
+                        
+                        $scope.VendorModal.AdditionalFieldsSearch ='';
+                        
+                        
+                        // Correct
+                        $scope.FilterAdditionalFields = function(items) {
+                        	var result = {};
+                            angular.forEach(items, function(value, key) {
+                                if (value.label.toLowerCase().indexOf($scope.VendorModal.AdditionalFieldsSearch) != -1) {
+                                    result[key] = value;
+                                }
+                            });
+                            return result;
+                        }
+                        
+                        // Correct  
+                        $scope.VendorModal.ShowAdditionalField = function(key){
+                       		$scope.VendorModal.AdditionalFieldsInfo[key].isPrimary = true;
+                            debug($scope.VendorModal.AdditionalFieldsInfo[key].isPrimary);
+                            var targetId = $scope.VendorModal.AdditionalFieldsInfo[key].fieldId;
+                            if(key=='FacebookLink') {
+                            	$scope.VendorModal.VendorInfo.FacebookLink="https://www.facebook.com/";
+                            } else if(key=='LinkedInLink') {
+                            	$scope.VendorModal.VendorInfo.LinkedInLink="https://www.LinkedIn.com/";
+                            } else if(key=='TwitterLink') {
+                           		$scope.VendorModal.VendorInfo.TwitterLink="https://www.Twitter.com/";
+                            } else if(key=='Website') {
+                           		$scope.VendorModal.VendorInfo.TwitterLink="http://";
+                            }
+                            
+                            setTimeout(
+                            	function() { 
+	                            	if(targetId != undefined) {
+	                                	angular.element('#'+targetId).focus() ;
+	                                }
+                                }, 10);
+                       	}
+                       	
+                       	   
+                        
+                        $scope.launchAlert = function (bool) {
+                                alert('!!! first function call to finish');
+                        };
+                        
+
+                        
+                        
+                                                
+				// Correct
+                $scope.VendorModal.SetVendorActiveStatus = function(status) {
+                	if(status) {
+                    	angular.element('.ConfirmBox-overlay').show();
+                    	angular.element('#confirmButton').focus();
+                    } else {
+                      	$scope.VendorModal.VendorInfo.Active = true;
+                    }
+             	}
+                       
+                $scope.VendorModal.DeactiveVendor= function(status) {
+                	if(!status){
+                		angular.element('.ConfirmBox-overlay').hide();
+                	} else {
+                		$scope.VendorModal.VendorInfo.Active = false;
+                		angular.element('.ConfirmBox-overlay').hide();
+                	}
+                }       
+                       
+                        
+                        
+					$scope.VendorModal.SetDafaultBillingCountry = function() {
+                 		for(var i = 0; i < $scope.VendorModal.VendorMasterData.CountryList.length; i++) {
+	                        if($scope.VendorModal.VendorMasterData.CountryList[i].IsDefault) {
+	                            $scope.VendorModal.SelectedCountry = $scope.VendorModal.VendorMasterData.CountryList[i];
+	                        }
+                      	}
+         			}
+         			
+
+					$scope.VendorModal.SetDafaultBillingState = function() {
+						$scope.VendorModal.State = $scope.VendorModal.VendorMasterData.StateList[0].countryNameToStateMap[$scope.VendorModal.SelectedCountry.CountryName];
+                 		for(var i = 0; i < $scope.VendorModal.State.length; i++) {
+	                        if($scope.VendorModal.State[i].IsDefault) {
+	                            $scope.VendorModal.SelectedState = $scope.VendorModal.State[i];
+	                        }
+                      	}
+         			}
+
+                        
+                    $scope.VendorModal.SetDafaultShippingCountry = function() {
+                 		for(var i = 0; i < $scope.VendorModal.VendorMasterData.CountryList.length; i++) {
+	                        if($scope.VendorModal.VendorMasterData.CountryList[i].IsDefault) {
+	                            $scope.VendorModal.SelectedShippingCountry = $scope.VendorModal.VendorMasterData.CountryList[i];
+	                        }
+                      	}
+         			}    
+                       
+                   	
+                   	$scope.VendorModal.SetDafaultShippingState = function() {
+						$scope.VendorModal.ShippingState = $scope.VendorModal.VendorMasterData.StateList[0].countryNameToStateMap[$scope.VendorModal.SelectedShippingCountry.CountryName];
+                 		for(var i = 0; i < $scope.VendorModal.ShippingState.length; i++) {
+	                        if($scope.VendorModal.ShippingState[i].IsDefault) {
+	                            $scope.VendorModal.SelectedShippingState = $scope.VendorModal.ShippingState[i];
+	                        }
+                      	}
+         			}
+                               
+                    $scope.VendorModal.SetDafaultSalesPriceLevel = function() {
+                 		for(var i = 0; i < $scope.VendorModal.SalesPriceLevel.length; i++) {
+	                        if($scope.VendorModal.SalesPriceLevel[i].IsDefault) {
+	                            $scope.VendorModal.SelectedSalesPriceLevel = $scope.VendorModal.SalesPriceLevel[i];
+	                        }
+                      	}
+         			}           
+                    /*   
+                    $scope.VendorModal.SetDafaultSalesTaxLevel = function() {
+                 		for(var i = 0; i < $scope.VendorModal.SalesTaxLevel.length; i++) {
+	                        if($scope.VendorModal.SalesTaxLevel[i].IsDefault) {
+	                            $scope.VendorModal.SelectedSalesTaxLevel = $scope.VendorModal.SalesTaxLevel[i];
+	                        }
+                      	}
+         			}*/
+         			
+         			$scope.VendorModal.SetDafaultPurchaseTaxLevel = function() {
+                 		for(var i = 0; i < $scope.VendorModal.PurchaseTaxLevel.length; i++) {
+	                        if($scope.VendorModal.PurchaseTaxLevel[i].IsDefault) {
+	                            $scope.VendorModal.SelectedPurchaseTaxLevel = $scope.VendorModal.PurchaseTaxLevel[i];
+	                        }
+                      	}
+         			}   
+                     
+                    $scope.VendorModal.SetDafaultPartCategory = function() {
+                 		for(var i = 0; i < $scope.VendorModal.PartCategory.length; i++) {
+	                        if($scope.VendorModal.PartCategory[i].IsDefault) {
+	                            $scope.VendorModal.SelectedPartCategory = $scope.VendorModal.PartCategory[i];
+	                        }
+                      	}
+         			}          
+
+                 	$scope.VendorModal.changeBillingCountry = function(){
+                    	$scope.VendorModal.State = $scope.VendorModal.VendorMasterData.StateList[0].countryNameToStateMap[$scope.VendorModal.SelectedCountry.CountryName];
+                     	$scope.VendorModal.SelectedState = $scope.VendorModal.State[0];
+                 	}
+                          
+                          
+                  	$scope.VendorModal.changeShippingCountry = function(){
+	                    $scope.VendorModal.ShippingState = $scope.VendorModal.VendorMasterData.StateList[0].countryNameToStateMap[$scope.VendorModal.SelectedShippingCountry.CountryName];
+	                    $scope.VendorModal.SelectedShippingState = $scope.VendorModal.ShippingState[0];
+                  	}
+                        
+						
+					// Correct
+                    $scope.VendorModal.SetAddressData = function() {
+	                    $scope.VendorModal.VendorInfo.IsBothAddressSame = ($scope.VendorModal.VendorInfo.IsBothAddressSame == true) ? false : true;
+	               		if($scope.VendorModal.VendorInfo.IsBothAddressSame == true) {
+			            	$scope.VendorModal.VendorInfo.ShippingStreet1 = $scope.VendorModal.VendorInfo.BillingStreet1;
+		                 	$scope.VendorModal.VendorInfo.ShippingStreet2 = $scope.VendorModal.VendorInfo.BillingStreet2;
+		                 	$scope.VendorModal.VendorInfo.ShippingCity =  $scope.VendorModal.VendorInfo.BillingCity;
+		                 	$scope.VendorModal.VendorInfo.ShippingPostalCode = $scope.VendorModal.VendorInfo.BillingPostalCode;
+		                 	$scope.VendorModal.SelectedShippingCountry = $scope.VendorModal.SelectedCountry;
+		                 	$scope.VendorModal.SelectedShippingState = $scope.VendorModal.SelectedState;
+	                	}
+	                	// $scope.VendorModal.VendorInfo.IsShippingAddress = !$scope.VendorModal.VendorInfo.IsShippingAddress; 
+                    }
+                    
+                    $scope.ProductAndServicesMap = {	PartPurchase : 'IsPartPurchases',
+											UnitPurchase : 'IsUnitPurchases',
+											SubletPurchase : 'IsSubletPurchases',
+											ClaimsForServiceWork : 'IsClaimsForServiceWork',
+											WarrantyPlans : 'IsWarrantyPlans',
+											FlooringCompany : 'IsFlooringCompany'
+											};
+                    
+                    $scope.VendorModal.SetProductAndServices = function(checkBoxName) {
+                    	$scope.VendorModal.VendorInfo[$scope.ProductAndServicesMap[checkBoxName]] = !$scope.VendorModal.VendorInfo[$scope.ProductAndServicesMap[checkBoxName]]; 
+                    	debug($scope.ProductAndServicesMap[checkBoxName] + '  ' + $scope.VendorModal.VendorInfo[$scope.ProductAndServicesMap[checkBoxName]]);
+                    }
+                    
+                    
+                    //save customer Functionality
+                	$scope.VendorModal.SaveVendor = function() {
+                    	debug($scope.VendorModal.VendorInfo);
+                    	
+                       	for (var key in $scope.VendorModal.VendorValidation) {
+	                        if ($scope.VendorModal.VendorValidation.hasOwnProperty(key)) {
+	                            var validationObj = $scope.VendorModal.VendorValidation[key];
+	                            if(validationObj.Type.indexOf('required') > -1) {
+	                                if($scope.VendorModal.VendorInfo[key] == undefined || $scope.VendorModal.VendorInfo[key] == ""){
+	                                    $scope.VendorModal.VendorValidation[key]['isError'] = true;
+	                                    $scope.VendorModal.VendorValidation[key]['ErrorMessage'] = 'Field is Required';
+	                                }
+	                            }
+	                        }
+	                    }
+                            
+                            
+                        for (var key in $scope.VendorModal.VendorValidation) {
+                            if($scope.VendorModal.VendorValidation.hasOwnProperty(key)) {
+                                var validationObj = $scope.VendorModal.VendorValidation[key];
+                                if(validationObj.isError == true) {
+                                    debug('error Present in ' + key);
+                                    return;
+                                }
+                            }
+                        }
+                            
+                        for (var key in $scope.VendorModal.VendorInfo) {
+                            if(key == 'PreferredPhone' || key == 'PreferredEmail' || key == 'PreferredSMS') {
+                                if($scope.VendorModal.VendorInfo[key] != null && $scope.VendorModal.VendorInfo[key] != undefined && $scope.VendorModal.VendorInfo[key] != "") {
+                                    var preferredValue = $scope.VendorModal.VendorInfo[key];
+                                    if($scope.VendorModal.VendorInfo[preferredValue] == null || $scope.VendorModal.VendorInfo[preferredValue] == undefined) {
+                                        $scope.VendorModal.VendorValidation[preferredValue].isError = true;
+                                        $scope.VendorModal.VendorValidation[preferredValue].ErrorMessage = 'Field is required';
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                            
+                            
+                            
+                        for (var key in $scope.VendorModal.AdditionalFieldsInfo) {
+                            if ($scope.VendorModal.AdditionalFieldsInfo.hasOwnProperty(key)) {
+                                var validationObj = $scope.VendorModal.AdditionalFieldsInfo[key];
+                                if(validationObj['isPrimary'] == false  && key !='Active' ) {
+                                
+                                    $scope.VendorModal.VendorInfo[key] = "";
+                                }
+                            }
+                        }
+                        
+                        
+                            
+                            
+                        $scope.VendorModal.VendorInfo.BillingCountry = $scope.VendorModal.SelectedCountry['CountryName'];
+                       	$scope.VendorModal.VendorInfo.BillingState = $scope.VendorModal.SelectedState['StateName'];
+                       
+                            
+                        if($scope.VendorModal.VendorInfo.IsBothAddressSame != true ) {
+                            $scope.VendorModal.VendorInfo.ShippingCountry = $scope.VendorModal.SelectedShippingCountry['CountryName'];
+                            $scope.VendorModal.VendorInfo.ShippingState = $scope.VendorModal.SelectedShippingState['StateName'];
+                        } else {
+                        	$scope.VendorModal.VendorInfo.ShippingStreet1 = $scope.VendorModal.VendorInfo.BillingStreet1;
+		                 	$scope.VendorModal.VendorInfo.ShippingStreet2 = $scope.VendorModal.VendorInfo.BillingStreet2;
+		                 	$scope.VendorModal.VendorInfo.ShippingCity =  $scope.VendorModal.VendorInfo.BillingCity;
+		                 	$scope.VendorModal.VendorInfo.ShippingPostalCode = $scope.VendorModal.VendorInfo.BillingPostalCode;
+		                 	$scope.VendorModal.VendorInfo.ShippingCountry = $scope.VendorModal.VendorInfo.BillingCountry;
+                            $scope.VendorModal.VendorInfo.ShippingState = $scope.VendorModal.VendorInfo.BillingState;
+                        }
+                            
+                      	if($scope.VendorModal.AdditionalFieldsInfo['SalesPriceLevel'].isPrimary == true) {
+                        	$scope.VendorModal.VendorInfo.SalesPriceLevelId = $scope.VendorModal.SelectedSalesPriceLevel.Id;
+                      	} else { 
+                            $scope.VendorModal.VendorInfo.SalesPriceLevelId = null;
+                        }
+                        
+                        /*
+                        if($scope.VendorModal.AdditionalFieldsInfo['SalesTaxLevel'].isPrimary == true) {
+                        	$scope.VendorModal.VendorInfo.SalesTaxLevelId = $scope.VendorModal.SelectedSalesTaxLevel.Id;
+                      	} else { 
+                            $scope.VendorModal.VendorInfo.SalesTaxLevelId = null;
+                        }*/
+                        
+                        
+                        if($scope.VendorModal.AdditionalFieldsInfo['PurchaseTaxLevel'].isPrimary == true) {
+                        	$scope.VendorModal.VendorInfo.PurchaseTaxLevelId = $scope.VendorModal.SelectedPurchaseTaxLevel.Id;
+                      	} else { 
+                            $scope.VendorModal.VendorInfo.PurchaseTaxLevelId = null;
+                        }
+                        
+                        if($scope.VendorModal.AdditionalFieldsInfo['PartCategory'].isPrimary == true) {
+                        	$scope.VendorModal.VendorInfo.PartCategoryId = $scope.VendorModal.SelectedPartCategory.Id;
+                      	} else { 
+                            $scope.VendorModal.VendorInfo.PartCategoryId = null;
+                        }
+                        
+                        addEditVendorService.saveVendor(angular.toJson($scope.VendorModal.VendorInfo)).then(function (saveResult) {
+			            	
+			            	if($scope.$parent.vendorRecordSaveCallback != undefined){
+		                        $scope.$parent.vendorRecordSaveCallback();
+		                        Notification.success('Vendor Saved Successfully');
+		                    }
+			            	$scope.VendorModal.closePopup();	
+	                   	},
+	                    function (errorSearchResult) {          
+	                         responseData = errorSearchResult; 
+	                    });
+                    
+                        /*
+                        var deferred = $q.defer();
+                        deferred.promise.then(function(result){
+                        	return addEditVendorService.saveVendor(angular.toJson($scope.VendorModal.VendorInfo));
+                            debug(result);
+                        }) 
+                        
+	                       .then(function(result){
+		                        $scope.$parent.ViewCustomer.saveCustomer(result)
+		                        Notification.success('Customer Successfully Saved');
+		                        angular.element('#pop').modal('hide');
+		                        return 'Sucess';
+	                               
+	                           });
+                            
+                            deferred.resolve('1');*/
+
+                 	}
+                        
+                        $scope.VendorModal.markFavourite = function(key, modalName){
+                        	debug(key + ' ' + modalName); 
+                            if($scope.VendorModal.VendorInfo[key] == modalName){
+                                $scope.VendorModal.VendorInfo[key] = '';
+                                if(modalName == 'WorkNumber' && key == 'PreferredSMS'){
+                                    $scope.VendorModal.VendorInfo.WorkNumberSMS = false;
+                                }else if(modalName == 'OtherPhone' && key == 'PreferredSMS'){
+                                    $scope.VendorModal.VendorInfo.MobileNumberSMS = false;
+                                }
+                            } else {
+                                $scope.VendorModal.VendorInfo[key] = modalName;
+                                if(modalName == 'WorkNumber' && key == 'PreferredSMS'){
+                                    $scope.VendorModal.VendorInfo.WorkNumberSMS = true;
+                                }else if(modalName == 'OtherPhone' && key == 'PreferredSMS'){
+                                    $scope.VendorModal.VendorInfo.MobileNumberSMS = true;
+                                } 
+                                
+                            }
+                        }
+                        
+                        $scope.VendorModal.markSMS  = function(key){
+                            $scope.VendorModal.VendorInfo[key] = !$scope.VendorModal.VendorInfo[key];
+                            if($scope.VendorModal.VendorInfo[key] == false){
+                                debug('inside  '+$scope.VendorModal.VendorInfo.PreferredSMS+'  '+key);
+                                if($scope.VendorModal.VendorInfo.PreferredSMS == 'WorkNumber'  && key == 'WorkNumberSMS'){
+                                    $scope.VendorModal.VendorInfo.PreferredSMS = '';
+                                }
+                                if($scope.VendorModal.VendorInfo.PreferredSMS == 'OtherPhone' && key == 'MobileNumberSMS' ){
+                                    $scope.VendorModal.VendorInfo.PreferredSMS = '';
+                                }
+                            }
+                        } 
+                     
+                          
+                     
+
+                
+                
+            });
+            
+            
+    		addEditVendorModule.service("addEditVendorService", function ($q) {
+            	
+            	// Correct
+            	this.getOtherSimilarVendor = function (vendorInfoJson){
+            		vendorInfoJson = encodeString(vendorInfoJson);
+            		
+                	var deferred = $q.defer();
+                    // make AJAX request to the remote service
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewVendorCtrl.getOtherSimilarVendor }',
+                                    vendorInfoJson,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var similarVendor = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                similarVendor = similarVendor.replace(re, '');
+                                deferred.resolve(JSON.parse(similarVendor));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+                }
+
+				// Correct
+                this.getVendorAllMasterData = function() {
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewVendorCtrl.getAllLookupFieldsJSON }',
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var vendorMasterData = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                vendorMasterData = vendorMasterData.replace(re, '');
+                                deferred.resolve(JSON.parse(vendorMasterData));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+                }
+
+
+                this.saveVendor = function(vendorJSON) {
+                	vendorJSON = encodeString(vendorJSON);
+                	
+                    var deferred = $q.defer();
+                    debug('Inside Service -- >');
+                    debug(vendorJSON);
+                    
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewVendorCtrl.saveVendor }',
+                        	vendorJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var saveResult = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                saveResult = saveResult.replace(re, '');
+                                deferred.resolve(JSON.parse(saveResult));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+                }
+                
+                this.getVendorInfoById= function(vendorId) {
+                	vendorId = encodeString(vendorId);
+                	
+                	var deferred = $q.defer();
+                    debug(vendorId);
+                    
+                    Visualforce.remoting.Manager.invokeAction(
+                    	'{!$RemoteAction.ViewVendorCtrl.getVendorInfo}',
+                        		vendorId,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.reject(event.message);
+                                } else {
+                                    debug('Aa gya result');
+                                    var vendor = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    vendor = vendor.replace(re, '');
+                                    debug(vendor);
+                                    deferred.resolve(JSON.parse(vendor));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                }
+            });
+            
+          
+	</script>
+       
+	<div id="newVendor" class="modal fade" ng-controller="addEditVendorController">
+		<div class="modal-dialog" >
+            <div class="modal-content vendor_container ">
+                <div class="modal-body popup_container" ng-class="{'popup_container_edit': VendorModal.IsEditMode}">
+                	<div class="popupinside">
+	                    <div class="Customer-Suggestion-overlay">
+	                    	<div >
+	                        	<div class="text">Insert this vendor into Vendor Order?</div>
+	                        	<button class="square-btn greenBtn pull-right" ng-click="VendorModal.AddSimilarCustomer()" >Select</button>   
+	                    	</div>
+                        </div>
+
+                        <div class="ConfirmBox-overlay">
+	                        <div >
+	                           	<div class="modal-content">
+	                           		<div class="modal-header">
+	                                	<button type="button" class="close" aria-label="Close" ng-click="VendorModal.DeactiveVendor(false)"><span aria-hidden="true">&times;</span></button>
+	                                    <h4 class="modal-title">Confirmation Inactive Status</h4>
+	                                </div>
+	                                <div class="modal-body" >
+	                                	<p>  This will deactive the vendor.</p>
+	                                    <p>  It will be imposible to complete venodr orders against </p>
+	                                    <p>  this vendor, or book them for appointments.</p>
+	                                    <br/>
+	                                    Are you sure, you want to continue?
+	                                </div>
+	                                <div class="modal-footer">
+	                                	<button type="button" id="confirmButton" class="btn btn-primary" ng-click="VendorModal.DeactiveVendor(true)">Yes</button>
+	                                    <button type="button" class="btn btn-default" ng-click="VendorModal.DeactiveVendor(false)">No</button>
+	                                </div>
+	                           	</div>
+	                       	</div>
+                      	</div>
+
+
+                        <div class="popupleft col-lg-4 col-lg-4" ng-if="!VendorModal.IsEditMode">
+                            <div class="popupleft_container" id="topsection" ng-show="VendorModal.IsEditMode == false || VendorModal.SimilarVendors == []">
+	                            <h1 class="letpanel_heading">
+	                                Existing Vendors Like This 
+	                     </h1>
+	                            <i class="fa fa-question-circle helptip" style=" float:left; font-weight: bold; color: #B7BEC6;  margin-top: 20px; margin-bottom: 10px;   font-size: 20px;"></i>
+	                            
+	                        	<div class="goldbox col-lg-12 col-md-12"
+                                    ng-repeat="SimilarVendor in VendorModal.SimilarVendors">
+                                    <!-- <div class="leftgoldbox">
+                                        <img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" />
+                                        <div class="star_container">
+                                            <i class="fa fa-star" style="float: left;color: #B7BEC6;margin-top: 5px; font-size: 15px;"></i> 
+                                            <i class="fa fa-star" style="float: left;color: #B7BEC6;margin-top: 5px; font-size: 15px;"></i> 
+                                        </div>
+                                    </div> -->
+                                    <div class="rightgoldbox rightgoldboxML" id="VendorSugesstionDiv{{$index}}" style="margin-left: 0px;"
+                                        ng-mouseover="VendorModal.showInfoOverlay('VendorSugesstionDiv',$index)"   ng-mouseleave="VendorModal.hideVendorInfoOverlay();">
+                                        <div>
+
+                                            <p class="cust_name">{{SimilarVendor.VendorName}}</p>
+                                            <p>{{SimilarVendor.WorkEmail}}</p>
+	                                        <p>{{SimilarVendor.WorkNumber}}</p>
+                                        </div>
+                                    </div>
+                                 	<!-- <div class="bottomgoldbox">
+                                  		<i>VENDOR ({{SimilarVendor.VendorCode}})</i> 
+                                   	</div> -->
+                                </div>
+                        	</div>
+                        </div> 
+                        
+                        <div class="popupright" ng-class="{'col-lg-8' : !VendorModal.IsEditMode, 'col-lg-12' : VendorModal.IsEditMode, 'noLeftBoder' : VendorModal.IsEditMode}">
+                            <div class="right_heading_container col-lg-12 col-md-12">
+                                <h1 class="right_panel_heading" ng-show="VendorModal.IsEditMode">Edit Vendor</h1>
+                                <h1 class="right_panel_heading" ng-show="!VendorModal.IsEditMode">New Vendor</h1>
+                                <div class="savecancle_btncntnr">
+									<button type="button" id="closemodal"
+										class="btn btn-default grayBtn"
+										ng-click="VendorModal.closePopup()"
+										ng-attr-tabindex="{{VendorModal.tabIndexValue + 204}}" ng-keydown = "VendorModal.adjustTabIndex($event);">{!$Label.Cancel_Label}</button>
+									<button type="button" class="btn btn-default greenBtn"
+										ng-click="VendorModal.SaveVendor()"
+										ng-attr-tabindex="{{VendorModal.tabIndexValue + 202}}">{!$Label.Save_Label}</button>
+								</div>
+                            </div>
+                            
+                            <div class="tabconainer" style="min-height: 524px;">
+                                <form>
+                                	<div class="form-group" style="float: right;padding-left: 88px;">
+	                                    <label for="required" class="FC9">* {!$Label.Indicates_Required_Fields}</label>
+	                                </div>
+                                	<div class="option_field">
+                                    	<div class="lable_fields">
+                                        	
+                                        	<p class="req-label">Company Name</p>
+                                    	</div>
+                                    	<div class="form_fields" style="margin:4px 0 8px 0;">
+                                      		<div class="form-group large" >
+                                        		<input type="text" class="form-control" id="vendorName" ng-model="VendorModal.VendorInfo.VendorName" placeholder="Company Name" rel="VendorName" ng-class="{'redborder' : VendorModal.VendorValidation['VendorName']['isError'] == true}"
+                                                ng-blur="VendorModal.validateForm('VendorName'); VendorModal.getOtherSimilarVendor();"
+                                                title="{{VendorModal.VendorValidation['VendorName']['ErrorMessage'] }} " ng-attr-tabindex="{{VendorModal.tabIndexValue + 1}}"/>
+	                                      	</div>
+	                                    </div>
+                                    	<div class="controls" id="VendorName"  >
+                                        	<i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['VendorName']}}"></i>
+                                        	<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('VendorName', 'vendorName')"></i>
+                                     	</div> 
+                                 	</div>
+                                 	
+                                 	
+                                 	<div class="clearfix"></div>
+                                 	
+                                 	<div class="option_field">
+                                    	<div class="lable_fields">
+                                        	
+                                        	<p>Vendor Code</p>
+                                    	</div>
+                                    	<div class="form_fields" style="margin:4px 0 8px 0;">
+                                      		<div class="form-group large" >
+                                        		<input type="text" ng-disabled="true" class="form-control" id="vendorName" ng-model="VendorModal.VendorInfo.VendorCode" placeholder="Vendor Code" rel="VendorCode" ng-class="{'redborder' : VendorModal.VendorValidation['VendorCode']['isError'] == true}"
+                                                		title="{{VendorModal.VendorValidation['VendorCode']['ErrorMessage'] }} " ng-attr-tabindex="{{VendorModal.tabIndexValue + 2}}"/>
+	                                      	</div>
+	                                    </div>
+	                                    <div class="controls" id="VendorCode"  >
+	                                        	<i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Code"></i>
+	                                        	<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('VendorCode', 'vendorCode')"></i>
+	                                     	</div> 
+                                 	</div>
+                                 	
+                                 	
+                                 	<div class="clearfix"></div>
+                                 	
+                                 	
+                                 	<div class="option_field">
+                                    	<div class="lable_fields">
+                                        	
+                                        	<p>Vendor Account Number</p>
+                                    	</div>
+                                    	<div class="form_fields" style="margin:4px 0 8px 0;">
+                                      		<div class="form-group large" >
+                                        		<input type="text" class="form-control" id="vendorAccountNumber" ng-model="VendorModal.VendorInfo.VendorAccountNumber" placeholder="Vendor Account Number" rel="VendorAccountNumber" ng-class="{'redborder' : VendorModal.VendorValidation['VendorCode']['isError'] == true}"
+                                                	title="{{VendorModal.VendorValidation['VendorAccountNumber']['ErrorMessage'] }} " ng-attr-tabindex="{{VendorModal.tabIndexValue + 3}}"/>
+	                                      	</div>
+	                                    </div>
+	                                    <div class="controls" id="VendorAccountNumber">
+	                                        	<i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['VendorAccountNumber']}}"></i>
+	                                        	<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('VendorAccountNumber', 'vendorAccountNumber')"></i>
+	                                     	</div> 
+                                 	</div>
+                                 	
+                                 	<div class="clearfix"></div>
+                                 	
+                                 	<div class="option_field">
+                                    	<div class="lable_fields">
+	                                        
+	                                        <p>Email</p>
+	                                    </div>
+	                                   	 <div class="form_fields">
+	                                    	<div class="form-group large">
+	                                        	<input type="text" class="form-control " ng-model="VendorModal.VendorInfo.WorkEmail" ng-attr-tabindex="{{VendorModal.tabIndexValue + 4}}"
+	                                            	ng-blur="VendorModal.getOtherSimilarVendor(); VendorModal.validateForm('WorkEmail');"  id="workEmail" placeholder="Work Email" rel="WorkEmail" 
+	                                            	title="{{VendorModal.VendorValidation['HomeEmail']['ErrorMessage'] }}" 
+	                                            	ng-class="{'redborder' : VendorModal.VendorValidation['WorkEmail']['isError'] == true}"/>
+	                                        
+	                                        	<a href="" class="bookmarklink">
+	                                            	<img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" 
+				                                    	ng-show="VendorModal.VendorInfo.PreferredEmail == 'WorkEmail'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredEmail','WorkEmail');"/>
+				                                    <i class="fa fa-star"
+				                                    	ng-show="VendorModal.VendorInfo.PreferredEmail != 'WorkEmail'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredEmail','WorkEmail');"></i>
+	                                        	</a>
+	                                      	</div>
+	                               		</div>
+	                                    <div class="controls" id="WorkEmail">
+	                                        <i class="fa fa-question-circle"  data-toggle="tooltip" title="{{VendorModal.helpText['WorkEmail']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('WorkEmail','workEmail')"></i>
+	                                   	</div>
+	                            	</div>
+                            	
+	                                <div class="clearfix"></div>
+	                                
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.OtherEmail.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	
+	                                        <p>Other Email</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group large">
+	                                        	<input type="text" class="form-control " ng-model="VendorModal.VendorInfo.OtherEmail" ng-class="{'redborder' : VendorModal.VendorValidation['OtherEmail']['isError'] == true}" 
+	                                            		ng-blur="VendorModal.validateForm('OtherEmail'); VendorModal.getOtherSimilarVendor();" id="otherEmail" placeholder="Other Email" rel="OtherEmail" ng-attr-tabindex="{{VendorModal.tabIndexValue + 5}}"
+	                                            		title="{{VendorModal.VendorValidation['OtherEmail']['ErrorMessage'] }}"/>
+	                                        	<a href="" class="bookmarklink">
+	                                            	<img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" 
+				                                    	ng-show="VendorModal.VendorInfo.PreferredEmail == 'OtherEmail'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredEmail','OtherEmail');"/>
+				                                    <i class="fa fa-star"
+				                                    	ng-show="VendorModal.VendorInfo.PreferredEmail != 'OtherEmail'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredEmail','OtherEmail');"></i>
+	                                        	</a>
+	                                      	</div>
+	                               		</div>
+	                                    <div class="controls" id="OtherEmail">
+	                                    	<i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['OtherEmail']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('OtherEmail','otherEmail')"></i>
+	                                   	</div>
+	                           		</div>
+	                                
+	                                
+	                                <div class="clearfix"></div>
+	                                 
+	                               	<div class="option_field" >
+	                                    <div class="lable_fields">
+	                                        
+	                                        <p>Phone</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group medium">
+	                                        	<input type="text" class="form-control" id="workPhone" maxlength="10" ng-model="VendorModal.VendorInfo.WorkNumber" ng-class="{'redborder' : VendorModal.VendorValidation['WorkNumber']['isError'] == true}"
+	                                        			ng-blur="VendorModal.getOtherSimilarVendor(); VendorModal.validateForm('WorkNumber');"  placeholder="Work Phone" rel="WorkNumber" ng-attr-tabindex="{{VendorModal.tabIndexValue + 6}}"
+	                                        			title="{{VendorModal.VendorValidation['WorkNumber']['ErrorMessage'] }}"/>
+		                                        <a href="" class="bookmarklink">
+			                                        
+			                                        <img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" 
+				                                    	ng-show="VendorModal.VendorInfo.PreferredPhone == 'WorkNumber'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredPhone','WorkNumber');"/>
+				                                    <i class="fa fa-star"
+				                                    	ng-show="VendorModal.VendorInfo.PreferredPhone != 'WorkNumber'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredPhone','WorkNumber');"></i>
+			                                        
+			                                        
+		                                        </a>
+	                                      	</div>
+	                                      	<div class="form-group small">
+	                                        	<label class="checkbox smschkbox">
+	                                            	<span class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.WorkNumberSMS == true}"
+		                                                 ng-click="VendorModal.markSMS('WorkNumberSMS');">
+		                                                <i class="fa fa-check-square chksqure" ></i>
+		                                            </span>
+	                                        	</label>
+	                                      	</div>
+	                                      	<div class="form-group small2">
+	                                        	<label>SMS ?</label>
+		                                        <a href="" class="bookmarklink">
+		                                        
+		                                            <img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" 
+				                                    	ng-show="VendorModal.VendorInfo.PreferredSMS == 'WorkNumber'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredSMS','WorkNumber');"/>
+				                                    <i class="fa fa-star"
+				                                    	ng-show="VendorModal.VendorInfo.PreferredSMS != 'WorkNumber'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredSMS','WorkNumber');"></i>
+		                                        </a>
+	                                      	</div>
+	                                   	</div>
+	                                    <div class="controls" id="WorkNumber">
+	                                    	<i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['Phone']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('WorkNumber', 'workPhone')"></i>
+	                                     </div>
+	                            	</div>
+	
+	                               	<div class="clearfix"></div>
+	                                 
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.OtherPhone.isPrimary">
+	                                	<div class="lable_fields" >
+	                                    	
+	                                        <p>Other Phone</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group medium">
+		                                        <input type="text" class="form-control" id="otherPhoneId" maxlength="10" ng-model="VendorModal.VendorInfo.OtherPhone" ng-class="{'redborder' : VendorModal.VendorValidation['OtherPhone']['isError'] == true}"
+		                                            ng-blur="VendorModal.validateForm('OtherPhone'); VendorModal.getOtherSimilarVendor();"  placeholder="Other Phone" rel="OtherNumber" ng-attr-tabindex="{{VendorModal.tabIndexValue + 7}}"
+		                                            title="{{VendorModal.VendorValidation['OtherPhone']['ErrorMessage'] }}"/>
+		                                        <a href="" class="bookmarklink">
+		                                        
+		                                            
+		                                            <img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" 
+				                                    	ng-show="VendorModal.VendorInfo.PreferredPhone == 'OtherPhone'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredPhone','OtherPhone');"/>
+				                                    <i class="fa fa-star"
+				                                    	ng-show="VendorModal.VendorInfo.PreferredPhone != 'OtherPhone'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredPhone','OtherPhone');"></i>
+		                                        </a>
+	                                      	</div>
+	                                      	<div class="form-group small">
+		                                        <label class="checkbox smschkbox">
+		                                            <span class="chk_tick"  ng-class="{'chked' : VendorModal.VendorInfo.MobileNumberSMS == true}"
+		                                                 ng-click="VendorModal.markSMS('MobileNumberSMS');">
+		                                                <i class="fa fa-check-square chksqure" ></i>
+		                                            </span>
+		                                        </label>
+	                                      	</div>
+	                                      	<div class="form-group small2">
+		                                        <label>SMS ?</label>
+		                                        <a href="" class="bookmarklink">
+		                                       
+		                                            
+		                                            <img class="starimgMarkFav" src="{!URLFOR($Resource.Images, 'star.png')}" 
+				                                    	ng-show="VendorModal.VendorInfo.PreferredSMS == 'OtherPhone'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredSMS','OtherPhone');"/>
+				                                    <i class="fa fa-star"
+				                                    	ng-show="VendorModal.VendorInfo.PreferredSMS != 'OtherPhone'"
+				                                    	ng-click="VendorModal.markFavourite('PreferredSMS','OtherPhone');"></i>
+		                                        </a>
+	                                      	</div>
+	                                  	</div>
+	                                    <div class="controls" id="OtherNumber">
+	                                        <i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['OtherPhone']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('OtherPhone', 'otherPhoneId')"></i>
+	                                    </div>
+	                              	</div>
+	                              	
+	                              	<div class="clearfix"></div>
+	                                 
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.Fax.isPrimary">
+	                                	<div class="lable_fields" >
+	                                    	
+	                                        <p>Fax</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group medium">
+		                                        <input type="text" class="form-control" id="faxId"  ng-model="VendorModal.VendorInfo.Fax" ng-class="{'redborder' : VendorModal.VendorValidation['Fax']['isError'] == true}"
+		                                            ng-blur="VendorModal.validateForm('Fax');"  placeholder="Fax" rel="Fax" ng-attr-tabindex="{{VendorModal.tabIndexValue + 8}}"
+		                                            title="{{VendorModal.VendorValidation['OtherPhone']['ErrorMessage'] }}"/>
+	                                      	</div>
+	                                  	</div>
+	                                    <div class="controls" id="Fax">
+	                                        <i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['Fax']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('Fax', 'faxId')"></i>
+	                                    </div>
+	                              	</div>
+	                                 
+	                                <div class="clearfix"></div>
+	                                
+	                                
+	                                <div class="option_field">
+	                                	<div class="lable_fields">
+	                                        
+	                                        <p>Billing Address</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group large">
+		                                        <label for="exampleInputEmail1">Address Line1</label>
+		                                        <input type="text" class="form-control"  ng-model="VendorModal.VendorInfo.BillingStreet1"
+		                                            ng-blur="VendorModal.getOtherSimilarVendor()" id="billingAddress1" placeholder="Apartment / Suite / Office address" rel="BillingAddLine1" ng-attr-tabindex="{{VendorModal.tabIndexValue + 10}}"/>
+		                                        
+	                                      	</div>
+	                                     </div>
+										<div class=" controls MT25" id="BillingAddLine1">
+											<i class="fa fa-question-circle" data-toggle="tooltip" title="Apartment, suite, unit, building, floor, etc"></i>
+											<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('BillingAddLine1', 'billingAddress1')"></i>
+										</div>
+									</div>
+	                                      	
+										 <div class="option_field">
+											<div class="lable_fields">
+												
+												<p></p>
+											</div>	
+											  <div class="form_fields">
+												<div class="form-group large">
+												   <label for="exampleInputEmail1">Address Line2</label>
+												   <input type="text" class="form-control"  ng-model="VendorModal.VendorInfo.BillingStreet2" id="billingAddress2" placeholder="Street Address" rel="BillingAddLine2" ng-attr-tabindex="{{VendorModal.tabIndexValue + 11}}"/>
+												</div>
+											</div>
+	                                      	<div class=" controls MT25"  id="BillingAddLine2">
+		                                         <i class="fa fa-question-circle"  data-toggle="tooltip" title="Street address, P.O. box, company name, c/o"></i>
+		                                         <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('BillingAddLine2', 'billingAddress2')"></i> 
+	                                      	</div>
+	                                      </div>	
+										   <div class="option_field">
+												<div class="lable_fields">
+													
+													<p></p>
+												</div>	
+											  <div class="form_fields">
+	                                     	<div class="form-group half">
+		                                        <label for="exampleInputEmail1">City</label>
+		                                        <input type="text" class="form-control" id="billingCity"  ng-model="VendorModal.VendorInfo.BillingCity" placeholder="City" rel="CityState" ng-attr-tabindex="{{VendorModal.tabIndexValue + 12}}"/>
+	                                      	</div>
+											
+	                                    	<div class="form-group half">
+		                                        <label for="exampleInputEmail1" >State/Province</label>
+		                                        <select class="form-control" rel="CityState" id="billingState" ng-model="VendorModal.SelectedState" ng-options="state  as state.StateName for state in VendorModal.State track by state.Id" ng-attr-tabindex="{{VendorModal.tabIndexValue + 13}}">
+		                                        </select>
+	                                      	</div>
+											</div>
+	                                       	<div class=" controls MT25" id="CityState">
+		                                         <i class="fa fa-question-circle"  data-toggle="tooltip" title="Select City and State"></i>
+		                                         <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('CityState','billingCity')"></i>
+	                                      	</div>
+											</div>
+	                                    	 <div class="option_field">
+											<div class="lable_fields">
+												
+												<p></p>
+											</div>	
+											  <div class="form_fields">
+	                                    	<div class="form-group half">
+		                                        <label for="exampleInputEmail1">Country</label>
+		                                        <select class="form-control" rel="CountryPostal" id="billingCountry" ng-model="VendorModal.SelectedCountry" ng-options="country as country.CountryName for country in VendorModal.Country track by country.Id"
+		                                            ng-change="VendorModal.changeBillingCountry()" ng-attr-tabindex="{{VendorModal.tabIndexValue + 14}}">
+	                                        	</select>
+	                                      	</div>
+	                                       	
+	                                        <div class="form-group half">
+		                                        <label for="exampleInputEmail1">Postal/Zip Code</label>
+		                                        <input type="text" class="form-control" id="exampleInputEmail1" 
+		                                        ng-blur="VendorModal.validateForm('BillingPostalCode');" maxlength="10"
+	                                            ng-class="{'redborder' : VendorModal.VendorValidation['BillingPostalCode']['isError'] == true}" 
+		                                        ng-model="VendorModal.VendorInfo.BillingPostalCode" placeholder="Postal/Zip Code"
+		                                        data-toggle="tooltip"
+                                                title="{{VendorModal.VendorValidation['BillingPostalCode']['ErrorMessage'] }}" 
+		                                        rel="CountryPostal" ng-attr-tabindex="{{VendorModal.tabIndexValue + 15}}"/>
+	                                   		</div>
+										</div>
+	                                       	<div class=" controls MT25" id="CountryPostal">
+	                                         	<i class="fa fa-question-circle"  data-toggle="tooltip" title="Add Country and Postal Code"></i>
+	                                        	<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('CountryPostal','billingCountry')"></i>
+	                                      	</div>                       
+	                                 	</div>
+	                             	
+	                                 
+	                                <div class="clearfix"></div>
+	                                
+	                                <div class="option_field">
+	                                    <div class="lable_fields chkbox">
+	                                        <p>Shipping Address</p>
+	                                    </div>
+	                                    <div class="form_fields" >
+	                                    	
+	                                    	
+	                                    	<div class="form-group large">
+	                                        	<label class="checkbox">
+	                                        	<span id="sameAsBA" ng-click="VendorModal.SetAddressData()" class="chk_tick" ng-class="{'chked': VendorModal.VendorInfo.IsBothAddressSame}" >
+	                                        	<i class="fa fa-check-square chksqure" ></i></span><span class="chk_txt" >Same as Billing Address</span></label>
+	                                      	</div>                      
+	                                   	</div>
+	                               	</div>
+	                                
+	                                
+	                                <div class="clearfix"></div>
+	                                
+	                                <div ng-class="{'sameBillineAddress': VendorModal.VendorInfo.IsBothAddressSame, 'differentBillingAddress': !VendorModal.VendorInfo.IsBothAddressSame }">
+	                                <div class="option_field" id="billingaddress" >
+	                                    <div class="lable_fields">
+	                                        
+	                                        <p>Shipping Address</p>
+	                                    </div>
+	                                    <div class="form_fields ">
+	                                    	<div class="form-group large">
+		                                        <label for="exampleInputEmail1">Address Line1</label>
+		                                        <input type="text" class="form-control"  ng-model="VendorModal.VendorInfo.ShippingStreet1" id="shippingAddress1" placeholder="Apartment / Suite number" rel="ShippingAddLine1" ng-attr-tabindex="{{VendorModal.tabIndexValue + 16}}"/>
+	                                      	</div>
+									</div>
+	                                       	<div class=" controls MT25" id="ShippingAddLine1">
+	                                         	<i class="fa fa-question-circle" data-toggle="tooltip" title="Apartment / Suite number"></i>
+	                                         	<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('ShippingAddLine1', 'shippingAddress1')"></i>
+	                                      	</div>
+	                               </div>  
+									    <div class="clearfix"></div>
+									<div class = "öption_field ">	
+									  <div class="lable_fields">
+	                                        
+	                                        <p></p>
+	                                    </div>
+									  <div class="form_fields ">
+	                                      	<div class="form-group large">
+		                                        <label for="exampleInputEmail1">Address Line2</label>
+		                                        <input type="text" class="form-control"  ng-model="VendorModal.VendorInfo.ShippingStreet2" id="shippingAddress2" placeholder="Street Address" rel="ShippingAddLine2" ng-attr-tabindex="{{VendorModal.tabIndexValue + 17}}"/>
+	                                      	</div>
+									</div>
+	                                       	<div class=" controls MT25" id="ShippingAddLine2">
+		                                         <i class="fa fa-question-circle" data-toggle="tooltip" title="Street"></i>
+		                                         <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('ShippingAddLine2', 'shippingAddress2')"></i>
+	                                      	</div>  
+	                                    </div>	   
+   										 <div class="clearfix"></div>
+										<div class = "öption_field ">	
+									  <div class="lable_fields">
+	                                        
+	                                        <p></p>
+	                                    </div>
+									  <div class="form_fields ">
+	                                        <div class="form-group half">
+		                                        <label for="exampleInputEmail1">City</label>
+		                                        <input type="text" class="form-control"  ng-model="VendorModal.VendorInfo.ShippingCity" id="shippingCity" placeholder="City" rel="ShippingCityState" ng-attr-tabindex="{{VendorModal.tabIndexValue + 18}}"/>
+	                                      	</div>
+	                                    	<div class="form-group half"> 
+	                                        	<label for="exampleInputEmail1">State/Province</label>
+	                                			<select class="form-control" rel="ShippingCityState"  ng-model="VendorModal.SelectedShippingState"   ng-options="state  as state.StateName for state in VendorModal.ShippingState track by state.Id" ng-attr-tabindex="{{VendorModal.tabIndexValue + 19}}">
+	                                        	</select>
+	                                      	</div>
+									</div>
+	                                      	<div class=" controls MT25" id="ShippingCityState">
+	                                        	<i class="fa fa-question-circle" data-toggle="tooltip" title="Select City and State"></i>
+	                                         	<i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('ShippingCityState', 'shippingCity')"></i>
+	                                      	</div>
+	                               </div>
+										    <div class="clearfix"></div>
+										<div class = "öption_field">	
+											  <div class="lable_fields">
+			                                        
+			                                        <p></p>
+			                                    </div>
+									 		 <div class="form_fields ">
+	                                        <div class="form-group half" >
+	                                            <label for="exampleInputEmail1">Country</label>
+	                                        	<select class="form-control" rel="CountryStateShipping"  ng-model="VendorModal.SelectedShippingCountry"  id="shippingCity" ng-options="country as country.CountryName for country in VendorModal.ShippingCountry track by country.Id" 
+	                                             	 	ng-change="VendorModal.changeShippingCountry()" ng-attr-tabindex="{{VendorModal.tabIndexValue + 20}}">
+	                                        	</select>
+	                                     	</div>
+	                                        <div class="form-group half">
+		                                        <label for="exampleInputEmail1">Postal/Zip Code</label>
+		                                        <input type="text" class="form-control"  
+		                                        ng-model="VendorModal.VendorInfo.ShippingPostalCode" 
+		                                        ng-blur="VendorModal.validateForm('ShippingPostalCode');" maxlength="10"
+	                                            ng-class="{'redborder' : VendorModal.VendorValidation['ShippingPostalCode']['isError'] == true}" 
+		                                        id="exampleInputEmail1" placeholder="Postal/Zip Code" 
+		                                        data-toggle="tooltip"
+                                                title="{{VendorModal.VendorValidation['ShippingPostalCode']['ErrorMessage'] }}"
+		                                        rel="CountryStateShipping" ng-attr-tabindex="{{VendorModal.tabIndexValue + 21}}"/>
+	                                      	</div>
+									</div>
+	                                       	<div class=" controls MT25" id="CountryStateShipping">
+		                                         <i class="fa fa-question-circle" data-toggle="tooltip" title="Add Country and Postal Code"></i>
+		                                         <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('CountryPostalShipping', 'shippingCity')"></i>
+	                                      	</div>                      
+	                                  	</div>
+	                               	
+	                              </div>  
+	                                
+	                                <div class="clearfix"></div>
+	                                
+	                                
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.ProductAndServices.isPrimary" id="ProductAndServicesId">
+	                                    <div class="lable_fields chkbox">
+	                                        <p>Products &amp; Services</p>
+	                                    </div>
+	                                    <div class="form_fields" >
+	                                    	<div class="form-group large">
+	                                        	<div class="row" style="margin-left: 0.0%;">
+		                                        	<label class="checkbox">
+		                                        		<span id="partPurchasesId" class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.IsPartPurchases == true}"
+		                                        						ng-click="VendorModal.SetProductAndServices('PartPurchase');">
+		                                        			<i class="fa fa-check-square chksqure"></i>
+		                                        		</span>
+		                                        		<span class="chk_txt" >Part Purchases</span>
+		                                        	</label>
+	                                        	</div>
+	                                        	<div class="row" style="margin-left: 0.0%;">
+		                                        	<label class="checkbox">
+		                                        		<span id="partPurchasesId" class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.IsUnitPurchases == true}"
+		                                        						ng-click="VendorModal.SetProductAndServices('UnitPurchase');">
+		                                        			<i class="fa fa-check-square chksqure" ></i>
+		                                        		</span>
+		                                        		<span class="chk_txt" >Unit Purchases</span>
+		                                        	</label>
+		                                        </div>
+		                                        <div class="row" style="margin-left: 0.0%;">
+		                                        	<label class="checkbox">
+		                                        		<span id="partPurchasesId" class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.IsSubletPurchases == true}"
+		                                        						ng-click="VendorModal.SetProductAndServices('SubletPurchase');">
+		                                        			<i class="fa fa-check-square chksqure" ></i>
+		                                        		</span>
+		                                        		<span class="chk_txt" >Sublet Purchases</span>
+		                                        	</label>
+		                                        </div>
+		                                        <div class="row" style="margin-left: 0.0%;">
+		                                        	<label class="checkbox">
+		                                        		<span id="partPurchasesId" class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.IsClaimsForServiceWork == true}"
+		                                        						ng-click="VendorModal.SetProductAndServices('ClaimsForServiceWork');">
+		                                        			<i class="fa fa-check-square chksqure" ></i>
+		                                        		</span>
+		                                        		<span class="chk_txt" >Claims for Service Work</span>
+		                                        	</label>
+		                                        </div>
+		                                        <div class="row" style="margin-left: 0.0%;">
+		                                        	<label class="checkbox">
+		                                        		<span id="partPurchasesId" class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.IsWarrantyPlans == true}"
+		                                        						ng-click="VendorModal.SetProductAndServices('WarrantyPlans');">
+		                                        			<i class="fa fa-check-square chksqure" ></i>
+		                                        		</span>
+		                                        		<span class="chk_txt" >Warranty Plans Sales on Unit Deals</span>
+		                                        	</label>
+		                                        </div>
+		                                        <div class="row" style="margin-left: 0.0%;">
+		                                        	<label class="checkbox">
+		                                        		<span id="partPurchasesId" class="chk_tick" ng-class="{'chked' : VendorModal.VendorInfo.IsFlooringCompany == true}"
+		                                        						ng-click="VendorModal.SetProductAndServices('FlooringCompany');" >
+		                                        			<i class="fa fa-check-square chksqure" ></i>
+		                                        		</span>
+		                                        		<span class="chk_txt" >Flooring Company</span>
+		                                        	</label>
+		                                        </div>
+	                                      	</div>                      
+	                                   	</div>
+	                               	</div>
+	                                
+	                                
+	                                <div class="clearfix"></div>
+	                                
+	                                
+	                                
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.Website.isPrimary" >
+		                                <div class="lable_fields">
+		                                   <p>Website</p>
+		                               	</div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group large">
+	                                        	<input type="url" class="form-control" ng-model="VendorModal.VendorInfo.Website" id="websiteId"
+	                                                    placeholder="Website" rel="WebsiteIcon" 
+	                                                    ng-attr-tabindex="{{VendorModal.tabIndexValue + 23}}"/>
+	                                       </div>
+	                                 	</div>
+	                                    <div class="controls" id="WebsiteIcon" >
+	                                    	<i class="fa fa-question-circle"  data-toggle="tooltip" title="{{VendorModal.helpText['Website']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('Website', 'websiteId')"></i>
+	                                  	</div>
+	                               	</div>
+	                                    
+	                             	<div class="clearfix"></div>
+	                                    
+	                                    
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.FacebookLink.isPrimary" >
+	                                	<div class="lable_fields">
+	                                        <p>Facebook</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group large">
+	                                        	<input type="text" class="form-control"  ng-model="VendorModal.VendorInfo.FacebookLink"
+	                                                ng-blur="VendorModal.getOtherSimilarVendor()"  id="facebookLink"
+	                                                placeholder="Facebook" rel="FacebookIcon" 
+	                                                ng-attr-tabindex="{{VendorModal.tabIndexValue + 24}}"/>
+	                                            <a href="" class="bookmarklink">
+	                                            	<i class="fa fa-facebook-square" style="color: #45619D;"></i>
+	                                            </a>
+	                                        </div>
+	                                    </div>
+	                                    <div class="controls" id="FacebookIcon" >
+	                                        <i class="fa fa-question-circle"  data-toggle="tooltip" title="{{VendorModal.helpText['Facebook']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('FacebookLink')"></i>
+	                                    </div>
+	                             	</div>
+	                             	
+	                                <div class="clearfix"></div>
+	                                
+	                                <div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.TwitterLink.isPrimary">
+		                                <div class="lable_fields">
+		                                   <p>Twitter</p>
+		                               	</div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group large">
+	                                        	<input type="text" class="form-control" ng-model="VendorModal.VendorInfo.TwitterLink"
+		                                                 ng-blur="VendorModal.getOtherSimilarVendor()"
+		                                                 id="twitterLink" placeholder="Twitter" rel="TwitterIcon" 
+		                                                 ng-attr-tabindex="{{VendorModal.tabIndexValue + 25}}"/>
+	                                            <a href="" class="bookmarklink">
+	                                           		<i class="fa fa-twitter-square"  style="color: #52A7E7;"></i>
+	                                            </a>
+	                                       	</div>
+	                                   	</div>
+	                                    <div class="controls" id="TwitterIcon">
+	                                    	<i class="fa fa-question-circle"  data-toggle="tooltip" title="{{VendorModal.helpText['Twitter']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('TwitterLink')"></i>
+	                                 	</div>
+	                             	</div>  
+	                                    
+	                                <div class="clearfix"></div>
+	                                
+	                                    
+	                              	<div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.LinkedInLink.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>LinkedIn</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                    	<div class="form-group large">
+	                                        	<input type="text" class="form-control" ng-model="VendorModal.VendorInfo.LinkedInLink"
+	                                                ng-blur="VendorModal.getOtherSimilarVendor()" id="LinkedinLink"
+	                                                placeholder="LinkedIn" rel="LinkedInIcon" 
+	                                                ng-attr-tabindex="{{VendorModal.tabIndexValue + 26}}"/>
+	                                            <a href="" class="bookmarklink">
+	                                            	<i class="fa fa-linkedin"  style="color: #52A7E7;"></i>
+	                                            </a>
+	                                        </div>
+	                                    </div>
+	                                    <div class="controls" id="LinkedInIcon">
+	                                    	<i class="fa fa-question-circle"  data-toggle="tooltip" title="{{VendorModal.helpText['Linkedin']}}"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('LinkedInLink')"></i>
+	                                    </div>
+	                              	</div>
+	                              	
+	                              	
+	                                <div class="clearfix"></div>
+	                                
+									<div class="option_field"  ng-show="VendorModal.AdditionalFieldsInfo.PartCategory.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>Part Category</p>
+	                                  	</div>
+	                                    <div class="form_fields">
+	                                   		<div class="form-group half">
+	                                        	<select class="form-control" rel="PartCategory" id="partCategoryDropDown" ng-model="VendorModal.SelectedPartCategory" 
+	                                        				ng-options="partCategory as partCategory.CategoryName for partCategory in VendorModal.PartCategory track by partCategory.Id"
+	                                                        ng-attr-tabindex="{{VendorModal.tabIndexValue + 27}}">
+	                                            </select>
+	                                            <!-- <autocomplete  id="Category" tab-index ="{{VendorModal.tabIndexValue + 27}}"  rel-value="PartCategory" placeholder="Part Category"  
+	                                            				type="Category"  titlefield="Name" validationkey="PartCategoryId" 
+	                                            				typesearchmodal="VendorModal.PartCategoryStr"/> -->
+	                                       	</div>
+	                                  	</div>
+	                                  	<div class="controls" id="PartCategory">
+		                                    	<i class="fa fa-question-circle"   data-toggle="tooltip" title="{{VendorModal.helpText['PartCategory']}}"></i>
+		                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('PartCategory')"></i>
+		                                    </div>
+	                               	</div>
+	                               	
+	                               	
+	                               	<div class="clearfix"></div>
+	                                
+									<div class="option_field"  ng-show="VendorModal.AdditionalFieldsInfo.PriceMethod.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>Price Method</p>
+	                                  	</div>
+	                                    <div class="form_fields">
+	                                   		<div class="form-group half">
+	                                        	<select class="form-control" rel="PriceMethod" id="priceMethodId" ng-model="VendorModal.SelectedPriceMethod"    
+	                                        				ng-options="pricelevel as pricelevel.PriceLevelName for pricelevel in VendorModal.PriceLevel track by pricelevel.Id"
+	                                                        ng-attr-tabindex="{{VendorModal.tabIndexValue + 28}}">
+	                                            </select>
+	                                       	</div>
+	                                  	</div>
+	                                  	<div class="controls" id="PriceMethod">
+		                                    	<i class="fa fa-question-circle"   data-toggle="tooltip" title="{{VendorModal.helpText['PriceMethod']}}"></i>
+		                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('PriceMethod')"></i>
+		                                    </div>
+	                               	</div>
+									
+	                                
+	                                <div class="clearfix"></div>
+	                                
+	                                
+									<div class="option_field"  ng-show="VendorModal.AdditionalFieldsInfo.PurchaseTaxLevel.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>Purchase Tax Level</p>
+	                                  	</div>
+	                                    <div class="form_fields">
+	                                   		<div class="form-group half">
+	                                        	<select class="form-control" rel="PurchaseTaxLevel" id="purchaseTaxLevel" ng-model="VendorModal.SelectedPurchaseTaxLevel"    
+	                                        				ng-options="purchaseTaxLevel as purchaseTaxLevel.SalesTaxName for purchaseTaxLevel in VendorModal.PurchaseTaxLevel track by purchaseTaxLevel.Id"
+	                                                        ng-attr-tabindex="{{VendorModal.tabIndexValue + 29}}">
+	                                            </select>
+	                                       	</div>
+		                                	
+	                                  	</div>
+	                                  	<div class="controls" id="PurchaseTaxLevel">
+		                                    	<i class="fa fa-question-circle" data-toggle="tooltip" title="{{VendorModal.helpText['PurchaseTaxLevel']}}"></i>
+		                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('PurchaseTaxLevel')"></i>
+		                                    </div>
+	                               	</div>
+	                               	
+	                               	
+	                               	<div class="clearfix"></div>
+	                                
+	                                <!--  
+									<div class="option_field"  ng-show="VendorModal.AdditionalFieldsInfo.SalesTaxLevel.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>Sales Tax Level</p>
+	                                  	</div>
+	                                    <div class="form_fields">
+	                                   		<div class="form-group half">
+	                                        	<select class="form-control" rel="SalesTaxLevel" id="salesTaxLevel" ng-model="VendorModal.SelectedSalesTaxLevel"    
+	                                        				ng-options="salesTaxLevel as salesTaxLevel.SalesTaxName for salesTaxLevel in VendorModal.SalesTaxLevel track by salesTaxLevel.Id"
+	                                                        ng-attr-tabindex="{{VendorModal.tabIndexValue + 30}}">
+	                                            </select>
+	                                       	</div> 
+	                                  	</div>
+	                                  	<div class="controls" id="SalesTaxLevel">
+		                                    	<i class="fa fa-question-circle"   data-toggle="tooltip" title="{{VendorModal.helpText['SalesTaxLevel']}}"></i>
+		                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('SalesTaxLevel')"></i>
+		                                    </div>
+	                               	</div>
+	                               	
+	                               	
+	                               	<div class="clearfix"></div>
+	                                -->
+	                                
+									<div class="option_field"  ng-show="VendorModal.AdditionalFieldsInfo.SalesPriceLevel.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>Sales Price Level</p>
+	                                  	</div>
+	                                    <div class="form_fields">
+	                                   		<div class="form-group half">
+	                                        	<select class="form-control" rel="SalesPriceLevel" id="salesPriceLevel" ng-model="VendorModal.SelectedSalesPriceLevel"    
+	                                        				ng-options="salesPriceLevel as salesPriceLevel.PriceLevelName for salesPriceLevel in VendorModal.SalesPriceLevel track by salesPriceLevel.Id"
+	                                                        ng-attr-tabindex="{{VendorModal.tabIndexValue + 31}}">
+	                                            </select>
+	                                       	</div>
+	                                  	</div>
+	                                  	<div class="controls" id="SalesPriceLevel">
+		                                    	<i class="fa fa-question-circle"   data-toggle="tooltip" title="{{VendorModal.helpText['SalesPriceLevel']}}"></i>
+		                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('SalesPriceLevel')"></i>
+		                                    </div>
+	                               	</div> 
+	                               	
+	                               	
+	                               	
+	                               	<div class="clearfix"></div>
+	                                
+									<div class="option_field"  ng-show="VendorModal.AdditionalFieldsInfo.ForeignCurrency.isPrimary">
+	                                	<div class="lable_fields">
+	                                    	<p>Foreign Currency</p>
+	                                  	</div>
+	                                    <div class="form_fields">
+	                                   		<div class="form-group half">
+	                                        	<select class="form-control" rel="ForeignCurrency" id="foreignCurrency" ng-model="VendorModal.SelectedForeignCurrency"   
+	                                        				ng-options="pricelevel as pricelevel.PriceLevelName for pricelevel in VendorModal.PriceLevel track by pricelevel.Id"
+	                                                        ng-attr-tabindex="{{VendorModal.tabIndexValue + 32}}">
+	                                            </select>
+	                                       	</div>
+	                                  	</div>
+	                                  	<div class="controls" id="ForeignCurrency">
+		                                    	<i class="fa fa-question-circle"   data-toggle="tooltip" title="{{VendorModal.helpText['ForiegnCurrency']}}"></i>
+		                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('ForeignCurrency')"></i>
+		                                    </div>
+	                               	</div>
+	                               	
+	                               	
+	                               	<div class="clearfix"></div>
+	                               	
+	                               	
+	                               	<div class="option_field" ng-show="VendorModal.AdditionalFieldsInfo.Active.isPrimary && VendorModal.IsEditMode">
+	                                    <div class="lable_fields">
+	                                        
+	                                        <p>Active</p>
+	                                    </div>
+	                                    <div class="form_fields">
+	                                        <div class="form-group onehalf"  > 
+	                                            <div class="chkbox_custom">
+	                                                <div class="leftchked " ng-class="{'checked' : VendorModal.VendorInfo.Active}"  id="activeVendor" ng-click="VendorModal.SetVendorActiveStatus(false)" rel="ActiveFlagIcon">
+	                                                    YES
+	                                                </div>
+	                                                <div class="rightchked"  ng-class="{'checked' : !VendorModal.VendorInfo.Active}"  id="inactiveVendor" ng-click="VendorModal.SetVendorActiveStatus(true)" rel="ActiveFlagIcon">
+	                                                    NO
+	                                                </div>
+	                                            </div>
+	                                        </div>
+	                                        
+	                                    </div>
+	                                     <div class="controls1 controls" id="ActiveFlagIcon">
+	                                        <i class="fa fa-question-circle"></i>
+	                                        <i class="fa fa-times" ng-click="VendorModal.ClearAndRemoveField('Active')"></i>
+	                                     </div> 
+	                                 </div>
+	                               	</form>
+	                      		</div>
+	                               	
+                              	<div class="clearfix"></div>
+                              	
+                              	<div class="addMoreInfoSection">
+                               	<button type="button" class="btn C11 T4 addmoreinfoBtn"
+                                       data-toggle="dropdown">{!$Label.Label_Add_More_Information}</button>
+                                   <ul class="add_info_dropdown dropdown-menu keep_open">
+                                       <div class="right-inner-addon" style="margin: 0 10px;">
+                                           <i class="glyphicon glyphicon-search"></i> <input
+                                               class="form-control ng-pristine ng-untouched ng-valid"
+                                               ng-model="VendorModal.AdditionalFieldsSearch"
+                                               placeholder="Search" type="search" />
+       
+                                       </div>
+       
+                                       <li
+                                           ng-repeat="(key,value) in FilterAdditionalFields(VendorModal.AdditionalFieldsInfo)"
+                                           ng-if="VendorModal.ManageAdditionalFields(key);"
+                                           ng-click="VendorModal.ShowAdditionalField(key)"><a
+                                           href="#">{{value.label}}</a></li>
+                                   </ul>
+                              </div>
+                              
+                              <div class="clearfix"></div>
+                               
+                               <div class="right_heading_container col-lg-12 col-md-12">
+                                        <div class="savecancle_btncntnr">
+                                            <button type="button" id="closemodal"
+                                                class="btn btn-default grayBtn"
+                                                ng-click="VendorModal.closePopup()"
+                                                ng-attr-tabindex="{{VendorModal.tabIndexValue + 204}}">{!$Label.Cancel_Label}</button>
+                                            <button type="button" class="btn btn-default greenBtn"
+                                                ng-click="VendorModal.SaveVendor()"
+                                                ng-attr-tabindex="{{VendorModal.tabIndexValue + 202}}">{!$Label.Save_Label}</button>
+                                        </div>
+                              </div>
+	                 	</div>
+	              	</div>
+	               
+                    <div class="clearfix"></div>
+	          	</div>              
+	      	</div>
+	   	</div>
+	</div>
+        
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        
+        $('.addmoreinfoBtn').click(function(){
+            if( $(this).hasClass('keep_open')){
+            }
+            else{
+                $('.dropdown-menu').addClass("keep_open");
+            }
+        });
+        
+        
+        
+        $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'}); 
+        
+        $(document).on('click', '.dropdown-menu', function(e) {
+            
+            $(this).hasClass('keep_open') && e.stopPropagation();
+            // This replace if conditional.
+        }); 
+       /*  $("#sameAsBA").click(function(){
+                alert($(this).hasClass("chked"));
+                if($(this).hasClass("chked") == true){
+                    $(this).removeClass("chked");
+                    $("#billingaddress").removeClass("hideit");
+                    $("#billingaddress").slideDown();
+                }else{
+                    $(this).addClass("chked");
+                    $("#billingaddress").addClass("hideit");
+                    $("#billingaddress").slideUp();
+                }
+        }) */
+        $(".form-control").focus(function(){
+            $('.controls').hide();  
+            $('#'+ $(this).attr('rel')).show();
+            
+        })
+
+        
+            $('#closemodal').click(function() {
+                $('#pop').modal('hide'); 
+            });
+        
+
+        /*var getleftheight = $(".right_heading_container").height() + $(".tabbtn_container").height() + $(".tabconainer").height();
+        $("#topsection").height(getleftheight - 30);*/
+    })
+</script>
+ 
+</apex:component>

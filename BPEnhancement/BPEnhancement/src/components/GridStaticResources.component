@@ -1,0 +1,23 @@
+<apex:component id="GridStaticResources">
+    
+    <!-- Common CSS files -->
+    <apex:stylesheet value="{!URLFOR($Resource.BP_Grid, 'css/kendo.common.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.BP_Grid, 'css/kendo.rtl.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.JQuery, 'css/jquery.dropdown.css')}"/>
+    
+    <!-- Theme styles -->
+    <!-- Bootstrap style -->
+    <apex:stylesheet value="{!URLFOR($Resource.BP_Grid, 'css/kendo.dataviz.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.BP_Grid_Theme, '/kendo.bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.BP_Grid_Theme, '/kendo.bootstrap.mobile.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.BP_Grid_Theme, '/kendo.dataviz.bootstrap.min.css')}"/>
+    
+    <!-- JS Include -->
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, 'js/jquery-1.10.2.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, 'js/jquery.collapse.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, 'js/jquery.collapse_storage.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, 'js/jquery.collapse_cookie_storage.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.BP_Grid, 'js/kendo.all.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, 'js/jquery.dropdown.js')}"/>
+    
+</apex:component>

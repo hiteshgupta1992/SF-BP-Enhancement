@@ -1,0 +1,1194 @@
+<apex:component controller="ViewKitCtrl">
+<c:NewPopupStyle />
+    <style>
+        .modal-content .kit_popup_container .popupinside .min_overflow{
+            height: 270px;
+            overflow: auto;
+            float: left;
+        }
+        .modal-content .kit_popup_container .popupinside .max_overflow{
+            height: 900px;
+            overflow: auto;
+            float: left;
+        }
+        
+        .modal-content .kit_popup_container .popupright{
+            min-height: 370px;
+        }  
+        
+        .modal-content .kit_popup_container .popupleft .goldbox .rightgoldbox{
+            width: 160px;
+        }
+        
+        .modal-content .kit_popup_container .popupleft .popupleft_container#topsection{
+            min-height: 0;
+        }
+        
+        .kit_popup_container .popupright .tabconainer form .controls1{
+            top: -45px;
+        }  
+        
+        .kit_popup_container .popupright .tabconainer form .form-group .txtbox:focus{
+            border: none;
+        }
+        
+        .kit_popup_container .popupright .tabconainer form .form-group .smschkbox .chk_tick{
+            margin-left: 0;
+        }
+        
+        .popupright .tabconainer .option_field .form_fields .WP	{
+         	width: 82%;	
+        }
+        
+        .popupright .tabconainer .option_field .controls .MTP	{
+        	margin-top: 12px;
+        }
+        
+        .popupright .tabconainer form .MTP30 {
+        	margin-top: 30px !important;
+        }
+    </style>
+    <script type="text/javascript">
+		
+        var addEditKitModule = angular.module("addEditKitModule",['ui-notification']);
+		
+		addEditKitModule.directive('ngEnter', function() {
+	        return function(scope, element, attrs) {
+	            element.bind("keydown keypress", function(event) {
+	                if(event.which === 13) {
+	                    scope.$apply(function(){
+	                        scope.$eval(attrs.ngEnter, {'event': event});
+	                    });
+	
+	                    event.preventDefault();
+	                }
+	            });
+	        };
+	    });
+        
+        addEditKitModule.controller("newEditKitCtrl", function($scope, AddEditKitService, Notification) {
+            
+            /****** Modals initialization ******/
+            if($scope.KitCompModal == undefined){
+                $scope.KitCompModal = {};
+            }
+            $scope.KitCompModal.KitModal = {};
+            $scope.KitCompModal.SimilarKits = [];
+            $scope.KitCompModal.tabIndexValue = 2000;
+            $scope.KitCompModal.setDefaultValidationModel = function() {
+                $scope.KitCompModal.KitFormValidationModal = {
+                    Code : {
+                        isError : false,
+                        ErrorMessage : '',
+                        Type : 'Required,Maxlength',
+                        Maxlength:50 
+                    },
+                    Description : { 
+                        isError : false,
+                        ErrorMessage : '',
+                        Type : 'Required'
+                    }
+                };
+            }
+            
+            $scope.KitCompModal.helpText = { Code : 'Kit Unique Code',
+                                                Description : 'Kit Description',
+                                                Concern : 'Specify the problem areas in the vehicle',
+                                                Cause : 'Specify the possible cause of the concern',
+                                                Correction : 'Specify the rectification action',
+                                                Make : 'Make of the vehicle',
+                                                Model : 'Model of the vehicle',
+                                                SubModel : 'SubModel of the vehicle'
+
+                                          };
+            
+            /****** Add/Edit Labour events ******/
+            $scope.$on('AddKitEvent', function () {   
+                //debug('In Component'); 
+                $scope.KitCompModal.openAddKitPopup();
+
+            });
+            
+            $scope.$on('EditKitEvent', function(event, kitInfo) {    
+                  $scope.KitCompModal.openEditkitPopup(kitInfo);
+            });
+            
+            
+            $scope.KitCompModal.openEditkitPopup = function(kitInfo){
+				kitInfo = angular.copy(kitInfo);
+                
+                $scope.KitCompModal.setDefaultValidationModel();
+                $scope.KitCompModal.KitMasterData = [];
+                $scope.KitCompModal.KitModal.TransactionTypeList = [];
+                AddEditKitService.getMasterData().then(function(masterData) {
+                    debug('masterData');
+                    debug(masterData);
+                    $scope.KitCompModal.KitMasterData = masterData;
+                    $scope.KitCompModal.UnitMakeList = $scope.KitCompModal.KitMasterData.UnitMakeList;
+                    //$scope.KitCompModal.KitModal.SelectedMake = $scope.KitCompModal.UnitMakeList[0];
+                    //$scope.KitCompModal.setModelOptions();
+                    //$scope.KitCompModal.KitMasterData.TransactionTypeList = [];
+                    $scope.KitCompModal.TransactionType = $scope.KitCompModal.KitMasterData.TransactionTypeList;
+
+                    
+                    debug(kitInfo);
+                    $scope.KitCompModal.isEditMode = true;
+                    $scope.KitCompModal.KitModal.Id = kitInfo.Id;
+                    $scope.KitCompModal.KitModal.Code = kitInfo.Code;
+                    $scope.KitCompModal.KitModal.Description = kitInfo.Description;
+                    $scope.KitCompModal.KitModal.CanItSplit = kitInfo.CanItSplit;
+                    $scope.KitCompModal.KitModal.IsServiceKit = kitInfo.IsServiceKit;
+                    $scope.KitCompModal.KitModal.NumberOfLabours = kitInfo.NumberOfLabours;
+
+                    $scope.KitCompModal.KitModal.Concern = kitInfo.Concern;
+                    $scope.KitCompModal.KitModal.Cause = kitInfo.Cause;
+                    $scope.KitCompModal.KitModal.Correction = kitInfo.Correction;
+                    
+                    $scope.KitCompModal.KitModal.TransactionTypeList = kitInfo.TransactionTypeList;
+                    debug('Make set');
+                    var makeObj = {UnitMakeName: kitInfo.MakeName, Id: kitInfo.MakeId};
+                    $scope.KitCompModal.SelectedMake = makeObj;
+
+                    $scope.KitCompModal.setModelOptions();
+                    var modelObj = {UnitModelName: kitInfo.ModelName, SubModelName: kitInfo.SubModelName, Id: kitInfo.SubModelId};
+                    var subModelObj = {UnitModelName: kitInfo.ModelName, SubModelName: kitInfo.SubModelName, Id: kitInfo.SubModelId};
+                    $scope.KitCompModal.SelectedModel = modelObj;
+                    $scope.KitCompModal.SelectedSubModel = subModelObj;
+                    
+                    $scope.KitCompModal.KitModal.IsActive = kitInfo.IsActive;
+                    $scope.KitCompModal.openPopup();
+
+                    setTimeout(function(){ 
+                        angular.element('#txtdescription').focus();
+                    }, 1000);
+                        
+                        
+                    
+                }, function(errorSearchResult) {
+                    
+                });
+            
+
+
+                
+                
+            }
+            
+            /****** Add/Edit Labour eventlisteners ******/
+            $scope.KitCompModal.openAddKitPopup = function () {
+                $scope.KitCompModal.clearAllData();
+                
+                //$scope.KitCompModal.getAndSetSystemDefaultCategory();
+                $scope.KitCompModal.openPopup();
+                setTimeout(function(){ 
+                	angular.element('#feeCodeInput').focus();
+                }, 1000);
+            }
+            
+            
+            // Open popup box
+            $scope.KitCompModal.openPopup = function() {
+                angular.element('.controls').hide(); 
+                angular.element('#addNewKit').modal({
+                    backdrop : 'static',
+                    keyboard : false
+                });
+            }
+            
+            // Close popup box
+            $scope.KitCompModal.closePopup = function() {
+                angular.element('#addNewKit').modal('hide');
+            }
+            
+            
+            $scope.KitCompModal.clearAllData = function () {
+                $scope.KitCompModal.isEditMode = false;
+                $scope.KitCompModal.KitModal = {};
+                $scope.KitCompModal.SimilarKits = [];
+                $scope.KitCompModal.LoadMasterData();
+                $scope.KitCompModal.setDataDefault();
+                
+            }
+            
+            // Set default data for new
+            $scope.KitCompModal.setDataDefault = function () {
+                $scope.KitCompModal.KitModal.CanItSplit = true;
+                $scope.KitCompModal.KitModal.IsServiceKit = false;
+                $scope.KitCompModal.KitModal.IsActive = true;
+                $scope.KitCompModal.KitModal.Code = null;
+                $scope.KitCompModal.KitModal.Description = null;
+                $scope.KitCompModal.KitModal.Concern = [];
+                $scope.KitCompModal.KitModal.Correction = [];
+                $scope.KitCompModal.KitModal.Cause = [];
+                $scope.KitCompModal.KitModal.TransactionTypeList = [];              
+
+                
+                $scope.KitCompModal.setDefaultValidationModel();
+                
+                var makeObj = {UnitMakeName: '', Id: null};
+                $scope.KitCompModal.SelectedMake = makeObj;
+                var modelObj = {UnitModelName: '', SubModelName: '', Id: null};
+                var subModelObj = {UnitModelName: '', SubModelName: '', Id: null};
+                $scope.KitCompModal.SelectedModel = modelObj;
+                $scope.KitCompModal.SelectedSubModel = subModelObj;     
+                //$scope.KitCompModal.setDefaultForNumberFields();
+            }
+            
+            $scope.KitCompModal.setModelOptions = function() {
+                debug('changed');
+                debug($scope.KitCompModal.SelectedMake);
+                if($scope.KitCompModal.SelectedMake == '' || $scope.KitCompModal.SelectedMake == null){
+                    $scope.KitCompModal.SelectedModel = '';
+                    $scope.KitCompModal.SelectedSubModel     = ''; 
+                }
+                $scope.KitCompModal.UnitModelList = $scope.KitCompModal.KitMasterData.UnitModelList[0].unitMakeNameToUnitModelMap[$scope.KitCompModal.SelectedMake.UnitMakeName];
+                $scope.KitCompModal.UnitSubModelList = $scope.KitCompModal.KitMasterData.UnitModelList[0].unitMakeNameToUnitModelMap[$scope.KitCompModal.SelectedMake.UnitMakeName];
+            }
+            
+            $scope.KitCompModal.isTransactionTypeSelected = function(ttModel){
+                for(var i = 0; i < $scope.KitCompModal.KitModal.TransactionTypeList.length; i++) {
+                    if(ttModel.TTName == $scope.KitCompModal.KitModal.TransactionTypeList[i].TTName) {
+                        return true;
+
+
+                    }
+                }
+                return false;
+            }
+            
+            $scope.KitCompModal.updateTTModel = function(rowNumber, ttModel) {
+                if($scope.KitCompModal.KitModal.TransactionTypeList == undefined) {
+                    $scope.KitCompModal.KitModal.TransactionTypeList = [];
+
+                }
+                var isExist = $scope.KitCompModal.isTransactionTypeSelected(ttModel);
+
+                
+                if(!isExist) {
+                    $scope.KitCompModal.KitModal.TransactionTypeList.push(ttModel);
+
+                }else{
+                    for(var i = 0; i < $scope.KitCompModal.KitModal.TransactionTypeList.length; i++) {
+                        if(ttModel.TTName == $scope.KitCompModal.KitModal.TransactionTypeList[i].TTName) {
+                            $scope.KitCompModal.KitModal.TransactionTypeList.splice(i, 1);
+
+
+
+
+                        }
+                    }
+                    
+                }
+                debug($scope.KitCompModal.KitModal.TransactionTypeList);
+            }
+            
+            $scope.KitCompModal.toggleServiceKit = function(){
+            	if($scope.KitCompModal.KitModal.IsServiceKit && $scope.KitCompModal.KitModal.NumberOfLabours > 0){
+            		Notification.error('Can\'t deselect because there is labour(s) in this kit');
+            		return;
+            	}
+            	$scope.KitCompModal.KitModal.IsServiceKit = !$scope.KitCompModal.KitModal.IsServiceKit;
+            	$scope.KitCompModal.resetServiceKitSection($scope.KitCompModal.KitModal.IsServiceKit);
+            }
+            
+            $scope.KitCompModal.resetServiceKitSection = function(isServiceKit) {
+                debug(isServiceKit);
+                if(!isServiceKit) {
+                    $scope.KitCompModal.KitModal.Concern = [];
+                    $scope.KitCompModal.KitModal.Correction = [];
+                    $scope.KitCompModal.KitModal.Cause = [];
+
+                    
+                    $scope.KitCompModal.NewConcern = '';
+                    $scope.KitCompModal.NewCorrection = '';
+                    $scope.KitCompModal.NewCause = '';
+                    $scope.KitCompModal.KitModal.TransactionTypeList = [];          
+
+                    
+                    var makeObj = {UnitMakeName: '', Id: null};
+                    $scope.KitCompModal.SelectedMake = makeObj;
+                    var modelObj = {UnitModelName: '', SubModelName: '', Id: null};
+                    var subModelObj = {UnitModelName: '', SubModelName: '', Id: null};
+                    $scope.KitCompModal.SelectedModel = modelObj;
+                    $scope.KitCompModal.SelectedSubModel = subModelObj;     
+                        
+                }else{
+                    for(var i = 0; i < $scope.KitCompModal.TransactionType.length; i++) {
+                        $scope.KitCompModal.KitModal.TransactionTypeList.push(angular.copy($scope.KitCompModal.TransactionType[i]));
+                    }
+                }
+                
+            }
+            
+            $scope.KitCompModal.adjustTabIndex = function(e){
+	            if(!$scope.KitCompModal.isEditMode()){
+		            if(e.which == 9){
+		           		$('#feeCodeInput').focus();
+	            		e.preventDefault();
+	            	}
+	           	}else{
+	           		angular.element('#txtdescription').focus();
+	           	}
+            	
+            }
+            
+            $scope.KitCompModal.clearFields = function(key, type){
+                if(type == 'value'){
+                    $scope.KitCompModal.KitModal[key] = '';
+                }else if(type == 'array'){
+                    $scope.KitCompModal.KitModal[key] = [];
+                    $scope.KitCompModal[$scope.multiInputModel[key]] = '';
+                }else if(type == 'dropdown'){
+                    $scope.KitCompModal[key] = '';
+                }
+                
+                if(key == 'SelectedMake'){
+                    $scope.KitCompModal.setModelOptions();
+                }
+                
+                debug('--'+key+'--');
+                 
+                if(key == 'Code' || key == 'Description'){
+                	$scope.KitCompModal.getSimilarKits(key);
+                }
+                
+            }
+            
+            // On click of Save button, save form data and close popup
+            $scope.KitCompModal.LoadMasterData = function() {
+                $scope.KitCompModal.KitMasterData = [];
+                AddEditKitService.getMasterData().then(function(masterData) {
+                    debug(masterData);
+                    $scope.KitCompModal.KitMasterData = masterData;
+                    $scope.KitCompModal.UnitMakeList = $scope.KitCompModal.KitMasterData.UnitMakeList;
+                    //$scope.KitCompModal.KitModal.SelectedMake = $scope.KitCompModal.UnitMakeList[0];
+                    //$scope.KitCompModal.setModelOptions();
+                    $scope.KitCompModal.TransactionType = $scope.KitCompModal.KitMasterData.TransactionTypeList;
+//                  for(var i = 0; i < $scope.KitCompModal.TransactionType.length; i++) {
+//                      $scope.KitCompModal.KitModal.TransactionTypeList.push(angular.copy($scope.KitCompModal.TransactionType[i]));
+
+//                  }
+                }, function(errorSearchResult) {
+                    
+                });
+            }
+            
+            $scope.KitCompModal.validateForm = function () {
+                angular.forEach($scope.KitCompModal.KitFormValidationModal, function(value, key) {
+                    debug(key + ' : ' + value);
+                    $scope.KitCompModal.validateFieldWithKey(key);
+                });
+            }
+            
+            $scope.KitCompModal.validateFieldWithKey = function (modelKey) {
+                var fieldValue = $scope.KitCompModal.KitModal[modelKey];
+                var validateType = $scope.KitCompModal.KitFormValidationModal[modelKey].Type;
+                var isError = false;
+                var ErrorMessage = ''; 
+                
+                
+                if(validateType.indexOf('Maxlength') > -1){
+                     if(fieldValue != undefined && fieldValue!= '' && fieldValue.length > $scope.KitCompModal.KitFormValidationModal[modelKey].Maxlength){
+                          isError = true;
+                          ErrorMessage = 'Max length should be '+ $scope.KitCompModal.KitFormValidationModal[modelKey].Maxlength;
+					 }
+                }
+                
+                 
+                if (validateType.indexOf('Required') > -1) {
+                    if(fieldValue == undefined || fieldValue == null || fieldValue == ''){
+                        isError = true;
+                        ErrorMessage = 'Field is Required';
+                    }
+                }
+                
+                 $scope.KitCompModal.KitFormValidationModal[modelKey].isError = isError;
+                 $scope.KitCompModal.KitFormValidationModal[modelKey].ErrorMessage = ErrorMessage;
+                
+                debug($scope.KitCompModal.KitFormValidationModal[modelKey].isError);
+                debug($scope.KitCompModal.KitFormValidationModal[modelKey].ErrorMessage);
+
+                
+                // Set validation flag value
+                if($scope.KitCompModal.KitFormValidationModal[modelKey].isError == true){
+                    $scope.KitCompModal.isValidForm = false;
+                }
+            }
+            
+            // On click of Save button, save form data and close popup
+            $scope.KitCompModal.SaveKitForm = function(event) {
+                // By default set valid flag to true before starting validation
+                $scope.KitCompModal.isValidForm = true;
+                
+                // Validate form
+                $scope.KitCompModal.validateForm();
+                
+                if(!$scope.KitCompModal.isValidForm) {
+                    //Notification.error('Please Review Error(s) before saving form');
+                    return;
+                }
+                
+                
+               
+                for(var i=0; i<$scope.KitCompModal.SimilarKits.length; i++){
+                    if($scope.KitCompModal.SimilarKits[i].PriorityValue == 1){
+                        Notification.error('Similar Kit record already present.');
+                        return;
+                    }
+                }
+                
+                $scope.KitCompModal.saveKitData();   
+            }
+            
+            
+            // On click of Save button, save form data and close popup
+            $scope.KitCompModal.saveKitData = function() {
+                debug($scope.KitCompModal.SelectedModel);
+                debug($scope.KitCompModal.SelectedSubModel);
+                if($scope.KitCompModal.SelectedMake != null && $scope.KitCompModal.SelectedMake != undefined) {
+                    $scope.KitCompModal.KitModal.MakeId = $scope.KitCompModal.SelectedMake.Id;
+
+                }
+                if($scope.KitCompModal.SelectedModel != null && $scope.KitCompModal.SelectedModel != undefined) {
+                    $scope.KitCompModal.KitModal.ModelId = $scope.KitCompModal.SelectedModel.Id;
+
+                }
+                if($scope.KitCompModal.SelectedSubModel != null && $scope.KitCompModal.SelectedSubModel != undefined) {
+                    $scope.KitCompModal.KitModal.SubModelId = $scope.KitCompModal.SelectedSubModel.Id;
+
+                }
+                debug('Before Save');
+                debug($scope.KitCompModal.KitModal);
+                AddEditKitService.saveKitInfo($scope.KitCompModal.KitModal).then(function(kitRec) {
+                    debug('Save');
+                    debug(kitRec.KitHeaderRec.Id);
+                    // If parent page has save callback method, then perform the method and close popup
+                    if($scope.$parent.kitRecordSaveCallback != undefined && $scope.KitCompModal.isEditMode){
+                        $scope.$parent.kitRecordSaveCallback(kitRec.KitHeaderRec);
+                        Notification.success('Kit Saved Successfully');
+                    }else{
+                    	Notification.success('Kit Saved Successfully');
+                    	var child = window.open("{!$Page.viewKit}?id="+kitRec.KitHeaderRec.Id);
+                    	if(child == undefined ){
+                    		Notification.warning('Allow pop-ups from browser settings');
+                    	} else {
+                    		child.opener.focus(); 
+                    	}
+                    	 
+                    }
+                    $scope.KitCompModal.closePopup();  
+                }, function(errorSearchResult) {
+                    Notification.error(errorSearchResult);
+                });
+            }
+            
+            // Get Similar Kits
+            $scope.KitCompModal.getSimilarKits = function(modelKey) {
+                var fieldValue = $scope.KitCompModal.KitModal[modelKey];
+                $scope.KitCompModal.SimilarKits = {};
+                debug('Model'+modelKey);
+                debug($scope.KitCompModal.KitModal[modelKey]);
+                if((($scope.KitCompModal.KitModal['Code'] == '' || $scope.KitCompModal.KitModal['Code'] == null) 
+                		&& ($scope.KitCompModal.KitModal['Description'] == null || $scope.KitCompModal.KitModal['Description'] == '')) 
+                	|| $scope.KitCompModal.isEditMode) {
+                    return;
+                }
+                AddEditKitService.getSimilarKits($scope.KitCompModal.KitModal).then(function(similarKits) {
+                    debug(similarKits);
+                    $scope.KitCompModal.SimilarKits = similarKits;
+                    debug($scope.KitCompModal.SimilarKits);
+                    //$scope.KitCompModal.closePopup();
+                }, function(errorSearchResult) {
+                    
+                });
+            }
+            
+            
+            
+            // Remove 
+            $scope.KitCompModal.removeFromMultiSelect = function(event, index, modelKey) {
+                $scope.KitCompModal.KitModal[modelKey].splice(index, 1);
+            }
+
+            
+            $scope.multiInputModel = {
+                                        'Concern' : 'NewConcern',
+                                        'Cause' : 'NewCause',
+                                        'Correction' : 'NewCorrection'
+
+
+                };
+            
+            /* add in mydata*/
+            $scope.KitCompModal.addAndRemoveFromMultiSelect = function (event, modelKey) {
+                var isAlreadyExist = false;
+                var fieldValue = $scope.KitCompModal.KitModal[modelKey];
+                if((event.keyCode == 13 || event.keyCode == 9) && $scope.KitCompModal[$scope.multiInputModel[modelKey]] != '' && $scope.KitCompModal[$scope.multiInputModel[modelKey]] != undefined) {
+                    debug('Testtttttttttt');
+                    debug($scope.KitCompModal.KitModal[modelKey][0]);
+
+                    
+                    for(var i=0; i<$scope.KitCompModal.KitModal[modelKey].length; i++){
+                        if($scope.KitCompModal.KitModal[modelKey][i] == $scope.KitCompModal[$scope.multiInputModel[modelKey]]){
+                            isAlreadyExist = true; 
+                            Notification.error('Same '+ modelKey +' Already Exist');
+
+
+
+                        }
+                    }
+                    
+                    if(!isAlreadyExist){
+                        $scope.KitCompModal.KitModal[modelKey].push($scope.KitCompModal[$scope.multiInputModel[modelKey]]);
+
+
+                    }
+                    
+                    $scope.KitCompModal[$scope.multiInputModel[modelKey]] = '';
+                    debug($scope.KitCompModal[$scope.multiInputModel[modelKey]]);
+                }
+             
+                /*remove using backspace */
+                var length = fieldValue.length;
+                if(event.keyCode === 8 && ($scope.KitCompModal[$scope.multiInputModel[modelKey]] == undefined || $scope.KitCompModal[$scope.multiInputModel[modelKey]] == '')) {
+                    $scope.KitCompModal.KitModal[modelKey].splice(length-1, 1);
+                }
+            }
+        });
+        
+        
+        // START: Services definition for Kit component
+        addEditKitModule.service("AddEditKitService", function ($q) {
+                        
+            // Save method for Part record
+            this.saveKitInfo = function(kitRecordJSON)
+            {
+            	kitRecordJSON = encodeString(angular.toJson(kitRecordJSON));
+            	activeOrderPageSortAttrsJSON = encodeString('{}');
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.ViewKitCtrl.saveKitHeader}', kitRecordJSON, activeOrderPageSortAttrsJSON,
+                    function (result, event) {
+                       if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var kitRecord = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            kitRecord = kitRecord.replace(re, '');
+                            deferred.resolve(JSON.parse(kitRecord));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+            }
+            
+            // get Similar Kit Records
+            this.getSimilarKits = function(kitRecordJSON)
+            {
+            	kitRecordJSON = encodeString(angular.toJson(kitRecordJSON));
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.ViewKitCtrl.getSimilarKits}', kitRecordJSON,
+                    function (result, event) {
+                       if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var similarKitRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            similarKitRec = similarKitRec.replace(re, '');
+                            deferred.resolve(JSON.parse(similarKitRec));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+            }
+            
+            // Get Master Data for PopUp
+            this.getMasterData = function() {
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.ViewKitCtrl.getMasterDataForKitCreation}',
+                    function (result, event) {
+                       if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var kitRecord = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            kitRecord = kitRecord.replace(re, '');
+                            deferred.resolve(JSON.parse(kitRecord));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+            }
+
+        })
+    </script>
+
+    <div id="addNewKit" class="modal fade" role="dialog" ng-controller="newEditKitCtrl">
+        <div class="modal-dialog" ng-class="{'edit_modal-dialog' : KitCompModal.isEditMode == true}">
+            <!-- Modal content-->
+            <div class="modal-content col-md-12">
+                <div class="modal-body popup_container kit_popup_container">
+                    <div class="popupinside">
+                        
+                        <!-- popup left start here -->
+                        <div class="col-md-4 popupleft" ng-show="KitCompModal.isEditMode != true">
+                            <div class="popupleft_container" id="topsection">
+                                <h1 class="letpanel_heading"> Existing Kits Like This </h1>
+                                <i class="fa fa-question-circle helptip" 
+                                    style="float: left; font-weight: bold; color: #B7BEC6; margin-top: 20px; margin-bottom: 10px; font-size: 20px;"></i>
+                                <div ng-class="{'min_overflow': KitCompModal.KitModal.IsServiceKit != true , 'max_overflow': KitCompModal.KitModal.IsServiceKit == true}">
+                                    <div class="goldbox col-lg-12 col-md-12" ng-repeat="kit in KitCompModal.SimilarKits">
+                                        <!-- <div class="leftgoldbox">
+                                            <img class="starimg" src="{!URLFOR($Resource.Images, 'star.png')}" />
+                                            <div class="star_container">
+                                                <i class="fa fa-star" style="float: left; color: #B7BEC6; margin-top: 5px; font-size: 15px;"></i>
+                                                <i class="fa fa-star" style="float: left; color: #B7BEC6; margin-top: 5px; font-size: 15px;"></i>
+                                            </div>
+                                        </div> -->
+
+                                        <div class="rightgoldbox rightgoldboxML" id="CustomerSugesstionDiv" style="margin-left: 0px;">
+
+                                            <div>
+                                                <p class="cust_name">{{kit.Code}}</p>
+                                                <p>Description : {{kit.Description}}</p>
+
+                                                <p>Can it be Split : 
+                                                    <span ng-if="kit.CanItSplit"> Yes </span> 
+                                                    <span ng-if="!kit.CanItSplit"> No </span>
+
+
+                                                </p>
+                                                <p>Service Kit : 
+                                                    <span ng-if="kit.IsServiceKit"> Yes </span> 
+                                                    <span ng-if="!kit.IsServiceKit"> No </span>
+
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <!-- popup left end here -->
+
+
+                        <!--  new kit user start here -->
+                        <div class="popupright" ng-class="{'col-lg-8 col-md-8': KitCompModal.isEditMode == false , 'leftBorderNone  col-lg-12 col-md-12': KitCompModal.isEditMode == true}">
+                            <div class="right_heading_container col-md-12">
+                                <h1 class="right_panel_heading" ng-if="!KitCompModal.isEditMode"> New Kit </h1>
+                                <h1 class="right_panel_heading" ng-if="KitCompModal.isEditMode">  Edit Kit  </h1>
+                                <div class="savecancle_btncntnr">
+                                    <button type="button" id="closemodal" class="btn btn-default grayBtn" 
+                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 17}}" 
+                                        ng-click="KitCompModal.closePopup()"> Cancel </button>
+                                    <button type="button" class="btn btn-default greenBtn" 
+                                    	ng-keydown = "KitCompModal.adjustTabIndex($event);"
+                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 18}}" 
+                                        ng-click="KitCompModal.SaveKitForm()"> Save </button>
+                                </div>
+                            </div>
+
+                            <div class="tabconainer">
+                                <form>
+                                    <div class="clearfix"></div>
+                                    <div class="option_field">
+                                        <div class="lable_fields">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p class="req-label">Code</p>
+                                        </div>
+                                        <div class="form_fields">
+                                            <div class="form-group MB WP">
+                                                <input type="text" class="form-control" id="feeCodeInput" ng-model="KitCompModal.KitModal.Code" 
+                                                        placeholder="Code" rel="kitCode" ng-disabled="KitCompModal.isEditMode"
+                                                        maxlength="255" ng-blur="KitCompModal.validateFieldWithKey('Code'); KitCompModal.getSimilarKits('Code');" 
+                                                        ng-class="{'redborder' : KitCompModal.KitFormValidationModal['Code']['isError'] == true}"
+                                                        data-toggle="tooltip" title="{{KitCompModal.KitFormValidationModal['Code']['ErrorMessage']}}"
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 1}}"/>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="controls1 controls" id="kitCode">
+                                                <i class="fa fa-question-circle MTP" data-toggle="tooltip" title="{{KitCompModal.helpText['Code']}}"></i> 
+                                                <i class="fa fa-times" 
+                                                    ng-click="KitCompModal.clearFields('Code','value');"></i>
+                                        </div>
+                                    </div>
+                                    
+                                   
+                                    
+                                    
+                                    
+                                    <div class="clearfix"></div>
+                                    
+                                    <div class="option_field">
+                                        <div class="lable_fields">
+                                            <!-- <span class="form_lable_icons text"> 100 </span> -->
+                                            <span class="form_lable_icons text" style="background: none;"></span>
+                                            <p class="req-label"> Description </p>
+                                        </div>
+                                        <div class="form_fields">
+                                            <div class="form-group MB WP">
+                                                <input type="text" class="form-control" id="txtdescription" ng-model="KitCompModal.KitModal.Description" placeholder="Description" rel="kitDescription" 
+                                                        ng-blur="KitCompModal.validateFieldWithKey('Description'); KitCompModal.getSimilarKits('Description');" ng-class="{'redborder' : KitCompModal.KitFormValidationModal['Description']['isError'] == true}"
+                                                        data-toggle="tooltip" title="{{KitCompModal.KitFormValidationModal['Description']['ErrorMessage']}}"
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 2}}"/>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="controls1 controls" id="kitDescription">
+                                                <i class="fa fa-question-circle MTP" data-toggle="tooltip" title="{{KitCompModal.helpText['Description']}}"></i> 
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('Description','value');"></i>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    
+                                    <div class="option_field">
+                                        <div class="lable_fields">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p> Can it be split </p>
+                                        </div>
+                                        <div class="form_fields">
+                                            <div class="form-group large">
+                                                <label class="checkbox smschkbox"> 
+                                                    <span class="chk_tick" ng-class="{'chked': KitCompModal.KitModal.CanItSplit == true}"
+                                                    	ng-attr-tabindex="{{KitCompModal.tabIndexValue + 3}}"
+                                                    	ng-enter="KitCompModal.KitModal.CanItSplit = !KitCompModal.KitModal.CanItSplit" 
+                                                    	ng-click="KitCompModal.KitModal.CanItSplit = !KitCompModal.KitModal.CanItSplit"> 
+                                                        <i class="fa fa-check-square chksqure"></i>
+
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    
+                                    
+                                    <div class="option_field">
+                                        <div class="lable_fields">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p> Service Kit </p>
+                                        </div>
+                                        <div class="form_fields">
+                                            <div class="form-group large">
+                                                <label class="checkbox smschkbox"> 
+                                                    <span class="chk_tick" ng-class="{'chked': KitCompModal.KitModal.IsServiceKit}"
+                                                    	ng-attr-tabindex="{{KitCompModal.tabIndexValue + 4}}"
+                                                    	ng-enter="KitCompModal.toggleServiceKit();" 
+                                                    	ng-click="KitCompModal.toggleServiceKit();"> 
+                                                        <i class="fa fa-check-square chksqure"></i>
+
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                               	
+                               		<div class="option_field" ng-show="KitCompModal.isEditMode">
+                                        <div class="lable_fields">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p> Active </p>
+                                        </div>
+                                        <div class="form_fields">
+                                            <div class="form-group large">
+                                                <label class="checkbox smschkbox"> 
+                                                    <span class="chk_tick" ng-class="{'chked': KitCompModal.KitModal.IsActive}" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 5}}"
+                                                    ng-enter="KitCompModal.KitModal.IsActive = !KitCompModal.KitModal.IsActive;" 
+                                                    ng-click="KitCompModal.KitModal.IsActive = !KitCompModal.KitModal.IsActive;"> 
+                                                        <i class="fa fa-check-square chksqure"></i>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                               
+                               
+                                </form>
+                            </div>
+
+
+                            <div class="tabconainer BTPT" ng-show="KitCompModal.KitModal.IsServiceKit">
+                                <form>
+                                    <div class="clearfix"></div>
+                                    
+                                     <!-- Start: updated by pooja -->
+                                   <div class="option_field">
+                                         <div class="lable_fields" style="margin-top: 25px;">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p> Service Need </p>
+                                        </div> 
+                                        <div class="form_fields MT">
+                                            <div class="form-group large MB">
+                                                <p> Concern </p>
+                                                <div class="multiselect">
+                                                    <div ng-repeat="value in KitCompModal.KitModal.Concern track by $index">
+                                                        <span> 
+
+                                                            {{value}} 
+                                                            <i class="fa fa-times" ng-click="KitCompModal.removeFromMultiSelect($event, $index, 'Concern')"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="txtbox form-control" id="txtconcern" ng-model="KitCompModal.NewConcern" 
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 6}}" 
+                                                        placeholder="Add Item" rel="Concern" ng-keydown="KitCompModal.addAndRemoveFromMultiSelect($event, 'Concern');" />
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="controls MTP30" id="Concern">
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Concern']}}"></i>
+                                            <i class="fa fa-times"
+                                                ng-click="KitCompModal.clearFields('Concern','array');"></i>
+                                        </div>
+                                    </div>
+									<div class="option_field">
+                                        <div class="form_fields MT">
+                                            <div class="form-group large MB">
+                                                <p> Cause </p>
+                                                <div class="multiselect">
+                                                    <div ng-repeat="value in KitCompModal.KitModal.Cause track by $index">
+                                                        <span> 
+
+                                                            {{value}} 
+                                                            <i class="fa fa-times" ng-click="KitCompModal.removeFromMultiSelect($event, $index, 'Cause')"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="txtbox form-control" id="txtcause" ng-model="KitCompModal.NewCause" 
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 7}}" 
+                                                        placeholder="Add Item" rel="Cause" ng-keydown="KitCompModal.addAndRemoveFromMultiSelect($event, 'Cause');" />
+                                                </div>
+                                            </div>
+
+                                            
+                                        </div>
+                                        <div class="controls MTP30" id="Cause">
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Cause']}}"></i>
+                                            <i class="fa fa-times"
+                                                ng-click="KitCompModal.clearFields('Cause','array');"></i>
+                                        </div>
+                                     </div>
+                                     <div class="option_field">
+
+                                        <div class="form_fields MT">
+                                            <div class="form-group large MB">
+                                                <p> Correction </p>
+                                                <div class="multiselect">
+                                                    <div ng-repeat="value in KitCompModal.KitModal.Correction track by $index">
+                                                        <span> 
+
+                                                            {{value}} 
+                                                            <i class="fa fa-times" ng-click="KitCompModal.removeFromMultiSelect($event, $index, 'Correction')"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="txtbox form-control" id="txtcorrection" ng-model="KitCompModal.NewCorrection"
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 8}}"  
+                                                        placeholder="Add Item" rel="Correction" ng-keydown="KitCompModal.addAndRemoveFromMultiSelect($event, 'Correction');" />
+                                                </div>
+                                            </div>
+                                            
+                                            
+                                        </div>
+                                        <div class="controls MTP30" id="Correction">
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Correction']}}"></i>
+                                            <i class="fa fa-times"
+                                                ng-click="KitCompModal.clearFields('Correction','array');"></i>
+                                        </div>
+                                    </div>  
+                                    
+                                     <!-- Start: Commented by pooja -->
+                                 <!-- <div class="option_field">
+                                         <div class="lable_fields" style="margin-top: 25px;">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p> Service Need </p>
+                                        </div> 
+                                        <div class="form_fields MT">
+                                            <div class="form-group large MB">
+                                                <p> Concern </p>
+                                                <div class="multiselect">
+                                                    <div ng-repeat="value in KitCompModal.KitModal.Concern track by $index">
+                                                        <span> 
+
+                                                            {{value}} 
+                                                            <i class="fa fa-times" ng-click="KitCompModal.removeFromMultiSelect($event, $index, 'Concern')"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="txtbox form-control" id="txtconcern" ng-model="KitCompModal.NewConcern" 
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 6}}" 
+                                                        placeholder="Add Item" rel="Concern" ng-keydown="KitCompModal.addAndRemoveFromMultiSelect($event, 'Concern');" />
+                                                </div>
+                                            </div>
+                                            <div class="controls1 controls" id="Concern">
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Concern']}}"></i>
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('Concern','array');"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="form_fields MT">
+                                            <div class="form-group large MB">
+                                                <p> Cause </p>
+                                                <div class="multiselect">
+                                                    <div ng-repeat="value in KitCompModal.KitModal.Cause track by $index">
+                                                        <span> 
+
+                                                            {{value}} 
+                                                            <i class="fa fa-times" ng-click="KitCompModal.removeFromMultiSelect($event, $index, 'Cause')"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="txtbox form-control" id="txtcause" ng-model="KitCompModal.NewCause" 
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 7}}" 
+                                                        placeholder="Add Item" rel="Cause" ng-keydown="KitCompModal.addAndRemoveFromMultiSelect($event, 'Cause');" />
+                                                </div>
+                                            </div>
+
+                                            <div class="controls1 controls" id="Cause">
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Cause']}}"></i>
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('Cause','array');"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="form_fields MT">
+                                            <div class="form-group large MB">
+                                                <p> Correction </p>
+                                                <div class="multiselect">
+                                                    <div ng-repeat="value in KitCompModal.KitModal.Correction track by $index">
+                                                        <span> 
+
+                                                            {{value}} 
+                                                            <i class="fa fa-times" ng-click="KitCompModal.removeFromMultiSelect($event, $index, 'Correction')"></i>
+                                                        </span>
+                                                    </div>
+                                                    <input type="text" class="txtbox form-control" id="txtcorrection" ng-model="KitCompModal.NewCorrection"
+                                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 8}}"  
+                                                        placeholder="Add Item" rel="Correction" ng-keydown="KitCompModal.addAndRemoveFromMultiSelect($event, 'Correction');" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="controls1 controls" id="Correction">
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Correction']}}"></i>
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('Correction','array');"></i>
+                                            </div>
+                                        </div>
+                                    </div>  -->
+                                     <!-- End: Commented by pooja -->
+                                     <!-- End: updated by pooja -->
+                                    
+                                    <div class="clearfix"></div>
+                                    
+                                    
+                                    <div class="option_field MT20">
+                                        <div class="lable_fields">
+                                            <span class="form_lable_icons text hiddenfield"> </span>
+                                            <p>Transaction Type</p>
+                                        </div>
+                                        <div class="form_fields" ng-repeat="tt in KitCompModal.TransactionType">
+                                            <div class="form-group large" ng-click="KitCompModal.updateTTModel($index, tt);">
+                                                <label class="checkbox smschkbox"> 
+                                                    <span class="chk_tick" 
+                                                    	ng-attr-tabindex="{{KitCompModal.tabIndexValue + 9 + $index}}" 
+                                                    	ng-enter="KitCompModal.updateTTModel($index, tt);"
+                                                    	ng-class="{'chked': KitCompModal.isTransactionTypeSelected(tt)}" id="tt{{$index}}" > 
+                                                        <i class="fa fa-check-square chksqure"></i>
+
+                                                    </span>
+                                                    <p style="cursor: pointer;">{{tt.TTName}}</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    
+                                     <!-- Start: updated by pooja -->
+                                     <div class="option_field MT20">
+                                        <div class="lable_fields" style="margin-top: 25px;">
+                                            <!-- <span class="form_lable_icons text">100 </span> -->
+                                             <span class="form_lable_icons text" style="background: none;"></span>
+                                            <p>Applies To</p>
+                                        </div>
+                                        <div class="form_fields MT">
+                                            <div class="form-group haff MB ">
+                                                <p>Make</p>
+                                                <select class="form-control" id="make" ng-model="KitCompModal.SelectedMake" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 12}}" rel="kitAppliesToMake"  
+                                                    ng-change="KitCompModal.setModelOptions();"
+                                                    ng-options="make as make.UnitMakeName for make in KitCompModal.UnitMakeList track by make.Id">
+                                                </select>
+                                            </div>
+                                            
+                                            
+                                        </div>
+                                        <div class="controls MTP30"  id="kitAppliesToMake">
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Make']}}"></i>
+                                            <i class="fa fa-times"
+                                                ng-click="KitCompModal.clearFields('SelectedMake','dropdown');"></i>
+                                        </div>
+                                    </div>
+									<div class="option_field">
+									
+                                        <div class="form_fields MT">
+                                            <div class="form-group haff MB">
+                                                <p> Model </p>
+                                                <select class="form-control" id="model" ng-model="KitCompModal.SelectedModel" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 13}}" rel="kitAppliesToModel"  
+                                                    ng-options="model as model.UnitModelName for model in KitCompModal.UnitModelList track by model.Id">
+                                                </select>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="controls MTP30"  id="kitAppliesToModel">
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Model']}}"></i>
+                                            <i class="fa fa-times"
+                                                ng-click="KitCompModal.clearFields('SelectedModel','dropdown');"></i>
+                                        </div>
+                                            
+                                        
+									</div>
+									<div class="option_field">
+                                        <div class="form_fields MT" style="margin-bottom: 20px;">
+                                            <div class="form-group haff MB ">
+                                                <p> Sub Model </p>
+                                                <select class="form-control" id="submodel" ng-model="KitCompModal.SelectedSubModel" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 14}}" rel="kitAppliesToSubModel"  
+                                                    ng-options="submodel as submodel.SubModelName for submodel in KitCompModal.UnitSubModelList track by submodel.Id">
+                                                </select>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="controls MTP30"  id="kitAppliesToSubModel">
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['SubModel']}}"></i>
+                                            <i class="fa fa-times"
+                                                ng-click="KitCompModal.clearFields('SelectedSubModel','dropdown');"></i>
+                                        </div>
+                                    </div> 
+                                    <!-- Start: Commented by pooja -->
+                                    <!-- <div class="option_field MT20">
+                                        <div class="lable_fields" style="margin-top: 25px;">
+                                            <span class="form_lable_icons text">100 </span>
+                                            <p>Applies To</p>
+                                        </div>
+                                        <div class="form_fields MT">
+                                            <div class="form-group haff MB ">
+                                                <p>Make</p>
+                                                <select class="form-control" id="make" ng-model="KitCompModal.SelectedMake" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 12}}" rel="kitAppliesToMake"  
+                                                    ng-change="KitCompModal.setModelOptions();"
+                                                    ng-options="make as make.UnitMakeName for make in KitCompModal.UnitMakeList track by make.Id">
+                                                </select>
+                                            </div>
+                                            <div class="controls" style="top:28px; right:-37%;" id="kitAppliesToMake">
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Make']}}"></i>
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('SelectedMake','dropdown');"></i>
+                                            </div>
+                                            
+                                        </div>
+
+                                        <div class="form_fields MT">
+                                            <div class="form-group haff MB">
+                                                <p> Model </p>
+                                                <select class="form-control" id="model" ng-model="KitCompModal.SelectedModel" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 13}}" rel="kitAppliesToModel"  
+                                                    ng-options="model as model.UnitModelName for model in KitCompModal.UnitModelList track by model.Id">
+                                                </select>
+                                            </div>
+                                            <div class="controls" style="top:28px; right:-37%;" id="kitAppliesToModel">
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['Model']}}"></i>
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('SelectedModel','dropdown');"></i>
+                                            </div>
+                                            
+                                        </div>
+
+                                        <div class="form_fields MT" style="margin-bottom: 20px;">
+                                            <div class="form-group haff MB ">
+                                                <p> Sub Model </p>
+                                                <select class="form-control" id="submodel" ng-model="KitCompModal.SelectedSubModel" 
+                                                    ng-attr-tabindex="{{KitCompModal.tabIndexValue + 14}}" rel="kitAppliesToSubModel"  
+                                                    ng-options="submodel as submodel.SubModelName for submodel in KitCompModal.UnitSubModelList track by submodel.Id">
+                                                </select>
+                                            </div>
+                                            <div class="controls" style="top:28px; right:-37%;" id="kitAppliesToSubModel">
+                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="{{KitCompModal.helpText['SubModel']}}"></i>
+                                                <i class="fa fa-times"
+                                                    ng-click="KitCompModal.clearFields('SelectedSubModel','dropdown');"></i>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <!-- End: Commented by pooja -->
+                                     <!-- End: updated by pooja -->
+                                </form>
+                            </div>
+                                    
+                            
+                            <div class="right_heading_container col-md-12">
+                                <div class="savecancle_btncntnr">
+                                    <button type="button" id="closemodal" class="btn btn-default grayBtn"
+                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 15}}" 
+                                        ng-click="KitCompModal.closePopup()"> Cancel </button>
+                                    <button type="button" class="btn btn-default greenBtn" 
+                                        ng-attr-tabindex="{{KitCompModal.tabIndexValue + 16}}" 
+                                        ng-click="KitCompModal.SaveKitForm()"> Save </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!--  new kit user End here -->
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    /*jquery Code */
+    $(document).ready(function(){
+
+    
+        $('.controls').hide();  
+        $(".form-control").focus(function(){
+            //debug('form-control focus');
+            $('.controls').hide(); 
+            debug($(this).attr('rel')) ;
+            $('#'+ $(this).attr('rel')).css('display','block'); 
+
+            if($( this ).hasClass( "txtbox" )){
+                $(".multiselect").css("border","1px solid #ccc");
+                $(this).parent().css("border","2px solid #00AEEF");
+
+            }
+            else{
+                $(".multiselect").css("border","1px solid #ccc");
+
+            }
+
+
+
+        })  
+            
+            $(document).on("mouseenter", ".multiselect span", function() {
+                $(this).find("i").css("display","block");
+
+            });
+             $(document).on("mouseleave", ".multiselect span", function() {
+             console.log("display none")
+                $(this).find("i").css("display","none");
+
+            });
+    })
+    </script>
+
+</apex:component>

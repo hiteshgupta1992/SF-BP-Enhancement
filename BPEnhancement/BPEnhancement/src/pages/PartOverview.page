@@ -1,0 +1,64 @@
+<apex:page showHeader="false" sidebar="false" controller="PartOverviewCtrl_Kendo">
+
+<!-- CSS and JS components -->
+
+
+ <body>
+        <br/>	
+  <div id="{!JSENCODE(partPN)}PartTabstrip" class="tabstrip-vertical"  >
+			            <ul>
+			                <li class="k-state-active">Part Details</li>
+			                <li >Chatter Feeds</li>
+			                <li >Alternate Parts</li>
+			                <li >Sales Transactions</li>
+			                <li >Service Transactions</li>
+			                <li >Purchase Order</li>
+			                <li >tax Exemptions</li>
+			            </ul> 
+				            <div>
+				                <div id="PartDetails"  style="margin-left:15%; height: 580px; width:85%">
+				                    	<c:PartDetailForm uniqueId="{!JSENCODE(partPN)}"  PartId="{!JSENCODE(PartId)}"/>
+				                </div>
+				            </div>
+				            <div> 
+				                <div id="chatterFeed" style="height: 515px;">
+				                   
+				                </div>
+				            </div>
+				            <div>
+				                <div id="alternateParts" style="height: 515px;">
+				                    
+				                </div>
+				            </div>
+				            <div>
+				                <div id="partSalesTransactions" style="height: 515px;">
+				                    
+				                </div>
+				            </div>
+				            <div>
+				                <div id="serviceTransactions" style="height: 515px;">
+				                    
+				                </div>
+				            </div>
+				            <div>
+				                <div id="partPurchaseOrders" style="height: 515px;">
+				                    
+				                </div>
+				            </div>
+				            <div>
+				                <div id="taxExemptions" style="height: 515px;">
+				                    
+				                </div>
+				            </div>
+			         </div>
+		    
+		</body>
+							         <script>
+							        var {!JSENCODE(partPN)}partGridTabPanel = $("#{!JSENCODE(partPN)}PartTabstrip").kendoTabStrip({
+							        	animation: false
+							        }).data("kendoTabStrip");
+							       
+							        {!JSENCODE(partPN)}partGridTabPanel.select(0);
+							    </script>
+		   
+</apex:page>

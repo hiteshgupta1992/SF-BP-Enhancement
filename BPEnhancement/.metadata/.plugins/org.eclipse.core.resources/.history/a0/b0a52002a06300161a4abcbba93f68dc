@@ -1,0 +1,155 @@
+<apex:component >
+	<script>
+		/**
+		 *	Documentation:
+		 *
+		 *	1. Include directive: angular.module('myApp', ['dir.priceInput'])
+		 *	2. Attributes:
+		 *		- idValue: required
+		 *		- classValue: required
+		 *		- placeHolderValue: required
+		 *		- maxLength: required Max value of text length
+		 *		- precisionLength: Length of precision after which value will be rounded off
+		 *		- relValue: "rel" value required
+		 *		- inputValue: ng-model for input value
+		 *		- validationModal: validation modal to check required check
+		 *		- validationModalKey: key for which to look validation object in validation model
+		 *		- inputModel: page model to access more related informations
+		 **/
+		angular.module('dir.priceInput', []).directive('priceOnlyInput', function () {
+			return {
+				restrict : 'EA',
+				template : '<input id="{{idValue}}" type="text" rel="{{relValue}}" class="{{classValue}}" ng-attr-tabindex="{{tabIndex}}" ng-disabled="packaged==false" placeholder="{{placeHolderValue}}" ng-model="inputValue" ng-blur="setPrecision()" ng-change="validatePriceInput()" ng-class="{\'redborder\' : validationModal[validationModalKey][\'isError\'] == true}" data-toggle="tooltip" title="{{validationModal[validationModalKey][\'ErrorMessage\']}}"/>',
+				scope : {
+					idValue : '@',
+					classValue : '@',
+					placeHolderValue : '@',
+					maxLength : '@',
+					precisionLength : '@',
+					relValue : '@',
+					inputValue : '=',
+					validationModal : '=',
+					validationModalKey : '@',
+					inputModel : '=',
+					blurCallback : '&blurCallback',
+					packaged : '=',
+					tabIndex : '@tabIndex'
+				},
+				link : function (scope, el, attrs) {
+					scope.inputMaxLength = parseInt(attrs.maxLength) + parseInt(attrs.precisionLength) + 1;
+					var oldValue = scope.inputValue;
+					
+					debug('linked');
+					scope.validatePriceInput = function () {
+						var newValue = scope.inputValue;
+		
+						var arr = String(newValue).split("");
+						var pieces = String(newValue).split(".");
+						if (arr.length === 0) {
+							oldValue = "";
+							return;
+						}
+						
+						if (arr[0] == '-') {
+							scope.inputValue = oldValue;
+						} else if (isNaN(newValue)) {
+							scope.inputValue = oldValue;
+						} else if (attrs.precisionLength == -1 && String(newValue).indexOf(".") != -1) {
+							scope.inputValue = oldValue;
+						} else {
+							if(pieces[0].length > attrs.maxLength){
+								pieces[0] = pieces[0].substring(0, attrs.maxLength);
+							}
+							if(pieces[1] != null && pieces[1] != "" && pieces[1].length > attrs.precisionLength){
+								pieces[1] = pieces[1].substring(0, attrs.precisionLength);
+							}
+							scope.inputValue = pieces[0] + ((pieces[1] != null && pieces[1] != "") ? ("." + pieces[1]) : ((attrs.precisionLength > 0 && String(newValue).indexOf(".") != -1) ? ".": ""));
+						}
+						
+						oldValue = scope.inputValue;
+					}
+		
+					/**
+					 * Returns a rounded number in the scope.precisionLength setup by the directive
+					 * @param  {Number} num Number to be rounded
+					 * @return {Number}     Rounded number
+					 */
+					function round(num) {
+						var d = Math.pow(10, attrs.precisionLength);
+						return Math.round(num * d) / d;
+					}
+		
+					/**
+					 * Returns a string that represents the rounded number
+					 * @param  {Number} value Number to be rounded
+					 * @return {String}       The string representation
+					 */
+					function formatPrecision(value) {
+						return parseFloat(value).toFixed(attrs.precisionLength);
+					}
+		
+					/**
+					 * Method to validate input if is not null
+					 *
+					 */
+					scope.validateInputValue = function () {
+						var validateType = scope.validationModal[scope.validationModalKey].Type;
+						var fieldValue = scope.inputValue;
+		
+						if (validateType.indexOf('Required') > -1) {
+							if (fieldValue == undefined || fieldValue == null || fieldValue.length == 0) {
+								scope.validationModal[scope.validationModalKey].isError = true;
+								scope.validationModal[scope.validationModalKey].ErrorMessage = '{!JSENCODE($Label.Field_Is_Required)}';
+							} else {
+								scope.validationModal[scope.validationModalKey].isError = false;
+								scope.validationModal[scope.validationModalKey].ErrorMessage = '';
+							}
+						} else if (validateType.indexOf('OrderLots') > -1) {
+							if (fieldValue == undefined || fieldValue == null || fieldValue.length == 0) {}
+							else {
+								if (fieldValue < 1) {
+									scope.validationModal[scope.validationModalKey].isError = true;
+									scope.validationModal[scope.validationModalKey].ErrorMessage = '{!JSENCODE($Label.Cannot_Be_less_than_Zero)}';
+		
+								} else {
+		
+									scope.validationModal[scope.validationModalKey].isError = false;
+									scope.validationModal[scope.validationModalKey].ErrorMessage = '';
+								}
+							}
+						}
+		
+						// Set validation flag value
+						if (scope.validationModal[scope.validationModalKey].isError == true) {
+							scope.inputModel.isValidForm = false;
+						}
+					}
+		
+					// Set the precision value
+					scope.setPrecision = function () {
+						var value = scope.inputValue;
+						if (attrs.precisionLength !== '-1') {
+							if (value) {
+								scope.inputValue = formatPrecision(value);
+								scope.inputValue;
+							}
+						}
+		
+						if (value == "") {
+							scope.inputValue = null;
+						}
+		
+						// Validate input value
+						if (scope.validationModal[scope.validationModalKey] != undefined) {
+							scope.validateInputValue();
+						}
+						
+						if (scope.blurCallback != undefined) {
+							scope.blurCallback();
+						}
+					}
+				}
+			};
+		});
+	</script>
+</apex:component>

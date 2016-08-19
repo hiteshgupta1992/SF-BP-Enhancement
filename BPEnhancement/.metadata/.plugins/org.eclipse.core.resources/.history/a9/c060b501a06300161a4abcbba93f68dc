@@ -1,0 +1,582 @@
+<apex:component >
+	<style>
+		th {
+			text-transform: uppercase;
+		}
+	</style>
+	
+	<!-- View part for component -->
+	<div ng-controller="viewVendorRelatedListController" >
+		
+		<!-- START: related section -->
+		<div id="Related" >
+	        <!-- START: Heading and toggle section -->
+	        <div class="heading_panel row">
+	            <div class="left_heading col-lg-12 col-md-12">
+	                <h1>
+	                    <span class="heading_icon handCursor" ng-click="ViewVendorRelatedListModal.hidePanel($event, 'relatedSection')">
+	                        <i class="fa fa-chevron-right"></i>
+	                    </span>
+	                    C {!$Label.Page_Section_Related}
+	                    
+	                    <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['PO_Type_Help']}}" style="font-size: 26px"></i>
+	                    <i class="fa fa-cog" style="float: right; margin-right: 7px;" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['PO_Type_Settings_Help']}}"> </i>
+	                </h1>
+	            </div>
+	        </div>
+			<!-- END: Heading and toggle section -->
+			
+			<div id="relatedSection" >
+				
+				<!-- START: PURCHASE ORDER TYPES section -->
+				<div class="heading_panel_sub row" id="VV_PO_Type_block_heading_panel" style="width: 99.6%;margin-left: -3px;">
+				    <div class="left_sub col-lg-5 col-md-5" id="VV_PO_Type_block_heading_panel_left_sub">
+				        <h1 id="VV_PO_Type_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VV_PO_Type_block_heading_panel_left_sub_h1_text">{!$Label.PO_Field_Types}</span> 
+				            
+				            <i class="fa fa-plus-square plush_sign handCursor" id="VV_PO_Type_block_heading_panel_left_sub_h1_text_plus_icon" 
+				            	ng-click="ViewVendorRelatedListModal.POTypes_addAction($event)"></i> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VV_PO_Type_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['PO_Type_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['PO_Type_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+				    
+				    <div class="gid_container" id="View_Vendor_PO_Types_Empty_Div" 
+				    	ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    <div ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length != 0">
+					    <div class="gid_container" id="View_Vendor_PO_Types" 
+					    	ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length != 0" >
+						    <table class="table" id="VV_PO_TypeGrid">
+						        <col width="4%"  />
+								<col width="25%" />
+	                            <col width="20%" />
+	                            <col width="17%" />
+	                            <col width="19%" />
+	                            <col width="13%" />
+						        <tr class="tableHeader" ng-click="ViewVendorRelatedListModal.POTypes_closeEditRows($event)">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewVendorRelatedListModal.POTypes_sortControlsAction();">
+						            	<i class="fa fa-sort-asc" ng-show="ViewVendorRelatedListModal.POTypes_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewVendorRelatedListModal.POTypes_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewVendorRelatedListModal.POTypes_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.Label_Code}
+						            </th>
+						            <th>{!$Label.Lead_Time}</th>
+						            <th>{!$Label.Discount}</th>
+						            <th>{!$Label.Landed_Cost_Adjustment}</th>
+						            <th>{!$Label.Usage}</th>
+						        </tr>
+						        <tbody ng-repeat="poType in ViewVendorRelatedListModal.VendorRelatedInfo.POTypes track by $index" >
+						        	<!-- START: Data Display Row -->
+						            <tr class="clickable_row" id="PO_Types_row{{$index}}" rel="rel_PO_Type_row{{$index}}_edit" 
+						            	ng-click="ViewVendorRelatedListModal.POTypes_openRowAsEdit($event, $index)">
+						                <td id="VV_PO_Type_block_grid_container_tbody_tr_td_1_{{$index}}" >
+						                	<i class="fa fa-star orange" ng-show="poType.IsDefault" ></i>
+		                                    <i class="fa fa-star-o" ng-show="!poType.IsDefault" ></i>
+						                </td>
+						                <td id="VV_PO_Type_block_grid_container_tbody_tr_td_2_{{$index}}"> {{poType.Code}}	</td>
+						                <td id="VV_PO_Type_block_grid_container_tbody_tr_td_3_{{$index}}"
+						                	ng-class="{'red': poType.Status == 'On Order'}">
+						                	{{poType.LeadTime}}
+						                	<span ng-show="poType.LeadTime != null && poType.LeadTime != ''">&#160;{!$Label.Label_Days}</span>
+						                </td>
+						                <td id="VV_PO_Type_block_grid_container_tbody_tr_td_4_{{$index}}">
+						                	{{poType.Discount}}
+						                	<span ng-show="poType.Discount != null && poType.Discount != ''">&#160;%</span>
+						                </td>
+						                <td id="VV_PO_Type_block_grid_container_tbody_tr_td_5_{{$index}}">
+						                	{{poType.LandedCostAdjustment}}
+						                	<span ng-show="poType.LandedCostAdjustment != null && poType.LandedCostAdjustment != ''">&#160;%</span>
+						                </td>
+						                <td id="VV_PO_Type_block_grid_container_tbody_tr_td_5_{{$index}}">  {{poType.Usage}}  		</td>
+						            </tr>
+						            <!-- END: Data Display Row -->
+						            
+						            <!-- START: Actions row in case editable row -->
+	                                <tr ng-show="ViewVendorRelatedListModal.POTypes_editRow[$index].isEdit" class="edit_panel sample-show-hide" id="rel_PO_Type_row{{$index}}_edit">
+									    <td colspan="9" id="VV_PO_Type_block_grid_container_tbody_expandtr_td_1_{{$index}}">
+									        <div id="VV_PO_Type_block_grid_container_tbody_expandtr_edit_box_{{$index}}" 
+									            class="edit_box col-lg-9 col-md-9" 
+									            ng-show="ViewVendorRelatedListModal.POTypes_editRow[$index].isEdit">
+									            <div class="its-heading" id="VV_PO_Type_block_grid_container_tbody_expandtr_edit_box_its-heading_{{$index}}">
+									                <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+									                <span>{!$Label.Label_Actions} (2 {!$Label.Label_Available})</span>
+									            </div>
+									            <div id="VV_PO_Type_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}" class="edit-body">
+									                <form>
+									                	<!-- Edit link as action -->
+	                                                    <div class="radio" id="VV_PO_Type_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_1">
+														    <label>
+															    <input type="radio" name="optionsRadios" id="optionsRadios1" value="1"
+															        ng-model= "ViewVendorRelatedListModal.POTypes_editRow[$index].radioValue"/>
+															    <span>
+																    <i class="fa fa-pencil-square-o"></i>
+																    {!$Label.Edit_Label}
+															    </span>
+														    </label>
+														</div>
+	                                                       
+									                    <!-- Remove link as action -->
+									                    <div class="radio" id="VV_PO_Type_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_2">
+									                        <label>
+										                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="2"
+										                            ng-model= "ViewVendorRelatedListModal.POTypes_editRow[$index].radioValue"/>
+										                        <span>
+											                        <i class="fa fa-times"></i>
+											                        {!$Label.Label_Remove} {!$Label.Label_Link}
+										                        </span>
+									                        </label>
+									                    </div>
+									                    <!-- Action button (Go) -->
+									                    <a href="" id="VV_PO_Type_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_go_btn" class="btn btn-default editform_btn" role="button"
+									                        ng-click="ViewVendorRelatedListModal.POTypes_GoAction($index)">   {!$Label.Label_Go}  </a>                                
+									                </form>
+									            </div>
+									            <a href="" class="faq_link">
+									            	<i class="fa fa-question-circle qmark"></i>
+									            </a>
+									        </div>
+									    </td>
+									</tr>
+	                                <!-- END: Actions row in case editable row -->
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Vendor_PO_Types_Pagination" ng-if="ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes != undefined" >
+					    	<list-pagination id-value = "View_Vendor_PO_Types_Pagination_" 
+				    						 total-records-length = "ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes"
+				    						 page-size = "ViewVendorRelatedListModal.POTypes_sectionModel.poTypesPageSize"
+				    						 current-page = "ViewVendorRelatedListModal.POTypes_sectionModel.poTypesCurrentPage"
+				    						 changes-count = "ViewVendorRelatedListModal.POTypes_sectionModel.poTypesChangesCount"
+				    						 pagination-control-method = "ViewVendorRelatedListModal.POTypes_paginationControlsAction" />
+					    </div>
+					</div>
+				</div>
+				<!-- END: PURCHASE ORDER TYPES section -->
+				
+				<!-- START: ACTIVE ORDERS section -->
+				<div class="heading_panel_sub row" id="VV_ActiveOrders_block_heading_panel" style="width: 99.6%;margin-left: -3px;"
+					 >
+				    <div class="left_sub col-lg-5 col-md-5" id="VV_ActiveOrders_block_heading_panel_left_sub">
+				        <h1 id="VV_ActiveOrders_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VV_ActiveOrders_block_heading_panel_left_sub_h1_text">{!$Label.Active_Orders}</span>
+				            <i class="fa fa-plus-square plush_sign handCursor" id="VV_ActiveOrders_block_heading_panel_left_sub_h1_text_plus_icon" 
+				            	ng-click="ViewVendorRelatedListModal.ActiveOrders_addAction($event)"></i> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VV_ActiveOrders_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['ActiveOrders_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['ActiveOrders_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+
+				    <div class="gid_container" id="View_Vendor_ActiveOrders_Empty_Div" 
+				    	ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    
+				    <div ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length != 0" >
+					    <div class="gid_container" id="View_Vendor_ActiveOrders" 
+					    	 ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length != 0" >
+						    <table class="table" id="VV_ActiveOrdersGrid">
+						        <col width="4%" />
+								<col width="21%"/>
+								<col width="15%"/>
+								<col width="15%"/>
+								<col width="15%"/>
+								<col width="15%"/>
+								<col width="15%"/>
+						        <tr class="tableHeader" ng-click="ViewVendorRelatedListModal.ActiveOrders_closeEditRows($event)">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewVendorRelatedListModal.ActiveOrders_sortControlsAction($event)">
+						            	<i class="fa fa-sort-asc" ng-show="ViewVendorRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewVendorRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewVendorRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.PO_Object_Short_Display_Label}
+						            </th>
+						            <th>{!$Label.Label_Status}</th>
+						            <th>{!$Label.Projected_Delivery}</th>
+						            <th>{!$Label.Label_Total} {!$Label.Label_Order}</th>
+						            <th>{!$Label.Label_Received}</th>
+						            <th>{!$Label.Label_Outstanding}</th>
+						        </tr>
+						        <tbody ng-repeat="activeOrder in ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders" >
+						            <tr class="clickable_row" id="ActiveOrders_row{{$index}}" rel="rel_ActiveOrder_row{{$index}}_edit" 
+						            	ng-click="ViewVendorRelatedListModal.ActiveOrders_openRowAsEdit($event, $index)">
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_1_{{$index}}">	*	</td>
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_2_{{$index}}">  <u>{{activeOrder.PONumber}}</u>	</td>
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_3_{{$index}}"
+						                	ng-class="{'red': activeOrder.Status == 'On Order'}">
+						                	{{activeOrder.Status}}
+						                </td>
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_4_{{$index}}">
+						                	{{activeOrder.ProjectedDelivery | date : 'medium'}}
+						                </td>
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_5_{{$index}}">
+						                	<span>$</span>
+						                	{{activeOrder.TotalOrder}}
+						                </td>
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_6_{{$index}}">
+						                	<span>$</span>
+						                	{{activeOrder.ReceivedOrder}}
+						                </td>
+						                <td id="VV_ActiveOrders_block_grid_container_tbody_tr_td_7_{{$index}}">
+						                	<span>$</span>
+						                	{{activeOrder.OutstandingOrder}}
+						                </td>
+						            </tr>
+						            
+						            <!-- START: Actions row in case editable row -->
+	                                <tr ng-show="ViewVendorRelatedListModal.ActiveOrders_editRow[$index].isEdit" class="edit_panel sample-show-hide" id="rel_ActiveOrder_row{{$index}}_edit">
+									    <td colspan="9" id="VV_ActiveOrders_block_grid_container_tbody_expandtr_td_1_{{$index}}">
+									        <div id="VV_ActiveOrders_block_grid_container_tbody_expandtr_edit_box_{{$index}}" 
+									            class="edit_box col-lg-9 col-md-9" 
+									            ng-show="ViewVendorRelatedListModal.ActiveOrders_editRow[$index].isEdit">
+									            <div class="its-heading" id="VV_ActiveOrders_block_grid_container_tbody_expandtr_edit_box_its-heading_{{$index}}">
+									                <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+									                <span>{!$Label.Label_Actions} (2 {!$Label.Label_Available})</span>
+									            </div>
+									            <div id="VV_ActiveOrders_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}" class="edit-body">
+									                <form>
+									                	<!-- Edit link as action -->
+	                                                    <div class="radio" id="VV_ActiveOrders_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_1">
+														    <label>
+															    <input type="radio" name="optionsRadios" id="optionsRadios1" value="1"
+															        ng-model= "ViewVendorRelatedListModal.ActiveOrders_editRow[$index].radioValue"/>
+															    <span>
+																    <i class="fa fa-pencil-square-o"></i>
+																    {!$Label.Edit_Label}
+															    </span>
+														    </label>
+														</div>
+	                                                       
+									                    <!-- Remove link as action -->
+									                    <div class="radio" id="VV_ActiveOrders_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_2">
+									                        <label>
+										                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="2"
+										                            ng-model= "ViewVendorRelatedListModal.ActiveOrders_editRow[$index].radioValue"/>
+										                        <span>
+											                        <i class="fa fa-pencil-square-o"></i>
+											                        {!$Label.Label_Remove} {!$Label.Label_Link}
+										                        </span>
+									                        </label>
+									                    </div>
+									                    <!-- Action button (Go) -->
+									                    <a href="" id="VV_ActiveOrders_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_go_btn" class="btn btn-default editform_btn" role="button"
+									                        ng-click="ViewVendorRelatedListModal.ActiveOrders_GoAction($index)">   {!$Label.Label_Go}  </a>                                
+									                </form>
+									            </div>
+									            <a href="" class="faq_link">
+									            	<i class="fa fa-question-circle qmark"></i>
+									            </a>
+									        </div>
+									    </td>
+									</tr>
+	                                <!-- END: Actions row in case editable row -->
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Vendor_ActiveOrders_Pagination" ng-if="ViewVendorRelatedListModal.VendorRelatedInfo.TotalActiveOrders != undefined" >
+					    	<list-pagination id-value = "View_Vendor_ActiveOrders_Pagination_" 
+				    						 total-records-length = "ViewVendorRelatedListModal.VendorRelatedInfo.TotalActiveOrders"
+				    						 page-size = "ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize"
+				    						 current-page = "ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersCurrentPage"
+				    						 changes-count = "ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersChangesCount"
+				    						 pagination-control-method = "ViewVendorRelatedListModal.ActiveOrders_paginationControlsAction" />
+					    </div>
+					</div>
+				</div>
+				<!-- END: ACTIVE ORDERS section -->
+				
+				<!-- START: CONTACTS section -->
+                <div class="heading_panel_sub row" id="VV_Contacts_block_heading_panel" style="width: 99.6%;margin-left: -3px;" >
+				    <div class="left_sub col-lg-5 col-md-5" id="VV_Contacts_block_heading_panel_left_sub">
+				        <h1 id="VV_Contacts_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VV_Contacts_block_heading_panel_left_sub_h1_text">{!$Label.Label_Contacts}</span>
+				            <i class="fa fa-plus-square plush_sign handCursor" id="VV_Contacts_block_heading_panel_left_sub_h1_text_plus_icon" 
+				            	ng-click="ViewVendorRelatedListModal.Contacts_addAction($event)"></i> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VV_Contacts_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['Contacts_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['Contacts_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+
+				    <div class="gid_container" id="View_Vendor_Contacts_Empty_Div" 
+				    	ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    
+				    <div ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length != 0" >
+					    <div class="gid_container" id="View_Vendor_Contacts" 
+					    	 ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length != 0" >
+						    <table class="table" id="VV_ContactsGrid">
+						        <col width="4%"  />
+                                <col width="16%"  />
+                                <col width="26%"  />
+                                <col width="17%" />
+                                <col width="22%"  />
+                                <col width="13%" />
+						        <tr class="tableHeader" ng-click="ViewVendorRelatedListModal.Contacts_closeEditRows($event)">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewVendorRelatedListModal.Contacts_sortControlsAction($event)">
+						            	<i class="fa fa-sort-asc" ng-show="ViewVendorRelatedListModal.Contacts_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewVendorRelatedListModal.Contacts_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewVendorRelatedListModal.Contacts_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.Label_Name}
+						            </th>
+						            <th>{!$Label.Label_Phone_Number}</th>
+						            <th>{!$Label.Label_Extension_Number} #</th>
+						            <th>{!$Label.Label_Email} {!$Label.Label_Address}</th>
+						            <th>{!$Label.Relation}</th>
+						        </tr>
+						        <tbody ng-repeat="contact in ViewVendorRelatedListModal.VendorRelatedInfo.Contacts" >
+						            <tr class="clickable_row" id="Contacts_row{{$index}}" rel="rel_Contact_row{{$index}}_edit" 
+						            	ng-click="ViewVendorRelatedListModal.Contacts_openRowAsEdit($event, $index)">
+						                <td id="VV_Contacts_block_grid_container_tbody_tr_td_1_{{$index}}">	*	</td>
+						                <td id="VV_Contacts_block_grid_container_tbody_tr_td_2_{{$index}}">
+						                	{{contact.FirstName}} {{contact.LastName}}
+						                </td>
+						                <td id="VV_Contacts_block_grid_container_tbody_tr_td_3_{{$index}}">
+						                	{{contact.Phone}}
+                                            <i class="fa fa-star orange" ng-show="contact.PreferredPhone && contact.Phone != ''"></i>
+                                            <i class="fa fa-star-o" ng-show="!contact.PreferredPhone && contact.Phone != null && contact.Phone != ''"></i>
+						                </td>
+						                <td id="VV_Contacts_block_grid_container_tbody_tr_td_4_{{$index}}" >
+						                	{{contact.Extension}}
+						                </td>
+						                <td id="VV_Contacts_block_grid_container_tbody_tr_td_5_{{$index}}">
+						                	{{contact.Email}}
+                                            <i class="fa fa-star orange" ng-show="contact.PreferredEmail && contact.Email != ''"></i>
+                                            <i class="fa fa-star-o" ng-show="!contact.PreferredEmail && contact.Email != null && contact.Email != ''"></i>
+						                </td>
+						                <td>
+						                	<select class="form-control" ng-model="contact.Relation" 
+												ng-click="$event.stopPropagation();"
+												ng-change="ViewVendorRelatedListModal.Contacts__updateRelation($index)">
+												
+												<option value="Friend">{!$Label.Label_Friend}</option>
+												<option value="Family">{!$Label.Label_Family}</option>
+												<option value="Employee">{!$Label.Label_Employee}</option>
+												<option value="Co-Worker">{!$Label.Label_Co_Worker}</option>
+												<option value="Employer">{!$Label.Label_Employer}</option>
+											</select>
+						                </td>
+						            </tr>
+						            
+						            <!-- START: Actions row in case editable row -->
+	                                <tr ng-show="ViewVendorRelatedListModal.Contacts_editRow[$index].isEdit" class="edit_panel sample-show-hide" id="rel_Contact_row{{$index}}_edit">
+									    <td colspan="9" id="VV_Contacts_block_grid_container_tbody_expandtr_td_1_{{$index}}">
+									        <div id="VV_Contacts_block_grid_container_tbody_expandtr_edit_box_{{$index}}" 
+									            class="edit_box col-lg-9 col-md-9" 
+									            ng-show="ViewVendorRelatedListModal.Contacts_editRow[$index].isEdit">
+									            
+									            <div class="its-heading" id="VV_Contacts_block_grid_container_tbody_expandtr_edit_box_its-heading_{{$index}}">
+									                <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+									                <span>{!$Label.Label_Actions} (2 {!$Label.Label_Available})</span>
+									            </div>
+									            <div id="VV_Contacts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}" class="edit-body">
+									                <form>
+									                	<!-- Edit link as action -->
+	                                                    <div class="radio" id="VV_Contacts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_1">
+														    <label>
+															    <input type="radio" name="optionsRadios" id="optionsRadios1" value="1"
+															        ng-model= "ViewVendorRelatedListModal.Contacts_editRow[$index].radioValue"/>
+															    <span>
+																    <i class="fa fa-pencil-square-o"></i>
+																    {!$Label.Edit_Label}
+															    </span>
+														    </label>
+														</div>
+	                                                       
+									                    <!-- Remove link as action -->
+									                    <div class="radio" id="VV_Contacts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_2">
+									                        <label>
+										                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="2"
+										                            ng-model= "ViewVendorRelatedListModal.Contacts_editRow[$index].radioValue"/>
+										                        <span>
+											                        <i class="fa fa-times"></i>
+											                        {!$Label.Label_Remove} {!$Label.Label_Link}
+										                        </span>
+									                        </label>
+									                    </div>
+									                    <!-- Action button (Go) -->
+									                    <a href="" id="VV_Contacts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_go_btn" class="btn btn-default editform_btn" role="button"
+									                        ng-click="ViewVendorRelatedListModal.Contacts_GoAction($index)">   {!$Label.Label_Go}  </a>                                
+									                </form>
+									            </div>
+									            <a href="" class="faq_link">
+									            	<i class="fa fa-question-circle qmark"></i>
+									            </a>
+									        </div>
+									    </td>
+									</tr>
+	                                <!-- END: Actions row in case editable row -->
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Vendor_Contacts_Pagination" ng-if="ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts != undefined" >
+					    	<list-pagination id-value = "View_Vendor_Contacts_Pagination_" 
+				    						 total-records-length = "ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts"
+				    						 page-size = "ViewVendorRelatedListModal.Contacts_sectionModel.contactsPageSize"
+				    						 current-page = "ViewVendorRelatedListModal.Contacts_sectionModel.contactsCurrentPage"
+				    						 changes-count = "ViewVendorRelatedListModal.Contacts_sectionModel.contactsChangesCount"
+				    						 pagination-control-method = "ViewVendorRelatedListModal.Contacts_paginationControlsAction" />
+					    </div>
+					</div>
+				</div>
+                <!-- END-: CONTACTS list section -->
+                
+                <!-- START: PRODUCTS section -->
+				<div class="heading_panel_sub row" id="VV_Product_block_heading_panel" style="width: 99.6%;margin-left: -3px;" >
+				    <div class="left_sub col-lg-5 col-md-5" id="VV_Product_block_heading_panel_left_sub">
+				        <h1 id="VV_Product_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VV_Product_block_heading_panel_left_sub_h1_text">{!$Label.Label_Products}</span> 
+				            
+				            <i class="fa fa-plus-square plush_sign handCursor" id="VV_Product_block_heading_panel_left_sub_h1_text_plus_icon" 
+				            	ng-click="ViewVendorRelatedListModal.Products_addAction($event)"></i> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VV_Product_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['Products_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewVendorRelatedListModal.helpText['Products_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+				    
+				    <div class="gid_container" id="View_Vendor_Products_Empty_Div" 
+				    	ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.Products.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    <div ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.Products.length != 0">
+					    <div class="gid_container" id="View_Vendor_Products" 
+					    	ng-show="ViewVendorRelatedListModal.VendorRelatedInfo.Products.length != 0" >
+						    <table class="table" id="VV_ProductsGrid">
+						        <col width="4%" />
+								<col width="15%"/>
+								<col width="15%"/>
+								<col width="35%"/>
+								<col width="8%" />
+								<col width="8%" />
+								<col width="15%"/>
+						        <tr class="tableHeader" ng-click="ViewVendorRelatedListModal.Products_closeEditRows($event)">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewVendorRelatedListModal.Products_sortControlsAction();">
+						            	<i class="fa fa-sort-asc" ng-show="ViewVendorRelatedListModal.Products_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewVendorRelatedListModal.Products_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewVendorRelatedListModal.Products_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.Label_Type}
+						            </th>
+						            <th>{!$Label.Label_Code}</th>
+						            <th>{!$Label.Label_Description}</th>
+						            <th>{!$Label.Label_Cost}</th>
+						            <th>{!$Label.Label_Price}</th>
+						            <th>{!$Label.Category_Object_Display_Label}</th>
+						        </tr>
+						        <tbody ng-repeat="product in ViewVendorRelatedListModal.VendorRelatedInfo.Products track by $index" >
+						        	<!-- START: Data Display Row -->
+						            <tr class="clickable_row" id="Products_row{{$index}}" rel="rel_Product_row{{$index}}_edit" 
+						            	ng-click="ViewVendorRelatedListModal.Products_openRowAsEdit($event, $index)">
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_1_{{$index}}">	&#160;					</td>
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_2_{{$index}}">  {{product.Type}}		</td>
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_3_{{$index}}">	{{product.Code}}		</td>
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_4_{{$index}}">	{{product.Description}}	</td>
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_5_{{$index}}">
+						                	<span ng-show="product.Cost != null && product.Cost != ''">{!$Label.Currency_Symbol}</span>
+						                	{{product.Cost}}
+						                </td>
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_6_{{$index}}">
+						                	<span ng-show="product.Price != null && product.Price != ''">{!$Label.Currency_Symbol}</span>
+						                	{{product.Price}}
+						                </td>
+						                <td id="VV_Product_block_grid_container_tbody_tr_td_7_{{$index}}">  {{product.CategoryName}}		</td>
+						            </tr>
+						            <!-- END: Data Display Row -->
+						            
+						            <!-- START: Actions row in case editable row -->
+	                                <tr ng-show="ViewVendorRelatedListModal.Products_editRow[$index].isEdit" class="edit_panel sample-show-hide" id="rel_Product_row{{$index}}_edit">
+									    <td colspan="9" id="VV_Product_block_grid_container_tbody_expandtr_td_1_{{$index}}">
+									        <div id="VV_Product_block_grid_container_tbody_expandtr_edit_box_{{$index}}" 
+									            class="edit_box col-lg-9 col-md-9" 
+									            ng-show="ViewVendorRelatedListModal.Products_editRow[$index].isEdit">
+									            <div class="its-heading" id="VV_Product_block_grid_container_tbody_expandtr_edit_box_its-heading_{{$index}}">
+									                <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+									                <span>{!$Label.Label_Actions} (2 {!$Label.Label_Available})</span>
+									            </div>
+									            <div id="VV_Product_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}" class="edit-body">
+									                <form>
+									                	<!-- Edit link as action -->
+	                                                    <div class="radio" id="VV_Product_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_1">
+														    <label>
+															    <input type="radio" name="optionsRadios" id="optionsRadios1" value="1"
+															        ng-model= "ViewVendorRelatedListModal.Products_editRow[$index].radioValue"/>
+															    <span>
+																    <i class="fa fa-pencil-square-o"></i>
+																    {!$Label.Edit_Label}
+															    </span>
+														    </label>
+														</div>
+	                                                       
+									                    <!-- Remove link as action -->
+									                    <div class="radio" id="VV_Product_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_2">
+									                        <label>
+										                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="2"
+										                            ng-model= "ViewVendorRelatedListModal.Products_editRow[$index].radioValue"/>
+										                        <span>
+											                        <i class="fa fa-times"></i>
+											                        {!$Label.Label_Remove} {!$Label.Label_Link}
+										                        </span>
+									                        </label>
+									                    </div>
+									                    <!-- Action button (Go) -->
+									                    <a href="" id="VV_Product_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_go_btn" class="btn btn-default editform_btn" role="button"
+									                        ng-click="ViewVendorRelatedListModal.Products_GoAction($index)">   {!$Label.Label_Go}  </a>                                
+									                </form>
+									            </div>
+									            <a href="" class="faq_link">
+									            	<i class="fa fa-question-circle qmark"></i>
+									            </a>
+									        </div>
+									    </td>
+									</tr>
+	                                <!-- END: Actions row in case editable row -->
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Vendor_Products_Pagination" ng-if="ViewVendorRelatedListModal.VendorRelatedInfo.TotalProducts != undefined" >
+					    	<list-pagination id-value = "View_Vendor_Products_Pagination_" 
+				    						 total-records-length = "ViewVendorRelatedListModal.VendorRelatedInfo.TotalProducts"
+				    						 page-size = "ViewVendorRelatedListModal.Products_sectionModel.productsPageSize"
+				    						 current-page = "ViewVendorRelatedListModal.Products_sectionModel.productsCurrentPage"
+				    						 changes-count = "ViewVendorRelatedListModal.Products_sectionModel.productsChangesCount"
+				    						 pagination-control-method = "ViewVendorRelatedListModal.Products_paginationControlsAction" />
+					    </div>
+					</div>
+				</div>
+				<!-- END: PRODUCTS section -->
+			</div>
+		</div>
+		<!-- END: related section -->
+	</div>
+</apex:component>

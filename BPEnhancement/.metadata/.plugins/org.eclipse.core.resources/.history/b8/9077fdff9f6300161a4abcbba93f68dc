@@ -1,0 +1,179 @@
+<apex:component >
+        <style>
+              .Vendor-Order-Part-Popup{
+                  display: none;
+                    background: #fff;
+                    color: #000;
+                    width: 650px;
+                    min-height: 100px;
+                    position: absolute;
+                    text-align: left;
+                    z-index: 1000;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    -moz-box-shadow: 0 0 20px #222;
+                    -webkit-box-shadow: 0 0 20px #222;
+                    box-shadow: 0 0 20px #222;
+              }
+              
+              .Vendor-Order-Part-Popup:before{
+                  content: '';
+                    display: block;
+                    position: absolute;
+                    z-index: -1;
+                    top: 13px;
+                    left: -13px;
+                    height: 30px;
+                    width: 30px;
+                    -moz-box-shadow: -3px 3px 5px 0px #7a7a7a;
+                    -webkit-box-shadow: -3px 3px 5px 0px #7a7a7a;
+                    -o-box-shadow: -3px 3px 5px 0px #7a7a7a;
+                    box-shadow: -3px 3px 5px 0px #7a7a7a;
+                    transform: rotate(45deg);
+                    -ms-transform: rotate(45deg);
+                    -webkit-transform: rotate(45deg);
+                    background-color: #fff;
+              }
+              .Vendor-Order-Part-Popup .under-line-row{
+                  padding: 10px;
+                  border-bottom: 1px solid #939598;
+                  margin-left: 0px;
+              }
+              .button-On-PopUp {
+                    background-color: orange;
+                    color: white;
+                    font-weight: bold;
+              }
+              .my-legend .legend-title {
+                text-align: left;
+                margin-bottom: 5px;
+                font-weight: bold;
+                font-size: 90%;
+                }
+              .my-legend .legend-scale ul {
+                margin: 0;
+                margin-bottom: 5px;
+                padding: 0;
+                float: left;
+                list-style: none;
+                }
+              .my-legend .legend-scale ul li {
+                font-size: 80%;
+                list-style: none;
+                margin-left: 0;
+                line-height: 18px;
+                margin-bottom: 2px;
+                }
+              .my-legend ul.legend-labels li span {
+                display: block;
+                float: left;
+                height: 16px;
+                width: 30px;
+                margin-right: 5px;
+                margin-left: 0;
+                border: 1px solid #999;
+                }
+              .my-legend .legend-source {
+                font-size: 70%;
+                color: #999;
+                clear: both;
+                }
+              .my-legend a {
+                color: #777;
+                }
+                
+                .row div label {
+                	text-transform: uppercase;
+                }
+        </style>
+        <script>
+            $(document).ready(function () {
+                $('.Vendor-Order-Part-Popup').mouseover(function() {
+                    $('.Vendor-Order-Part-Popup').show(); 
+                })
+                $('.Vendor-Order-Part-Popup').mouseout(function() {
+                    $('.Vendor-Order-Part-Popup').hide(); 
+                })
+            });
+        </script>
+        
+        <div class="Vendor-Order-Part-Popup">
+            <div>
+                <div class="row overlay-header">
+                    <div class="col-lg-6 col-md-6">
+                        <b style="font-size: 20px;"> {{VendorOrderModel.partInfoDetail.PartNumber}} - {{VendorOrderModel.partInfoDetail.Description}} </b>  
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <div class="row pull-right">
+                            <div>
+                                <button class="btn btn-default button-On-PopUp" ng-click="VendorOrderModel.ViewPart(VendorOrderModel.partInfoDetail.Id)">View</button>
+                                <button class="btn btn-default button-On-PopUp" ng-click="VendorOrderModel.EditPart(VendorOrderModel.partInfoDetail.Id)">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+                
+                <div class="row clearfix" style="height:20px;">
+                </div>  
+                
+                <div class="row overlay-header">
+                    <div class="col-lg-7 col-md-7">
+                        <parts-chart chart-data="chartData" part-charts-details="partChartsDetails" label-data-value="labelDataValue" >
+                        </parts-chart>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-2">
+                        <div class="row clearfix" style="height:20px;">
+                        </div>
+                        
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-md-12">
+                                 <label for="labelFirstName"> {!$Label.Label_Location} </label>
+                                 <div ng-repeat="location in VendorOrderModel.getLocations()"> 
+                                    {!$Label.Label_Location}: {{location}} 
+                                 </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row clearfix" style="margin-top : 5px;">
+                            <div class="col-lg-12 col-md-12">
+                                 <label for="labelFirstName"> {!$Label.Label_Cost} </label>
+                                 <div> {!$Label.Currency_Symbol}{{VendorOrderModel.partInfoDetail.Cost}}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row clearfix" style="margin-top : 5px;">
+                            <div class="col-lg-12 col-md-12">
+                                 <label for="labelFirstName"> {!$Label.Label_Retail} </label>
+                                 <div> {!$Label.Currency_Symbol}{{VendorOrderModel.partInfoDetail.Retail}} </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-3">
+                        <div class="row clearfix" style="height:20px;">
+                        </div>
+                        
+                        <div class="row clearfix">
+                            <div class='my-legend'>
+                                <div class='legend-title'>{!$Label.Label_Legends}</div>
+                                <div class='legend-scale'>
+                                    <ul class='legend-labels'>
+                                        <li><span style='background:#008000;'></span>{!$Label.Part_Object_Status_InStock} - {{VendorOrderModel.partInfoDetail.InStockQty}}</li>
+                                        <li><span style='background:#00AEEF;'></span>{!$Label.Part_Object_Status_Committed} - {{VendorOrderModel.partInfoDetail.QtyCommited}}</li>
+                                        <li><span style='background:#FAC645;'></span>{!$Label.Part_Object_Status_Available} - {{VendorOrderModel.partInfoDetail.QtyAvailable}}</li>
+                                        <li><span style='background:#BCBDC0;'></span>{!$Label.Part_Object_Status_OnOrder} - {{VendorOrderModel.partInfoDetail.QtyOnOrder}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+                
+                
+                
+            </div> 
+        </div>
+      
+</apex:component>

@@ -1,0 +1,335 @@
+<apex:component controller="CustomerOrderCtrl" >
+	<!-- Import styles -->
+	<c:NewPopupStyle />
+
+	<!-- Include required directives -->
+	<!-- Directive for price fields -->
+	<c:dirNumberInput />
+
+	<style>
+		#AddEditHourLog .controls1 {   
+			top: -45px;
+		}
+		
+		.modal-content .fee_popup_container .leftbordernone{
+			border-left: none;
+		}
+		
+		.modal-content .fee_popup_container .popupinside .min_overflow{
+			height: 360px;
+			overflow: auto;
+			float: left;
+		}
+		
+		.modal-content .fee_popup_container	.angucomplete-dropdown{
+			margin: 0;
+		}
+		
+		.modal-content .fee_popup_container  .popupright .tabconainer form .angucomplete-overide-dropdown{
+			width: 63% !important
+		}
+		
+		.modal-content .fee_popup_container .angucomplete-overide-dropdown .ML{
+			margin-left: 6px;
+		}
+		.starimgdivlog{
+			height: auto;
+			margin-bottom: 0px;
+		}
+		.itemiconlog{
+			width: auto;
+			margin-left: 10px;
+		}
+		.logservicelabel p
+		{
+			padding: 0px;
+			text-align: right;
+			margin-right: 5px;
+			text-transform: uppercase;
+		}
+		.pull-left p
+		{
+			text-transform: uppercase;
+		}
+		.logservices .lightbox .infotext
+		{
+			margin-left: 0px;
+		    margin-top: 7px;
+		    position: relative;
+		    width: 140px;
+		    float: left;
+		    left: 0;
+		}
+		.logservice-dialog .popup_container
+		{
+			height:auto;
+			padding-bottom: 50px;
+		}
+		.logservices
+		{
+			margin-bottom:7px;
+		}
+		.logservices .infoemail
+		{
+			word-wrap: break-word;
+			
+		}
+		.logservicelabel .fa-question-circle
+		{
+				color: #939CA9;
+		}
+		.logservicepopup .InfoMT
+		{
+			margin-top: 7px;
+		}
+		#logservice .popupright
+		{
+			border:none;
+		}
+		.ui-datepicker
+		{
+			z-index: 1000000 !important;
+		}
+		.M10
+		{
+			margin-left:10px;
+		}
+		.logservicepopup .logservices .lightbox
+		{
+			width:200px;
+		}
+		.M7
+		{
+			margin:6px;
+			text-transform: lowercase;
+		}
+		.exptxt
+		{
+			font-size: 10px;
+			float:left;
+			padding-top: 8px;
+			
+		}
+		.user-fb
+		{   float: right;
+		    margin-top: 19px;
+		    margin-right: -11px;
+		    color: #00CEFF
+		}
+		.user-twitter
+		{
+		 	float:right;
+		    color: #00CEFF
+		}
+		.log-ques
+		{
+			padding-top:2px;
+		}
+		.logservices .starimgdiv
+		{
+			height: auto;
+			margin-bottom: 0;
+		}
+		.logservices .itemicon
+		{
+			width: auto;
+		}
+		.logservices .lightbox .infotext p
+		{
+			float: left;
+			width: 120px;
+		}
+		.hourlogMR{
+			margin-right: 3px;
+		}
+		.PTL5{
+			padding: 5px 0px 0px 5px;
+		}
+		.right_heading_container.col-md-12.popupright.removeborder{
+			border-left:none;
+		}
+		.modal-dialog.coactionmodel-dialog{
+			width : 800px;
+		}
+		.right_heading_container.col-md-12.modal-footer.removebordertop{
+		border-top : none;
+		}
+		.right_heading_container.col-md-12.modal-footer.whitesmokebackground{
+		    background-color: whitesmoke;
+		}
+		.right_heading_container.col-md-12.popupright.removeborder.whitesmokebackground{
+		    background-color: whitesmoke;
+		}
+	</style>
+
+	<script>
+	var coActionModule= angular.module('coActionModule', ['ui-notification'] );
+        coActionModule.controller('CoActionController', function ($scope, StatusOverrideService, Notification) {
+        $scope.COActionModal = {};
+        $scope.closeCOActionPopup = function() {
+		 	angular.element('#coaction').modal('hide');
+		 }
+        
+        $scope.$on('OverridenStatus', function(event, appLog) {    
+        	debug('OverridenStatus');
+        	debug(appLog);
+        	$scope.COActionModal.setData(appLog);
+        	
+        });
+        
+        $scope.COActionModal.openPopup = function() {
+            angular.element('#coaction').modal({
+                backdrop : 'static',
+                keyboard : false
+            });
+        }
+        $scope.COActionModal.closePopup = function() {
+        	angular.element('#coaction').modal('hide');
+        }
+        
+        $scope.COActionModal.setData = function(appLog){
+        	$scope.COActionModal.appLog = {};
+        	$scope.COActionModal.appLog.Label = appLog.label;
+        	$scope.COActionModal.appLog.newStatus = appLog.newStatus;
+        	$scope.COActionModal.appLog.oldStatus = appLog.oldStatus;
+        	$scope.COActionModal.appLog.notes = '';
+        	$scope.COActionModal.appLog.SOHeaderId = appLog.soHeaderId;
+        	$scope.COActionModal.type = appLog.type;
+        	//$scope.COActionModal.appLog.field = '';
+        	$scope.COActionModal.appLog.CurrentDate = new Date();
+        	if($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest'){
+                $scope.$digest();
+            }
+        	$scope.COActionModal.openPopup();
+        }
+        
+        $scope.COActionModal.insertLogRecord = function(){
+        	StatusOverrideService.insertLogRecord(JSON.stringify($scope.COActionModal.appLog), $scope.COActionModal.type).then(function(successfulSearchResult) {
+        		if(successfulSearchResult.indexOf('{!JSENCODE($Label.SetAsCompleteErrorMessage)}') > -1){
+        			Notification.error('{!JSENCODE($Label.SetAsCompleteErrorMessage)}');
+        			$scope.COActionModal.closePopup();
+        		} else if(successfulSearchResult.indexOf('{!$Label.SignedOutErrorMessage}') > -1){
+        			Notification.error('{!JSENCODE($Label.SignedOutErrorMessage)}');
+        			$scope.COActionModal.closePopup();
+        		}else{
+					$scope.COActionModal.closePopup();
+					$scope.$emit('Override_Status', { SOHeaderId : $scope.COActionModal.appLog.SOHeaderId } );
+				}
+            }, function(errorSearchResult) {  
+                Notification.error(errorSearchResult);
+                $scope.COActionModal.closePopup();
+            });
+        	
+        }
+        
+        $scope.CurrentDate = new Date();
+        
+        });
+        
+        coActionModule.service("StatusOverrideService", function ($q) {
+          	
+            this.insertLogRecord = function(appLog, type){
+                appLog = encodeString(appLog);
+                type = encodeString(type);
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.CustomerOrderCtrl.insertLogRecord}', appLog, type,
+                    function (result, event) {
+                       if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var overrideRecord = decodeString(result);
+                            deferred.resolve(result);
+                        }
+                    }, {
+                        escape : true
+                });  
+                return deferred.promise;
+            }
+        });   
+    </script>
+
+	<div id="coaction" class="modal fade" role="dialog" ng-controller="CoActionController">
+		<div class="modal-dialog coactionmodel-dialog">
+			<!-- Modal content-->
+			<div class="modal-content col-md-12">
+				<div class="modal-body popup_container fee_popup_container">
+					<div class="right_heading_container col-md-12 popupright removeborder">
+					<h1 class="right_panel_heading">{{COActionModal.appLog.Label}}</h1>
+					<div class="savecancle_btncntnr">
+						<button type="button" class="btn btn-default greenBtn  pull-right"
+								ng-attr-tabindex ="107"
+								ng-click="COActionModal.insertLogRecord()">{!$Label.Save_Label}</button>
+						<button type="button" id="closemodalup"
+							class="btn btn-default grayBtn pull-right hourlogMR"
+							ng-attr-tabindex ="112" ng-click="closeCOActionPopup();">{!$Label.Cancel_Label}</button>
+						
+				  	</div>
+				</div>
+						<div class="popupinside logservicepopup">
+							<div class="col-md-12 InfoMT logservices">
+                                   <div class="col-md-4 logservicelabel "><p class="T3 col-md-10 ">{!$Label.Label_Employee}</p>
+                                   </div>
+                                       <div class="col-md-8">
+                                           <div class="lightbox pull-left">
+                                               <div class="starimgdiv starimgdivlog  col-md-3 Plr0 MB12">
+                                                    <img class="Profile_pic" src="{!URLFOR($Resource.Images, 'profile_default.jpg')}" style="height:30px;width:100%"/>
+                                               </div>
+                                               <div class="infotext">
+                                                   <p class="infoname">{!$User.FirstName} {!$User.LastName}</p>
+                                               </div>
+                                                <div class="itemiconlog itemicon">
+                                                       <p class="T7">{!$Label.Label_Employee} | <span class="userStatus feeuserstatus ng-scope">{!$Label.Label_Active}</span></p>
+												</div>
+                                           </div>
+                                 	</div>
+                            </div>
+							<div class="col-md-12 InfoMT"> 
+	                           <div class="col-md-4 logservicelabel"><p class="T3 col-md-10  ">{!$Label.Label_Date}</p>
+                                  </div>
+                                  <div class="col-md-8">
+									<div class="pull-left Plr0">
+							            <p class="input-group" style="width: 200px;">
+							             {{COActionModal.appLog.CurrentDate | date:'MMMM dd, yyyy'}} @ {{COActionModal.appLog.CurrentDate | date:'hh:mm a'}}
+							            </p>
+							        </div>
+						        </div>
+                            	</div>
+							<div class="col-md-12 InfoMT"> 
+	                           <div class="col-md-4 logservicelabel"><p class="T3 col-md-10  ">CHANGING STATUS</p>
+                                  </div>
+                                  <div class="col-md-8">
+									<div class="Plr0">
+							            <p>
+							             <span>From: </span> <span class="T3"> {{COActionModal.appLog.oldStatus}} </span> <span>  To: </span> <span class="T3">  {{COActionModal.appLog.newStatus}} </span>
+							            </p>
+							        </div>
+						        </div>
+                            	</div>
+							<div class="col-md-12 InfoMT">
+	                           <div class="col-md-4 logservicelabel"><p class="T3 col-md-10">{!$Label.Label_Notes}</p>
+                                   </div>
+	                             <div class="col-md-8">
+								 	<div class="pull-left Plr0">
+							            <textarea rows="4" cols="50" style="resize:none;" 
+							            	ng-model="COActionModal.appLog.notes"
+							            	ng-attr-tabindex ="108"></textarea>
+							        </div>	
+	                             </div>
+                             </div>
+							<div class="right_heading_container col-md-12 modal-footer removebordertop">
+							<div class="savecancle_btncntnr  pull-right">
+								<button type="button" class="btn btn-default greenBtn pull-right" 
+								ng-attr-tabindex ="109" ng-click="COActionModal.insertLogRecord()" >{!$Label.Save_Label}</button>
+								<button type="button" id="closemodal" ng-keydown="keydownevent()" 
+									ng-attr-tabindex ="110" class="btn btn-default grayBtn pull-right hourlogMR" ng-click="closeCOActionPopup();">{!$Label.Cancel_Label}</button>
+								
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</apex:component>

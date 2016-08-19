@@ -1,0 +1,824 @@
+<apex:component id="PriceLevelsComp" controller="BlackPurlContentCtrl">
+    <!-- Component Attributes -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for components here."/>
+    
+    <body>
+    	<span id="{!uniqueId}Notification"></span>
+        <div id="{!uniqueId}grid" style="width:100%"></div>
+        <div class="{!uniqueId}waitingSearchDiv"   > 
+            <img class="waitingImage" src="{!URLFOR($Resource.Images, '/loading.gif')}" title="Please Wait..." />
+        </div>
+    </body>
+    <style>
+        .bpGridAddButton {
+            float:left;
+         	position:relative;
+        }
+        .bpGridRowSelected {
+        	text-align:left;
+        }
+        .ob-center {
+        	text-align:center;
+        }
+        .ob-right {
+        	text-align:center;
+        }
+    </style>
+    <script>
+    	var {!uniqueId}popupNotification;
+        $(document).ready(function () {
+        	// Notification Popup
+            {!uniqueId}popupNotification = $("#{!uniqueId}Notification").kendoNotification({
+				// hide automatically after 2 seconds
+				autoHideAfter: 5000,
+				// prevent accidental hiding for 100 mili-second
+				allowHideAfter: 100,
+				// prevent to show a hide button
+				button: false,
+				// allow hiding by clicking on the notification content
+				hideOnClick: true,
+				// Set animation to false
+				animation: false
+            }).data("kendoNotification");
+              
+            // Load grid here
+            {!uniqueId}loadPriceLevelGrid();
+            
+            if({!uniqueId}priceLevelGrid == null){
+                {!uniqueId}priceLevelGrid = $("#{!uniqueId}grid").data("kendoGrid");
+            }
+            
+            $("#{!uniqueId}grid").data().kendoGrid.dataSource.bind('requestStart', {!uniqueId}start);
+            $("#{!uniqueId}grid").data().kendoGrid.dataSource.bind('requestEnd', {!uniqueId}end );
+            
+            function {!uniqueId}start(){
+                $(".{!uniqueId}waitingSearchDiv").show();//i.e. make your loading gif visible
+            }
+            
+            function {!uniqueId}end(){
+                $(".{!uniqueId}waitingSearchDiv").hide();//i.e. make your loading gif visible
+            }
+
+            // Load document click bindings
+            $(document).on('click', function (event) {
+            	if($(event.target).attr('class').indexOf("overlay") == -1){
+	                {!uniqueId}PL_DocOnClikcBindings(event);
+	                if( {!uniqueId}priceLevelGrid.editable != null && ({!uniqueId}priceLevelGrid.editable.validatable.validate())){
+	                    {!uniqueId}togglePLToolbarButtons(false);
+	                }
+				}
+            });
+            
+            
+            
+            {!uniqueId}priceLevelGrid.element.on("click", "tbody>tr>td", "click", function (event) {
+                
+                {!uniqueId}plGridCellSingleClickEvent(this);
+                
+                event.stopPropagation();
+            });
+            
+            $("#{!uniqueId}PL_Add_Button", {!uniqueId}priceLevelGrid.element).on("click", function (event) {
+              //  {!uniqueId}priceLevelGrid.dataSource.sort(null);
+                
+                {!uniqueId}plGridAddButtonClickEvent();
+                
+                event.stopPropagation();
+            });
+            
+            $("#{!uniqueId}PL_Clone_Button", {!uniqueId}priceLevelGrid.element).on("click", function (event) {
+                {!uniqueId}plGridCloneButtonClickEvent();
+                
+                event.stopPropagation();
+            });
+            
+            $("#{!uniqueId}PL_Delete_Button", {!uniqueId}priceLevelGrid.element).on("click", function (event) {
+                {!uniqueId}plGridDeleteButtonClickEvent();
+                
+                event.stopPropagation();
+            });
+            
+            // Resolve dec
+            
+                {!uniqueId}priceLevelGrid.element.on("click", "tbody>tr>td>span.k-dropdown", "click", function (event) {
+                    
+                    $(document).unbind('click');
+                    event.stopPropagation();
+                    
+                });
+                
+                {!uniqueId}priceLevelGrid.element.on("change", "tbody>tr>td>span.k-dropdown", "change", function (event) {
+                    
+                    var delta = 200;
+                    var timeout = false;
+                        event.stopPropagation();
+                        if (timeout === false) {
+                                        
+                                        setTimeout(CallBinds, delta);
+                                    }
+                        
+                    
+                });
+                
+                
+                function CallBinds()
+                {
+                $(document).bind('click', function (event) {
+                        
+                            {!uniqueId}PL_DocOnClikcBindings(event);
+                            if( {!uniqueId}priceLevelGrid.editable != null && ({!uniqueId}priceLevelGrid.editable.validatable.validate())){
+                                {!uniqueId}togglePLToolbarButtons(false);
+                            }
+                        });
+                
+                
+                }
+        });
+        var {!uniqueId}currentRowIndex = -1;
+        var {!uniqueId}firstClickEvent = true;
+        var priceLevelDefaultConfirm = true;
+        var priceLevelDefaultClickEventName = '';
+        
+        // Method: Load the grid
+        function {!uniqueId}loadPriceLevelGrid(){
+            console.log('Loading Price level');
+            // Grid Data Source
+            var priceLevelGridDataSource = new kendo.data.DataSource({
+                transport: {
+                    read: function (options) {
+                        // make AJAX request to the remote service
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.BlackPurlContentCtrl.getJSONForAllPriceLevels}',
+                            function(result, event){
+                                if (event.type == 'exception') {
+                                    {!uniqueId}showPopupNotification(event.message, "error");
+                                } else {
+                                    var priceLevel = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    priceLevel = priceLevel.replace(re,'');
+                                    priceLevel = JSON.parse(priceLevel);
+                                    if(priceLevel.length==0)
+                                    {
+                                   	 {!uniqueId}showPopupNotification('No records found ','info');
+                                    }
+                                    options.success(priceLevel);
+            
+            
+            						
+            
+            
+                                }
+                        },
+                        {escape: true}
+                        );
+                    },
+                      create:function(e)
+                            {
+                                return false;
+                            },
+                            update:function(e)
+                            {
+                                return false;
+                            },
+                },
+                schema: {
+                    model: {
+                        Id: "PL_Id",
+                        fields: {
+                            PL_Name: {
+                                type: "string", 
+                                validation : {
+                                    required:{message: "Price Level Name is required"},
+                                    priceLevelNamevalidation: function (input) {
+                                        var count = 0;
+                                        if(input.is("[name='PL_Name']")) {
+                                            var data = priceLevelGridDataSource.data();
+                                            $.each( data, function( item, dataVal ) {
+                                                if(data[item]["PL_Name"].trim().toLowerCase() == input.val().trim().toLowerCase() ){
+                                                    count += 1;
+                                                }
+                                            });
+                                        }
+                                        if(count>1) {
+                                        
+                                        }else { 
+                                            input.attr("data-priceLevelNamevalidation-msg", "Name already exists");
+                                            return true;
+                                        }
+                                    },
+                                    PriceLevelNameSpecialCharValidation: function (input, params) {
+                                         //check for the name attribute 
+                                             if (input.filter("[name='PL_Name']").length && input.val()) {
+                                             var a=!/[^a-zA-Z0-9 ]/.test(input.val());
+                                                 if(!a){
+                                                    input.attr("data-PriceLevelNameSpecialCharValidation-msg", "Enter an alphanumeric value");
+                                                    return false;
+                                                 }
+                                                     if(input.val().length > 80) {
+                                                    input.attr("data-PriceLevelNameSpecialCharValidation-msg", "Cannot exceed 80 characters");
+                                                    return false;
+                                               }
+                                        
+                                        }    
+                                        
+                                         return true;
+                                            
+                                                   
+                                 }
+                               }
+                            },
+                           PL_Description: { 
+                                type: "string",
+                                validation : {
+                                    PriceLevelDescriptionLengthValidation : function (input, params) {
+                                    
+                                     if (input.filter("[name='PL_Description']").length && input.val()) {
+                                                     if(input.val().length > 255) {
+                                                    input.attr("data-PriceLevelDescriptionLengthValidation-msg", "Description cannot exceed 255 characters");
+                                                    return false;
+                                                 }
+                                        
+                                        }    
+                                        
+                                         return true;
+                                    }
+                                }           
+                            },
+                            PL_Part_Price_Base: { type: "String" },
+                            PL_Discount_Markup: { 
+                                type: "number",
+                                defaultValue: 0.00,
+                                validation: { 
+                                    PLRateValueValidation : function (input, params) {
+                                        var errMsg = "Cannot be less than zero";
+                                        if(input.is("[name='PL_Discount_Markup']")){
+	                                       	if ($(input).val().trim().length == 0) {
+	                                       		$(input).val(0.00);
+	                                       		$(input).parent().find("input:first-child").val(0.00);
+	                                       		return true;
+	                                       	}else {
+	                                       		var selectedPartPrieBase = $(input).closest("tr").find("span[class='k-widget k-dropdown k-header']>input").val();
+	                                       		var rateApplied = $(input).val();
+	                                       		
+	                                       		if(selectedPartPrieBase == 'Average Cost' || selectedPartPrieBase == 'Cost'){
+	                                       			if(rateApplied < 0){
+	                                       				input.attr("data-PLRateValueValidation-msg", errMsg);
+	                                       				return false;
+	                                       			}
+	                                       		}
+	                                       		
+	                                       		if(rateApplied >= 10000){
+	                                       			errMsg = "Cannot exceed 9999.99%";
+	                                       			input.attr("data-PLRateValueValidation-msg", errMsg);
+	                                       			return false;
+	                                       		}else if(rateApplied < -100){
+	                                       			errMsg = "Cannot be less than -100%";
+	                                       			input.attr("data-PLRateValueValidation-msg", errMsg);
+	                                       			return false;
+	                                       		}
+	                                       	}
+                                    	}
+                                    	
+                                    	return true;
+                                    }
+                                }                   
+                            },
+                            PL_Labour_Rate: {
+                                type: "number",
+                                defaultValue: 0.00,
+                                validation: { 
+                                    PLLabourRateValueValidation : function (input, params) {
+                                    	var errMsg = "Cannot be less than zero";
+                                        if(input.is("[name='PL_Labour_Rate']")){
+	                                       	if ($(input).val().trim().length == 0) {
+	                                       		var win = $(input).closest("tr");
+												var uid = win.data("uid");
+												// Assign value (anything works)
+												$(input).val("0");
+												var model = $("#{!uniqueId}grid").data("kendoGrid").dataSource.getByUid(uid);
+												model.set('PL_Labour_Rate','0');
+												
+												$(input).val(0.00);
+	                                       		$(input).parent().find("input:first-child").val(0.00);
+	                                       		return true;
+	                                       	}else {
+	                                       		if(input.val() < 0) {
+                                                    input.attr("data-PLLabourRateValueValidation-msg", "Cannot be less than zero");
+                                                    return false;
+                                          		}
+                                          		
+                                          		if(input.val().length > 16) {
+		                                            input.attr("data-PLLabourRateValueValidation-msg", "Enter a smaller value");
+		                                            return false;
+		                                         }
+	                                       	}
+                                    	}
+                                    	return true;
+                                    }
+                                }
+                            },
+                            PL_Active : { type: "boolean"},
+                            PL_Default: { type: "boolean", class:"ob-center" },
+                            PL_Order: { type:"number", defaultValue:1 }
+                        }
+                    }
+                },
+                sortable: {
+                            mode: "single",
+                            allowUnsort: false
+                        }
+            });
+            
+            // Method: Load Data Grid here
+            $("#{!uniqueId}grid").kendoGrid({
+                toolbar: [
+                    {
+                        name: "Add",
+                        template: '<img src="{!URLFOR($Resource.Images, '/add.jpg')}" class="bpGridAddButton" id="{!uniqueId}PL_Add_Button">',
+                        text: "Add New Sales Tax Item",
+                        click: function(e){return false;}
+                    },
+                    {
+                        name: "my-extra",
+                        template: '<div class="rightFloatDiv"><div class="leftFloatDiv"><img src="{!URLFOR($Resource.Images, '/copy.png')}" class="my-clone-default" id="{!uniqueId}PL_Clone_Button"/></div><div class="rightFloatDiv"><img src="{!URLFOR($Resource.Images, '/delete.png')}" class="my-delete-default" id="{!uniqueId}PL_Delete_Button"/></div></div>'
+                    }
+                ],
+                columns: [
+                        {
+                            field:"PL_Name",title:"Name", width: "25%", 
+                            template: '<span title=\'${PL_Name}\'>${PL_Name}</span>', ClientTemplate: "#= renderNumber(data) #"
+                        },
+                        {
+                            field:"PL_Description",title:"Description", width: "15%", 
+                            template: '<span title=\'${PL_Description}\'>${PL_Description}</span>'
+                        },
+                        {
+                            field:"PL_Part_Price_Base",title:"Part Price is Based on", width: "20%", editor: typeDropDownEditor,
+                            template: "#=getPPBaseName(PL_Part_Price_Base)#"
+                        },
+                        {
+                            field: "PL_Discount_Markup", title: "<span style=\'margin-left:20%\'>Rate Applied </sapn>", width: "15%" ,
+                            template: '<div class="ob-center"> #=kendo.format("{0:p}", PL_Discount_Markup / 100)#</div>'
+                        },
+                        {
+                            field:"PL_Labour_Rate",title:"<span style=\'margin-left:23%\'>Labour Rate</span>", width: "15%" , 
+                            template: '<div class="ob-center"> #=kendo.format("{0:c2}", PL_Labour_Rate )#</div>'
+                        },
+                        {
+                            field: "PL_Default", title: "<span style=\'margin-left:32%\'>Default </sapn>", width: "15%" , attributes:{ class:"ob-center" },
+                            template: '<div class="ob-center"><img #= PL_Default ? "src={!URLFOR($Resource.Images, '/Check_Selected.png')}" : "src=/img/checkbox_unchecked.gif"# ></div>'
+                        },
+                        {
+                            field: "PL_Active", title: "<span style=\'margin-left:35%\'>Active </span>", width: "15%", attributes:{ class:"ob-center" },
+                            template: '<div class="ob-center"><img #= PL_Active ? "src={!URLFOR($Resource.Images, '/Check_Selected.png')}" : "src=/img/checkbox_unchecked.gif"# ></div>'
+                        }
+                    ],
+                    dataSource: priceLevelGridDataSource,
+                    scrollable:false,
+                    sortable: {
+                        mode: "single",
+                        allowUnsort: false
+                    },
+                        edit:function(e)
+                            {  
+                                    e.sender.unbind('dataBound');
+                                    {!uniqueId}firstClickEvent = true;
+                                    
+                                    var input = e.container.find("input[name='PL_Name']");      
+                                    input.focus();
+                                    
+                            },
+                            save:function(e)
+                            {
+                                
+                                this.editable.end();
+                                
+                                
+                                
+                                
+                            },
+                    
+                    reorderable: true,
+                    dataBound: {!uniqueId}onPLDataBound,
+                    selectable: "single",
+                    editable: {
+                        mode: "inline",
+                        confirmation: false,
+                        update: false
+                    }
+            });
+        }
+        
+        // Price Level Price Book picklist
+        var PL_PPBaseDatasource = JSON.parse(decodeString('{!PriceLevelPriceBookPicklistValues}')); 
+        
+        var dropdownSelected = false;
+        function typeDropDownEditor(container, options) {
+            $('<input data-bind="value:' + options.field + '"/>')
+            .appendTo(container)
+            .kendoDropDownList({      
+                    dataTextField: "Name",
+                    dataValueField: "Value",
+                    dataSource: PL_PPBaseDatasource,
+                    change: function(e){
+                        dropdownSelected = true;
+                        e.preventDefault();
+                    }
+            });
+        }
+        
+        function {!uniqueId}gridChange(currElem){
+            {!uniqueId}currentRowIndex = this.select().index();
+            //{!uniqueId}priceLevelGrid.bind('edit', {!uniqueId}gridChange);
+        }   
+        
+        function getPPBaseName(ppBase) {
+            if(ppBase == null || ppBase == '') return '';
+            for (var idx = 0, length = PL_PPBaseDatasource.length; idx < length; idx++) {
+                if (PL_PPBaseDatasource[idx].Value === ppBase) {
+                    return PL_PPBaseDatasource[idx].Name;
+                }
+            }
+        }
+        
+        // Price Level Grid Instance
+        var {!uniqueId}priceLevelGrid = $("#{!uniqueId}grid").data("kendoGrid");
+        
+        // Method: click bindings for document click
+        function {!uniqueId}PL_DocOnClikcBindings(event){
+            var isSuccessfullySaved = {!uniqueId}validateAndSaveRow();
+        }
+        
+        function {!uniqueId}plGridCellSingleClickEvent(thisElem){
+            // Check if selected row is alreadey in edited mode
+            if($(thisElem).parent().hasClass('k-grid-edit-row')) {
+                
+            }else {
+                var isSuccessfullySaved = true;
+                var hasEditedRow = {!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row");
+                if(hasEditedRow) {
+                    // Save
+                    isSuccessfullySaved = {!uniqueId}validateAndSaveRow();
+                }
+                
+                if(isSuccessfullySaved) {
+                    {!uniqueId}toggleSelectedRowClass($(thisElem).parent());
+                    {!uniqueId}togglePLToolbarButtons(!(isSuccessfullySaved && hasEditedRow));
+                   
+                        if({!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row"))
+                        {
+                        
+                        }
+                        else
+                        {
+                            $("#{!uniqueId}grid").data("kendoGrid").editRow($(thisElem).parent());
+                        } 
+                        
+                    // Unique DEFAULT bind
+                    $( "#{!uniqueId}grid input[name='PL_Default']").on("change", function (event) {
+                        checkExistingDefault_Global(this, 
+                        							'PL_Name', 'PL_Default', 'PL_Active', 
+                        							'{!uniqueId}grid', 'Price Level', {!uniqueId}currentRowIndex,
+                        							{!uniqueId}showPopupNotification
+                        							);
+                    });
+                    
+                    // Unique ACTIVE bind
+                    $( "#{!uniqueId}grid input[name='PL_Active']").on("change", function (event) {
+                        checkExistingDefaultActive_Global(this, 
+	                        							  'PL_Name', 'PL_Default', 'PL_Active', 
+	                        							  '{!uniqueId}grid', 'Price Level', {!uniqueId}currentRowIndex,
+	                        							  {!uniqueId}showPopupNotification
+	                        							 );
+                    });
+                }else{
+                    if({!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                        var existingEditedCells = $("#{!uniqueId}grid .bpGridRowSelected");
+                        {!uniqueId}priceLevelGrid.select( $(existingEditedCells[0]).parent() );
+                    }
+                }
+            }
+        }
+        
+        function {!uniqueId}plGridAddButtonClickEvent(){
+            if({!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                // Save
+                {!uniqueId}validateAndSaveRow();
+            }else {
+                {!uniqueId}addNewDataRow(null);
+            }
+        }
+        
+        function {!uniqueId}plGridCloneButtonClickEvent(){
+            if({!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                if(({!uniqueId}priceLevelGrid.editable.validatable.validate())){
+                    var rowData = {!uniqueId}getSelectedRowData(false);
+                    if(rowData == null){
+                        return;
+                    }
+                    {!uniqueId}addNewDataRow(rowData);
+                    
+                    // At last save all modifications
+                    //{!uniqueId}validateAndSaveRow();
+                }
+            }
+        }
+        
+        function {!uniqueId}addNewDataRow(rowData){
+            var dataSource = {!uniqueId}priceLevelGrid.dataSource;
+            var total = dataSource.data().length;
+            if(total > 0)
+            {
+             {!uniqueId}priceLevelGrid.dataSource.sort(null);
+            }
+           
+            dataSource.insert(total, {
+                "PL_Id": "",
+                "PL_Name" : (rowData == null) ? "" : (getClonedName(rowData.PL_Name)),
+                "PL_Description" : (rowData == null) ? "" : rowData.PL_Description,
+                "PL_Part_Price_Base" : (rowData == null) ? "Price" : rowData.PL_Part_Price_Base,
+                "PL_Discount_Markup" : (rowData == null) ? 0.00 : rowData.PL_Discount_Markup,
+                "PL_Labour_Rate" : (rowData == null) ? 0.00 : rowData.PL_Labour_Rate,
+                "PL_Active" : (rowData == null) ? true : rowData.PL_Active,
+                "PL_Default" : false,
+                "PL_Order":0
+            });
+            dataSource.page(dataSource.totalPages());
+            
+            var newRowToAdd = {!uniqueId}priceLevelGrid.tbody.children().last();
+            
+            {!uniqueId}priceLevelGrid.editRow(newRowToAdd);
+            
+            // Unique DEFAULT bind
+            $( "#{!uniqueId}grid input[name='PL_Default']").on("change", function (event) {
+                checkExistingDefault_Global(this, 
+                							'PL_Name', 'PL_Default', 'PL_Active', 
+                							'{!uniqueId}grid', 'Sales Tax', {!uniqueId}currentRowIndex,
+                							{!uniqueId}showPopupNotification
+                							);
+            });
+            
+            // Unique ACTIVE bind
+            $( "#{!uniqueId}grid input[name='PL_Active']").on("change", function (event) {
+                checkExistingDefaultActive_Global(this, 
+                 							  'PL_Name', 'PL_Default', 'PL_Active', 
+                 							  '{!uniqueId}grid', 'Sales Tax', {!uniqueId}currentRowIndex,
+                 							  {!uniqueId}showPopupNotification
+                 							 );
+            });
+            
+            {!uniqueId}toggleSelectedRowClass(newRowToAdd);
+            {!uniqueId}togglePLToolbarButtons("TF");
+            
+        }
+        
+        function getClonedName(originalName) {
+                var dataSource = {!uniqueId}priceLevelGrid.dataSource;
+                var total = dataSource.data().length;
+                var originalNameWithoutCounter;
+                
+                var cloneName = originalName + ' Copy';
+                var countToBeAppend = 0;
+                var isLoopExecuted = false;
+                for(var i = 0; i < total ; i++ ) {
+                    if(dataSource.at(i).PL_Name.search(cloneName) != -1) {
+                        isLoopExecuted = true;
+                        var lastIndex = dataSource.at(i).PL_Name.lastIndexOf(" Copy");
+                        var counter = dataSource.at(i).PL_Name.substr(lastIndex + 5, dataSource.at(i).PL_Name.length);
+                        if(countToBeAppend < +counter) {
+                            countToBeAppend = +counter;
+                        }
+                    }
+                }
+                
+                if(countToBeAppend == 0) {
+                    if(isLoopExecuted) {
+                        return cloneName + '1'; 
+                    } else {
+                        return cloneName;
+                    }
+                } else {
+                    countToBeAppend++;
+                    return cloneName + countToBeAppend;
+                }
+            }
+        
+        var confirmDeletePriceLevelRecord = function(isConfirmed){
+        	if(!isConfirmed){
+        		return;
+        	}
+        	var rowData = {!uniqueId}getSelectedRowData(true);
+        	
+            var priceLevelRecId = rowData.PL_Id;
+            
+            if(priceLevelRecId == null || priceLevelRecId == ''){
+                {!uniqueId}refreshGridLocally(rowData);
+            }else{
+                Visualforce.remoting.Manager.invokeAction(  '{!$RemoteAction.BlackPurlContentCtrl.deletePriceLevel}',
+                                                            encodeString(priceLevelRecId),
+                                                            function(result, event){
+                                                                if (event.status) {
+                                                                    // Successfully deleted record
+                                                                    {!uniqueId}refreshGridLocally(rowData);
+                                                                    {!uniqueId}togglePLToolbarButtons(false);
+                                                                } else if (event.type === 'exception') {
+                                                                    {!uniqueId}showPopupNotification(event.message, "error");
+                                                                } else {
+                                                                    {!uniqueId}showPopupNotification(event.message, "error");
+                                                                }
+                                                            },
+                                                            {escape: true}
+                                                        );
+            }
+        }
+        
+        function {!uniqueId}plGridDeleteButtonClickEvent(){
+            var rowData = {!uniqueId}getSelectedRowData(true);
+             debug({!uniqueId}priceLevelGrid.select().closest("tr"));
+            if(rowData == null){
+                return;
+            }
+            if(rowData.PL_Id != null && rowData.PL_Id.length > 0 && rowData.PL_Default == true){
+				{!uniqueId}showPopupNotification('Cannot delete a default Price Level record.', 'error');
+                return;
+            }
+            
+            var delConfirmMsg = "Are you sure that you want to delete record for " + rowData.PL_Name + "?";
+            confirmAction("Confirm Delete", delConfirmMsg, confirmDeletePriceLevelRecord);
+        }
+        
+        function {!uniqueId}getSelectedRowData(isToDelInCase){
+            var rowIndex = {!uniqueId}priceLevelGrid.select().closest("tr");
+            if(rowIndex.length == 0){
+            	if(isToDelInCase){
+                	{!uniqueId}deleteNewEditingRowInPLGrid();
+                }
+                return null;
+            }else{
+                var rowData = {!uniqueId}priceLevelGrid.dataItem(rowIndex);
+                if(rowData.PL_Id != ""){
+                    return rowData;
+                }else if( ({!uniqueId}priceLevelGrid.editable.validatable.validate()) == false ){
+                	if(isToDelInCase){
+                    	{!uniqueId}deleteNewEditingRowInPLGrid();
+                    }
+                    return null;
+                }
+            }
+            var rowData = {!uniqueId}priceLevelGrid.dataItem(rowIndex);
+            return rowData;
+        }
+        
+        function {!uniqueId}deleteNewEditingRowInPLGrid(){
+            if({!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                var existingEditedCells = $("#{!uniqueId}grid .bpGridRowSelected");
+                {!uniqueId}refreshGridLocally( $(existingEditedCells[0]).parent() );
+                {!uniqueId}togglePLToolbarButtons(false);
+                EditRowStatus=false;
+            }
+        }
+        
+        // Validate and Save row
+        function {!uniqueId}validateAndSaveRow(){
+            if( {!uniqueId}priceLevelGrid.editable != null && ({!uniqueId}priceLevelGrid.editable.validatable.validate())){
+                {!uniqueId}savePriceLevel();
+                return true;
+            }else {
+                return false;
+            }
+        }
+        
+        function doesDataSourceHaveChanges(){
+            var gridDataSource = {!uniqueId}priceLevelGrid.dataSource;
+            var dirty = false;
+            $.each(gridDataSource._data, function () {
+                if (this.dirty == true) {
+                    dirty = true;
+                }
+            });
+        
+            if (gridDataSource._destroyed.length > 0) dirty = true;
+        
+            return dirty;
+        }
+        
+        function {!uniqueId}savePriceLevel(){
+            if({!uniqueId}priceLevelGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                if(({!uniqueId}priceLevelGrid.editable.validatable.validate())) {
+                    var rowIndex = {!uniqueId}priceLevelGrid.tbody.find(".k-grid-edit-row");
+                    if(rowIndex.length == 0){
+                        return;
+                    }
+                
+                    var rowData = JSON.stringify({!uniqueId}priceLevelGrid.dataItem(rowIndex));
+                    Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.BlackPurlContentCtrl.savePriceLevelJSON}',
+                                                                        encodeString(rowData),
+                                                                        function(result, event){
+                                                                            if (event.status) {
+                                                                            	{!uniqueId}showPopupNotification("Saved", "success");
+                                                                                rowData.PL_Order=1; 
+                                                                                {!uniqueId}refreshGrid();
+                                                                            }else if (event.type === 'exception') {
+                                                                                {!uniqueId}showPopupNotification(event.message, "error");
+                                                                            } else {
+                                                                                {!uniqueId}showPopupNotification(event.message, "error");
+                                                                            }
+                                                                        },
+                                                                        {escape: true}
+                            );
+                }
+            }
+        }
+        
+        // Refresh the grid:
+        function {!uniqueId}refreshGrid(){
+            {!uniqueId}priceLevelGrid.dataSource.read();
+            {!uniqueId}priceLevelGrid.refresh();
+        }
+        
+        // Refresh grid locally
+        function {!uniqueId}refreshGridLocally(rowData){
+            {!uniqueId}priceLevelGrid.removeRow(rowData);
+            {!uniqueId}priceLevelGrid.dataSource.remove(rowData);
+            {!uniqueId}showPopupNotification("Deleted", "success");
+        }
+        
+        function {!uniqueId}removeSelectedRowsClass(){
+            var selectedRows = $("#{!uniqueId}grid .bpGridRowSelected");
+            for(var rowNum = 0; rowNum < selectedRows.length; rowNum++){
+                lastColumnOfSelectedRow = $(selectedRows[rowNum]);
+                lastColumnOfSelectedRow.removeClass("bpGridRowSelected");
+            }
+        }
+        
+        function {!uniqueId}toggleSelectedRowClass(selectedRow){
+            // If previouslySelectedRow
+            var selectedCellElem = $(selectedRow.children()[0]);
+            var previouslySelectedRow = (selectedCellElem.attr("class") == "bpGridRowSelected") ? true : false;
+            
+            var lastColumnOfSelectedRow;
+            if(!previouslySelectedRow){
+                for(var i = 0; i < selectedRow.children().length; i++){
+                    lastColumnOfSelectedRow = $(selectedRow.children()[i]);
+                    lastColumnOfSelectedRow.addClass("bpGridRowSelected");
+                }
+            }
+        }
+            
+        function {!uniqueId}togglePLToolbarButtons(makeActive){
+        	var tempMakeActive = makeActive;
+              	if(makeActive == "TF"){
+           		makeActive = true;
+           	}
+            var cloneButton = $("#{!uniqueId}PL_Clone_Button");
+            var deleteButton = $("#{!uniqueId}PL_Delete_Button");
+            
+            if(makeActive){
+                // Show operations buttons in toolbar
+                cloneButton.removeClass("my-clone-default");
+                cloneButton.addClass("my-clone-active");
+                
+                deleteButton.removeClass("my-delete-default");
+                deleteButton.addClass("my-delete-active");
+                
+                cloneButton.prop('title', 'Clone');
+            	deleteButton.prop('title', 'Delete');
+            }else{
+                deleteButton.addClass("my-delete-default");
+                deleteButton.removeClass("my-delete-active");
+                
+            	deleteButton.removeAttr('title');
+            }
+            
+            if(!makeActive || tempMakeActive == "TF"){
+                // hide operations buttons in toolbar
+                cloneButton.addClass("my-clone-default");
+                cloneButton.removeClass("my-clone-active");
+                
+                cloneButton.removeAttr('title');
+            }
+        }
+        
+        function {!uniqueId}onPLDataBound(e) {
+            
+            $("#{!uniqueId}grid").find(".k-grid-toolbar").insertAfter($("#{!uniqueId}grid").children()[1]);
+            $(".k-grid-toolbar").css("background-color", "#ffffff");
+            $(".k-grid-toolbar").css("border-bottom", " solid 1px #ccc");
+            $(".k-grid-toolbar").css("border-top", "none");
+            $(".k-grid-toolbar").css("height", "25px");
+            $(".k-grid-toolbar").css("vertical-align", "middle");
+            
+            $(".bpGridAddButton").prop('title', 'Add');
+            
+            {!uniqueId}priceLevelGrid.bind('edit', {!uniqueId}gridChange);
+        }
+        
+        // Display popup notiications:
+        function {!uniqueId}showPopupNotification(message, msgType){
+        	{!uniqueId}popupNotification.hide();
+        	{!uniqueId}popupNotification.show(kendo.toString(message), msgType);
+        }
+        var asd;
+    </script>
+</apex:component>

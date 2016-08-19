@@ -1,0 +1,1745 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" controller="ViewKitCtrl">
+    <html ng-app="viewKi">
+      
+        <head>
+            <title>View Kit</title>
+            <c:Css_and_Js />
+            <c:NewViewCustomerStyle />
+            <c:NewDirPagination /><!-- <c:dirPagination /> -->
+            <c:NewPartPopUpOnVendorOrder />
+            <style>
+               /*  ::-webkit-scrollbar {
+                    width: 2px;
+                    height: 20px;
+                }
+                ::-webkit-scrollbar-button {
+                    background: #fff;
+                }
+                ::-webkit-scrollbar-track-piece {
+                    background: #fff;
+                }
+                ::-webkit-scrollbar-thumb {
+                    background: #00AEEF;
+                } */
+            
+            	::-webkit-scrollbar{
+                    width: 11px;
+                    height: 20px;
+                }
+                ::-webkit-scrollbar-button{
+                    background: #ECF0F1;
+                }
+                ::-webkit-scrollbar-track-piece{
+                    background: #ECF0F1;
+                }
+                ::-webkit-scrollbar-thumb{
+                    background: #B7BEC6;
+                    border-radius : 3px;
+                    border: 1px solid #fff;
+                } 
+            
+            
+                .angucomplete-dropdown {
+                    width: 100%;
+                    margin-top: 28px;
+                }
+                
+                #GeneralInfoSection .rowGeneral .fa,
+                #ServiceInfoSection .rowGeneral .fa{
+                    color: #939CA9;
+                }
+                
+                #ServiceInfoSection{
+                    padding-top: 24px;
+                    border-top: 1px solid #ECF0F1;
+                    margin-bottom: 48px;
+                }
+                
+                .service_main{
+                    margin-top: 25px;
+                }
+                .service_sub_list li,
+                .service_sub_list p{
+                    margin: 5px 10px;
+                    font-weight: 600;
+                    word-break: break-all;
+                }
+                .grid_container_row{
+                    margin-left: -20px;
+                    margin-right: -20px;
+                }
+                
+                
+                .cou_plus_icon {
+                    margin-left: 10px;
+                    color: #939CA9;
+                }
+                
+                .gid_container_Customer .table {
+                    border: 0;
+                }
+                .main_section_COU_Header .actionRow .actionText {
+                    margin-left: 5px;
+                    color: #939CA9;
+                }
+                .first_img {
+                    height: 30px;
+                }
+                .gid_container_Customer .table th {
+                    border: none;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                }
+                .gid_container_Customer .table tbody {
+                    border: none;
+                }
+                .gid_container_Customer .table tbody > tr > td {
+                    border: none;
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                    vertical-align: middle;
+                }
+                .gid_container_Customer .table tbody .tddropdown td {
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                    vertical-align: middle;
+                }
+                .angucomplete-dropdown {
+                    width: 100%;
+                    margin-top: 28px;
+                }
+                .gid_container_Customer .tableHeader {
+                    margin-left: -15px;
+                    margin-right: -15px;
+                }
+                .gid_container_Customer .S2 {
+                    margin-left: 12px;
+                    margin-right: 12px;
+                }
+                .gid_container_Customer table tr.edit_panel {
+                    background: #fff;
+                }
+                .gid_container_Customer table tr.edit_panel,
+                .gid_container_Customer table tr.Editable_row {} .gid_container_Customer table tr.edit_panel.show_tr {
+                    display: table-row;
+                }
+                .gid_container_Customer table tr.edit_panel input[type="radio"] {
+                    float: left;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body .editform_btn {
+                    position: absolute;
+                    right: 20px;
+                    top: 87px;
+                    width: 50px;
+                }
+                .gid_container_Customer table tr.edit_panel td {
+                    overflow: hidden;
+                    height: 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box {
+                    border: 1px dashed #A8A8A8;
+                    margin: 10px 5px;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel.animate_tr td {
+                    border-left: 3px solid #939393;
+                    height: auto;
+                    padding: 4px;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box.ng-hide {
+                    height: 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box {
+                    transition: all 0.5s ease;
+                }
+                .edit_box {
+                    transition: .5s linear all;
+                    height: 130px;
+                }
+                .gid_container_Customer table tr.edit_panel.animate_tr {
+                    margin-top: 10px;
+                    transition: all 0.5s ease;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .its-heading {
+                    position: absolute;
+                    left: 24px;
+                    top: -15px;
+                    min-width: 175px;
+                    background: #fff;
+                    min-height: 30px;
+                    padding: 6px;
+                    font-size: 14px;
+                    color: #939CA9;
+                    font-weight: bold;
+                }
+                .gid_container_Customer .table .edite_btn{  
+                    height: 38px;
+                    width: 38px; 
+                    float: left;
+                    padding: 4px;
+                    margin: 4px 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body {
+                    margin: 26px;
+                }
+                .animate-showContent {
+                    opacity: 1;
+                }
+                .animate-showContent.ng-hide-add.ng-hide-add-active,
+                .animate-showContent.ng-hide-remove.ng-hide-remove-active {
+                    -webkit-transition: all ease-in-out 0.1s;
+                    transition: all ease-in-out 0.1s;
+                }
+                .animate-showContent.ng-hide {
+                    line-height: 0;
+                    opacity: 0;
+                    padding: 0 10px;
+                }
+                
+                .gid_container_Customer .headerRow{
+                    background-color: #E8E8E8;  
+                } 
+                
+                .gid_container_Customer .table .checkbox{
+                    margin-top: 0px;
+                }
+                
+                .smschkbox .chk_tick{
+                    width: 20px !important;
+                    height: 20px !important;
+                    border-radius: 4px;
+                    margin: 3px 6px;
+                    display: block;
+                    float: left;
+                    cursor: pointer;
+                    border: 1px solid #CCC;
+                }
+                .smschkbox .chk_tick .chksqure {
+                    font-size: 0px;
+                    height: 12px;
+                    width: 12px;
+                    margin: 3px;
+                    border-radius: 2px;
+                    background: #D8D8D8;
+                }
+                .smschkbox .chked .chksqure {
+                    font-size: 0px !important;
+                    height: 12px;
+                    width: 12px;
+                    margin: 3px;
+                    border-radius: 2px;
+                    background: #71BF3E;
+                }
+                .show_Availableline{
+                    background:#27ae60;
+                    font-size:12;
+                    color:#fff;
+                    padding-left:10px;
+                
+                }
+                .gid_container_Customer .table tbody > tr > td .available_td{
+                    padding:0px;
+                }               
+                
+                .statusRow .kitStatus{
+                	margin: 0;
+                	float: left;
+                	padding-top: 5px;
+                }
+                
+                /* Added by pooja */
+                .userNameblock_Kit_ML0	{
+                	margin-left: 0px;
+                }
+                
+                .searchToAdd_Kit_Ml110	{
+                	margin-left: 110px;
+                }
+            </style>
+            <script>
+                var viewKit = angular.module('viewKi', ['BPGlobalHeader','searchToAddModule', 'dir.listPagination', 'ngAnimate','ui-notification', 'PartPopUpModule']);
+                
+               
+               viewKit.directive('numberOnlyInputHeader', function () {
+                    return { 
+                        restrict : 'EA',
+                        template : '<input type="text" ng-blur="blur();" onfocus="this.select();" class="form-control" ng-model="inputValue" id="{{idVal}}" style="width: 60%;"/>',
+                        scope : {
+                            inputValue : '=',
+                            "idVal": "@idVal"
+                        },
+                        link : function (scope) {
+                            
+                            scope.blur=function(){
+                                    scope.$parent.blurcallback();
+                            }
+                            
+                            
+                            scope.$watch('inputValue', function (newValue, oldValue) {
+                                var arr = String(newValue).split("");
+                                var pieces = String(newValue).split(".");
+                                if (arr.length === 0)
+                                    return;
+                                if (arr[0] == '-') {
+                                    scope.inputValue = oldValue;
+                                } else if (isNaN(newValue)) {
+                                    scope.inputValue = oldValue;
+                                } else if (typeof(pieces[1]) != "undefined" && pieces[1].length > 2) {
+                                    scope.inputValue = oldValue;
+                                }
+                            });
+                        }
+                    };
+                });
+               
+                viewKit.directive('numberOnlyInput', function () {
+                    return { 
+                        restrict : 'EA',
+                        template : '<input type="text" onfocus="this.select();" class="form-control" ng-model="inputValue"  id="{{idVal}}" style="width: 60%;"/>',
+                        scope : {
+                            inputValue : '=',
+                            "idVal": "@idVal"
+                        },
+                        link : function (scope) {
+                        	scope.inputValue = Math.round(scope.inputValue * 100) / 100; 
+                        	
+                            scope.$watch('inputValue', function (newValue, oldValue) {
+                                var arr = String(newValue).split("");
+                                var pieces = String(newValue).split(".");
+                                if (arr.length === 0)
+                                    return;
+                                if (arr[0] == '-') {
+                                    scope.inputValue = oldValue;
+                                } else if (isNaN(newValue)) {
+                                    scope.inputValue = oldValue;
+                                } else if (typeof(pieces[1]) != "undefined" && pieces[1].length > 2) {
+                                    scope.inputValue = oldValue;
+                                }
+                            });
+                        }
+                    };
+                });
+                
+                
+                viewKit.controller('ViewKitCtrl', function ($scope, $timeout, kitInfoService,Notification){
+                    $scope.Viewkit = {};
+                    $scope.Viewkit.kitId = "{!JSENCODE(URLENCODE($CurrentPage.parameters.id))}";
+                    $scope.Viewkit.ShowContent = false;
+                    $scope.Viewkit.HeaderUpdated=false;
+                    
+                     $scope.SearchableObjectsModal=
+                                            [
+                                                { "Name":"Part","Object":"Part__c"},
+                                                { "Name":"Labour","Object":"Labour_Code__c" }
+                                            ]
+                    
+                    // Map variable to hold order of sorting
+                    var sortOrderMap = {
+                        "ASC"   :   "DESC",
+                        "DESC"  :   ""
+                    };
+                    
+                    // Pagination and sort related JSON
+                    $scope.Viewkit.kitLineItemsPageSortAttrsJSON = {};
+                    
+                    // Method to set default page sort attributes JSON
+                    $scope.Viewkit.setDefaultPageSortAttrs = function() {
+                        $scope.Viewkit.kitLineItemsPageSortAttrsJSON = {
+                            ChangesCount    :   0,
+                            CurrentPage     :   1,
+                            PageSize        :   10,
+                            Sorting :   [{
+                                FieldName       :   "LastModifiedDate",
+                                SortDirection   :   "DESC"
+                            }]
+                        };
+                        try{
+                            $scope.Viewkit.kitLineItemsPageSortAttrsJSON.PageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+                        } catch (ex){}
+                        
+                        
+                        $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON = {
+                            ChangesCount    :   0,
+                            CurrentPage     :   1,
+                            PageSize        :   10,
+                            Sorting :   [{
+                                FieldName       :   "LastModifiedDate",
+                                SortDirection   :   "DESC"
+                            }]
+                        };
+                        try{
+                            $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON.PageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+                        } catch (ex){}
+                    }
+                    
+                    $scope.Viewkit.loadKitInfo = function () {
+                        var kitId = $scope.Viewkit.kitId;  
+                        $scope.Viewkit.setDefaultPageSortAttrs();
+                        
+                        kitInfoService.getKitInfo(kitId, $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON).then(function (kitInfo) {
+                            debug(kitInfo);
+                            $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+                            $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+                            $scope.Viewkit.TotalActiveOrder = kitInfo.TotalActiveOrder;
+                            $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+                            //$scope.Viewkit.PrimaryRowIsFixedPrice = $scope.Viewkit.kitInfo.IsFixedPrice ;
+                            $scope.Viewkit.ActiveOrderList = kitInfo.ActiveOrderList;
+                            $scope.Viewkit.ShowContent = true;
+                            setTimeout(function () {
+                                $scope.Viewkit.kitLineItemsPageSortAttrsJSON.ChangesCount++;
+                            }, 10);
+                        }, function (errorSearchResult) {
+                            Notification.error(errorSearchResult);
+                        });     
+                    }
+                    
+                    $scope.blurcallback=function(){
+                        
+                        $scope.Viewkit.HeaderUpdated = true;
+                        $scope.Viewkit.updateKitHeader($scope.Viewkit.kitInfo.Id ,JSON.stringify($scope.Viewkit.kitInfo),false);
+                        
+                    }
+                    
+                    
+                    $scope.Viewkit.updateKitContents = function(KitHeaderLineItemList){
+                        $scope.Viewkit.kitContentsItems = KitHeaderLineItemList;
+                        $scope.Viewkit.kitContentsItems_editRow = [];
+                        for (i = 0; i < $scope.Viewkit.kitContentsItems.length; i++) {
+                            $scope.Viewkit.kitContentsItems_editRow.push({
+                                isEdit : false,
+                                radioValue : 0
+                            });
+                        }
+                    }
+                    
+                    $scope.Viewkit.editKitContentsItem = function(event, index){
+                        
+                
+                        
+                        if(event.target.className== "fa fa-check-square chksqure")
+                        {
+                             IsFixedPrice= !$scope.Viewkit.kitContentsItems[index].IsFixedPrice;
+                
+                             var isEditModeEnabled = false;
+                                var lineitem = [];
+                                for (i = 0; i < $scope.Viewkit.kitContentsItems_editRow.length; i++) {
+                                    if ($scope.Viewkit.kitContentsItems_editRow[i].isEdit == true) {
+                                        isEditModeEnabled = true;
+                                       
+                                        //lineitem.push(JSON.stringify($scope.Viewkit.kitContentsItems[i]));
+                                        $scope.Viewkit.updateKitLineItem(JSON.stringify($scope.Viewkit.kitContentsItems[i]),$scope.Viewkit.kitInfo.Id);
+                                    }
+                                    $scope.Viewkit.kitContentsItems_editRow[i].isEdit = false;
+                                }
+                
+                                if (!isEditModeEnabled) {
+                                    $scope.Viewkit.kitContentsItems[index].IsFixedPrice=IsFixedPrice;
+                                    
+                                    if(IsFixedPrice){
+                                        $scope.Viewkit.kitContentsItems_editRow[index].isEdit = true;
+                                        
+                                        setTimeout(function () {
+                                            angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+                                        }, 10);
+                                    }
+                                    else{
+                                         
+                                         $scope.Viewkit.updateKitLineItem(JSON.stringify($scope.Viewkit.kitContentsItems[index]),$scope.Viewkit.kitInfo.Id);
+                                    
+                                    }
+                                    
+                                    
+                                } 
+                
+                             
+                            
+                        } 
+                        else{
+                                
+                                var isEditModeEnabled = false;
+                                var lineitem = [];
+                                for (i = 0; i < $scope.Viewkit.kitContentsItems_editRow.length; i++) {
+                                    if ($scope.Viewkit.kitContentsItems_editRow[i].isEdit == true) {
+                                        isEditModeEnabled = true;
+                                       
+                                        //lineitem.push(JSON.stringify($scope.Viewkit.kitContentsItems[i]));
+                                        $scope.Viewkit.updateKitLineItem(JSON.stringify($scope.Viewkit.kitContentsItems[i]),$scope.Viewkit.kitInfo.Id);
+                                    }
+                                    $scope.Viewkit.kitContentsItems_editRow[i].isEdit = false;
+                                }
+                
+                                if (!isEditModeEnabled) {
+                                    $scope.Viewkit.kitContentsItems_editRow[index].isEdit = true;
+                                    setTimeout(function () {
+                                        angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+                                    }, 10);
+                                } 
+                        
+                        }
+                   }
+                    
+                   
+                   $scope.Viewkit.updateKitLineItem = function ( jsonString,  kitHeaderId){
+                        kitInfoService.updateKitLineItem(jsonString, kitHeaderId, $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON).then(function (kitInfo) {
+                                       if(kitInfo.ResponseDetails.ResponseCode=='200' ||  kitInfo.ResponseDetails.ResponseCode ==null){
+                                            $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+                                            $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+                                            $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+                                            setTimeout(function () {
+                                                $scope.Viewkit.kitLineItemsPageSortAttrsJSON.ChangesCount++;
+                                            }, 10);
+                                            Notification.success('Kit Updated') ;
+                                       }
+                                       else{
+                                            Notification.error(kitInfo.ResponseDetails.ResponseMeassage);
+                                            $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+                                            $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+                                            $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+                                            
+                                            
+                                       }
+                                }, function (errorSearchResult) {
+                                        $scope.Viewkit.kitInfo = errorSearchResult;
+                                        $scope.Viewkit.ShowContent = false;
+                                }); 
+                    } 
+                    
+                    
+                    $scope.Viewkit.closeEditKitContentsRow = function(){
+                        for (i = 0; i < $scope.Viewkit.kitContentsItems_editRow.length; i++) {
+                            if ($scope.Viewkit.kitContentsItems_editRow[i].isEdit == true) {
+                                $scope.Viewkit.kitContentsItems_editRow[i].isEdit = false;
+                            }
+                        }
+                    }
+                    
+                    $scope.Viewkit.editRowBlur = function(event,index) {
+                        if (event.keyCode == 9) {
+                            $scope.Viewkit.updateKitLineItem(JSON.stringify($scope.Viewkit.kitContentsItems[index]),$scope.Viewkit.kitInfo.Id);
+                        }
+                    }
+                    
+                    
+                    $scope.Viewkit.EditRowBlurQtyNeedeed =function(event,index){
+                        if(event.keyCode == 9 &&  !$scope.Viewkit.kitContentsItems[index].IsFixedPrice){
+                                $scope.Viewkit.updateKitLineItem(JSON.stringify($scope.Viewkit.kitContentsItems[index]),$scope.Viewkit.kitInfo.Id);
+                        }
+                    
+                    }
+                    
+                   
+                    
+                    
+                    $scope.Viewkit.kitContentsGoAction = function(index) {
+                    	//condition added by pooja
+                    	var isKitWithUnfixedPricePresent = false;
+                    	
+                    	if($scope.Viewkit.kitInfo.IsFixedPrice != true || $scope.Viewkit.kitContentsItems[index].TotalPrice == 0)	{
+                    		isKitWithUnfixedPricePresent = true;
+                    	} else {
+                    		for(var i=0; i < $scope.Viewkit.kitContentsItems.length; i++) {
+	                    		if(i != index && $scope.Viewkit.kitContentsItems[i].IsFixedPrice != true) {
+	                    			isKitWithUnfixedPricePresent = true;
+	                    			break;
+                    			}
+                    		}
+                    	 }
+                    	if(isKitWithUnfixedPricePresent == false)	{
+                    		Notification.error("Line item can not be remove as no unfixed line item present in kit header to adjust exceeded price");
+                    		return;
+                    	}
+                    
+                    	
+                        if ($scope.Viewkit.kitContentsItems_editRow[index].radioValue == 1) {
+                        		  
+                                var kitLineItemId =$scope.Viewkit.kitContentsItems[index].Id;
+                                kitInfoService.removeKitLineItem (kitLineItemId, $scope.Viewkit.kitInfo.Id,  $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON)
+                                .then(function(kitInfo){
+                                
+                                	debug("inside Go action");
+	                                        debug($scope.Viewkit.TotalKitLineItems);
+	                                        debug($scope.Viewkit.kitLineItemsPageSortAttrsJSON.PageSize);
+	                                        var itemsGridNewPN = $scope.Viewkit.kitLineItemsPageSortAttrsJSON.CurrentPage;
+	                                        debug("itemsGridNewPN:"+itemsGridNewPN);
+					                        if($scope.Viewkit.TotalKitLineItems % $scope.Viewkit.kitLineItemsPageSortAttrsJSON.PageSize == 1){
+					                        	debug("inside condition");
+					                            $scope.Viewkit.kitLineItemsPageSortAttrsJSON.CurrentPage = (itemsGridNewPN > 1) ? (itemsGridNewPN - 1) : 1;
+					                            debug("current page:"+$scope.Viewkit.kitLineItemsPageSortAttrsJSON.CurrentPage);
+					                  }
+	                                 if(kitInfo.ResponseDetails.ResponseCode=='200' ||  kitInfo.ResponseDetails.ResponseCode ==null){
+	                                    $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+	                                    $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+	                                    $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+	                                        Notification.success('Kit Updated') ;
+	                                        
+	                                 }
+	                                 else{
+	                                    Notification.error(kitInfo.ResponseDetails.ResponseMeassage);
+	                                    $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+	                                    $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+	                                    $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+	                              	}
+                                });
+                            }
+                        }
+                    
+                    $scope.Viewkit.updateKitHeader = function(kitHeaderId, JsonKitHeader,flag){
+                    
+                    	//Condition added by pooja
+                    	var sumOfFixedTotalPrice = 0;
+                    	for(var i=0; i < $scope.Viewkit.kitContentsItems.length; i++) {
+	                    		if($scope.Viewkit.kitContentsItems[i].IsFixedPrice == true) {
+	                    			sumOfFixedTotalPrice = sumOfFixedTotalPrice + $scope.Viewkit.kitContentsItems[i].TotalPrice;
+                    			}  
+                    		} 
+                    	if($scope.Viewkit.kitInfo.FixedPrice < sumOfFixedTotalPrice)	{
+                    		Notification.error("Kit header total can not be less than fixed line items total");
+                    		return;          
+                    	}      
+                    	  
+                    	  
+                        kitInfoService.updateKitHeader(kitHeaderId, JsonKitHeader, $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON).then(function (kitInfo) {
+                                   if(kitInfo.ResponseDetails.ResponseCode=='200' ||  kitInfo.ResponseDetails.ResponseCode ==null){
+                                        $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+                                        $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+                                        $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+                                        $scope.Viewkit.ShowContent = true;
+                                        $scope.Viewkit.HeaderUpdated = false;
+                                        setTimeout(function () {
+                                            $scope.Viewkit.kitLineItemsPageSortAttrsJSON.ChangesCount++;
+                                        }, 10);
+                                        if($scope.Viewkit.kitInfo.IsFixedPrice && flag){
+                                                setTimeout(function () {
+                                                    debug('primary Row Focus');
+                                                    angular.element('#kitPrimaryRowTotal').focus();
+                                                }, 10);
+                                            }
+                                            
+                                            Notification.success('Kit Updated') ;
+                                   
+                                   }
+                                   else{
+                                        Notification.error(kitInfo.ResponseDetails.ResponseMeassage);
+                                        $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+                                        $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+                                        $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList)
+                                   }
+                                   
+                                   
+                                    
+                            }, function (errorSearchResult) {
+                                    $scope.Viewkit.kitInfo = errorSearchResult;
+                                    $scope.Viewkit.ShowContent = false;
+                            });  
+                       }     
+                    
+                    
+                    $scope.Viewkit.toggleKitPrimaryRowFixedChkBox = function(){
+                        //$scope.Viewkit.PrimaryRowIsFixedPrice = !$scope.Viewkit.PrimaryRowIsFixedPrice;
+                        $scope.Viewkit.kitInfo.IsFixedPrice= !$scope.Viewkit.kitInfo.IsFixedPrice;
+                        
+                         $scope.Viewkit.updateKitHeader($scope.Viewkit.kitInfo.Id ,JSON.stringify($scope.Viewkit.kitInfo),true);
+                        
+                    }
+                    
+                   $scope.Viewkit.toggleKitItemRowFixedChkBox=function(event,index){
+                   
+                         		 var IsFixedPrice= !$scope.Viewkit.kitContentsItems[index].IsFixedPrice;
+                   					debug(IsFixedPrice);          
+                                    if(IsFixedPrice){
+                                    
+                                    $scope.Viewkit.kitContentsItems[index].IsFixedPrice = true;
+                                        setTimeout(function () {
+                                            angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+                                        }, 10);
+                                    }
+                                    else{
+                                    		$scope.Viewkit.kitContentsItems[index].IsFixedPrice = false;	
+                                     		$scope.Viewkit.updateKitLineItem(JSON.stringify($scope.Viewkit.kitContentsItems[index]),$scope.Viewkit.kitInfo.Id);
+                                    }
+                   
+                   }
+                    
+                    $scope.SearchToadd = {};
+                    $scope.SearchableObjects = "Part__c,Labour_Code__c";
+                    $scope.typeToSearch = "";
+                    $scope.PreferredObject = "Merchandise";
+                    $scope.SelectedObjectValue = null;  
+                    
+                    $scope.SetDetfault =function(selectedRecord) {
+                    $scope.SelectedObjectValue = null;
+					 $scope.SearchableObjects = 'Part__c,Labour_Code__c';
+                    }
+                   
+                    $scope.SearchToAddCallback =function(selectedRecord){
+                        
+                        debug(selectedRecord)
+                        
+                        if(selectedRecord.ObjectType=="Object"){
+                            $scope.SelectedObjectValue= selectedRecord.title ;
+                           
+                            for(i=0; i < $scope.SearchableObjectsModal.length ;i++){
+                                if($scope.SearchableObjectsModal[i].Name == $scope.SelectedObjectValue ){
+                                     $scope.SearchableObjects = $scope.SearchableObjectsModal[i].Object
+                                }
+                            }
+ 
+                        }
+                        else{
+                                 $scope.SearchableObjects = 'Part__c,Labour_Code__c';
+                                 
+                                 if(selectedRecord.originalObject.Value != null){
+                                        kitInfoService.insertKitLineItem($scope.Viewkit.kitInfo.Id, selectedRecord.originalObject.Value, $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON).then(function (kitInfo) {
+                                               if(Object.keys(kitInfo).length != 0) {
+	                                               if(kitInfo.ResponseDetails.ResponseCode=='200' ||  kitInfo.ResponseDetails.ResponseCode ==null){
+	                                               		debug('Insert');    
+	                                               		debug(kitInfo);  
+	                                                    $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+	                                                    $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+	                                                    $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+	                                                     $scope.Viewkit.kitContentsItems_editRow[0].isEdit = true;  
+	                                                    $scope.Viewkit.ShowContent = true;
+	                                                    
+	                                                     
+	                                                    setTimeout(function () {
+	                                                        $scope.Viewkit.kitLineItemsPageSortAttrsJSON.ChangesCount++;
+	                                                    }, 10);
+	                                                    
+	                                                    $scope.Viewkit.HeaderUpdated = false;
+	                                                    if($scope.Viewkit.kitInfo.IsFixedPrice ){
+	                                                            setTimeout(function () {
+	                                                                debug('primary Row Focus'); 
+	                                                                 angular.element('.gid_container_Customer grid_container_row .edit_panel sample-show-hide').find('input').filter(':first').focus();
+	                                                            }, 10);
+	                                                        }
+	                                               }  
+	                                               else{ 
+	                                                     
+	                                                    Notification.error(kitInfo.ResponseDetails.ResponseMeassage);
+	                                                    $scope.Viewkit.kitInfo = kitInfo.KitHeaderRec;
+	                                                    $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+	                                                    $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList)
+	                                               } 
+                                               }
+                                        }, function (errorSearchResult) {
+                                               // $scope.Viewkit.kitInfo = errorSearchResult;
+                                               //$scope.Viewkit.ShowContent = false;
+                                        });
+                                 }
+                        } 
+                    }  
+                     
+                    
+                    
+                    $scope.Viewkit.editKitDetails = function () {
+                        var kitInfo = $scope.Viewkit.kitInfo;
+                        $scope.$broadcast('EditKitEvent', kitInfo);
+                    }
+                    
+                    $scope.Viewkit.newKitPopUp = function () {
+                        $scope.$broadcast('AddKitEvent');
+                    }
+                     
+                    $scope.Viewkit.displaySections = {
+                        'Info' : true,
+                        'KitContents' : true,
+                        'Related' : true,
+                        'Statistics' : true,
+                        'ActivityStream' : true
+                    };
+                    
+                    
+                    $scope.Viewkit.activeSidepanelink = '#KitInfoSection';
+                    
+                    angular.element(document).off("scroll");
+                    angular.element(document).on("scroll", function () {
+                        $scope.Viewkit.onScroll();
+                    });
+                    
+                    $scope.Viewkit.sidepanelLink = function (event, relatedContent) {
+                        event.preventDefault();
+                        //$scope.Viewkit.displaySections[relatedContent] = true;
+                        angular.element(document).off("scroll");
+                        var target = angular.element(angular.element(event.target.closest('a'))).attr("href");
+                        angular.element('html, body').stop().animate({
+                            scrollTop : angular.element(target).offset().top - 120
+                        }, 500, function () {
+                            angular.element(document).on("scroll", function () {
+                                $scope.Viewkit.onScroll();
+                            });
+                            $scope.Viewkit.onScroll();
+                        });
+                    }
+                    
+                    $scope.Viewkit.onScroll = function () {
+                        var activeSidepanelink;
+                        var scrollPos = angular.element(document).scrollTop();
+                        if (scrollPos < angular.element('#KitInfoSection').position().top + angular.element('#KitInfoSection').height() + 50) {
+                        	
+                            activeSidepanelink = '#KitInfoSection';
+                        } else if (scrollPos < angular.element('#KitContentsSection').position().top + angular.element('#KitContentsSection').height() + 50) {
+                            
+                            activeSidepanelink = '#KitContentsSection';
+                        } else {
+                        	if($scope.Viewkit.ActiveOrderList != undefined && $scope.Viewkit.ActiveOrderList.length != 0) {
+                         		if (scrollPos < angular.element('#RelatedSection').position().top + angular.element('#RelatedSection').height() + 50) {
+                            
+		                        	activeSidepanelink = '#RelatedSection';
+	                        	} else {
+	                        		activeSidepanelink = '#RelatedSection';
+	                        	}
+	                        }
+	                        else {
+	                        	activeSidepanelink = '#KitContentsSection';
+	                        }
+                        } /* else if (scrollPos < angular.element('#RelatedSection').position().top + angular.element('#RelatedSection').height() + 50) {
+                           
+                            activeSidepanelink = '#RelatedSection';
+                        } else {  
+                            activeSidepanelink = '#RelatedSection';
+                        }
+                         */
+                        $scope.Viewkit.activeSidepanelink = activeSidepanelink;
+                        if (!$scope.$$phase) {
+                            $scope.$digest();
+                        }
+                    }
+                    
+                    
+                    $scope.kitRecordSaveCallback = function(KitHeaderRec){
+                        if($scope.Viewkit.kitId.substring(0,15) == KitHeaderRec.Id.substring(0,15)){
+                            $scope.Viewkit.kitInfo = KitHeaderRec;
+                        }
+                    }
+                    
+                    $scope.setFocusToSearchBox = function () {
+		                angular.element('#SearchToAddKit').focus();
+		            }
+                    // part popup
+                       $scope.applyCssOnPartPopUp = function (event, className) {
+                        var targetEle = angular.element(event.target);
+                        var elementWidth = targetEle.width();
+                        if (targetEle.width() > targetEle.parent().width()) {
+                            elementWidth = targetEle.parent().width() - 15;
+
+                        }
+                        angular.element(className).css('top', targetEle.offset().top);
+                        angular.element(className).css('left', event.clientX);
+                        setTimeout(function(){  angular.element(className).show(); }, 1000); 
+                    }
+                    
+                     var timer;
+                    $scope.Viewkit.openpartpopup = function (event, partId) {
+                         timer = $timeout(function () {
+                            //var partId = $scope.CustomerOrderModel.VORLineItemGroupList[index].PartId;
+                            debug(partId);
+                            $scope.$broadcast('PartPopUpEvent',  partId);
+                            $scope.applyCssOnPartPopUp(event, '.PartPopupOnVenderOrder');
+                         }, 1000);
+                     }
+                    
+                      $scope.Viewkit.hidePartPopUp =function(){
+                         $timeout.cancel(timer);
+                         angular.element('.Vendor-Order-Part-Popup').hide();
+                     }
+                     
+                    
+                    // Method to handle any updates in sort controls
+                    $scope.Viewkit.kitLineItemsPageSortControlsAction = function () {
+                        var newSortOrder = sortOrderMap[$scope.Viewkit.kitLineItemsPageSortAttrsJSON.Sorting[0].SortDirection];
+                        if(newSortOrder == null || newSortOrder == undefined){
+                            newSortOrder = "ASC";
+                        }
+                        $scope.Viewkit.kitLineItemsPageSortAttrsJSON.Sorting[0].SortDirection = newSortOrder;
+                        
+                        // Set current page to 1
+                        $scope.Viewkit.kitLineItemsPageSortAttrsJSON.CurrentPage = 1;
+                        $scope.Viewkit.Items_paginationControlsAction();
+                    }
+                    
+                    // Method to handle any updates in pagination controls
+                    $scope.Viewkit.KitLineItems_paginationControlsAction = function () {
+                        debug("HERE");
+                        var kitId = $scope.Viewkit.kitId;
+                        kitInfoService.getKitInfo(kitId, $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON).then(function (kitInfo) {
+                            $scope.Viewkit.TotalKitLineItems = kitInfo.TotalLineItem;
+                            $scope.Viewkit.updateKitContents(kitInfo.KitHeaderLineItemList);
+                            //$scope.Viewkit.PrimaryRowIsFixedPrice = $scope.Viewkit.kitInfo.IsFixedPrice ;
+                            $scope.Viewkit.ShowContent = true;  
+                            
+                            setTimeout(function () {
+                                $scope.Viewkit.kitLineItemsPageSortAttrsJSON.ChangesCount++;
+                            }, 10);
+                        }, function (errorSearchResult) {
+                            
+                            $scope.Viewkit.kitInfo = errorSearchResult;
+                            $scope.Viewkit.ShowContent = false;
+                        });
+                    }
+                    
+                    // Method to handle any updates in pagination controls
+                    $scope.Viewkit.KitActiveOrder_paginationControlsAction = function () {
+                        debug("HERE");
+                        var kitId = $scope.Viewkit.kitId;
+                        kitInfoService.getKitInfo(kitId, $scope.Viewkit.kitLineItemsPageSortAttrsJSON, $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON).then(function (kitInfo) {
+                            $scope.Viewkit.ActiveOrderList = kitInfo.ActiveOrderList;
+                            $scope.Viewkit.ShowContent = true;  
+                            setTimeout(function () {
+                                $scope.Viewkit.kitActiveOrdersPageSortAttrsJSON.ChangesCount++;
+                            }, 10);
+                        }, function (errorSearchResult) {
+                            
+                            $scope.Viewkit.kitInfo = errorSearchResult;
+                            $scope.Viewkit.ShowContent = false;
+                        });
+                    }
+                });
+                
+                viewKit.service("kitInfoService", function ($q) {
+                    this.getKitInfo = function (kitHeaderId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON) {
+                    	kitHeaderId = encodeString(kitHeaderId);
+                    	kitLineItemsPageSortAttrsJSON = encodeString(angular.toJson(kitLineItemsPageSortAttrsJSON));
+                    	kitActiveOrdersPageSortAttrsJSON = encodeString(angular.toJson(kitActiveOrdersPageSortAttrsJSON));
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewKitCtrl.getKitDetails}',
+                            kitHeaderId, null, null, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON, 
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var kitInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                kitInfo = kitInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(kitInfo));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    }
+                    
+                     // Function Update Kit header
+                     this.updateKitHeader = function ( kitHeaderId, JsonKitHeader, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON) {
+                     	kitHeaderId = encodeString(kitHeaderId);
+                     	JsonKitHeader = encodeString(JsonKitHeader);
+                     	kitLineItemsPageSortAttrsJSON = encodeString(angular.toJson(kitLineItemsPageSortAttrsJSON));
+                     	kitActiveOrdersPageSortAttrsJSON = encodeString(angular.toJson(kitActiveOrdersPageSortAttrsJSON));
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewKitCtrl.updateKitHeader}',
+                            kitHeaderId, JsonKitHeader, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON,
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var kitInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                kit = kitInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(kitInfo));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    }
+                    
+                     this.updateKitLineItem = function ( jsonString,  kitHeaderId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON) {
+                     	jsonString = encodeString(jsonString);
+                     	kitHeaderId = encodeString(kitHeaderId);
+                     	kitLineItemsPageSortAttrsJSON = encodeString(angular.toJson(kitLineItemsPageSortAttrsJSON));
+                     	kitActiveOrdersPageSortAttrsJSON = encodeString(angular.toJson(kitActiveOrdersPageSortAttrsJSON));
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewKitCtrl.updateKitLineItem}',
+                            jsonString, kitHeaderId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON,
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var kitInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                kit = kitInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(kitInfo));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    }
+                    
+                     this.insertKitLineItem = function ( kitHeaderId,  parentObjId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON) {
+                     	kitHeaderId = encodeString(kitHeaderId);
+                     	parentObjId = encodeString(parentObjId);
+                     	kitLineItemsPageSortAttrsJSON = encodeString(angular.toJson(kitLineItemsPageSortAttrsJSON));
+                     	kitActiveOrdersPageSortAttrsJSON = encodeString(angular.toJson(kitActiveOrdersPageSortAttrsJSON));
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewKitCtrl.insertKitLineItem}',
+                             kitHeaderId,  parentObjId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON, 
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var kitInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                kit = kitInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(kitInfo));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    }
+                    
+                    
+                    this.removeKitLineItem =function(kitLineItemId, kitHeaderId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON) {
+                    		
+                            kitLineItemId = encodeString(kitLineItemId);
+                            kitHeaderId = encodeString(kitHeaderId);
+                            kitLineItemsPageSortAttrsJSON = encodeString(angular.toJson(kitLineItemsPageSortAttrsJSON));
+                            kitActiveOrdersPageSortAttrsJSON = encodeString(angular.toJson(kitActiveOrdersPageSortAttrsJSON));
+                            var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewKitCtrl.removeKitLineItem}',
+                             kitLineItemId, kitHeaderId, kitLineItemsPageSortAttrsJSON, kitActiveOrdersPageSortAttrsJSON,
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                 deferred.reject(event.message);
+                            } else {
+                                var kitInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                kit = kitInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(kitInfo));
+                                debug("kitInfo................."+kitInfo)
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    
+                    }
+                    
+                });
+            </script>
+            
+        </head>
+        <body ng-controller="ViewKitCtrl" ng-init="Viewkit.loadKitInfo()" ng-cloak="ng-cloak">
+            <c:BPGlobalHeader />
+            
+            <div class="content" ng-if="Viewkit.ShowContent">
+                <div class="col-lg-2 col-md-2 sidePanel ">
+                    <div class="sidepaneluserinfo row">
+                        <!-- <div class="userimg">
+                            <div style="float:left;background-color: #373c40; border-radius: 5px; padding: 1px; margin-right: 5px;">
+                                    <img  src="{!URLFOR($Resource.Images, 'star.png')}" style="height:35px; width:35px; padding: 5px;"/>
+                            </div>
+                        </div> -->
+                        <div class="userNameblock userNameblock_Kit_ML0">
+                            <p class="T3"><span>{{Viewkit.kitInfo.Code}}</span></p>
+                            <p class="customerNumber">${{Viewkit.kitInfo.FixedPrice | number:2}}</p>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="row statusRow">
+                        <span class="userStatus kitStatus" ng-if="Viewkit.kitInfo.IsActive">Active</span>
+                        <span class="userStatus kitStatus" style="color:#E80000" ng-if="!Viewkit.kitInfo.IsActive">Deactive</span>
+                    </div>
+                    
+                    
+                    <div class="leftPanelLinks">
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : Viewkit.activeSidepanelink =='#KitInfoSection'}"  
+                            href="#KitInfoSection" ng-click="Viewkit.sidepanelLink($event, 'Info')" ><span class="alphabetLetter">A</span>Info</a>
+                        <a class="row T10 subSectionLink" href="#KitInfoSection" ng-click="Viewkit.sidepanelLink($event, 'Statistics')">
+                            <span class="alphabetLetter"></span>General</a>
+                        <a class="row T10 subSectionLink" href="#ServiceInfoSection" ng-click="Viewkit.sidepanelLink($event, 'Statistics')"
+                        	ng-if="Viewkit.kitInfo.IsServiceKit">
+                            <span class="alphabetLetter"></span>Service</a>
+                            
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : Viewkit.activeSidepanelink =='#KitContentsSection'}" 
+                            href="#KitContentsSection" ng-click="Viewkit.sidepanelLink($event, 'Statistics')" ><span class="alphabetLetter">B</span>Kit Contents</a>                    
+                        
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : Viewkit.activeSidepanelink =='#RelatedSection'}" ng-if="Viewkit.ActiveOrderList.length != 0"
+                            href="#RelatedSection" ng-click="Viewkit.sidepanelLink($event, 'Related')" ><span class="alphabetLetter">C</span>Related</a>
+        
+<!--                         <a class="row T10 mainSectionLink" ng-class="{'active' : Viewkit.activeSidepanelink =='#StatisticsSection'}"  -->
+<!--                             href="#StatisticsSection" ng-click="Viewkit.sidepanelLink($event, 'Related')" ><span class="alphabetLetter">D</span>Statistics</a> -->
+        
+<!--                         <a class="row T10 subSectionLink" href="#StatisticsSection" ng-click="Viewkit.sidepanelLink($event, 'Related')"> -->
+<!--                             <span class="alphabetLetter"></span>Vital Statistics</a> -->
+<!--                         <a class="row T10 subSectionLink" href="#TelementryStatisticsSection" ng-click="Viewkit.sidepanelLink($event, 'Related')"> -->
+<!--                             <span class="alphabetLetter"></span>Telementry</a> -->
+                        
+<!--                         <a class="row T10 mainSectionLink" ng-class="{'active' : Viewkit.activeSidepanelink =='#ActivitySection'}"  -->
+<!--                             href="#ActivitySection" ng-click="Viewkit.sidepanelLink($event, 'ActivityStream')" ><span class="alphabetLetter">E</span>Activity Stream</a> -->
+                    </div>
+                    
+                </div>
+                <div class="col-lg-10 col-md-10 mainSection" style="margin-top: 98px;">
+                    <div class=" sectionHeader row fixedRow" >
+                        <div class="col-lg-4 col-md-4" ng-show="Viewkit.activeSidepanelink =='#KitInfoSection'"> 
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.Info"
+                                    ng-Click="Viewkit.displaySections.Info = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.Info"
+                                    ng-Click="Viewkit.displaySections.Info = false">  
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2">A INFO</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4" ng-show="Viewkit.activeSidepanelink =='#KitContentsSection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.KitContents"
+                                    ng-Click="Viewkit.displaySections.KitContents = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.KitContents"
+                                    ng-Click="Viewkit.displaySections.KitContents = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2">B KIT CONTENTS</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4" ng-show="Viewkit.activeSidepanelink =='#RelatedSection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.Related"
+                                    ng-Click="Viewkit.displaySections.Related = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.Related"
+                                    ng-Click="Viewkit.displaySections.Related = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2">C RELATED</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4" ng-show="Viewkit.activeSidepanelink =='#StatisticsSection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.Statistics"
+                                    ng-Click="Viewkit.displaySections.Statistics = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.Statistics"
+                                    ng-Click="Viewkit.displaySections.Statistics = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2">D STATISTICS</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4" ng-show="Viewkit.activeSidepanelink =='#ActivitySection'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.ActivityStream"
+                                    ng-Click="Viewkit.displaySections.ActivityStream = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.ActivityStream"
+                                    ng-Click="Viewkit.displaySections.ActivityStream = false">
+                                </i>  
+                                <span class="divider">|</span>
+                                <span class="T2">E ACTIVITY STREAM</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                    
+                        <div class="col-lg-8 col-md-8 fixedContent">
+                            <button type="button" class="flatBtn" ng-click="Viewkit.editKitDetails()">EDIT</button>
+                            <!-- <div class="fa-icons">
+                                <i class="fa fa-floppy-o"></i>
+                                <i class="fa fa-cog"></i>
+                            </div> -->
+                            <!-- <a href="#" class="newLink" ng-click="Viewkit.newKitPopUp()">NEW</a> -->
+                            <div class="col-lg-8 col-md-7 searchToAdd searchToAdd_Kit_Ml110">
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn C5 LabelBtn">
+                                        <span class="T5" style="color: #939CA9;">TO:</span>
+                                        <span style="color: #FFFFFF;">A Customer</span>
+                                        </button>
+                                        <button type="button" class="btn C5 dropdown-toggle caretBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Customer</a></li>
+                                            <li><a href="#">Merchandise</a></li>
+                                            <li><a href="#">Vendor</a></li>
+                                            <li><a href="#">User</a></li>
+                                            <li><a href="#">Category</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a href="#">ADVANCED SEARCH</a></li>
+                                        </ul>
+                                    </div>
+                                    <!-- /btn-group -->
+                                    <div class="inner-addon right-addon">
+                                        <i class="fa fa-search fa-flip-horizontal"></i>
+                                        <c:CustomSearchToAdd />
+                                        <!-- <input class="header-search form-control"  placeholder="search to Add Related" type="text" /> -->
+                                    </div>
+                                </div>
+                                <!-- /input-group -->
+                            </div> 
+                        </div>
+                    </div>
+                    <div id="KitInfoSection" >
+                         <div class="main_section row" ng-show="Viewkit.displaySections.Info">
+                            <div id="GeneralInfoSection" style="margin-bottom: 48px;">
+                                <p class="actionRow T2 C2">
+                                    <span class="sectionText">General</span>
+                                    <!-- <span class="actionText">Actions</span> -->
+                                    <span class="ActionIcons">
+                                    <!-- <i class="fa fa-th"></i> -->
+                                    <i class="fa fa-question-circle"></i>
+                                    </span> 
+                                </p>
+                                <div class="row rowGeneral" style="margin-top: 25px;">
+                                    <div class="col-lg-3">
+                                        <p class="T3">DESCRIPTION
+                                            <i class="fa fa-question-circle"></i>
+                                        </p>
+                                        <p class="T7">{{Viewkit.kitInfo.Description}}</p>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <p class="T3">CAN IT BE SPLIT?
+                                            <i class="fa fa-question-circle"></i>
+                                        </p>
+                                        <p class="T7" ng-if="Viewkit.kitInfo.CanItSplit">Yes</p>
+                                        <p class="T7" ng-if="!Viewkit.kitInfo.CanItSplit">No</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="ServiceInfoSection" style="margin-bottom: 48px;" ng-if="Viewkit.kitInfo.IsServiceKit">
+                                <p class="actionRow T2 C2">
+                                    <span class="sectionText">Service</span>
+                                    <span class="actionText">Actions</span>
+                                    <span class="ActionIcons">
+                                    <i class="fa fa-th"></i>
+                                    <i class="fa fa-question-circle"></i>
+                                    </span> 
+                                </p>
+                                <div class="row rowGeneral" >
+                                    <div class="col-lg-12 service_main">  
+                                        <p class="T3">SERVICE NEED
+                                            <i class="fa fa-question-circle"></i>
+                                        </p>
+                                        <div class="col-lg-4">
+                                            <p class="T7">Concern</p>
+                                            <ul class="service_sub_list">
+                                                <li class="T7" ng-repeat="ConcernItem in Viewkit.kitInfo.Concern">{{ConcernItem}}</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="col-lg-4">
+                                            <p class="T7">Cause</p>
+                                            <ul class="service_sub_list">
+                                                <li class="T7" ng-repeat="CauseItem in Viewkit.kitInfo.Cause">{{CauseItem}}</li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="col-lg-4">
+                                            <p class="T7">Correction</p>
+                                            <ul class="service_sub_list">
+                                                <li class="T7" ng-repeat="CorrectionItem in Viewkit.kitInfo.Correction">{{CorrectionItem}}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                    <div class="col-lg-12 service_main">        
+                                        <p class="T3">TRANSACTION TYPE
+                                            <i class="fa fa-question-circle"></i>
+                                        </p>
+                                        <div class="col-lg-4">
+                                            <p class="T7" ng-repeat="transactionType in Viewkit.kitInfo.TransactionTypeList">{{transactionType.TTName}}</p>
+                                        </div>
+                                        
+                                    </div>
+                                     
+                                    
+                                    <div class="col-lg-12 service_main">        
+                                        <p class="T3">APPLIES TO
+                                            <i class="fa fa-question-circle"></i>
+                                        </p>
+                                        <div class="col-lg-4">
+                                            <p class="T7">Make</p>
+                                            <div class="service_sub_list">
+                                                <p class="T7">{{Viewkit.kitInfo.MakeName}}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-4">
+                                            <p class="T7">Model</p>
+                                            <div class="service_sub_list">
+                                                <p class="T7">{{Viewkit.kitInfo.ModelName}}</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-lg-4">
+                                            <p class="T7">Submodel</p>
+                                            <div class="service_sub_list">
+                                                <p class="T7">{{Viewkit.kitInfo.SubModelName}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="sectionHeader row">
+                        <div class="col-lg-4 col-lg-5">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.KitContents"
+                                    ng-Click="Viewkit.displaySections.KitContents = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.KitContents"
+                                    ng-Click="Viewkit.displaySections.KitContents = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2">B KIT CONTENTS</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                    </div>
+                    <div id="KitContentsSection" >
+                        <div class="main_section row" ng-show="Viewkit.displaySections.KitContents">
+                            <p class="actionRow T2">
+                                <span class="sectionText">Items
+                                    <i class="fa fa-plus cou_plus_icon" ng-click="setFocusToSearchBox();"></i>
+                                </span>
+                               <!--  <span class="actionText">Actions</span> -->
+                                <span class="ActionIcons">
+                                <!-- <i class="fa fa-th"></i> -->
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </p>
+                            <div class="row rowGeneral" >
+                            
+                                <div class="gid_container_Customer grid_container_row" id="Customer_Owned_Units" >
+                                    <table class="table" id="CM_Owned_UnitsGrid">
+                                        <col width="2%"  />
+                                        <col width="2%"  />
+                                        <col width="6%"  />
+                                        <col width="14%"  />
+                                        <col width="14%"  />
+                                        <col width="13%" />
+                                        <col width="13%"  />
+                                        <col width="13%"  />
+                                        <col width="13%" />
+                                        <col width="8%"  />
+                                        <col width="2%"  />
+                                        <tr  class="tableHeader T3 C2" ng-click="Viewkit.closeEditKitContentsRow()">
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                            <th>ITEM/DESC</th>
+                                            <th>STATUS</th>
+                                            <th>QTY NEEDED</th>
+                                            <th>RETAIL</th>
+                                            <th>KIT PRICE</th>
+                                            <th>TOTAL</th>
+                                            <th>FIXED</th>
+                                            <th></th>
+                                        </tr>
+                                        
+                                            <!-- Display rows -->
+                                        <tr class="clickable_row headerRow" id="row1">
+                                            <td style="background:#fff"></td>
+                                            <td></td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_1_{{$index}}" >
+                                                <a href="" class="edite_btn" rel="row1_edit">
+                                                    <img src="{!URLFOR($Resource.Images, 'user-3.png')}" class="first_img" /> 
+                                                </a>
+                                            </td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_3_{{$index}}" class="T7 ">{{Viewkit.kitInfo.Code}} - {{Viewkit.kitInfo.Description}}</td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7"></td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7"></td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}"  class="T7">${{Viewkit.kitInfo.RetailPrice | number:2 }}</td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7"> </td>
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">
+                                                <span ng-show="!Viewkit.kitInfo.IsFixedPrice">${{Viewkit.kitInfo.FixedPrice | number:2}}</span>
+                                                <number-only-input-header ng-show="Viewkit.kitInfo.IsFixedPrice" input-value="Viewkit.kitInfo.FixedPrice " 
+                                                id-val="kitPrimaryRowTotal"/>
+                                            </td>  
+                                            <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}"  class="T7">
+                                                <label class="checkbox smschkbox"> 
+                                                    <span class="chk_tick" ng-class="{'chked': Viewkit.kitInfo.IsFixedPrice == true}"
+                                                        ng-click="Viewkit.toggleKitPrimaryRowFixedChkBox();"> 
+                                                        <i class="fa fa-check-square chksqure"></i>
+                                                    </span>
+                                                </label>
+                                            </td>
+                                            <td style="background:#fff"></td>
+                                        </tr>
+                                        
+                                        <tbody ng-repeat="kitItem in Viewkit.kitContentsItems">
+                                            <tr class="clickable_row" id="row1" rel="owned_unit_row{{$index}}_edit" ng-class-even="'C2'" 
+                                                 ng-click="Viewkit.editKitContentsItem($event, $index)"
+                                                 ng-show="!Viewkit.kitContentsItems_editRow[$index].isEdit">
+                                                <td style="background:#fff"></td>
+                                                <td></td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_1_{{$index}}" >
+                                                    <a href="" class="edite_btn" rel="row1_edit">
+                                                        <img src="{!URLFOR($Resource.Images, 'user-3.png')}" class="first_img" /> 
+                                                    </a>
+                                                </td>
+                                                 <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_3_{{$index}}" class="T7 " ng-if = "kitItem.isPart">
+                                                 <a ng-mouseover="Viewkit.openpartpopup($event, kitItem.partId);" ng-mouseleave="Viewkit.hidePartPopUp();">{{kitItem.ItemDesc}}</a></td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_3_{{$index}}" class="T7 " ng-if = "!kitItem.isPart" >{{kitItem.ItemDesc}}</td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7">{{kitItem.Status}} </td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">{{kitItem.QtyNeeded}}</td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}" class="T7">${{kitItem.ReatilPrice | number:2 }}</td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7">${{kitItem.KitPrice | number:2 }}</td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">${{kitItem.TotalPrice | number:2 }}</td>
+                                                <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}" class="T7">
+                                                    <label class="checkbox smschkbox"> 
+                                                        <span class="chk_tick" ng-class="{'chked': kitItem.IsFixedPrice == true}"> 
+                                                            <i class="fa fa-check-square chksqure"></i>
+                                                        </span>
+                                                    </label>
+                                                </td>
+                                                <td style="background:#fff"></td>
+                                            </tr>
+                                            
+                                            <tr ng-show="Viewkit.kitContentsItems_editRow[$index].isEdit" class="edit_panel sample-show-hide"
+                                             id="rel_contact_row{{$index}}_edit">
+                                                    <td style="background:#fff"></td>
+                                                    <td></td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_1_{{$index}}" >
+                                                        <a href="" class="edite_btn" rel="row1_edit">
+                                                            <img src="{!URLFOR($Resource.Images, 'user-3.png')}" class="first_img" /> 
+                                                        </a>
+                                                    </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_3_{{$index}}" class="T7 " >{{kitItem.ItemDesc}}</td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7">{{kitItem.Status}} </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">
+                                                        <number-only-input input-value="kitItem.QtyNeeded" id-val="kitItem_totalPrice_{{$index}}" 
+                                                        ng-keydown="Viewkit.EditRowBlurQtyNeedeed($event,$index)"/>
+                                                    </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}" class="T7">${{kitItem.ReatilPrice | number:2 }}</td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" ng-show="kitItem.IsFixedPrice" class="T7">
+                                                        <number-only-input input-value="kitItem.KitPrice" id-val="kitItem_totalPrice_{{$index}}"
+                                                            ng-keydown="Viewkit.editRowBlur($event,$index)"/>
+                                                    </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" ng-show="!kitItem.IsFixedPrice" class="T7">
+                                                        ${{kitItem.KitPrice | number:2 }}
+                                                    </td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">${{kitItem.TotalPrice | number:2}}</td>
+                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}" class="T7">
+                                                        <label class="checkbox smschkbox"> 
+                                                            <span class="chk_tick" ng-class="{'chked': kitItem.IsFixedPrice == true}" 
+                                                                ng-click="Viewkit.toggleKitItemRowFixedChkBox($event,$index)"> 
+                                                                <i class="fa fa-check-square chksqure"></i>
+                                                            </span>
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-show="Viewkit.kitContentsItems_editRow[$index].isEdit && kitItem.AvailableParts!=null">
+                                                         <td style="background:#fff"></td>
+                                                          <td colspan="9" class="available_td">
+                                                                 <div class="show_Availableline">  
+                                                                       AVAILABLE INVENTORY  {{kitItem.AvailableParts}}
+                                                                 </div>
+                                                          </td>
+                                                          <td style="background:#fff"></td>
+                                                </tr>
+                                                <tr ng-show="Viewkit.kitContentsItems_editRow[$index].isEdit" class="edit_panel sample-show-hide T7" id="merch_item_row{{$index}}_edit">
+                                                    <td style="backgroung-color:#fff"></td>
+                                                    <td colspan="7" id="CustomerOrder_SpecialOrderGrid_tbody_expandtr_td_1_{{$index}}">
+                                                    
+                                                       <div class="edit_box col-lg-9 col-md-9" id="CustomerOrder_SpecialOrderGrid_tbody_expandtr_td_1_{{$index}}_edit_box"  ng-show="Viewkit.kitContentsItems_editRow[$index].isEdit">
+                                                          <div class="its-heading" id="CustomerOrder_SpecialOrderGrid_tbody_expandtr_td_1_{{$index}}_edit_box_its-heading">
+                                                    
+                                                              <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+                                                              <span>Actions (1 Actions Available)</span>
+                                                          </div>
+                                                          <div class="edit-body" id="CustomerOrder_SpecialOrderGrid_tbody_expandtr_td_1_{{$index}}_edit-body">
+                                                    
+                                                              <form>
+                                                                  <div class="radio" id="CustomerOrder_SpecialOrderGrid_tbody_expandtr_td_1_{{$index}}_edit-body_radio1">
+                                                                    <label>
+                                                                      <input type="radio" name="optionsRadios" ng-model="Viewkit.kitContentsItems_editRow[$index].radioValue" id="optionsRadios2" value="1" />
+                                                                      <span>Remove From Kit</span>
+                                                                    </label>
+                                                                  </div>
+                                                                  <a href="" id="CustomerOrder_SpecialOrderGrid_tbody_expandtr_td_1_{{$index}}_edit-body_gobtn" class="btn btn-default editform_btn" role="button"
+                                                                    ng-click="Viewkit.kitContentsGoAction($index)">Go</a>                                
+                                                    
+                                                              </form>
+                                                          </div>
+                                                         
+                                                       </div>
+                                                       
+                                                    </td>
+                                                </tr>
+                                            <!-- action editable Row -->
+                                        </tbody>
+                                    </table>
+                                    
+                                    <!-- Pagination container -->
+                                    <div class="row pagination_container" id="Kit_Line_Items_Pagination" ng-if="Viewkit.TotalKitLineItems != undefined" style="padding-left: 2%; max-width: 100%;">
+                                        <list-pagination id-value = "Kit_Line_Items_Pagination_" 
+                                                         total-records-length = "Viewkit.TotalKitLineItems"
+                                                         page-size = "Viewkit.kitLineItemsPageSortAttrsJSON.PageSize"
+                                                         current-page = "Viewkit.kitLineItemsPageSortAttrsJSON.CurrentPage"
+                                                         changes-count = "Viewkit.kitLineItemsPageSortAttrsJSON.ChangesCount"
+                                                         pagination-control-method = "Viewkit.KitLineItems_paginationControlsAction" />
+                                    </div>
+                                </div>   
+                                
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div ng-if="Viewkit.ActiveOrderList.length != 0">
+	                    <div class="sectionHeader row">
+	                        <div class="col-lg-4 col-lg-5">
+	                            <div class="fixedHeaderText">
+	                                <span class="headerlabel">
+	                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+	                                    ng-show="!Viewkit.displaySections.Related"
+	                                    ng-Click="Viewkit.displaySections.Related = true">
+	                                </i> 
+	                                <i class="fa fa-angle-down" style="width:10px;"
+	                                    ng-show="Viewkit.displaySections.Related"
+	                                    ng-Click="Viewkit.displaySections.Related = false">
+	                                </i> 
+	                                <span class="divider">|</span>
+	                                <span class="T2">C RELATED</span>
+	                                </span>
+	                                <span class="ActionIcons pull-right">
+	                                <!-- <i class="fa fa-th"></i> -->
+	                                <i class="fa fa-question-circle"></i>
+	                                </span> 
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div  id="RelatedSection" >
+	                            <div class="main_section row" ng-show="Viewkit.displaySections.Related">
+	                                <p class="actionRow T2">
+	                                    <span class="sectionText">Active Orders
+	                                        <!-- <i class="fa fa-plus cou_plus_icon"></i> -->
+	                                    </span>
+	                                    <!-- <span class="actionText">Actions</span> -->
+	                                    <span class="ActionIcons">
+	                                    <!-- <i class="fa fa-th"></i> -->
+	                                    <i class="fa fa-question-circle"></i>
+	                                    </span> 
+	                                </p>
+	                                <div class="row rowGeneral" >
+	                                    
+	                                    <div class="gid_container_Customer grid_container_row" id="Customer_Owned_Units" >
+	                                        <table class="table" id="CM_Owned_UnitsGrid">
+	                                            <col width="2%"  />
+	                                            <col width="2%"  />
+	                                            <col width="6%"  />
+	                                            <col width="22%"  />
+	                                            <col width="22%"  />
+	                                            <col width="22%" />
+	                                            <col width="22%"  />
+	                                            <col width="2%"  />
+	                                            <tr  class="tableHeader T3 C2">
+	                                                <th></th>
+	                                                <th></th>
+	                                                <th></th>
+	                                                <th>ORDER NUMBER</th>
+	                                                <th>CUSTOMER</th>
+	                                                <th>OWNER</th>
+	                                                <th>STATUS</th>
+	                                                <th></th>
+	                                            </tr>
+	                                            <tbody>
+	                                                <!-- Display rows -->
+	                                                <tr ng-repeat="ActiveOrder in Viewkit.ActiveOrderList">
+	                                                    <td style="background:#fff"></td>
+	                                                    <td></td>
+	                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_1_{{$index}}" >
+	                                                        <a href="" class="edite_btn" rel="row1_edit">
+	                                                            <img src="{!URLFOR($Resource.Images, 'user-3.png')}" class="first_img" /> 
+	                                                        </a>
+	                                                    </td>
+	                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_3_{{$index}}" class="T7 " >
+	                                                    	<a href="{!$Page.NewCustomerOrder}?id={{ActiveOrder.COHeaderId}}" target="_blank">{{ActiveOrder.COHeaderNumber}}</a>
+	                                                    </td>
+	                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_4_{{$index}}" class="T7">{{ActiveOrder.CustomerName}} </td>
+	                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_5_{{$index}}" class="T7">{{ActiveOrder.OwnerName}} </td>
+	                                                    <td id="CM_Owned_Units_block_grid_container_tbody_tr_td_6_{{$index}}"  class="T7">{{ActiveOrder.Status}}</td>
+	                                                    <td style="background:#fff"></td>
+	                                                </tr>
+	                                                <!-- action editable Row -->
+	                                            </tbody>
+	                                        </table>
+	                                        
+	                                        <!-- Pagination container -->
+		                                    <div class="row pagination_container" id="Kit_Line_Items_Pagination" style="padding-left: 2%; max-width: 100%;">
+		                                        <list-pagination id-value = "Kit_Active_Order_Pagination_" 
+		                                                         total-records-length = "Viewkit.TotalActiveOrder"
+		                                                         page-size = "Viewkit.kitActiveOrdersPageSortAttrsJSON.PageSize"
+		                                                         current-page = "Viewkit.kitActiveOrdersPageSortAttrsJSON.CurrentPage"
+		                                                         changes-count = "Viewkit.kitActiveOrdersPageSortAttrsJSON.ChangesCount"
+		                                                         pagination-control-method = "Viewkit.KitActiveOrder_paginationControlsAction" />
+		                                    </div>
+	                                    </div>
+	                                    
+	                                </div>
+	                            </div>
+	                        </div>
+                    </div>
+                    
+                    <!-- 
+                    
+                    <div class="sectionHeader row">
+                        <div class="col-lg-4 col-lg-5">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.Statistics"
+                                    ng-Click="Viewkit.displaySections.Statistics = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.Statistics"
+                                    ng-Click="Viewkit.displaySections.Statistics = false">
+                                </i> 
+                                <span class="divider">|</span>
+                                <span class="T2">D STATISTICS</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                    </div>
+                    <div id="StatisticsSection">
+                        <div class="main_section row" ng-show="Viewkit.displaySections.Statistics">
+                            <div id="VitalStatisticsSection" style="margin-bottom: 48px;">
+                                <p class="actionRow T2 C2">
+                                    <span class="sectionText">Vital Statistics</span>
+                                    <span class="actionText">Actions</span>
+                                    <span class="ActionIcons">
+                                    <i class="fa fa-th"></i>
+                                    <i class="fa fa-question-circle"></i>
+                                    </span> 
+                                </p>
+                                <div class="row rowGeneral" >
+                           
+                                </div>
+                            </div>
+                            <div id="TelementryStatisticsSection" style="margin-bottom: 48px;">
+                            <p class="actionRow T2 C2">
+                                <span class="sectionText">Telementry</span>
+                                <span class="actionText">Actions</span>
+                                <span class="ActionIcons">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </p>
+                            <div class="row rowGeneral" >
+                       
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sectionHeader row">
+                        <div class="col-lg-4 col-lg-5">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                <i class="fa fa-angle-right" style="width:10px; padding: 0 3px;"
+                                    ng-show="!Viewkit.displaySections.ActivityStream"
+                                    ng-Click="Viewkit.displaySections.ActivityStream = true">
+                                </i> 
+                                <i class="fa fa-angle-down" style="width:10px;"
+                                    ng-show="Viewkit.displaySections.ActivityStream"
+                                    ng-Click="Viewkit.displaySections.ActivityStream = false">
+                                </i>  
+                                <span class="divider">|</span>
+                                <span class="T2">E ACTIVITY STREAM</span>
+                                </span>
+                                <span class="ActionIcons pull-right">
+                                <i class="fa fa-th"></i>
+                                <i class="fa fa-question-circle"></i>
+                                </span> 
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="ActivitySection">
+                          <div class="main_section row"  ng-show="Viewkit.displaySections.ActivityStream">
+                              <p class="actionRow T2">
+                                  <span class="sectionText">General</span>
+                                  <span class="actionText">Actions</span>
+                                  <span class="ActionIcons">
+                                  <i class="fa fa-th"></i>
+                                  <i class="fa fa-question-circle"></i>
+                                  </span> 
+                              </p>
+                              <div class="row rowGeneral" >
+                         
+                              </div>
+                          </div>
+                      </div>
+                     -->
+                     
+                    <div style="height:600px; background: #E6EBEC; margin: 0 -15px;" />
+                    </div>
+                </div>
+           
+        </body>
+    </html> 
+</apex:page>

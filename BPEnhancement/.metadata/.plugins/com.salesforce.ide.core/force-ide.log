@@ -1,0 +1,75 @@
+ WARN [2016-08-12 11:47:11,321] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'Certificate': Unable to get bean for id 'Certificate'
+ WARN [2016-08-12 11:47:11,327] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'AuraDefinitionBundle': Unable to get bean for id 'AuraDefinitionBundle'
+ WARN [2016-08-12 11:47:11,331] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'ExternalDataSource': Unable to get bean for id 'ExternalDataSource'
+ WARN [2016-08-12 11:47:11,333] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'NamedCredential': Unable to get bean for id 'NamedCredential'
+ WARN [2016-08-12 11:47:11,337] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'GlobalPicklist': Unable to get bean for id 'GlobalPicklist'
+ WARN [2016-08-12 11:47:11,349] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'FlowDefinition': Unable to get bean for id 'FlowDefinition'
+ WARN [2016-08-12 11:47:11,357] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'MatchingRules': Unable to get bean for id 'MatchingRules'
+ WARN [2016-08-12 11:47:11,360] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'ChannelLayout': Unable to get bean for id 'ChannelLayout'
+ WARN [2016-08-12 11:47:11,363] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'SharingRules': Unable to get bean for id 'SharingRules'
+ WARN [2016-08-12 11:47:11,368] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'DelegateGroup': Unable to get bean for id 'DelegateGroup'
+ WARN [2016-08-12 11:47:11,371] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'CorsWhitelistOrigin': Unable to get bean for id 'CorsWhitelistOrigin'
+ WARN [2016-08-12 11:47:11,374] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'ActionLinkGroupTemplate': Unable to get bean for id 'ActionLinkGroupTemplate'
+ WARN [2016-08-12 11:47:11,376] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'TransactionSecurityPolicy': Unable to get bean for id 'TransactionSecurityPolicy'
+ WARN [2016-08-12 11:47:11,378] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'SynonymDictionary': Unable to get bean for id 'SynonymDictionary'
+ WARN [2016-08-12 11:47:11,381] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'PathAssistant': Unable to get bean for id 'PathAssistant'
+ WARN [2016-08-12 11:47:11,385] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'PlatformCachePartition': Unable to get bean for id 'PlatformCachePartition'
+ WARN [2016-08-12 11:47:13,334] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'Certificate': Unable to get bean for id 'Certificate'
+ WARN [2016-08-12 11:47:13,337] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'AuraDefinitionBundle': Unable to get bean for id 'AuraDefinitionBundle'
+ WARN [2016-08-12 11:47:13,342] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'ExternalDataSource': Unable to get bean for id 'ExternalDataSource'
+ WARN [2016-08-12 11:47:13,346] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'NamedCredential': Unable to get bean for id 'NamedCredential'
+ WARN [2016-08-12 11:47:13,350] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'GlobalPicklist': Unable to get bean for id 'GlobalPicklist'
+ WARN [2016-08-12 11:47:13,358] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'FlowDefinition': Unable to get bean for id 'FlowDefinition'
+ WARN [2016-08-12 11:47:13,364] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'MatchingRules': Unable to get bean for id 'MatchingRules'
+ WARN [2016-08-12 11:47:13,367] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'ChannelLayout': Unable to get bean for id 'ChannelLayout'
+ WARN [2016-08-12 11:47:13,369] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'SharingRules': Unable to get bean for id 'SharingRules'
+ WARN [2016-08-12 11:47:13,374] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'DelegateGroup': Unable to get bean for id 'DelegateGroup'
+ WARN [2016-08-12 11:47:13,377] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'CorsWhitelistOrigin': Unable to get bean for id 'CorsWhitelistOrigin'
+ WARN [2016-08-12 11:47:13,379] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'ActionLinkGroupTemplate': Unable to get bean for id 'ActionLinkGroupTemplate'
+ WARN [2016-08-12 11:47:13,381] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'TransactionSecurityPolicy': Unable to get bean for id 'TransactionSecurityPolicy'
+ WARN [2016-08-12 11:47:13,384] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'SynonymDictionary': Unable to get bean for id 'SynonymDictionary'
+ WARN [2016-08-12 11:47:13,387] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'PathAssistant': Unable to get bean for id 'PathAssistant'
+ WARN [2016-08-12 11:47:13,390] (ComponentFactory.java:getComponentBean:1149) - Unable to get component for id 'PlatformCachePartition': Unable to get bean for id 'PlatformCachePartition'
+ WARN [2016-08-12 12:01:32,911] (DefaultBuilder.java:applyDirtyMarkers:93) - TODO: apply 'Save locally only...' markers on each resource
+ WARN [2016-08-12 16:35:43,726] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-12 16:35:43,761] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-12 16:39:12,234] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-12 16:39:12,244] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-12 16:46:37,449] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-12 16:46:37,458] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-12 18:32:41,179] (BuilderPayload.java:handleConflict:386) - Conflict found while preparing to save 'NewViewCustomer.page' to server.  Remote instance has been updated since last save or sync.  Use the Synchronize Perspective to resolve the conflict.
+ WARN [2016-08-12 18:51:19,105] (BuilderPayload.java:handleConflict:386) - Conflict found while preparing to save 'NewViewVendor.page' to server.  Remote instance has been updated since last save or sync.  Use the Synchronize Perspective to resolve the conflict.
+ WARN [2016-08-12 19:46:16,107] (ConnectionFactory.java:clearCache:220) - Clearing the following cached connections
+ WARN [2016-08-12 19:46:16,111] (DescribeObjectRegistry.java:clearCache:663) - Clearing cached describes
+ WARN [2016-08-12 19:46:16,113] (MetadataFactory.java:clearCache:128) - Clearing the following cached metadata stubs
+ WARN [2016-08-16 16:47:44,077] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 16:47:44,091] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 16:48:25,858] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 16:48:25,873] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 16:48:46,724] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 16:48:46,730] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 16:49:26,790] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 16:49:26,797] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 16:49:50,407] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 16:49:50,419] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 16:50:13,944] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 16:50:13,952] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 19:12:45,034] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 19:12:45,101] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 19:12:53,531] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-16 19:12:53,603] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-16 19:24:29,980] (ConnectionFactory.java:clearCache:220) - Clearing the following cached connections
+ WARN [2016-08-16 19:24:29,985] (DescribeObjectRegistry.java:clearCache:660) - No cached describes
+ WARN [2016-08-16 19:24:29,986] (MetadataFactory.java:clearCache:128) - Clearing the following cached metadata stubs
+ WARN [2016-08-17 12:56:32,534] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-17 12:56:32,564] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-17 12:57:00,749] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-17 12:57:00,762] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-17 12:57:27,510] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-17 12:57:27,529] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ WARN [2016-08-17 12:58:38,552] (ProjectService.java:handleDeployResult:1917) - Save failed!
+ WARN [2016-08-17 12:58:38,560] (ProjectService.java:handleRetrieveResult:2087) - Nothing to save to project - retrieve result is empty
+ERROR [2016-08-17 15:39:56,510] (MetadataOperationsRetryAspect.java:metadataOperationsRetry:34) - ForceRemoteException occurred while attempting to perform a metadata operation
+ WARN [2016-08-17 20:22:34,948] (ConnectionFactory.java:clearCache:220) - Clearing the following cached connections
+ WARN [2016-08-17 20:22:34,952] (DescribeObjectRegistry.java:clearCache:660) - No cached describes
+ WARN [2016-08-17 20:22:34,955] (MetadataFactory.java:clearCache:128) - Clearing the following cached metadata stubs

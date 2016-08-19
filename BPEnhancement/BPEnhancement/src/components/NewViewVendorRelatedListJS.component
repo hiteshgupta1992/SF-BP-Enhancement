@@ -1,0 +1,1168 @@
+<apex:component controller="ViewVendorRelatedListCtrl">
+
+	<!-- Register directives -->
+	<c:NewDirPagination />
+	<c:dirNgEnter />
+	<c:NewTaxExemption />
+	
+	<script>
+		// Created module for component
+		var viewVendorRelatedListModule = angular.module('viewVendorRelatedListModule',
+														  ['dir.listPagination', 'dir.ngEnter', 'ngAnimate', 'ui-notification', 'taxExemptionModule']);
+														
+		
+		// Angular controller for component module
+		viewVendorRelatedListModule.controller('viewVendorRelatedListController', function ($scope,
+																							$rootScope,
+																							Notification, 
+																								POTypesServices, 
+																								ActiveOrdersServices, 
+																								ContactsServices, 
+																								ProductsServices
+																						) {
+			// START: Modals definition
+			$scope.ViewVendorRelatedListModal.RenderPOTypesSection = true;
+			$scope.ViewVendorRelatedListModal.RenderActiveOrdersSection = true;
+			
+			// PO Type
+			$scope.ViewVendorRelatedListModal.POTypes_sectionModel = {
+				poTypesChangesCount	:	0,
+				poTypesCurrentPage	:	1,
+				poTypesPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"Code",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+            
+            // active Orders
+            $scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel = {
+				activeOrdersChangesCount	:	0,
+				activeOrdersCurrentPage		:	1,
+				activeOrdersPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"PO",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+            
+            // active Orders
+            $scope.ViewVendorRelatedListModal.Contacts_sectionModel = {
+				contactsChangesCount	:	0,
+				contactsCurrentPage		:	1,
+				contactsPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"FirstName",
+					sortDirection	:	""
+				},
+				{
+					fieldName		:	"LastName",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+            
+            // Vendor Products
+            $scope.ViewVendorRelatedListModal.Products_sectionModel = {
+				productsChangesCount	:	0,
+				productsCurrentPage		:	1,
+				productsPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"Type",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewVendorRelatedListModal.Products_sectionModel.productsPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+			
+            // Tax Exemptions
+            $scope.ViewVendorRelatedListModal.TaxExemptionPageSortAttrsJSON = {
+                ChangesCount    :   0,
+                CurrentPage     :   1,
+                PageSize        :   10,
+                Sorting :   [{
+                    FieldName       :   "ItemDesc",
+                    SortDirection   :   "ASC"
+                }]
+            };
+            try{
+                $scope.ViewVendorRelatedListModal.TaxExemptionPageSortAttrsJSON.PageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+			
+			// Map variable to hold order of sorting
+			var sortOrderMap = {
+				"ASC"	:	"DESC",
+				"DESC"	:	""
+			};
+			
+			// Help text for related lists
+			$scope.ViewVendorRelatedListModal.helpText = {
+				PO_Type_Help : 'Vendor Order Types',
+				PO_Type_Settings_Help : 'Vendor Orders Options',
+				ActiveOrders_Help : 'Active Vendor Orders',
+				ActiveOrders_Settings_Help : 'Active Orders Options',
+				Contacts_Help : 'Contacts',
+				Contacts_Settings_Help : 'Cotnacts Options',
+				Products_Help : 'Products',
+				Products_Settings_Help : 'Products Options'
+			};
+			// END: Modals definition
+			
+			$scope.ViewVendorRelatedListModal.hidePanel = function(event, id){
+                var targetelement = angular.element(event.target).closest('h1').find('.fa:first');
+                if(targetelement.hasClass('fa-chevron-right')){
+                    targetelement.removeClass('fa-chevron-right');
+                    targetelement.addClass('fa-chevron-down');
+                } else {
+                    targetelement.removeClass('fa-chevron-down');
+                    targetelement.addClass('fa-chevron-right');
+                }
+                $('#'+id).toggle();
+            }
+            
+            // Related lists save callback action
+            $scope.ViewVendorRelatedListModal.VendorRelatedLists_recordSaveCallback = function (objType, newUpdatedRecordsInfo) {
+            	if(objType == "{!$ObjectType.PO_Type__c.label}"){
+            		$scope.ViewVendorRelatedListModal.POTypes_recordSaveCallback(newUpdatedRecordsInfo);
+            	} else if(objType == "{!$ObjectType.Vendor_Order_Line_Item__c.label}"){
+            		$scope.ViewVendorRelatedListModal.ActiveOrders_recordSaveCallback(newUpdatedRecordsInfo);
+            	} else if(objType == "{!$ObjectType.Contact.label}"){
+            		$scope.ViewVendorRelatedListModal.Contacts_recordSaveCallback(newUpdatedRecordsInfo);
+            	} else if(objType == "{!$ObjectType.Product__c.label}"){
+            		$scope.ViewVendorRelatedListModal.Products_recordSaveCallback(newUpdatedRecordsInfo);
+            	}
+            }
+            
+            // Initialize/Update default modals
+            $scope.ViewVendorRelatedListModal.initModals = function () {
+            	// Populate edit rows modal
+            	$scope.ViewVendorRelatedListModal.POTypes_initEditRowsModal();
+            	$scope.ViewVendorRelatedListModal.ActiveOrders_initEditRowsModal();
+            	$scope.ViewVendorRelatedListModal.Contacts_initEditRowsModal();
+            	$scope.ViewVendorRelatedListModal.Products_initEditRowsModal();
+            	$scope.ViewVendorRelatedListModal.TaxExemption_initEditRowsModal();
+            }
+            
+			// START: Purchase Order types subsection methods
+            // Init edit rows
+            $scope.ViewVendorRelatedListModal.POTypes_initEditRowsModal = function () {
+            	$scope.ViewVendorRelatedListModal.POTypes_editRow = [];
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length; i++) {
+                    $scope.ViewVendorRelatedListModal.POTypes_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+                    });
+                }
+            }
+            
+            // Method to handle any updates in pagination controls
+            $scope.ViewVendorRelatedListModal.POTypes_paginationControlsAction = function () {
+                POTypesServices.getPaginatedPOTypesForVendor(	$scope.ViewVendorRelatedListModal.VendorId,
+                												$scope.ViewVendorRelatedListModal.POTypes_sectionModel)
+				.then(function(poTypesInfo) {
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes = poTypesInfo.TotalPOTypes;
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes = poTypesInfo.POTypes;
+            		$scope.ViewVendorRelatedListModal.POTypes_initEditRowsModal();
+            		
+            		setTimeout(function () {
+		            	$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('Some error occurred, please try again.');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewVendorRelatedListModal.POTypes_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewVendorRelatedListModal.POTypes_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewVendorRelatedListModal.POTypes_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesCurrentPage = 1;
+            	$scope.ViewVendorRelatedListModal.POTypes_paginationControlsAction();
+            }
+            
+            // Method for DOM action: Select record as preferred	
+			$scope.ViewVendorRelatedListModal.POTypes_makeDefault = function (event, index) {
+				event.stopPropagation();
+				// Invoke add purchase order type UPDATE DEFAULT service
+                POTypesServices.updateDefaultPOType($scope.ViewVendorRelatedListModal.VendorId,
+                									$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].Id,
+          											!$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].IsDefault
+         										)
+                .then(function(resultInfo) {
+                	if(resultInfo.indexOf(',') != -1){
+                		//Notification.info( resultInfo.substring(resultInfo.indexOf(',')) );
+                		$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes = parseInt( resultInfo.substring(0, resultInfo.indexOf(",")) );
+                	} else {
+                		$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes = parseInt(resultInfo);
+                	}
+                	
+               		// If new value to update is true, then update other default to false and then update new value
+               		if( !$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].IsDefault == true ){
+                		for(i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length; i++){
+                			if($scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[i].IsDefault){
+                				$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[i].IsDefault = false;
+                			}
+                		}
+                	}
+               		$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].IsDefault = !$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].IsDefault;
+                	
+                	setTimeout(function () {
+		            	$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('Some error occurred while updating the record.');
+                });
+			}
+            
+            // Method for DOM action: Add
+			$scope.ViewVendorRelatedListModal.POTypes_addAction = function (event) {
+				$scope.$parent.POTypeCompModal.openAddPOTypePopup( $scope.ViewVendorRelatedListModal.VendorId );
+			}
+			
+			// Update relation field value action
+            $scope.ViewVendorRelatedListModal.POTypes_updateAction = function (poTypeId) {
+                $scope.$parent.POTypeCompModal.openEditPOTypePopup( poTypeId, $scope.ViewVendorRelatedListModal.VendorId );
+            }
+            
+			// Method for DOM action: Add after saving record
+			$scope.ViewVendorRelatedListModal.POTypes_recordSaveCallback = function (newPOTypeDetails) {
+                // Check for any error
+				if (newPOTypeDetails[0].isError == true) {
+					Notification.info(newPOTypeDetails[0].ErrorMsg);
+				} else {
+					var newRecords = [newPOTypeDetails[0].POTypeRecord];
+					var indexPosition = $scope.ViewVendorRelatedListModal.POTypes_getRecordIndex(newRecords[0].Id);
+					
+					// if indexPosition is null, means the record is inserted in database so add the record in data model at top and focus on the record row
+					if(indexPosition == null){
+						//$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes = newRecords.concat($scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes);
+						var initIndex = ($scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes == null || $scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length == 0)
+										? 0
+										: ($scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[0].IsDefault) ? 1 : 0;
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.splice(initIndex, 0, newRecords[0]);
+						$scope.ViewVendorRelatedListModal.POTypes_initEditRowsModal();
+					
+						if ($scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length > $scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesPageSize) {
+							$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length = $scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesPageSize;
+						}
+                		angular.element("#PO_Types_row" + initIndex).focus();
+					} else {
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[indexPosition] = newRecords[0];
+                		angular.element("#PO_Types_row" + indexPosition).focus();
+					}
+				
+					$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes = newPOTypeDetails[0].TotalPOTypes;
+					setTimeout(function () {
+						$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesChangesCount++;
+					}, 10);
+				                
+	                Notification.success('Vendor Order Type Saved Successfully');
+            		$scope.$parent.POTypeCompModal.closePopup();
+				}
+			}
+			
+			// Method to get the index value of POType record Id in current data model if exists
+			$scope.ViewVendorRelatedListModal.POTypes_getRecordIndex = function (recId) {
+				var indexPosition = null;
+				for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes.length; i++) {
+					if( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[i].Id == recId ){
+						indexPosition = i;
+						break;
+					}
+                }
+                return indexPosition;
+			}
+            
+            // Method to open row in edit mode
+            $scope.ViewVendorRelatedListModal.POTypes_openRowAsEdit = function (event, index) {
+           		event.stopPropagation();
+            	if($scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].Code == "STANDARD") {
+            	debug("Row is not editable");
+            		$scope.ViewVendorRelatedListModal.POTypes_editRow[index].isEdit = false;
+            	} else {
+            		// Close previous open row first
+	            	var editRowIndex = $scope.ViewVendorRelatedListModal.POTypes_closeEditRows();
+	
+	                if(editRowIndex != index){
+		                // Open selected row now
+		                $scope.ViewVendorRelatedListModal.POTypes_editRow[index].isEdit = true;
+		                $scope.ViewVendorRelatedListModal.POTypes_editRow[index].radioValue = 1;
+		                setTimeout(function () {
+	                    	angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+		                }, 10);
+					}
+            	}
+            	
+            }
+            
+            // Method to close row from edit mode
+            $scope.ViewVendorRelatedListModal.POTypes_closeEditRows = function (event) {
+            	var editRowIndex;
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.POTypes_editRow.length; i++) {
+            		$scope.ViewVendorRelatedListModal.POTypes_editRow[i].radioValue = 0;
+            	}
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.POTypes_editRow.length; i++) {
+                    if ($scope.ViewVendorRelatedListModal.POTypes_editRow[i].isEdit == true) {
+                        $scope.ViewVendorRelatedListModal.POTypes_editRow[i].isEdit = false;
+                        editRowIndex = i;
+                        break;
+                    }
+                }
+                return editRowIndex;
+            }
+            
+            // Edit row "GO" Action
+            $scope.ViewVendorRelatedListModal.POTypes_GoAction = function (index) {
+            	// selected radio value == 1 Means Edit the record in the list
+            	if($scope.ViewVendorRelatedListModal.POTypes_editRow[index].radioValue == 1){
+            		$scope.ViewVendorRelatedListModal.POTypes_updateAction( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].Id );
+            	} else if($scope.ViewVendorRelatedListModal.POTypes_editRow[index].radioValue == 2){
+                	// selected radio value == 2 Means delete the record from the list
+                    // Invoke add purchase order type REMOVE service
+	                POTypesServices.removePOType(	$scope.ViewVendorRelatedListModal.VendorId, 
+              										$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes[index].Id,
+           											$scope.ViewVendorRelatedListModal.POTypes_sectionModel
+            									)
+	                .then(function(newPOTypesDetails) {
+	                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.POTypes = newPOTypesDetails.POTypes;
+	                	$scope.ViewVendorRelatedListModal.POTypes_initEditRowsModal();
+	                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes = newPOTypesDetails.TotalPOTypes;
+	            		
+	            		if($scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalPOTypes % $scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesPageSize == 0){
+	            			$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesCurrentPage--;
+	            			$scope.ViewVendorRelatedListModal.POTypes_paginationControlsAction();
+	            		} else {
+		            		setTimeout(function () {
+				            	$scope.ViewVendorRelatedListModal.POTypes_sectionModel.poTypesChangesCount++;
+				            }, 10);
+			            }
+			            
+	                	Notification.success('Vendor Order Type removed successfully.');
+	                }, function(errorSearchResult) {
+	                	Notification.error('Can\'t remove Vendor Order Type.');
+	                });
+                }
+            }
+            // END: Purchase Order types subsection methods
+            
+            // START: Active Orders subsection methods
+            // Init edit rows
+            $scope.ViewVendorRelatedListModal.ActiveOrders_initEditRowsModal = function () {
+            	$scope.ViewVendorRelatedListModal.ActiveOrders_editRow = [];
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length; i++) {
+                    $scope.ViewVendorRelatedListModal.ActiveOrders_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+                    });
+                }
+            }
+            
+			// Method to handle any updates in pagination controls
+            $scope.ViewVendorRelatedListModal.ActiveOrders_paginationControlsAction = function () {
+                ActiveOrdersServices.getPaginatedActiveOrdersForVendor(	$scope.ViewVendorRelatedListModal.VendorId,
+             															$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel)
+				.then(function(activeOrdersInfo) {
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalActiveOrders = activeOrdersInfo.TotalActiveOrders;
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders = activeOrdersInfo.activeOrders;
+            		
+            		setTimeout(function () {
+		            	$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('Some error occurred, please try again.');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewVendorRelatedListModal.ActiveOrders_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersCurrentPage = 1;
+            	$scope.ViewVendorRelatedListModal.ActiveOrders_paginationControlsAction();
+            }
+            
+            // Method for DOM action: Add
+			$scope.ViewVendorRelatedListModal.ActiveOrders_addAction = function (event) {
+				//$scope.$parent.POTypeCompModal.openAddActiveOrdersPopup( $scope.ViewVendorRelatedListModal.VendorId );
+			}
+			
+			// Update relation field value action
+            $scope.ViewVendorRelatedListModal.ActiveOrders_updateAction = function (activeOrderId) {
+                //$scope.$parent.POTypeCompModal.openEditActiveOrdersPopup( activeOrderId, $scope.ViewVendorRelatedListModal.VendorId );
+            }
+            
+			// Method for DOM action: Add after saving record
+			$scope.ViewVendorRelatedListModal.ActiveOrders_recordSaveCallback = function (newActiveOrderDetails) {
+                // Check for any error
+				if (newActiveOrderDetails[0].isError == true) {
+					Notification.info(newActiveOrderDetails[0].ErrorMsg);
+				} else {
+					var newRecords = [newActiveOrderDetails[0].POTypeRecord];
+					var indexPosition = $scope.ViewVendorRelatedListModal.ActiveOrders_getRecordIndex(newRecords[0].Id);
+					
+					// if indexPosition is null, means the record is inserted in database so add the record in data model at top and focus on the record row
+					if(indexPosition == null){
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders = newRecords.concat($scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders);
+						$scope.ViewVendorRelatedListModal.ActiveOrders_initEditRowsModal();
+					
+						if ($scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length > $scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize) {
+							$scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length = $scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize;
+						}
+                		angular.element("#ActiveOrders_row0").focus();
+					} else {
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders[indexPosition] = newRecords[0];
+                		angular.element("#ActiveOrders_row" + indexPosition).focus();
+					}
+				
+					$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalActiveOrders = newActiveOrderDetails[0].TotalActiveOrders;
+					setTimeout(function () {
+						$scope.ViewVendorRelatedListModal.ActiveOrders_sectionModel.activeOrdersCurrentPage++;
+					}, 10);
+				                
+	                Notification.success('Vendor Order Saved Successfully');
+            		//$scope.$parent.POTypeCompModal.closePopup();
+				}
+			}
+			
+			// Method to get the index value of Active Order record Id in current data model if exists
+			$scope.ViewVendorRelatedListModal.ActiveOrders_getRecordIndex = function (recId) {
+				var indexPosition = null;
+				for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders.length; i++) {
+					if( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders[i].Id == recId ){
+						indexPosition = i;
+						break;
+					}
+                }
+                return indexPosition;
+			}
+			
+			// Method to open row in edit mode
+            $scope.ViewVendorRelatedListModal.ActiveOrders_openRowAsEdit = function (event, index) {
+           		event.stopPropagation();
+            	
+            	// Close previous open row first
+            	var editRowIndex = $scope.ViewVendorRelatedListModal.ActiveOrders_closeEditRows();
+
+                if(editRowIndex != index){
+	                // Open selected row now
+	                $scope.ViewVendorRelatedListModal.ActiveOrders_editRow[index].isEdit = true;
+	                $scope.ViewVendorRelatedListModal.ActiveOrders_editRow[index].radioValue = 1;
+	                setTimeout(function () {
+                    	angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+	                }, 10);
+				}
+            }
+            
+			// Method to close row from edit mode
+            $scope.ViewVendorRelatedListModal.ActiveOrders_closeEditRows = function (event) {
+            	var editRowIndex;
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.ActiveOrders_editRow.length; i++) {
+            		$scope.ViewVendorRelatedListModal.ActiveOrders_editRow[i].radioValue = 0;
+            	}
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.ActiveOrders_editRow.length; i++) {
+                    if ($scope.ViewVendorRelatedListModal.ActiveOrders_editRow[i].isEdit == true) {
+                        $scope.ViewVendorRelatedListModal.ActiveOrders_editRow[i].isEdit = false;
+                        editRowIndex = i;
+                        break;
+                    }
+                }
+                return editRowIndex;
+            }
+            
+            // Edit row "GO" Action
+            $scope.ViewVendorRelatedListModal.ActiveOrders_GoAction = function (index) {
+            	// selected radio value == 1 Means Edit the record in the list
+            	if($scope.ViewVendorRelatedListModal.ActiveOrders_editRow[index].radioValue == 1){
+            		$scope.ViewVendorRelatedListModal.ActiveOrders_updateAction( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.ActiveOrders[index].Id );
+            	} else if($scope.ViewVendorRelatedListModal.ActiveOrders_editRow[index].radioValue == 2){
+                	// ToDo
+                }
+            }
+            // END: Active Orders subsection methods
+            
+            // START: CONTACTS subsection methods
+            // Init edit rows
+            $scope.ViewVendorRelatedListModal.Contacts_initEditRowsModal = function () {
+            	$scope.ViewVendorRelatedListModal.Contacts_editRow = [];
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length; i++) {
+                    $scope.ViewVendorRelatedListModal.Contacts_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+                    });
+                }
+            }
+            
+            // Method to handle any updates in pagination controls
+            $scope.ViewVendorRelatedListModal.Contacts_paginationControlsAction = function () {
+                ContactsServices.getPaginatedContactsForVendor(	$scope.ViewVendorRelatedListModal.VendorId,
+                												$scope.ViewVendorRelatedListModal.Contacts_sectionModel)
+				.then(function(contactsInfo) {
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts = contactsInfo.TotalContacts;
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts = contactsInfo.Contacts;
+            		$scope.ViewVendorRelatedListModal.Contacts_initEditRowsModal();
+            		
+            		setTimeout(function () {
+		            	$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('Some error occurred, please try again.');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewVendorRelatedListModal.Contacts_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewVendorRelatedListModal.Contacts_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewVendorRelatedListModal.Contacts_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsCurrentPage = 1;
+            	$scope.ViewVendorRelatedListModal.Contacts_paginationControlsAction();
+            }
+            
+            // Method for DOM action: Select record as preferred	
+			$scope.ViewVendorRelatedListModal.Contacts__updateRelation = function (index) {
+				// Invoke add purchase order type UPDATE DEFAULT service
+                ContactsServices.updateContactRelation(	$scope.ViewVendorRelatedListModal.VendorId,
+	                									$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts[index].Id,
+	          											$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts[index].Relation
+	         										)
+                .then(function(resultInfo) {
+                	if(resultInfo.indexOf(',') != -1){
+                		//Notification.info( resultInfo.substring(resultInfo.indexOf(',')) );
+                		$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts = parseInt( resultInfo.substring(0, resultInfo.indexOf(",")) );
+                	} else {
+                		$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts = parseInt(resultInfo);
+                		Notification.success('Contact updated  Successfully');
+                	}
+                	
+                	angular.element("#Contacts_row" + index).find("select").filter(':first').focus();
+                	setTimeout(function () {
+		            	$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('Some error occurred while updating the record.');
+                });
+			}
+            
+            // Method for DOM action: Add
+			$scope.ViewVendorRelatedListModal.Contacts_addAction = function (event) {
+				$scope.$parent.VendorContactModal.openAddVendorContactPopup( $scope.ViewVendorRelatedListModal.VendorId );
+			}
+			
+			// Update relation field value action
+            $scope.ViewVendorRelatedListModal.Contacts_updateAction = function (contactId) {
+                $scope.$parent.VendorContactModal.openEditVendorContactPopup( contactId, $scope.ViewVendorRelatedListModal.VendorId );
+            }
+            
+			// Method for DOM action: Add after saving record
+			$scope.ViewVendorRelatedListModal.Contacts_recordSaveCallback = function (newContactDetails) {
+                // Check for any error
+				if (newContactDetails[0].isError == true) {
+					Notification.info(newContactDetails[0].ErrorMsg);
+				} else {
+					var newRecords = [newContactDetails[0].ContactRecord];
+					var indexPosition = $scope.ViewVendorRelatedListModal.Contacts_getRecordIndex(newRecords[0].Id);
+					
+					$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts = newContactDetails[0].TotalContacts;
+					setTimeout(function () {
+						$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsChangesCount++;
+					}, 10);
+					
+					// if indexPosition is null, means the record is inserted in database so add the record in data model at top and focus on the record row
+					var initIndex = 0;
+					if(indexPosition == null){
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.splice(initIndex, 0, newRecords[0]);
+						$scope.ViewVendorRelatedListModal.Contacts_initEditRowsModal();
+					
+						if ($scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length > $scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsPageSize) {
+							$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length = $scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsPageSize;
+						}
+					} else {
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts[indexPosition] = newRecords[0];
+					}
+					
+	                Notification.success('Contact Saved Successfully');
+            		$scope.$parent.VendorContactModal.closePopup();
+            		
+            		setTimeout(function () {
+						angular.element("#Contacts_row" + initIndex).find("select").filter(':first').focus();
+					}, 10);
+				}
+			}
+			
+			// Method to get the index value of Contact record Id in current data model if exists
+			$scope.ViewVendorRelatedListModal.Contacts_getRecordIndex = function (recId) {
+				var indexPosition = null;
+				for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts.length; i++) {
+					if( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts[i].Id == recId ){
+						indexPosition = i;
+						break;
+					}
+                }
+                return indexPosition;
+			}
+            
+            // Method to open row in edit mode
+            $scope.ViewVendorRelatedListModal.Contacts_openRowAsEdit = function (event, index) {
+           		event.stopPropagation();
+            	
+            	// Close previous open row first
+            	var editRowIndex = $scope.ViewVendorRelatedListModal.Contacts_closeEditRows();
+
+                if(editRowIndex != index){
+	                // Open selected row now
+	                $scope.ViewVendorRelatedListModal.Contacts_editRow[index].isEdit = true;
+	                $scope.ViewVendorRelatedListModal.Contacts_editRow[index].radioValue = 1;
+	                setTimeout(function () {
+                    	angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+	                }, 10);
+				}
+            }
+            
+            // Method to close row from edit mode
+            $scope.ViewVendorRelatedListModal.Contacts_closeEditRows = function (event) {
+            	var editRowIndex;
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.Contacts_editRow.length; i++) {
+            		$scope.ViewVendorRelatedListModal.Contacts_editRow[i].radioValue = 0;
+            	}
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.Contacts_editRow.length; i++) {
+                    if ($scope.ViewVendorRelatedListModal.Contacts_editRow[i].isEdit == true) {
+                        $scope.ViewVendorRelatedListModal.Contacts_editRow[i].isEdit = false;
+                        editRowIndex = i;
+                        break;
+                    }
+                }
+                return editRowIndex;
+            }
+            
+            // Edit row "GO" Action
+            $scope.ViewVendorRelatedListModal.Contacts_GoAction = function (index) {
+            	// selected radio value == 1 Means Edit the record in the list
+            	if($scope.ViewVendorRelatedListModal.Contacts_editRow[index].radioValue == 1){
+            		$scope.ViewVendorRelatedListModal.Contacts_updateAction( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts[index].Id );
+            	} else if($scope.ViewVendorRelatedListModal.Contacts_editRow[index].radioValue == 2){
+                	// selected radio value == 2 Means delete the record from the list
+	                ContactsServices.removeContact(	$scope.ViewVendorRelatedListModal.VendorId, 
+              										$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts[index].Id,
+           											$scope.ViewVendorRelatedListModal.Contacts_sectionModel
+            									)
+	                .then(function(newContactsDetails) {
+	                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Contacts = newContactsDetails.Contacts;
+	                	$scope.ViewVendorRelatedListModal.Contacts_initEditRowsModal();
+	                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts = newContactsDetails.TotalContacts;
+	            		
+	            		if($scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalContacts % $scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsPageSize == 0){
+	            			$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsCurrentPage--;
+	            			$scope.ViewVendorRelatedListModal.Contacts_paginationControlsAction();
+	            		} else {
+		            		setTimeout(function () {
+				            	$scope.ViewVendorRelatedListModal.Contacts_sectionModel.contactsChangesCount++;
+				            }, 10);
+			            }
+			            
+	                	Notification.success('Contact record removed successfully.');
+	                }, function(errorSearchResult) {
+	                	Notification.error('Can\'t remove Contact record.');
+	                });
+                }
+            }
+            // END: CONTACTS subsection methods
+            
+            // START: PRODUCTS subsection methods
+            // Init edit rows
+            $scope.ViewVendorRelatedListModal.Products_initEditRowsModal = function () {
+            	$scope.ViewVendorRelatedListModal.Products_editRow = [];
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products.length; i++) {
+                    $scope.ViewVendorRelatedListModal.Products_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+                    });
+                }
+            }
+            
+            // Method to handle any updates in pagination controls
+            $scope.ViewVendorRelatedListModal.Products_paginationControlsAction = function () {
+                ProductsServices.getPaginatedProductsForVendor(	$scope.ViewVendorRelatedListModal.VendorId,
+                												$scope.ViewVendorRelatedListModal.Products_sectionModel)
+				.then(function(productsInfo) {
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalProducts = productsInfo.TotalProducts;
+                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products = productsInfo.Products;
+            		$scope.ViewVendorRelatedListModal.Products_initEditRowsModal();
+            		
+            		setTimeout(function () {
+		            	$scope.ViewVendorRelatedListModal.Products_sectionModel.productsChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('Some error occurred, please try again.');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewVendorRelatedListModal.Products_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewVendorRelatedListModal.Products_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewVendorRelatedListModal.Products_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewVendorRelatedListModal.Products_sectionModel.productsCurrentPage = 1;
+            	$scope.ViewVendorRelatedListModal.Products_paginationControlsAction();
+            }
+            
+            // Method for DOM action: Add
+			$scope.ViewVendorRelatedListModal.Products_addAction = function (event) {
+				$scope.$parent.ProductCompModal.openAddProductPopup( $scope.ViewVendorRelatedListModal.VendorId );
+			}
+			
+			// Update relation field value action
+            $scope.ViewVendorRelatedListModal.Products_updateAction = function (productId) {
+                $scope.$parent.ProductCompModal.openEditProductPopup( productId, $scope.ViewVendorRelatedListModal.VendorId );
+            }
+            
+			// Method for DOM action: Add after saving record
+			$scope.ViewVendorRelatedListModal.Products_recordSaveCallback = function (newProductDetails) {
+                // Check for any error
+				if (newProductDetails[0].isError == true) {
+					Notification.info(newProductDetails[0].ErrorMsg);
+				} else {
+					var newRecords = [newProductDetails[0].ProductRecord];
+					var indexPosition = $scope.ViewVendorRelatedListModal.Products_getRecordIndex(newRecords[0].Id);
+					
+					// if indexPosition is null, means the record is inserted in database so add the record in data model at top and focus on the record row
+					var initIndex = 0;
+					if(indexPosition == null){
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products.splice(initIndex, 0, newRecords[0]);
+						$scope.ViewVendorRelatedListModal.Products_initEditRowsModal();
+					
+						if ($scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products.length > $scope.ViewVendorRelatedListModal.Products_sectionModel.productsPageSize) {
+							$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products.length = $scope.ViewVendorRelatedListModal.Products_sectionModel.productsPageSize;
+						}
+					} else {
+						$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products[indexPosition] = newRecords[0];
+                		initIndex = indexPosition;
+					}
+					$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalProducts = newProductDetails[0].TotalProducts;
+					
+					Notification.success('Product Saved Successfully');
+            		$scope.$parent.ProductCompModal.closePopup();
+            		
+					setTimeout(function () {
+						$scope.ViewVendorRelatedListModal.Products_sectionModel.productsChangesCount++;
+						angular.element("#PO_Types_row" + initIndex).focus();
+					}, 10);
+				}
+			}
+			
+			// Method to get the index value of Product record Id in current data model if exists
+			$scope.ViewVendorRelatedListModal.Products_getRecordIndex = function (recId) {
+				var indexPosition = null;
+				for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products.length; i++) {
+					if( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products[i].Id == recId ){
+						indexPosition = i;
+						break;
+					}
+                }
+                return indexPosition;
+			}
+            
+            // Method to open row in edit mode
+            $scope.ViewVendorRelatedListModal.Products_openRowAsEdit = function (event, index) {
+           		event.stopPropagation();
+            	
+            	// Close previous open row first
+            	var editRowIndex = $scope.ViewVendorRelatedListModal.Products_closeEditRows();
+
+                if(editRowIndex != index){
+	                // Open selected row now
+	                $scope.ViewVendorRelatedListModal.Products_editRow[index].isEdit = true;
+	                $scope.ViewVendorRelatedListModal.Products_editRow[index].radioValue = 1;
+				}
+            }
+            
+            // Method to close row from edit mode
+            $scope.ViewVendorRelatedListModal.Products_closeEditRows = function (event) {
+            	var editRowIndex;
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.Products_editRow.length; i++) {
+            		$scope.ViewVendorRelatedListModal.Products_editRow[i].radioValue = 0;
+            	}
+            	for (i = 0; i < $scope.ViewVendorRelatedListModal.Products_editRow.length; i++) {
+                    if ($scope.ViewVendorRelatedListModal.Products_editRow[i].isEdit == true) {
+                        $scope.ViewVendorRelatedListModal.Products_editRow[i].isEdit = false;
+                        editRowIndex = i;
+                        break;
+                    }
+                }
+                return editRowIndex;
+            }
+            
+            // Edit row "GO" Action
+            $scope.ViewVendorRelatedListModal.Products_GoAction = function (index) {
+            	// selected radio value == 1 Means Edit the record in the list
+            	if($scope.ViewVendorRelatedListModal.Products_editRow[index].radioValue == 1){
+            		$scope.ViewVendorRelatedListModal.Products_updateAction( $scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products[index].Id );
+            	} else if($scope.ViewVendorRelatedListModal.Products_editRow[index].radioValue == 2){
+                	// selected radio value == 2 Means delete the record from the list
+                    // Invoke add purchase order type REMOVE service
+	                ProductsServices.removeProduct(	$scope.ViewVendorRelatedListModal.VendorId, 
+              										$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products[index].Id,
+           											$scope.ViewVendorRelatedListModal.Products_sectionModel
+            									)
+	                .then(function(newProductsDetails) {
+	                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.Products = newProductsDetails.Products;
+	                	$scope.ViewVendorRelatedListModal.Products_initEditRowsModal();
+	                	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalProducts = newProductsDetails.TotalProducts;
+	            		
+	            		if($scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalProducts % $scope.ViewVendorRelatedListModal.Products_sectionModel.productsPageSize == 0){
+	            			$scope.ViewVendorRelatedListModal.Products_sectionModel.productsCurrentPage--;
+	            			$scope.ViewVendorRelatedListModal.Products_paginationControlsAction();
+	            		} else {
+		            		setTimeout(function () {
+				            	$scope.ViewVendorRelatedListModal.Products_sectionModel.productsChangesCount++;
+				            }, 10);
+			            }
+			            
+	                	Notification.success('Product removed successfully.');
+	                }, function(errorSearchResult) {
+	                	Notification.error('Can\'t remove Product.');
+	                });
+                }
+            }
+            // END: PRODUCTS subsection methods
+            
+            // START : TAX EXEMPTION subsection methods
+            
+            $scope.ViewVendorRelatedListModal.TaxExemption_initEditRowsModal = function () {
+                $scope.ViewVendorRelatedListModal.TaxExemptions_editRow = [];
+                for (i = 0; i < $scope.ViewVendorRelatedListModal.VendorRelatedInfo.TaxExemptionList.length; i++) {
+                    $scope.ViewVendorRelatedListModal.TaxExemptions_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+		});
+                }
+            }
+            
+		
+            // Edit Tax Exemption
+            $scope.ViewVendorRelatedListModal.editTaxExemptions = function (event, index) {
+                $scope.ViewVendorRelatedListModal.TaxExemptions_editRow[index].radioValue = 0;
+                
+                var isEditModeEnabled = false;
+                for (i = 0; i < $scope.ViewVendorRelatedListModal.TaxExemptions_editRow.length; i++) {
+                    if ($scope.ViewVendorRelatedListModal.TaxExemptions_editRow[i].isEdit == true) {
+                        isEditModeEnabled = true;
+                    }
+                    $scope.ViewVendorRelatedListModal.TaxExemptions_editRow[i].isEdit = false;
+                }
+                if (!isEditModeEnabled) {
+                    $scope.ViewVendorRelatedListModal.TaxExemptions_editRow[index].isEdit = true;
+                } 
+            }
+            
+            
+            // Tax Exemption : selected action method after row edit
+            $scope.ViewVendorRelatedListModal.TaxExemption_GoAction = function (indexVal) {
+                if ($scope.ViewVendorRelatedListModal.TaxExemptions_editRow[indexVal].radioValue == 0) {
+                    $scope.ViewVendorRelatedListModal.openTaxExemptionsPopup();
+                }
+            }
+            
+            
+            $scope.ViewVendorRelatedListModal.openTaxExemptionsPopup = function(){
+            	console.log('TaxExemptionPopupEvent');
+            	$rootScope.$broadcast('TaxExemptionPopupEvent', $scope.ViewVendorRelatedListModal.VendorId);
+            }
+            
+            $rootScope.$on('TaxExemptionCallback', function (event, args) {
+            	console.log('TaxExemptionCallback');
+            	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TotalTaxExemptionRecords = args.TotalTaxExemptionRecords;
+            	$scope.ViewVendorRelatedListModal.VendorRelatedInfo.TaxExemptionList = args.TaxExemptionList;
+            	$scope.ViewVendorRelatedListModal.TaxExemption_initEditRowsModal();
+            });
+            
+            // END : TAX EXEMPTION subsection methods
+            
+		});
+		
+		// START: Services section
+		viewVendorRelatedListModule.service("POTypesServices", function ($q) {
+			// Service method to add an purchase order type to a part alternate
+			// As result, the purchase order type details are returned so as to add the detail in the original list
+			this.addUpdatePOTypeToVendor = function (poTypesJSON) {
+				poTypesJSON = encodeString(angular.toJson(poTypesJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.addUpdatePOTypeToVendor}',
+					poTypesJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var poTypeInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						poTypeInfo = poTypeInfo.replace(re, '');
+						deferred.resolve(JSON.parse(poTypeInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+			
+			// Service method to update record as preffered record
+			this.updateDefaultPOType = function (vendorId, poTypeId, defaultValToUpdate) {
+				vendorId = encodeString(vendorId);
+				poTypeId = encodeString(poTypeId);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.updateDefaultPOType}',
+					vendorId, poTypeId, defaultValToUpdate,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var resultInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						resultInfo = resultInfo.replace(re, '');
+						deferred.resolve(resultInfo);
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		
+			// Service method to remove an purchase order type relation
+			this.removePOType = function (vendorId, alternatePartJunctionId, pageSortAttrsJSON) {
+				vendorId = encodeString(vendorId);
+				alternatePartJunctionId = encodeString(alternatePartJunctionId);
+				pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.removePOType}',
+					vendorId, alternatePartJunctionId, pageSortAttrsJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var poTypesInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						poTypesInfo = poTypesInfo.replace(re, '');
+						deferred.resolve(JSON.parse(poTypesInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		
+			// Service method to get purchase order type records as per pagination and sorting attributes
+			this.getPaginatedPOTypesForVendor = function (vendorId, pageSortAttrsJSON) {
+				vendorId = encodeString(vendorId);
+				pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.getPaginatedPOTypesForVendor}',
+					vendorId, pageSortAttrsJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var poTypesInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						poTypesInfo = poTypesInfo.replace(re, '');
+						deferred.resolve(JSON.parse(poTypesInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		});
+		
+		viewVendorRelatedListModule.service("ActiveOrdersServices", function ($q) {
+            // Service method to get Active Order records as per pagination and sorting attributes
+            this.getPaginatedActiveOrdersForVendor = function(vendorId, pageSortAttrsJSON)
+            {
+                    vendorId = encodeString(vendorId);
+                    pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewVendorRelatedListCtrl.getPaginatedActiveOrdersForVendor}',
+                        vendorId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var activeOrdersInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                activeOrdersInfo = activeOrdersInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(activeOrdersInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+		});
+		
+		viewVendorRelatedListModule.service("ContactsServices", function ($q) {
+			// Service method to update record relation field
+			this.updateContactRelation = function (vendorId, contactId, relationValueToUpdate) {
+				vendorId = encodeString(vendorId);
+				contactId = encodeString(contactId);
+				relationValueToUpdate = encodeString(relationValueToUpdate);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.updateContactRelation}',
+					vendorId, contactId, relationValueToUpdate,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var resultInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						resultInfo = resultInfo.replace(re, '');
+						deferred.resolve(resultInfo);
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		
+			// Service method to remove contact record
+			this.removeContact = function (vendorId, contactId, pageSortAttrsJSON) {
+				vendorId = encodeString(vendorId);
+				contactId = encodeString(contactId);
+				pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.removeContact}',
+					vendorId, contactId, pageSortAttrsJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var resultInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						resultInfo = resultInfo.replace(re, '');
+						deferred.resolve(JSON.parse(resultInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		
+			// Service method to get contact records as per pagination and sorting attributes
+			this.getPaginatedContactsForVendor = function (vendorId, pageSortAttrsJSON) {
+				vendorId = encodeString(vendorId);
+				pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.getPaginatedContactsForVendor}',
+					vendorId, pageSortAttrsJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var resultInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						resultInfo = resultInfo.replace(re, '');
+						deferred.resolve(JSON.parse(resultInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		});
+		
+		viewVendorRelatedListModule.service("ProductsServices", function ($q) {
+			// Service method to remove an Product
+			this.removeProduct = function (vendorId, productId, pageSortAttrsJSON) {
+				vendorId = encodeString(vendorId);
+				productId = encodeString(productId);
+				pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.removeProduct}',
+					vendorId, productId, pageSortAttrsJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var productsInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						productsInfo = productsInfo.replace(re, '');
+						deferred.resolve(JSON.parse(productsInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		
+			// Service method to get Product records as per pagination and sorting attributes
+			this.getPaginatedProductsForVendor = function (vendorId, pageSortAttrsJSON) {
+				vendorId = encodeString(vendorId);
+				pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.getPaginatedProductsForVendor}',
+					vendorId, pageSortAttrsJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var productsInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						productsInfo = productsInfo.replace(re, '');
+						deferred.resolve(JSON.parse(productsInfo));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		});
+	</script>
+</apex:component>

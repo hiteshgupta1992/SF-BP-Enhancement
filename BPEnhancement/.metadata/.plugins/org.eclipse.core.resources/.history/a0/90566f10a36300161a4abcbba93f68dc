@@ -1,0 +1,38 @@
+/**
+ * Author: Richa Mittal
+ * Since: August 12, 2016
+ * Name: GlobalSearchResultsWrapper
+ * Description: Class is used for the Creating Json For Search Results
+**/
+public with sharing class GlobalSearchResultsWrapper {
+    
+    public String Type;
+	public String AdditionalInfo1;
+	public String AdditionalInfo2;
+	public String ItemName;
+	
+	/**
+	 * Name:GlobalSearchResultsWrapper 
+	 * Description: Constructor
+	**/
+	public GlobalSearchResultsWrapper(Sobject searchedObj) {
+		
+		/*Type = Type;
+		AdditionalInfo1 = Email;
+		AdditionalInfo2 = Phone_No;
+		ItemName = Name;*/
+	}
+	
+	/**
+     * Name: GlobalQueryJSON
+     * Description: Class to represent global search query JSON
+    **/
+    public class GlobalQueryJSON {
+        // Object label selected by user to search in
+        public String GlobalSearchKeyword {get; set;}
+        
+        // Search text
+        public String GlobalSearchText {get; set;}
+        
+    }
+}

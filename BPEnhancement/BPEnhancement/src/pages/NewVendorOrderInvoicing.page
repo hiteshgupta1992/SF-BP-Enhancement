@@ -1,0 +1,2378 @@
+<apex:page standardStylesheets="false"
+            showChat="false" showHeader="false" sidebar="false" Controller="VendorInvoicingCtrl">
+        
+<html ng-app="vendorOrderInvoicingApp">
+    <head>
+        <title>Vendor Order Invoicing</title>    
+    </head>
+    <c:Css_and_Js ></c:Css_and_Js> 
+    <apex:includeScript value="{!$Resource.niceScroll}"/>  
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-beta.6/angular-animate.js"></script>
+    <apex:includeScript value="{!$Resource.d3}"/>
+    <apex:includeScript value="{!$Resource.angularanimate}"/>
+    <!-- <c:dirPagination /> -->
+    <c:NewDirPagination />
+    <c:NewViewCustomerStyle />
+    <c:New_Price_mini_page_layout ></c:New_Price_mini_page_layout>
+    <c:New_Customer_mini_page_layout />
+     <c:New_Invoice_history_Mini_Page_layout />
+    <c:NewVendorOrderStyle />
+    <c:VendorInfo /> 
+    <c:NewPartPopUpOnVendorOrder />
+    <style>
+
+            /* style added for vendorName in left panel */
+            .vendorName{
+                color: #337ab7;
+            }
+            .userNameblock .vendorName:hover{
+                text-decoration : none;
+            }
+            .VOInvoicingLeftHeader .sidepaneluserinfo {
+                padding-bottom: 5px;
+            }
+            .VOInvoicingLeftHeader .userNameblock {
+                margin-top: 0px;
+            }
+            .VOInvoicingLeftHeader .userStatus {
+                margin: 0px;
+            }
+            /* end style for vendorName in left panel */
+            
+            .finalizeInvoiceBtnSection .C5{
+                    background-color: #B7BEC6;
+
+            }
+            .contentWrapper .generalInfoData{
+                    float:left;
+                    width:40%;
+                    margin-top: 8px;
+
+            }
+            .contentWrapper .VOI_Info_Block{
+                    margin-bottom: 0px;
+
+            }
+            .mainSection .Mrg20:last-child {margin-top: 20px;}
+            .radio, .checkbox{
+                margin-top: 0px;
+                margin-bottom: 0px;
+
+            }   
+          a.not-active {
+                   pointer-events: none;
+                   cursor: default;
+                   color: inherit;
+                }
+                
+                
+            .main_section_COU {
+                    margin-bottom: 48px;
+                    margin-top: 21px; 
+                }
+          
+          .main_section_COU_Header .actionRow .sectionText {
+                    font-weight: bold;
+                    color: #00AEEF;
+                    margin-left: 24px;
+                }
+                
+           .main_section_COU_Header {
+                    border-top: 1px solid #ECF0F1;
+                    margin: 0px 20px 0px 20px;
+                    padding-top: 24px;
+                    border-top: 1px solid #ECF0F1;
+                }
+                
+                
+            .main_section_COU_Header .actionRow .actionText {
+                    margin-left: 5px;
+                    color: #939CA9;
+                    background-color: #F6F7F9;
+                    padding:0px 5px 2px 5px;
+                }
+      
+      
+             .finalizeInvoiceBtnSection .C5{
+                    background-color: #B7BEC6;
+
+                }
+                
+                 ::-webkit-scrollbar{
+                    width: 11px;
+                    height: 20px;
+                }
+                ::-webkit-scrollbar-button{
+                    background: #ECF0F1;
+                }
+                ::-webkit-scrollbar-track-piece{
+                    background: #ECF0F1;
+                }
+                ::-webkit-scrollbar-thumb{
+                    background: #B7BEC6;
+                    border-radius : 3px;
+                    border: 1px solid #fff;
+                } 
+                
+              /*   
+                #VOI_Info_Block {
+                    min-height: 400px !important;
+                }
+                
+                #VOI_invoicing_Block    {
+                    min-height: 400px !important;
+                }
+                #VOI_Finalize_Block {
+                    min-height: 1500px !important;
+                } */
+                
+               
+                
+               
+                
+               
+                
+                
+                /*from PrintPriviewMerchandise*/
+                .gid_container_Customer {
+                  margin-top: 35px;
+              }
+              
+              
+              
+              
+               .gid_container_Customer table tr.edit_panel td.edit-service-item .serviceitemedit{
+                    height: 190px;
+                }
+                
+                  .gid_container_Customer table tr.edit_panel td.edit-service-item .serviceitemedit{
+                    border: 1px solid #BBE5F9;
+                    height: 190px;
+                    transition: all 0.5s ease;
+
+
+                
+                }
+                
+                
+                 .gid_container_Customer table tr.edit_panel td .serviceitemedit{
+                     margin: 10px 0;
+
+                }
+                
+                  .gid_container_Customer table tr.edit_panel td.edit-service-item .serviceitemedit .its-heading{
+                    position: static;
+
+                }
+                
+                 .gid_container_Customer table tr.edit_panel td .serviceitemedit .edit-body{
+                    margin: 15px 26px 15px 0px;
+
+                }
+                
+                 .gid_container_Customer table tr.edit_panel td .serviceitemedit .edit-body .radio label, .checkbox label{
+                    height: 30px;
+                }
+                
+                
+                 .gid_container_Customer table tr.edit_panel td .serviceitemedit .edit-body .radio label, .checkbox label{
+                    padding: 0;
+                    height: 30px;
+
+                }
+                
+                
+                
+                 .chk_tick {
+                    width: 20px !important;
+                    height: 20px !important;
+                    border-radius: 4px;
+                    margin: 3px 15px;
+                    border: 1px solid #cccccc;
+                    display: block;
+                    float: left;
+                    cursor: pointer;
+                }
+                
+                
+                .edit-service-chek{
+                    margin: 0;
+                    margin-right:10px;
+
+                }
+                
+                
+                 .chk_tick .chksqure {
+                    font-size: 0px;
+                    height: 12px;
+                    width: 12px;
+                    margin: 3px;
+                    border-radius: 2px;
+                    background: #D8D8D8;
+                }
+                
+                .chked .chksqure {
+                    font-size: 0px !important;
+                    height: 12px;
+                    width: 12px;
+                    margin: 3px;
+                    border-radius: 2px;
+                    background: #71BF3E;
+                }
+                
+                
+                 .gid_container_Customer table tr.edit_panel td .edit_box .edit-body .radio label span {
+                    display: block;
+                    float: left;
+                    margin-top: 0px;
+                    font-size: 14px;
+                    color: #707070;
+                }
+                
+                 .gid_container_Customer table tr.edit_panel td .serviceitemedit .edit-body .editform_btn{
+                    top: 150px;
+                }
+                
+                .gid_container_Customer table tr.edit_panel td .serviceitemedit .edit-body .editform_btn{
+                    right:auto;
+                    width:70px;
+                    top: 150px;
+
+                }
+                
+                
+               
+                
+                
+                
+                
+                
+                
+                .gid_container_Customer .gid_container_Customer_headerWrapper   {
+                    margin-left: 39%;
+                    width: 61%;
+                }
+                
+                .gid_container_Customer .gid_container_Customer_headerWrapper .gid_container_Customer_headerContainer1  {
+                    width: 44%;
+                    float:left;
+                }
+                
+                .gid_container_Customer .gid_container_Customer_headerWrapper .gid_container_Customer_headerContainer2  {
+                    width: 51%;
+                    margin-left:5%;
+                    float:left;
+                }
+                
+                
+                 .linetext div {  
+                  position: relative; 
+                  text-align: center;
+                }
+                
+                .linetext div span {
+                  background: #fff;
+                  padding: 0 15px;
+                  position: relative;
+                  z-index: 1;
+                  font-size:14px;
+                  text-transform: uppercase;
+                }
+                
+                .linetext div:before {
+                  background: #000;
+                  content: "";
+                  display: block;
+                  height: 1px;
+                  position: absolute;
+                    top: 50%;
+                  width: 100%;
+                }
+                
+                .linetext div:before {
+                  left: 0;
+                }
+                
+                
+                /*common style*/
+                .sidePanel{
+                    
+                    padding: 0;
+                    color: #939CA9;
+                    
+                }
+                  .sidePanel .orderNumber{
+                    height: 48px;
+                    background-color: #E6EBEC;
+                    color: #00AEEF;
+                    font-weight: bold;
+                    padding: 15px 20px;
+                    margin-bottom: 20px;
+                }
+                .userimg div    {
+                    float:left;
+                    background-color: #373c40;
+                    border-radius: 5px;
+                    padding: 1px;
+                    margin-right: 5px;
+                }
+                .userimg div img    {
+                     height:35px;
+                     width:35px;
+                     padding: 5px;
+                }
+               /*common style end*/
+               
+               
+                
+                /*invoice style*/   
+                .userNameblock p span   {
+                    color: #337ab7;
+                }
+                
+                 .divider   {
+                    margin-left: 10px;
+                }
+                 /*invoice style emd*/
+                 
+                 
+                 
+                 /*common style*/
+                  .ownerInfo{
+                    padding: 5px 10px 5px 20px;
+                    border-top: 2px solid #ECF0F1;
+                    color: #939CA9;
+                    //border-bottom: 2px solid #ECF0F1;
+                }
+                
+                .ownerInfo img  {
+                    height:30px;
+                    width:30px;
+                }
+                
+                .ownerInfo .Name{
+                    margin-left: 20px;
+                }
+                
+                
+                  .sidePanel .leftPanelLinks:hover { overflow: auto; }
+                
+                  .sidePanel .leftPanelLinks .active:after{
+                   content: none; 
+                }
+                  .sidePanel .leftPanelLinks{
+                    height: 200px;
+                    overflow: hidden;
+                }
+                
+                 .sideBarTotals{
+                    position: fixed;
+                    bottom: 10px;
+                    width: 16.6%;
+                    border-top: 2px solid #ECF0F1;
+
+                }
+                
+                
+                  .orderleftPanelLinks .ordertotal, .totalDue{padding:12px 20px;}
+                .orderleftPanelLinks, .totalDue{padding-bottom:20px;}
+                .orderleftPanelLinks .ordertotal a:hover, .totalDue a:hover{text-decoration:none;}
+                .totalDue a:hover{color:#00AEEF;}
+                 .orderleftPanelLinks .ordertotal a, .totalDue a{width:48%; float:left;    text-transform: uppercase;}
+                 
+                 .fixedContent .fa-refresh , .fixedContent .fa-floppy-o, .fixedContent .fa-cog{color:#000}
+                
+                /*common style end*/
+                
+                
+                /*invoice style*/
+                   @media(min-width: 1024px) and (max-width: 1200px)    {
+                    .orderleftPanelLinks .ordertotal .ordertotalPA1 {
+                        width:69%;
+                    }
+                    
+                    .orderleftPanelLinks .ordertotal .ordertotalPA2 {
+                        width:27%;
+                    }
+          }
+                
+          @media(min-width: 1201px) and (max-width: 1366px) {
+                    .orderleftPanelLinks .ordertotal .ordertotalPA1     {
+                        width:56%;
+                    }
+                    
+                    .orderleftPanelLinks .ordertotal .ordertotalPA2 {
+                        width:40%;
+                    }
+          }
+          
+          
+            .Invoice-info-overlay:before{   
+                top: 20px !important;
+            }
+            
+            
+            .VOI_Final_Div  {
+                height: 600px;
+                background: #E6EBEC;
+                margin: 0 -15px;
+            }
+          /*invoice style end*/
+          
+          
+          
+          /*common style*/
+          .mainSection  {
+            margin-top: 98px;
+          }
+          
+          .fixedHeaderText .headerlabel .fa-angle-right {
+            width:10px;
+            padding: 0 3px;
+          }
+          
+          .fixedHeaderText .headerlabel .fa-angle-down  {
+            width:10px;
+          }
+          
+          .searchToAdd .input-group .input-group-btn .LabelBtn .T5  {
+             color: #939CA9;
+          }
+          /*common style end*/
+          
+          /*invoice style*/
+          .searchToAdd .input-group .input-group-btn .LabelBtn .selectedItem_btn_span   {
+             color: #FFFFFF;
+          }
+          /*invoice style end*/
+          
+          /*common style */
+          .Profile_pic  {
+            height: 100px;
+            width: 100%;
+          }
+          /*common style end*/
+          
+           /*invoice style*/
+          .Plr12 .Plr0 .MB12 .Plr12_Plr0_MB12_imgDiv    {
+             float:left;
+             background-color: #373c40;
+             border-radius: 5px;
+             padding: 1px;
+             margin-right: 5px;
+          }
+          
+          .Plr12 .Plr0 .MB12 .Plr12_Plr0_MB12_imgDiv .Plr12_Plr0_MB12_imgDiv_img    {
+            height:35px;
+            width:35px;
+            padding: 5px;
+          }
+          
+           .Plr12 .Plr0 .MB12 .T7_vendor    {
+             margin-left:20px;
+             padding-top:10px;
+             padding-left:24px;
+           }
+           /*invoice style end*/
+           
+           /*common style */
+           .Mrg20 .mycustvalue  {
+              float:left;
+              width:60%;
+           }
+           /*common style end*/
+           
+            /*invoice style*/
+            .Mrg20 .mycustvalue .form-control{
+                 width: 100%;
+            }
+            
+            .Profile_pic_owner  {
+                height:80px;
+                width:100%;
+            }
+             /*invoice style end*/
+             
+              /*common style */
+             .Plr12 .MB24 .MB12 .Lh25   {
+                margin-bottom:1px;
+             }
+              /*common style end*/
+              
+              /*invoice style */
+              .Plr12 .MB24 .MB12 .Plr12_MB24_MB12_imgDiv    {
+                 float:left;
+                 background-color: #373c40;
+                 border-radius: 5px;
+                 padding: 1px;
+                 margin-right: 5px;
+              }
+              
+              .Plr12 .MB24 .MB12 .Plr12_MB24_MB12_imgDiv  .Plr12_MB24_MB12_imgDiv_img   {
+                height:25px;
+                width:25px;
+                padding: 5px;
+              }
+              
+              .Plr12 .Plr0 .MB12 .T7_owner  {
+                padding-top:10px;
+                padding-left:24px;
+              }
+              
+              .invoiceStatus    {
+                color:green;                
+              }
+             
+           
+            .VOR_Vendor_Received_Block_grid_container_Empty_Div1_class  {
+                 padding-left: 44px;
+            }
+            
+            .th_cursor_style    {
+                 cursor: pointer;
+            }
+            
+            
+              /*invoice style end*/
+              
+               /*common style */
+               .pagination_container    {
+                margin-left: 10px;
+                margin-right: 0;
+               }
+                 /*common style end */
+                 
+                   /*invoice style */
+               .td_background_style {
+                 background:#fff;
+               }
+               
+              
+               .VO_Group_block_grid_container_tbody_tr_td_1_index_class img {
+                 height: 26px;
+                 width: 26px;
+               }
+               
+               .VO_Group_block_grid_container_tbody_tr_td_2_index_class div {
+                 color:red;
+               }
+               
+               
+                /*invoice style end */
+                
+                  /*common style */
+               .finalizeInvoiceBtnSection button    {
+                    margin: auto;
+                    width: 80%;
+               }
+               
+                .finalizeInvoiceBtnSection button .fa   {
+                    font-size: 15px;
+                    margin-left: 5px;
+                }
+                /*common style end*/
+                
+                
+                /*invoice style  */
+                .required_field:after{
+                    content:" *";
+                    color:red;
+                }
+                
+                 /* style added for addnewItem */
+                .addnewItem {
+                    border: 1px dashed #939598;
+                    margin: 20px 0;
+                    text-align: center;
+                    padding: 20px 0;
+                }
+              /* end style for addnewItem */
+                /*invoice style end */
+                /* added by richa */
+                .gid_container_Customer table tr.disabledCheckOut td {
+                    color: #B3B3B3;
+                }
+                
+                .disabledSearchToAddElement .angucomplete-holder .form-control  {
+                    background: #dddddd;
+                    pointer-events: none;
+                }
+                
+                .disabledSearchToAddElement .angucomplete-holder .form-control .anguinput  {
+                    background: #dddddd;
+                }
+                .viStatus {
+					margin-top: 8px;
+				}
+    </style>
+   
+<script>
+
+    var vendorOrderInvoicingApp = angular.module('vendorOrderInvoicingApp',  ['BPGlobalHeader','ngDialog', 'searchToAddModule', 'dir.priceInput', 'dir.listPagination', 'ngAnimate', 'ui-notification', 'PartPopUpModule', 'vendorInfo']);
+    
+    
+      vendorOrderInvoicingApp.directive('numberOnlyInput', function () {
+            return {
+                restrict: 'EA',
+                template: '<input type="text" class="form-control" ng-model="inputValue" />',
+                scope: {
+                    inputValue: '='
+
+                },
+                link: function (scope) {
+                    scope.$watch('inputValue', function(newValue,oldValue) {
+                        var arr = String(newValue).split("");
+                        var pieces = String(newValue).split(".");
+                        if (arr.length === 0) return;
+                        if(arr[0] == '-'){
+                            scope.inputValue = oldValue;
+                        }
+                        else if (isNaN(newValue)) {
+                            scope.inputValue = oldValue;
+                        }
+                        else if(typeof(pieces[1]) != "undefined" && pieces[1].length > 2){
+                            scope.inputValue = oldValue;
+                        }
+                    });
+                }
+            };
+        });
+    
+    //controller starts
+    vendorOrderInvoicingApp.controller('vendorOrderInvoicingController', function ($scope, $sce, $q, $timeout, Notification,vendorOrderInvoicingService, ngDialog) {
+                $scope.VORModel = {};
+                 $scope.VORModel.displaySections = {
+                    'Info' : true,
+                    'Invoicing' : true,
+                    'FinalizeOrder' : true
+               };
+                //$scope.VORModel.VOR_Header['VendorName']="vendor test";
+                 $scope.parseInt = parseInt;
+                $scope.VORModel.VIHeader = {};
+                 $scope.VendorOrderModel = {};
+                 // $scope.VORModel.VOR_Header.VORId=null;
+                   
+                $scope.SearchToadd = {};
+                $scope.typeToSearch = "";
+                $scope.PreferredObject = "Vendor";
+                $scope.SearchableObjects = 'Vendor';
+                 /* start-1 */
+                   $scope.VORModel.activeSidepanelink = '#VOI_Info_Block';
+                   $scope.VORModel.selectedItem = 'Info';
+                   angular.element(document).off("scroll");
+                   angular.element(document).on("scroll", function () {
+                    $scope.VORModel.onScroll();
+              });
+              
+              
+              // dropdown functionality
+              $scope.VORModel.dropDownItem = function (event, selectedSection) {
+                    var activeSection = $scope.VORModel.activeSidepanelink.replace('#','');
+                    $scope.VORModel.selectedItem = selectedSection;
+                    if(activeSection != selectedSection) {
+                        $scope.VORModel.sidepanelLink(event, selectedSection);
+                        
+                    }
+             }
+              
+              
+              /* End-1 */
+                  /* Start-1 */
+              $scope.VORModel.sidepanelLink = function (event, relatedContent) {
+                event.preventDefault();
+                $scope.VORModel.displaySections[relatedContent] = true;
+                angular.element(document).off("scroll");
+                var target = angular.element(event.target.closest('a')).attr("href");
+                debug("targate="+target)
+                angular.element('html, body').stop().animate({
+                    scrollTop : angular.element(target).offset().top - 110
+                }, 500, function () {
+                    angular.element(document).on("scroll", function () {
+                        $scope.VORModel.onScroll();
+                    });
+                    $scope.VORModel.onScroll();
+                });
+             }
+             /* End-1 */
+             
+             /*Start-1*/
+             $scope.VORModel.onScroll = function () {
+                 var activeSidepanelink;
+                 var heading = '';
+                 var scrollPos = angular.element(document).scrollTop();
+                 var fixedHeight = 50;
+                 var selectedItem;
+                 debug('****'+angular.element('#VOI_Info_Block').position().top);
+                 if (scrollPos < angular.element('#VOI_Info_Block').position().top + angular.element('#VOI_Info_Block').height() + fixedHeight || $scope.VORModel.VIHeader.VendorId == null) {
+                    activeSidepanelink = '#VOI_Info_Block';
+                    selectedItem = 'Info';
+                 } else if (scrollPos < angular.element('#VOI_invoicing_Block').position().top + angular.element('#VOI_invoicing_Block').height() + fixedHeight) {
+                    if($scope.VORModel.VIGroupList.length != 0) {
+                        activeSidepanelink = '#VOI_invoicing_Block';
+                        selectedItem = 'Invoicing';
+                    } else {
+                        if($scope.VORModel.VIHeader.Status != 'Invoiced' && $scope.VORModel.VIGroupList.length != 0) {
+                            activeSidepanelink = '#VOI_Finalize_Block';
+                            selectedItem = 'Finalize Order';
+                        }
+                        else {
+                            activeSidepanelink = '#VOI_Info_Block';
+                            selectedItem = 'Info';
+                        }
+                    }
+                 } else if (scrollPos < angular.element('#VOI_Finalize_Block').position().top + angular.element('#VOI_Finalize_Block').height() + fixedHeight) {
+                    if($scope.VORModel.VIHeader.Status != 'Invoiced' && $scope.VORModel.VIGroupList.length != 0) {
+                        activeSidepanelink = '#VOI_Finalize_Block';
+                        selectedItem = 'Finalize Order';
+                    }
+                    else {
+                        activeSidepanelink = '#VOI_Info_Block';
+                        selectedItem = 'Info';
+                    }
+                 } else {
+                        activeSidepanelink = '#VOI_Finalize_Block';
+                        selectedItem = 'Finalize Order';
+                }
+                $scope.VORModel.activeSidepanelink = activeSidepanelink;
+                $scope.VORModel.selectedItem = selectedItem;
+               if (!$scope.$$phase) {
+                $scope.$digest();
+               }
+            }
+            /*End-1*/
+              
+              
+              //print invoice
+              $scope.VORModel.invoicePrintPriview = function(customerInvoiceId){
+                         var myWindow = window.open("{!$Page.PrintCustomerOrderInvoice}?id="+customerInvoiceId, "", "width=1200, height=600");
+              }
+              
+              // refresh
+              $scope.VORModel.refreshVendorOrder = function(){
+                      $scope.VORModel.isrefresh = true;
+                       setTimeout(function () {
+                       $scope.VORModel.initFunction();
+                       }, 10);
+                     
+              }
+              
+              
+                // Map variable to hold order of sorting
+                var sortOrderMap = {
+                    "ASC"   :   "DESC",
+                    "DESC"  :   ""
+                };
+                
+                // Pagination and sort related JSON
+            $scope.VORModel.setDefaultPageSortAttrs = {};
+
+            // Method to set default page sort attributes JSON
+            $scope.VORModel.setDefaultPageSortAttrs = function() {
+                $scope.VORModel.receivingPageSortAttrsJSON = {
+                    ChangesCount    :   0,
+                    CurrentPage     :   1,
+                    PageSize        :   10,
+                    Sorting :   [{
+                        FieldName       :   "Order",
+                        SortDirection   :   "ASC"
+                    }]
+                };
+                try{
+                    $scope.VORModel.receivingPageSortAttrsJSON.PageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+                } catch (ex){}
+                
+                $scope.VORModel.groupItemsPageSortAttrsJSON = {
+                    ChangesCount    :   0,
+                    CurrentPage     :   1,
+                    PageSize        :   10,
+                    Sorting :   [{
+                        FieldName       :   "Order",
+                        SortDirection   :   "ASC"
+                    }]
+                };
+                try{
+
+                    $scope.VORModel.groupItemsPageSortAttrsJSON.PageSize ='{!JSENCODE(TEXT(Related_List_Page_Size))}';
+                } catch (ex){}
+            }
+                
+                
+               $scope.VORModel.calculateSidebarHeight = function(){
+                  var leftPanelLinks =  angular.element(window).height() - ( angular.element(".headerNav").height() + angular.element(".orderNumber").height() + angular.element(".sidepaneluserinfo").height() + angular.element(".statusRow").height() + angular.element(".ownerInfo").height() + angular.element(".sideBarTotals").height() + 85);
+                  angular.element(".leftPanelLinks").css("height", leftPanelLinks);
+                  
+                  setTimeout(function(){ angular.element('[data-toggle="tooltip"]').tooltip({placement : 'bottom'}); }, 1500);
+               
+               }
+                
+                $scope.VORModel.initFunction = function(){
+                
+                        
+                        $scope.VORModel.setDefaultPageSortAttrs();
+                       
+                        $scope.VORModel.VIHeader.VIHeaderId = location.search.split('id=')[1] ? location.search.split('id=')[1] : null;
+                        if($scope.VORModel.VIHeader.VIHeaderId != null && $scope.VORModel.VIHeader.VIHeaderId.trim().length != 15 && $scope.VORModel.VIHeader.VIHeaderId.trim().length != 18){
+                            $scope.VORModel.VIHeader.VIHeaderId = null;
+                        }
+                       // $scope.SearchToAddCallback = $scope.VORModel.searchToAddCallback;
+                       /*LeftSideHeadingLables Start*/ 
+                        $scope.VORModel.setDefaultPageSortAttrs(); 
+                        /*LeftSideHeadingLables End*/  
+                        var vendorId=null;
+                        var viHeaderId=$scope.VORModel.VIHeader.VIHeaderId;
+                        var vrHeaderId =null;
+                        $scope.VORModel.isrefresh = false;
+                        $scope.SearchToAddCallback = $scope.VORModel.searchToAddCallback;
+                        
+                            vendorOrderInvoicingService.getVendorInvoicing( viHeaderId, 
+                                                                            vrHeaderId,
+                                                                            $scope.VORModel.receivingPageSortAttrsJSON,
+                                                                            $scope.VORModel.groupItemsPageSortAttrsJSON
+                                                                        )
+                                .then(function (successfulResult) {
+                                                      
+                                                      debug(successfulResult);
+                                                      $scope.VORModel.PopulatePageModel(successfulResult);
+                                                      
+                                                      debug("dfdgggggggggggggggggggg");
+                                                      debug($scope.VORModel);
+                                                       setTimeout(function(){ $scope.VORModel.calculateSidebarHeight(); }, 10); 
+                                                       
+                                                 });
+                               
+                    }                      
+                          
+                /*LeftSideHeadingLables Start*/ 
+                $scope.VORModel.populateLeftSideHeadingLables = function(){
+                        $scope.VORModel.LeftSideHeadingLables = {};
+                        var currentHeadingSequenceIndex = 65;
+                        // Info Header
+                        $scope.VORModel.LeftSideHeadingLables['Info'] = String.fromCharCode(currentHeadingSequenceIndex++);
+                        
+                        // Invoice Header
+                        if($scope.VORModel.VIGroupList.length != 0){
+                            $scope.VORModel.LeftSideHeadingLables['Invoice'] = String.fromCharCode(currentHeadingSequenceIndex++);
+                        }
+                       // debug($scope.VORModel.vendorOrderLineItemGroupList);
+                        //Finalize Header
+                        if($scope.VORModel.VIHeader.Status != 'Invoiced' && $scope.VORModel.VIGroupList.length != 0) {
+                            $scope.VORModel.LeftSideHeadingLables['Finalize'] = String.fromCharCode(currentHeadingSequenceIndex++);
+                        }
+                }
+                /*LeftSideHeadingLables End*/
+                
+                $scope.VORModel.searchToAddCallback = function (selectedRecord){
+                    if(selectedRecord.originalObject.Info == 'Vendor') {
+                        
+                        if($scope.VORModel.VIGroupList.length == 0  || $scope.VORModel.VIGroupList =='undefined') {
+                            var selectedRecordId = selectedRecord.originalObject.Value;
+                            debug('In add Vendor   viHeaderId - > ');
+                            
+                            debug($scope.VORModel.VIHeader);
+                            if($scope.VORModel.VIHeader == undefined) {
+                                viHeaderId = null 
+                            } else {
+                                viHeaderId= $scope.VORModel.VIHeader.VIHeaderId;
+                            }
+                            
+                            debug(viHeaderId);
+                            
+                            if (selectedRecordId.length == 18) {
+                                selectedRecordId = selectedRecordId.substring(0, 15);
+                            }
+                            
+                            vendorOrderInvoicingService.addVendor(selectedRecordId , viHeaderId,
+                                                                    $scope.VORModel.receivingPageSortAttrsJSON,
+                                                                    $scope.VORModel.groupItemsPageSortAttrsJSON
+                                                                    )
+                                    .then(function (successfulResult) {
+                                          debug(successfulResult);
+                                          $scope.VORModel.PopulatePageModel(successfulResult)
+                                     });
+                              $scope.VORModel.resetSearchBox();
+                        } else {
+                           Notification.error('Cannot add vendor first remove item from invoice');
+                        }   
+                    }
+                    
+                }    
+                
+                
+                 // Method for DOM action: Add
+                $scope.VORModel.RelatedList_addAction = function (event, typeToSearch) {
+                    $scope.VORModel.setFocusToSearchBox(typeToSearch);
+                }   
+                 // used when to add related records via page level search box
+                $scope.VORModel.setFocusToSearchBox = function (typeToSearch) {
+                
+                    $scope.typeToSearch = typeToSearch;
+                    $scope.PreferredObject = typeToSearch;
+                    angular.element('#SearchToaddCutomer').focus();
+                }    
+                    
+               $scope.VORModel.resetSearchBox = function () {
+                    $scope.typeToSearch = "";
+                    $scope.PreferredObject = "";
+                }
+                
+                          
+                $scope.VORModel.PopulatePageModel = function(result) {
+                    debug('In Populate Method');
+                    debug(result);
+                    
+                    if(result.VIHeaderRec.length > 0) {
+                        var url = '?id=' + result.VIHeaderRec[0].VIHeaderId;
+                        window.history.pushState("string", "Title" , url);
+                        
+                        $scope.VORModel.VIHeader = result.VIHeaderRec[0];
+                        $scope.VORModel.VIHeader.VIHeaderId = result.VIHeaderRec[0].VIHeaderId;
+                    }
+                    
+                    if($scope.VORModel.VIHeader != 'undefiend') {
+                        $scope.VORModel.PopulateGrid(null,result);
+                    }
+                    
+                    $scope.VORModel.populateLeftSideHeadingLables();
+                    //debug($scope.VORModel.VIHeader);
+                    
+                    /*if($scope.VORModel.VIHeader != 'undefiend') {
+                        if(($scope.VORModel.VIHeader.VIHeaderId == null || $scope.VORModel.VIHeader.VIHeaderId == 'undefined') && result.VIHeaderRec.length > 0) {
+                            
+                        }
+                        if(result.VIHeaderRec.length > 0 ){
+                            
+                            $scope.VORModel.PopulateGrid(null,result);  
+                        }
+                    }*/
+                }
+                
+                 /* Start-1 */
+            angular.element('.leftPanelLinks').bind('mousewheel', function(e, d) {
+                var toolbox = $('.leftPanelLinks'),
+                height = toolbox.height(),
+                scrollHeight = toolbox.get(0).scrollHeight;
+                //debug('left panel scroll');
+                if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+                    e.preventDefault();
+                }
+            });
+            /* End-1 */
+        
+        // data initialization
+            
+         $scope.labelDataValue = {
+                QtyComitted : 0,
+                QtyAvalable : 0,
+                Instock : 0,
+                QtyOnOrder : 0,
+                ReOrderMin : 0,
+                ReOrderMax : 0,
+                maxPoint : 0,
+            };
+            
+                //Update Header data
+                $scope.VORModel.updateVIHeaderDetails=function(){
+                
+                            var viHeaderId=$scope.VORModel.VIHeader.VIHeaderId;
+                            var InvoiceDateString=$scope.VORModel.VIHeader.InvoiceDate;
+                            var InvoiceNumber=$scope.VORModel.VIHeader.InvoiceNumber;
+                            
+                            vendorOrderInvoicingService.updateVIHeader( viHeaderId,  InvoiceNumber,  InvoiceDateString,
+                                                                            $scope.VORModel.receivingPageSortAttrsJSON,
+                                                                            $scope.VORModel.groupItemsPageSortAttrsJSON).then(function(successfulResult){
+                                    
+                                    $scope.VORModel.VIHeader = successfulResult.VIHeaderRec[0];
+                                    Notification.success("Invoice information updated Successfully");
+                            
+
+                            }, function (errorResult) {
+                                    Notification.error(errorResult+"Error in updating invoice information");
+                    });
+                
+                }
+                
+                
+                  $scope.VORModel.onClickSelectAllVO = function(event) {
+                        if(event.target.attributes.class.value.indexOf("disabled_chk_tick") != -1){
+                            return;
+                            event.stopPropagation();
+                        }
+                        
+                        $scope.VORModel.currentSelectedVOIndex = null;
+                        $scope.VORModel.currentSelectedVOId = null;
+                        
+                        // First popup for confirmation if really want to unselect vendor order from receiving,
+                        // if any of item is already selected in receiving items grid
+                        if( $scope.VORModel.isAllVOSelected == true ){                  // Check with TRUE, as the selected box is not toggelled yet
+                            // ToDo: Loop through items grid if any items from the current VENDOR ORDER is selected already
+                            angular.element('#VODeselectConfirmBox').show();
+                        } else {
+                            $scope.VORModel.isAllVOSelected = !$scope.VORModel.isAllVOSelected;
+                            $scope.VORModel.VODeselectConfirm();
+                        }
+                     }
+                    
+                    
+                //Select VR on CLick         
+                 $scope.VORModel.onClickSelectVO = function(event, indexVal, vendorOrderId) {
+                 
+                        var viHeaderId=$scope.VORModel.VIHeader.VIHeaderId;
+                        $scope.VORModel.populateLeftSideHeadingLables();
+                        if($scope.VORModel.VRHeaderList[indexVal].InProgressVIHeaderId ==null){
+                                    vendorOrderInvoicingService.addToItemsSubsection(viHeaderId,vendorOrderId,$scope.VORModel.receivingPageSortAttrsJSON,
+                                                                        $scope.VORModel.groupItemsPageSortAttrsJSON)
+                                    .then(function(successfulResult){
+                                            $scope.VORModel.PopulateGrid(null,successfulResult);
+                                    });
+                        }
+                        else{
+                                vendorOrderInvoicingService.removeFromItemSubSection(viHeaderId,vendorOrderId,$scope.VORModel.receivingPageSortAttrsJSON,
+                                                                        $scope.VORModel.groupItemsPageSortAttrsJSON)
+                                        .then(function(successfulResult){
+                                                $scope.VORModel.PopulateGrid(null,successfulResult);
+                                        });
+                        }
+                        
+            } 
+            
+            //Open Item in Mode
+            $scope.VORModel.editGroupItem=function(event, index){
+                if($scope.VORModel.VIHeader.Status == 'Invoiced'){
+                    return;
+                }
+                
+                var isEditModeEnabled = false;
+                debug('1233'); 
+                if(event.target['type']=='text')
+                {
+                
+                }   
+                else{
+                         for (i = 0; i < $scope.VORModel.VIGroupListItems_editRow.length; i++) {
+                                if ($scope.VORModel.VIGroupListItems_editRow[i].isEdit == true) {
+                                    isEditModeEnabled = true;
+                                }
+                               $scope.VORModel.VIGroupListItems_editRow[i].isEdit = false;
+                            }
+                            if (!isEditModeEnabled) {
+                            
+                                $scope.VORModel.VIGroupListItems_editRow[index].isEdit = true;
+                            }
+                            else{
+                                
+                                    $scope.VORModel.UpdateVIGroupItem(index);
+                            }
+            
+                }
+            }
+            
+            $scope.VORModel.UpdateVIGroupItem=function(index){
+                
+                
+                var viHeaderId=$scope.VORModel.VIHeader.VIHeaderId;
+                var vrHeaderId=null
+                var jsonString= $scope.VORModel.VIGroupList[index];
+                
+                vendorOrderInvoicingService.updateVIGroup(viHeaderId, vrHeaderId, jsonString, $scope.VORModel.receivingPageSortAttrsJSON,$scope.VORModel.groupItemsPageSortAttrsJSON)
+                .then(function(successResult){
+                        Notification.success("Vendor Invoice group item updated Successfully");
+                        $scope.VORModel.PopulateGrid(null,successResult);
+                }, function (errorResult) {
+                   Notification.error(errorResult+"  Error in updating invoice; cost or discount value is incorrect ");
+         });
+       }
+            $scope.VORModel.editRowTabOutLast=function(event,index){
+                        
+                        if (!event.shiftKey && event.keyCode == 9){
+                                $scope.VORModel.UpdateVIGroupItem(index);
+                        }
+            
+            }
+            
+            // Grid Populate function
+            $scope.VORModel.PopulateGrid = function(gridName,result){
+                    $scope.VORModel.totalVendorOrderInvoicing = result.totalVendorOrderInvoicing;
+                    $scope.VORModel.totalGroupItems = result.totalGroupItems;
+                    debug("pagination"+$scope.VORModel.totalGroupItems);
+                    if(gridName==null || gridName=='VOListGrid'){
+                            $scope.VORModel.VRHeaderList =result.VRHeaderList;
+                    }
+                    if(gridName==null || gridName=='VOInvoicingGrid'){
+                         $scope.VORModel.VIGroupList = result.VIGroupList;
+                         $scope.VORModel.populateItemsSubSectionEditableModel(result.VIGroupList)
+                    }
+                     $scope.VORModel.ItemsTotal=result.ItemsTotal;
+                     $scope.VORModel.PurchaseTax=result.PurchaseTax;
+                     $scope.VORModel.Total=result.Total;
+                    
+            }
+            
+            // Populate Edit Sub Section
+            $scope.VORModel.populateItemsSubSectionEditableModel = function(VIGroupList) {
+              $scope.VORModel.VIGroupListItems_editRow = [];
+              for (var i = 0; i < VIGroupList.length; i++) {
+                  $scope.VORModel.VIGroupListItems_editRow.push({
+                      isEdit : false,
+                      radioValue : 0,
+                      optionSelected : 0
+                  });
+              }
+              debug($scope.VORModel.VIGroupListItems_editRow);
+          }
+          
+          $scope.VORModel.loadAllGridDetails = function(gridName, callBackMethod) {
+                // If Vendor receivinig Id is not null: record already exists, then only load grid details
+                if ($scope.VORModel.VIHeader.VIHeaderId != null) {
+                    vendorOrderInvoicingService.getVendorInvoicing( $scope.VORModel.VIHeader.VIHeaderId, 
+                                                                    null,
+                                                                    $scope.VORModel.receivingPageSortAttrsJSON,
+                                                                    $scope.VORModel.groupItemsPageSortAttrsJSON
+                                                                )
+                    .then(function (successfulResult) {
+                        $scope.VORModel.PopulatePageModel(successfulResult);
+                        
+                        if(callBackMethod != null && callBackMethod != undefined){
+                            callBackMethod();
+                        }
+                    });
+                }
+            }
+          
+          // Method to handle any updates in sort controls
+          $scope.VORModel.Receiving_PageSortControlsAction = function () {
+              var newSortOrder = sortOrderMap[$scope.VORModel.receivingPageSortAttrsJSON.Sorting[0].SortDirection];
+              if(newSortOrder == null || newSortOrder == undefined){
+                  newSortOrder = "ASC";
+              }
+              $scope.VORModel.receivingPageSortAttrsJSON.Sorting[0].SortDirection = newSortOrder;
+              
+              // Set current page to 1
+              $scope.VORModel.receivingPageSortAttrsJSON.CurrentPage = 1;
+              $scope.VORModel.Receiving_paginationControlsAction();
+          }
+
+          // Method to handle any updates in sort controls
+          $scope.VORModel.Receiving_paginationControlsAction = function () {
+              $scope.VORModel.loadAllGridDetails(null, $scope.VORModel.Receiving_UpdatePaginationControls);
+          }
+          
+
+          // Update pagination count for Vendor Orders grid
+          $scope.VORModel.Receiving_UpdatePaginationControls = function () {
+              setTimeout(function () {
+                  $scope.VORModel.receivingPageSortAttrsJSON.ChangesCount++;
+              }, 10);
+          }
+          
+          
+          // Method to handle any updates in sort controls
+          $scope.VORModel.GroupItems_PageSortControlsAction = function () {
+              var newSortOrder = sortOrderMap[$scope.VORModel.groupItemsPageSortAttrsJSON.Sorting[0].SortDirection];
+              if(newSortOrder == null || newSortOrder == undefined){
+                  newSortOrder = "ASC";
+              }
+              $scope.VORModel.groupItemsPageSortAttrsJSON.Sorting[0].SortDirection = newSortOrder;
+              
+              // Set current page to 1
+              $scope.VORModel.groupItemsPageSortAttrsJSON.CurrentPage = 1;
+              $scope.VORModel.GroupItems_paginationControlsAction();
+          }
+
+          // Method to handle any updates in sort controls
+          $scope.VORModel.GroupItems_paginationControlsAction = function () {
+              $scope.VORModel.loadAllGridDetails(null, $scope.VORModel.GroupItems_UpdatePaginationControls);
+          }
+          
+
+          // Update pagination count for Vendor Orders grid
+          $scope.VORModel.GroupItems_UpdatePaginationControls = function () {
+              setTimeout(function () {
+                  $scope.VORModel.groupItemsPageSortAttrsJSON.ChangesCount++;
+              }, 10);
+          }
+          
+          $scope.VORModel.hidePanel = function(event, id){
+              var targetelement = angular.element(event.target).closest('h1').find('.fa:first');
+              if(targetelement.hasClass('fa-chevron-right')){
+                  targetelement.removeClass('fa-chevron-right');
+                  targetelement.addClass('fa-chevron-down');
+              } else {
+                  targetelement.removeClass('fa-chevron-down');
+                  targetelement.addClass('fa-chevron-right');
+              }
+              $('#'+id).toggle();
+          }
+          
+        $scope.VORModel.finalizeOrder = function (event) {
+            var voHeaderId = $scope.VORModel.VIHeader.VIHeaderId;
+                 $scope.VORModel.editGroupItem(event,0);
+                vendorOrderInvoicingService.finalizeInvoiceAction(  $scope.VORModel.VIHeader.VIHeaderId,
+                                                                    $scope.VORModel.receivingPageSortAttrsJSON,
+                                                                    $scope.VORModel.groupItemsPageSortAttrsJSON
+                                                                )
+                .then(function (successfulResult) {
+                    $scope.VORModel.PopulatePageModel(successfulResult);
+                    
+                    $scope.VORModel.setDefaultPageSortAttrs();
+                    $scope.VORModel.Receiving_UpdatePaginationControls();
+                    $scope.VORModel.GroupItems_UpdatePaginationControls();
+                    $scope.VORModel.populateLeftSideHeadingLables();
+                });
+        }
+        
+           var timer;
+           $scope.VORModel.showPartPopUp = function (event, partId) {
+           
+           
+            timer = $timeout(function () {
+                            //var partId = $scope.CustomerOrderModel.VORLineItemGroupList[index].PartId;
+                            
+                            debug(partId);
+                            $scope.$broadcast('PartPopUpEvent',  partId);
+                            $scope.applyCssOnPopUp(event, '.Vendor-Order-Part-Popup');
+                         }, 1000);
+           
+           
+               /*  $scope.applyCssOnPopUp(event, '.Vendor-Order-Part-Popup');
+                
+                vendorOrderInvoicingService.getPartRecord(partId).then(function (partRecord) {
+                    if (partRecord.PartDetailRec != undefined) {
+
+                       
+                        $scope.VendorOrderModel.partInfoDetail = partRecord.PartDetailRec;
+                        $scope.VORModel.loadChartData();
+                    }
+                }, function (errorSearchResult) {
+                    $scope.VORModel.OverlayInfo = errorSearchResult;
+                }); */
+            } 
+            
+             $scope.VORModel.hidePartPopUp =function(){
+             		
+                    $timeout.cancel(timer);
+                    
+                    angular.element('.Vendor-Order-Part-Popup').hide();
+            
+            }
+            
+              $scope.applyCssOnPopUp = function (event, className) {
+              
+               var targetEle = angular.element(event.target);
+               var elementWidth = targetEle.width();
+               if (targetEle.width() > targetEle.parent().width()) {
+                   elementWidth = targetEle.parent().width() - 15;
+
+               }
+               angular.element(className).css('top', targetEle.offset().top);
+               angular.element(className).css('left', event.clientX);
+               setTimeout(function(){  angular.element(className).show(); }, 1000); 
+              
+              
+              
+               /*  var targetEle = angular.element(event.target);
+                var elementWidth = targetEle.width();
+                if (targetEle.width() > targetEle.parent().width()) {
+                    elementWidth = targetEle.parent().width() - 15;
+                }
+                angular.element(className).css('top', targetEle.offset().top - 22);
+                angular.element(className).css('left', targetEle.offset().left + elementWidth + 20);
+                angular.element(className).show(); */
+
+
+            }
+              
+              /*  $scope.applyCssOnInfoOverlay  = function (event, className) {
+                var targetEle = angular.element(event.target);
+                var elementWidth = targetEle.width();
+                if (targetEle.width() > targetEle.parent().width()) {
+                    elementWidth = targetEle.parent().width() - 15;
+                }
+                angular.element(className).css('top', targetEle.offset().top);
+                angular.element(className).css('left', event.clientX);
+                setTimeout(function(){  angular.element(className).show(); }, 1000); 
+               } */
+            // added by hitesh
+            var timer3;
+            $scope.VORModel.showInvoiceDetail = function (vrHeaderId, event) {
+            
+            
+            
+                 timer3 = $timeout(function () {
+                            //var partId = $scope.CustomerOrderModel.VORLineItemGroupList[index].PartId;
+                            $scope.VORModel.InvoiceDetailInfo = {};
+                var targetEle = angular.element(event.target);
+                var elementWidth = targetEle.width();
+                if (targetEle.width() > targetEle.parent().width()) {
+                    elementWidth = targetEle.parent().width() - 15;
+                }
+                angular.element('.Invoice-info-overlay').css('top', targetEle.offset().top -27);
+                angular.element('.Invoice-info-overlay').css('left', event.clientX);
+                angular.element('.Invoice-info-overlay').show();
+                debug('show popup');
+                
+                vendorOrderInvoicingService.getVRHeaderDetails(vrHeaderId).then(function (vrHeaderDetail) {
+                    $scope.VORModel.vrHeaderDetail = vrHeaderDetail;
+                    debug($scope.VORModel.vrHeaderDetail);
+                }, function (errorSearchResult) {
+                    $scope.VORModel.vrHeaderDetail = errorSearchResult;
+                });
+                         }, 1000);
+                /*  timer3 = $timeout(function () {
+                            //var partId = $scope.CustomerOrderModel.VORLineItemGroupList[index].PartId;
+                            debug(vrHeaderId);
+                            $scope.$broadcast('InvoiceInfoOverlayEvent',  vrHeaderId);
+                            $scope.applyCssOnInfoOverlay(event, '.Invoice-info-overlay');
+                         }, 1000);  */
+                         
+                /* $scope.VORModel.InvoiceDetailInfo = {};
+                var targetEle = angular.element(event.target);
+                var elementWidth = targetEle.width();
+                if (targetEle.width() > targetEle.parent().width()) {
+                    elementWidth = targetEle.parent().width() - 15;
+                }
+                angular.element('.Invoice-info-overlay').css('top', targetEle.offset().top - 275);
+                angular.element('.Invoice-info-overlay').css('left', targetEle.offset().left + elementWidth + 68);
+                angular.element('.Invoice-info-overlay').show();
+                debug('show popup');
+                
+                vendorOrderInvoicingService.getVRHeaderDetails(vrHeaderId).then(function (vrHeaderDetail) {
+                    $scope.VORModel.vrHeaderDetail = vrHeaderDetail;
+                    debug($scope.VORModel.vrHeaderDetail);
+                }, function (errorSearchResult) {
+                    $scope.VORModel.vrHeaderDetail = errorSearchResult;
+                }); */
+                
+                
+                
+                /* $scope.VORModel.InvoiceDetailInfo = {};
+                var targetEle = angular.element(event.target);
+                var elementWidth = targetEle.width();
+                if (targetEle.width() > targetEle.parent().width()) {
+                    elementWidth = targetEle.parent().width() - 15;
+                }
+                angular.element('.Invoice-history-info-overlay').css('top', targetEle.offset().top - 275);
+                angular.element('.Invoice-history-info-overlay').css('left', targetEle.offset().left + elementWidth + 68);
+                angular.element('.Invoice-history-info-overlay').show();
+                debug('show popup');
+                
+                vendorOrderInvoicingService.getVRHeaderDetails(vrHeaderId).then(function (vrHeaderDetail) {
+                    $scope.VORModel.vrHeaderDetail = vrHeaderDetail;
+                    debug($scope.VORModel.vrHeaderDetail);
+                }, function (errorSearchResult) {
+                    $scope.VORModel.vrHeaderDetail = errorSearchResult;
+                }); */
+            }
+            $scope.VORModel.showInfoOverlay = function (event, vendorId) {
+                var targetEle = angular.element(event.target);
+                var elementWidth = targetEle.width();
+                if (targetEle.width() > targetEle.parent().width()) {
+                    elementWidth = targetEle.parent().width() - 15;
+                }
+                angular.element('.Vendor-info-overlay').css('top', targetEle.offset().top - 45);
+                angular.element('.Vendor-info-overlay').css('left', event.clientX);
+                angular.element('.Vendor-info-overlay').show();
+            }
+            $scope.VORModel.showVendorInfoOverlay = function (event, vendorId) {
+                        debug("vendor id : "+vendorId);
+                         $scope.$broadcast('VendorInfoPopUpEvent',  vendorId);
+                         $scope.VORModel.showInfoOverlay(event, vendorId);
+                }
+            $scope.VORModel.hideVendorInfoOverlay = function () {
+                angular.element('.Vendor-info-overlay').hide();
+            }
+            $scope.VORModel.hideInvoiceDetail = function () {
+                $timeout.cancel(timer3);
+                angular.element('.Invoice-info-overlay').hide();
+                /* angular.element('.Invoice-history-info-overlay').hide(); */
+            }
+            
+            // Method to show pop up box to confrim delete operation.
+        $scope.VORModel.confirmDelete = function() {
+            var dialog = ngDialog
+                    .open({
+                        template : '<div class="dialogBox"><h3>Delete Vendor Invoicing  '
+                                + '</h3><hr/>'
+                                + '<form >'
+                                + '<span > Are you sure ? <hr/>'
+                                + '<div style="text-align: right;">'
+                                + '<button style="margin-right:10px;" type="button" class="btn btn-default greenBtn" ng-click="VORModel.vendorInvoicingDelete()'
+                                + ' && closeThisDialog()">Delete</button>'
+                                + '<button style="margin-right:10px;" type="button" class="btn btn-default grayBtn" ng-click="closeThisDialog()">Cancel</button>'
+                                + '</div>' + '</form>' + '</div>',
+                        showClose : false,
+                        scope : $scope,
+                        plain : true
+                    });
+        };  
+        
+        // added By Anurag
+         $scope.VORModel.vendorInvoicingDelete = function() {
+        
+           var viHeaderId = $scope.VORModel.VIHeader.VIHeaderId;
+            debug(viHeaderId);
+            vendorOrderInvoicingService.deleteVendorInvoice(viHeaderId).then(function (successfulSearchResult) {
+                    Notification.success("Vendor Invoice Deleted Successfully");
+                    debug("vendor Info");
+                    debug(successfulSearchResult);
+                    window.location.href = "{!$Page.HomeSearch}";//"/apex/HomeSearch";
+               }, function (errorSearchResult) {
+                   responseData = errorSearchResult;
+                   Notification.error(errorSearchResult); 
+         });
+         return true ;  
+         };
+         
+    });
+    // controller end
+    
+    //services
+    vendorOrderInvoicingApp.service("vendorOrderInvoicingService", function ($q) {
+            
+            //Finalize Invoicing
+            this.finalizeInvoiceAction= function (viHeaderId, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON){
+            	viHeaderId = encodeString(viHeaderId);
+            	receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+            	groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+            	
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.finalizeInvoiceAction}',
+                                viHeaderId, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true 
+                });
+                return deferred.promise;
+            }
+            
+            //Get Part popup Data
+            this.getVendorInvoicing= function (viHeaderId,vrHeaderId,receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON){
+            	viHeaderId = encodeString(viHeaderId);
+            	vrHeaderId = encodeString(vrHeaderId);
+            	receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+            	groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+            	
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.getVendorInvoicingDetails}',
+                                viHeaderId,vrHeaderId, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                           deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+            }
+            
+        
+        
+        //Add Vendor Recceiving to Item sub section grid
+        this.addToItemsSubsection=function(viHeaderId,vrHeaderId,receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON){
+        	viHeaderId = encodeString(viHeaderId);
+        	vrHeaderId = encodeString(vrHeaderId);
+        	receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+        	groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+        	
+             var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.addToItemsSubsection}',
+                                viHeaderId,vrHeaderId, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+        }
+        
+        //Remove Vendor Recceiving to Item sub section grid
+        this.removeFromItemSubSection=function(viHeaderId,vrHeaderId,receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON){
+        	viHeaderId = encodeString(viHeaderId);
+        	vrHeaderId = encodeString(vrHeaderId);
+        	receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+        	groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+        	
+             var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.removeFromItemSubSection}',
+                                viHeaderId,vrHeaderId, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+        }
+    
+    
+    
+    //update VI Header
+    this.updateVIHeader= function( viHeaderId,  InvoiceNumber,  InvoiceDateString,receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON) {
+    			viHeaderId = encodeString(viHeaderId);
+    			InvoiceNumber = encodeString(InvoiceNumber);
+    			InvoiceDateString = encodeString(InvoiceDateString);
+    			receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+    			groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+    			
+                 var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.updateVIHeader}',
+                               viHeaderId,  InvoiceNumber,  InvoiceDateString, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+    
+    
+    };
+    
+    //Update VI Group
+    this.updateVIGroup = function( viHeaderId, vrHeaderId, jsonString,receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON){
+    			viHeaderId = encodeString(viHeaderId);
+    			vrHeaderId = encodeString(vrHeaderId);
+    			jsonString = encodeString(angular.toJson(jsonString));
+    			receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+    			groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+    			
+                 var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.updateVIGroup}',
+                                viHeaderId, vrHeaderId,jsonString, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+    
+    }
+    
+    //Add Vendor To Vendor invoicing
+    this.addVendor=function( vendorId , viHeaderId,receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON){
+                vendorId = encodeString(vendorId);
+                viHeaderId = encodeString(viHeaderId);
+                receivingPageSortAttrsJSON = encodeString(angular.toJson(receivingPageSortAttrsJSON));
+                groupItemsPageSortAttrsJSON = encodeString(angular.toJson(groupItemsPageSortAttrsJSON));
+                
+                debug(vendorId +' '+ viHeaderId+' '+receivingPageSortAttrsJSON+' '+groupItemsPageSortAttrsJSON)
+                 var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.VendorInvoicingCtrl.addVendor}',
+                                vendorId , viHeaderId, receivingPageSortAttrsJSON, groupItemsPageSortAttrsJSON,
+                    function (result, event) {
+                        if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var partRec = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            partRec = partRec.replace(re, '');
+                            deferred.resolve(JSON.parse(partRec));
+                        }
+                    }, {
+                        escape : true
+
+                });
+                return deferred.promise;
+    
+    }
+    
+        //View part popup
+        
+         this.getPartRecord = function (partId){
+         			partId = encodeString(partId);
+         			
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.VendorInvoicingCtrl.getPartByPartId}',
+                                    partId,
+                        function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var partRec = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                partRec = partRec.replace(re, '');
+                                deferred.resolve(JSON.parse(partRec));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+                }
+                
+         // View VR Header Group popup
+         this.getVRHeaderDetails = function (vrHeaderId){
+         	vrHeaderId = encodeString(vrHeaderId);
+         	
+             var deferred = $q.defer();
+             Visualforce.remoting.Manager.invokeAction(
+                 '{!$RemoteAction.VendorInvoicingCtrl.getVRDetailForPopUp}',
+                             vrHeaderId,
+                 function (result, event) {
+                     if (event.type == 'exception') {
+                         deferred.reject(event.message);
+                     } else {
+                         var vrHeaderRec = decodeString(result);
+                         var find = '\'';
+                         var re = new RegExp(find, 'g');
+                         vrHeaderRec = vrHeaderRec.replace(re, '');
+                         deferred.resolve(JSON.parse(vrHeaderRec));
+                     }
+                 }, {
+                     escape : true
+             });
+             return deferred.promise;
+         }
+                
+        this.deleteVendorInvoice = function (viHeaderId){
+        		viHeaderId = encodeString(viHeaderId);
+        		
+                 var deferred = $q.defer();
+                 Visualforce.remoting.Manager.invokeAction(
+                     '{!$RemoteAction.VendorInvoicingCtrl.deleteVendorOrderInvoicing}', viHeaderId,
+                     function (result, event) {
+                         if (event.type == 'exception') {
+                             deferred.reject(event.message);
+                         } else {
+                             var vrHeaderRec = decodeString(result);
+                             deferred.resolve(vrHeaderRec);
+                         }
+                     }, {
+                         escape : true
+                 });
+                 return deferred.promise;
+             }
+        
+});
+
+
+
+</script>
+
+
+           
+            
+
+<body ng-controller="vendorOrderInvoicingController"  ng-init="VORModel.initFunction()" ng-cloak="ng-cloak">
+    <!-- Header start -->
+    <c:BPGlobalHeader />
+    <!-- Header End -->
+    <!--  content start here -->
+       <div class="content VOInvoicingLeftHeader">
+      
+    
+            <!-- side panel start here -->
+             <div class="col-lg-2 col-md-2 sidePanel">
+                 <div class="orderNumber row">
+                        <span>ORDER #:  {{VORModel.VIHeader.VIHeaderNumber}}</span>
+                 </div>
+                 <div class="sidepaneluserinfo row">
+                        <!-- <div class="userimg">
+                            <div>
+                                    <img  src="{!URLFOR($Resource.Images, 'star.png')}" />
+                            </div>
+                        </div> -->
+                        <div class="userNameblock">
+                            <p class="vendorName"> 
+                               <!--  <span>{{VORModel.VIHeader.VendorName}}</span> -->
+                                <a href="" ng-mouseover="VORModel.showVendorInfoOverlay($event, VORModel.VIHeader.VendorId);" 
+                                    ng-mouseleave="VORModel.hideVendorInfoOverlay();" id="CO_workflow_sidepanel_cust_name_link">
+                                    {{VORModel.VIHeader.VendorName}}</a>
+                            </p>
+                            <span class="userStatus">{{VORModel.VIHeader.Status}}</span>
+                        </div>
+                  </div>
+                  
+                <div class="row statusRow">
+                            <!-- <label>Status</label> -->
+                            <!-- <span class="divider">|</span> -->
+                            <!-- <span class="userStatus" style="margin: 0px 5px 0px 52px;">{{VORModel.VIHeader.Status}}</span> -->
+                </div> 
+                <!-- <div class="row ownerInfo">
+                    <img src="{!URLFOR($Resource.Images, 'profile_default.jpg')}" />
+                    <span class="Name">{{VORModel.VIHeader.OwnerName}}</span>
+                </div> -->
+                <!-- left panel links start here -->
+                <div class="leftPanelLinks">
+                    <a class="row T10 mainSectionLink" ng-class="{'active' : VORModel.activeSidepanelink =='#VOI_Info_Block'}" 
+                       href="#VOI_Info_Block" ng-click="VORModel.sidepanelLink($event, 'Info')" ><span class="alphabetLetter">{{VORModel.LeftSideHeadingLables.Info}}</span>{!$Label.Page_Section_Info}
+                    </a>
+                    <a class="row T10 subSectionLink" href="#VOI_Info_Block" ng-click="VORModel.sidepanelLink($event, 'Info')">
+                        <span class="alphabetLetter"></span>{!$Label.Label_General}
+                    </a>
+                    <a class="row T10 subSectionLink" href="#VOI_Receivinig_Block" ng-click="VORModel.sidepanelLink($event, 'Info')" ng-if="VORModel.VIHeader.Status != 'Invoiced'">
+                        <span class="alphabetLetter"></span>{!$Label.Label_Receivings}
+                    </a>
+                    <div ng-if="VORModel.VIHeader.VendorId !=null" ng-show="VORModel.VIGroupList.length != 0">
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : VORModel.activeSidepanelink =='#VOI_invoicing_Block'}" 
+                           href="#VOI_invoicing_Block" ng-click="VORModel.sidepanelLink($event, 'Invoicing')" >
+                            <span class="alphabetLetter">{{VORModel.LeftSideHeadingLables.Invoice}}</span>{!$Label.Label_Invoicing}
+                        </a>
+                        <a class="row T10 subSectionLink" href="#VOI_invoicing_Block" ng-click="VORModel.sidepanelLink($event, 'Invoicing')">
+                            <span class="alphabetLetter"></span>{!$Label.Items}
+                        </a>
+                        <!-- <a class="row T10 subSectionLink" href="#VOI_invoicing_Block" ng-click="VORModel.sidepanelLink($event, 'Invoicing')" ng-if="VORModel.VIHeader.VendorId != null">
+                            <span class="alphabetLetter"></span>Other Charges
+                        </a> -->
+                        <a class="row T10 mainSectionLink" ng-class="{'active' : VORModel.activeSidepanelink =='#VOI_Finalize_Block'}" 
+                            href="#VOI_Finalize_Block" ng-click="VORModel.sidepanelLink($event, 'FinalizeOrder')"
+                            ng-show="VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0 && VORModel.VIHeader.InvoiceNumber != undefined && VORModel.VIHeader.InvoiceNumber != '' && VORModel.VIHeader.InvoiceNumber != null" >
+                            <span class="alphabetLetter">{{VORModel.LeftSideHeadingLables.Finalize}}</span>{!$Label.Finalize}
+                        </a>
+                      </div>    
+                                     
+                </div>
+                <!-- left panel links end here -->
+                 
+                 
+                 
+                    <!-- Section Totals -->
+                    <div class="sideBarTotals">
+                      <div class="C1 orderleftPanelLinks">
+                        <div class="ordertotal">
+                        <a class= "T10 subSectionLink ">{!$Label.Items}</a>
+                        <a class= "T10 subSectionLink text-right">{{VORModel.ItemsTotal | currency}}</a>
+                        </div>
+                        <!-- <div class="ordertotal ">
+                        <a class= "T10 subSectionLink ordertotalPA1">Other Charges</a>
+                        <a class= "T10 subSectionLink text-right ordertotalPA2">{{0 | currency}}</a>
+                        </div> -->
+                      <div class="ordertotal">
+                        <a class= "T10 subSectionLink ">{!$Label.Vendor_Invoicing_Taxes}</a>
+                        <a class= "T10 subSectionLink text-right">{{VORModel.PurchaseTax | currency}}</a>
+                      </div>
+                        
+                     </div>
+                      <div class="mainSectionLink totalDue C1">
+                        <a class="T2">{!$Label.Vendor_Invoicing_Total_Due}:</a>
+                        <a class="T2 text-right"> {{VORModel.Total  | currency}}</a>
+                     </div>
+                    </div>
+                  
+                 
+             </div>
+             <!-- side panel end here -->
+             <!-- center div start here -->
+             
+             
+                 <div class="col-lg-10 col-md-10 mainSection" >
+                     <div class=" sectionHeader row fixedRow">
+                        <div class="col-lg-6 col-md-6" ng-show="VORModel.activeSidepanelink =='#VOI_Info_Block'">
+                            <div class="fixedHeaderText">
+                                <span class="headerlabel">
+                                    <i class="fa fa-angle-right" ng-show="!VORModel.displaySections.Info"
+                                        ng-Click="VORModel.displaySections.Info = true">
+                                    </i> 
+                                    <i class="fa fa-angle-down" 
+                                        ng-show="VORModel.displaySections.Info"
+                                        ng-Click="VORModel.displaySections.Info = false">
+                                    </i> 
+                                    <span class="divider">|</span>
+                                    <span class = "headdingFirstText">{{VORModel.LeftSideHeadingLables.Info}}</span>
+                                    <span class="T2">{!$Label.Page_Section_Info}</span>
+                                </span>
+                                 <span class="ActionIcons pull-left ">
+                                    <!-- <div class="dropdown selectDropdown checkboxDropdown">
+                                      <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{!$Label.Label_Actions}
+                                      <span class="caret"></span></button>
+                                    </div> -->
+                                </span>
+                            </div>
+                        </div>
+                        <div ng-show="VORModel.VIGroupList.length != 0">
+                            <div class="col-lg-6 col-md-6" ng-show="VORModel.activeSidepanelink =='#VOI_invoicing_Block'">
+                                <div class="fixedHeaderText">
+                                    <span class="headerlabel">
+                                    <i class="fa fa-angle-right" 
+                                        ng-show="!VORModel.displaySections.Invoicing"
+                                        ng-Click="VORModel.displaySections.Invoicing = true">
+                                    </i> 
+                                    <i class="fa fa-angle-down" 
+                                        ng-show="VORModel.displaySections.Invoicing"
+                                        ng-Click="VORModel.displaySections.Invoicing = false">
+                                    </i> 
+                                    <span class="divider">|</span>
+                                    <span class = "headdingFirstText">B</span>
+                                    <span class="T2"> {!$Label.Label_Invoicing}</span>
+                                    </span>
+                                    <span class="ActionIcons pull-left">
+                                    <div class="dropdown selectDropdown checkboxDropdown">
+                                          <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{!$Label.Label_Actions}
+                                          <span class="caret"></span></button>
+                                    </div>
+                                    </span>
+                                    
+                                    <span class="T3  pull-right total">
+                                        <a id="CO_Merchandise_total_price_row_h3_a" >{{VORModel.ItemsTotal | currency}} </a>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0 && VORModel.VIHeader.InvoiceNumber != undefined && VORModel.VIHeader.InvoiceNumber != '' && VORModel.VIHeader.InvoiceNumber != null">
+                            <div class="col-lg-6 col-md-6" ng-show="VORModel.activeSidepanelink =='#VOI_Finalize_Block'">
+                                <div class="fixedHeaderText">
+                                    <span class="headerlabel">
+                                    <i class="fa fa-angle-right"
+                                        ng-show="!VORModel.displaySections.FinalizeOrder"
+                                        ng-Click="VORModel.displaySections.FinalizeOrder = true">
+                                    </i> 
+                                    <i class="fa fa-angle-down" 
+                                        ng-show="VORModel.displaySections.FinalizeOrder"
+                                        ng-Click="VORModel.displaySections.FinalizeOrder = false">
+                                    </i> 
+                                    <span class="divider">|</span>
+                                    <span class = "headdingFirstText">C</span>
+                                    <span class="T2">{!$Label.Finalize}</span>
+                                    </span>
+                                    <span class="ActionIcons pull-left">
+	                                    <div class="dropdown selectDropdown checkboxDropdown">
+	                                          <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{!$Label.Label_Actions}
+	                                          <span class="caret"></span></button>
+	                                    </div>
+                                    </span> 
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        <div class="col-lg-6 col-md-6 fixedContent">
+                            <i class="fa fa-refresh fa-2x fa-fw" ng-class="{'fa-spin' : VORModel.isrefresh}"
+                                    ng-click="VORModel.refreshVendorOrder();">
+                            </i>
+                            <div class="fa-icons pull-right">
+                                <i class="fa fa-floppy-o"></i>
+                                <i class="fa fa-cog"></i>
+                            </div>
+                            
+                            <div class="col-lg-10 col-md-9 searchToAdd  pull-right">
+                                <div class="input-group" ng-class="{'activeSearchDiv' : VORModel.searchDivActive}">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn C5 LabelBtn">
+                                            <span class="T5 text-uppercase">{!$Label.Label_To}:</span>
+                                            <span class="selectedItem_btn_span">{{VORModel.selectedItem}}</span>
+                                        </button>
+                                        <button type="button" class="btn C5 dropdown-toggle caretBtn" ng-disabled="VORModel.VIHeader.Status == 'Invoiced'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                        
+                                            <li><a href="#VOI_Info_Block" ng-click="VORModel.dropDownItem($event, 'Info')">{!$Label.Page_Section_Info}</a></li>
+                                            <li ng-if="VORModel.VIHeader.VendorId !=null"><a href="#VOI_invoicing_Block" ng-show="VORModel.VIGroupList.length != 0" ng-click="VORModel.dropDownItem($event, 'Invoicing')">{!$Label.Label_Invoicing}</a></li>
+                                            <li ng-if="VORModel.VIHeader.VendorId !=null"><a href="#VOI_Finalize_Block" ng-show="VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0 && VORModel.VIHeader.InvoiceNumber != undefined && VORModel.VIHeader.InvoiceNumber != '' && VORModel.VIHeader.InvoiceNumber != null" ng-click="VORModel.dropDownItem($event, 'Finalize Order')">{!$Label.Finalize}</a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a href="#">ADVANCED SEARCH</a></li>
+                                           
+                                        </ul>
+                                    </div>
+                                    <!-- /btn-group -->
+                                    
+                                    <div class="inner-addon right-addon neVendorOrderAutocomplete-container" ng-class="{'disabledSearchToAddElement' : VORModel.VIHeader.Status == 'Invoiced' }">
+                                        <i class="fa fa-search fa-flip-horizontal"></i>
+                                     <c:SearchToAdd />
+                                        <!-- <input class="header-search form-control"  placeholder="search to Add Related" type="text" /> -->
+                                    </div>
+                                </div>
+                                <!-- /input-group -->
+                            </div>
+                            
+                        </div>
+                     </div>
+                       <div class="contentWrapper">
+                         <div id="VOI_Info_Block"  ng-show="VORModel.displaySections.Info">
+                             <div class="main_section row VOI_Info_Block">
+                            <div class="row rowGeneral" >
+                            <div class="content ">
+                            <div class="col-lg-12 col-md-12 Pl24 MB48" id="VOI_InfoGeneral_Block" >
+                                <p class="actionRow T2">
+                                    <span class="sectionText">{!$Label.Label_General}</span>
+                                    <!-- <span class="actionText">{!$Label.Label_Actions}</span> -->
+                                    <span class="ActionIcons">
+                                    <!-- <i class="fa fa-th"></i> -->
+                                    	<i class="fa fa-question-circle" data-toggle="tooltip" title="Info General Section"></i>
+                                    </span> 
+                                </p>
+                               <div class="col-lg-7 col-md-7 Plr12">
+                                  <p class="T3 MB24 F12 FC2">{!$Label.Vendor_Object_Display_Label}</p>
+                                  <div class="col-md-6 Plr0">
+                                     <div class="col-lg-4 col-md-5 Plr0 MB12  ">
+                                        <img class="Profile_pic" src="{!URLFOR($Resource.Images, 'profile_default.jpg')}" />
+                                     </div>
+                                     <div class="col-lg-8 col-md-7 Plr12 MB12 ">
+                                         <div ng-if="VORModel.VIHeader.VendorId==null" >
+                                            <span class="T1_SubHeading"  >
+                                                <a href="" ng-click="VORModel.RelatedList_addAction($event, 'Vendor')" id="VI_workflow_sidepanel_add_cust_link">{!$Label.Label_Add} {!$Label.Vendor_Object_Display_Label}</a><!-- ng-click="AddToSearch('Vendor')" -->
+                                            </span>
+                                         </div> 
+                                         <div  ng-if="VORModel.VIHeader.VendorId !=null">
+                                            <p class="T1 " > 
+                                                <!-- <a href=""  id="VI_workflow_sidepanel_cust_name_link"> -->
+                                                      <a href="" ng-mouseover="VORModel.showVendorInfoOverlay($event, VORModel.VIHeader.VendorId);" 
+                                                        ng-mouseleave="VORModel.hideVendorInfoOverlay();" id="CO_workflow_sidepanel_cust_name_link">
+                                                        {{VORModel.VIHeader.VendorName}}</a>
+
+                                                <!--  </a> -->   
+                                            </p>
+                                        </div>
+                                        <!-- <div class="Plr12_Plr0_MB12_imgDiv">
+                                           <img src="{!URLFOR($Resource.Images, 'star.png')}" class="Plr12_Plr0_MB12_imgDiv_img" />
+                                        </div>
+                                        <p class="T7 T7_vendor">{!$Label.Label_Gamification}</p> -->
+                                     </div>
+                                    
+                                    <div class="col-lg-8 col-md-7 Plr0 MB24 " ng-if="VORModel.VIHeader.VendorId !=null" >
+                                        <span class="T7 F9" style="margin-left: 12px;">Last Visited 04/06/2015</span>
+                                     </div>
+                                     
+                                   <div class="col-md-12 Plr0 MB24 ">
+										<div class="generalInfoData">
+											<label class="T3">{!$Label.Label_Status}</label>
+										</div>
+										<div class="mycustvalue viStatus">
+											<span class="FC10 T3 invoiceStatus"><!--  style="color: green" -->
+												{{VORModel.VIHeader.Status}}
+											</span>
+										</div>
+									</div>
+                                   
+                                   
+                                   
+                                   <div class = "col-md-12 Plr0 Mrg20">
+                                            <div class="generalInfoData">
+                                                 <label class="T7 required_field">{!$Label.Invoice_Object_Display_Label}</label>
+                                            </div>
+                                             <div class="mycustvalue">
+                                              <input type="text" class="form-control" id="InvoiceNumber" placeholder="INVOICE"
+                                                    maxlength="255" ng-model="VORModel.VIHeader.InvoiceNumber" rel="InvoiceNumberId"
+                                                    ng-class="{'redborder' : VORModel.VendorOrderReceivingFormValidationModal['InvoiceNumber']['isError'] == true}" 
+                                                    data-toggle="tooltip" title="{{VORModel.VIHeader['InvoiceNumber']['ErrorMessage']}}"
+                                                    ng-disabled="VORModel.VIHeader.Status == 'Invoiced' || VORModel.VIHeader.VendorId ==null"
+                                                    ng-blur="VORModel.updateVIHeaderDetails()"/>
+                                              </div>
+                                         </div>
+                                    <div class = "col-md-12 Plr0 Mrg20">
+                                            <div class="generalInfoData">
+                                                 <label class="T7 required_field">{!$Label.Invoice_Page_Invoice_Date}</label>
+                                            </div>
+                                             <div class="mycustvalue">
+                                              <input type="text" class="form-control" id="InvoiceDate" placeholder="INVOICE DATE"
+                                                    maxlength="255" ng-model="VORModel.VIHeader.InvoiceDate" rel="InvoiceDateId"
+                                                    ng-class="{'redborder' : VORModel.VendorOrderReceivingFormValidationModal['InvoiceDate']['isError'] == true}" 
+                                                    data-toggle="tooltip" title="{{VORModel.VIHeader['InvoiceDate']['ErrorMessage']}}"
+                                                    ng-disabled="VORModel.VIHeader.Status == 'Invoiced' || VORModel.VIHeader.VendorId ==null"
+                                                    ng-blur="VORModel.updateVIHeaderDetails()"/>
+                                              </div>
+                                         </div>
+                                       
+                                  </div>
+                               </div>
+                               <div class="col-lg-5 col-md-5 Plr12">
+                                  <!-- <div class="col-md-6 Plr0 MB24">
+                                     <p class="T3 MB24 F12"> {!$Label.Label_Owner}</p>
+                                     <div class="col-md-4 Plr0 MB12  ">
+                                        
+                                         <img src="{!URLFOR($Resource.Images, 'profile_default.jpg')}" class="Profile_pic Profile_pic_owner"  />
+                                     </div>
+                                     <div class="col-md-8 Plr12 MB12 ">
+                                        <p class="T1 Lh25 F16" > {!$User.FirstName} {!$User.LastName}</p>
+                                        <div class="Plr12_MB24_MB12_imgDiv">
+                                           <img  src="{!URLFOR($Resource.Images, 'star.png')}" class="Plr12_MB24_MB12_imgDiv_img" />
+                                        </div>
+                                        <p class="T7 T7_owner" >{!$Label.Label_Gamification}</p>
+                                     </div>
+                                  </div> -->
+                                  <!-- <div class="col-md-12 MB24 Plr0 ">
+                                      <span class="T3 col-md-2 Plr0">{!$Label.Label_Status}</span>
+                                         <label class="FC10 T3 invoiceStatus" > {{VORModel.VIHeader.Status}} </label>
+                                  </div> -->
+                               </div>
+                            </div>
+                            
+                           </div> 
+                            
+                            <div class="col-lg-12 col-md-12 T3 addnewItem " id="CO_notanyitemadded" 
+                                   ng-if="VORModel.VIHeader.VendorId ==null">
+                                 <a id="CO_notanyitemadded" ng-click="VORModel.RelatedList_addAction($event, 'Vendor')">
+                                    {!$Label.Label_Add} {!$Label.New_Label} {!$Label.Vendor_Object_Display_Label}.<!--  You haven't added anything yet! Add something. -->
+                                 </a>
+                            </div>
+                                 
+                            </div>
+                        </div>
+                         <div class="main_section_COU row" ng-show="VORModel.VIHeader.VendorId != null" ng-if="VORModel.VIHeader.Status != 'Invoiced'">
+                                 <div class="main_section_COU_Header row" id="VOI_Receivinig_Block">
+                                    <p class="actionRow T2">
+                                        <span class="sectionText">{!$Label.Label_Receivings} 
+                                            <!-- <i class="fa fa-plus cou_plus_icon " ng-click="AddToSearch('Invoice:')"></i> -->
+                                        </span>
+                                        <!-- <span class="actionText">{!$Label.Label_Actions}</span> -->
+                                        <span class="ActionIcons">
+                                            <!-- <i class="fa fa-th"></i> -->
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="Info Receiving Section"></i>
+                                        </span> 
+                                     </p>
+                                   </div>
+                                   <div class="gid_container T6 VOR_Vendor_Received_Block_grid_container_Empty_Div1_class" id="VOR_Vendor_Received_Block_grid_container_Empty_Div" 
+                                        ng-show="VORModel.VRHeaderList.length == 0" >
+                                        {!$Label.Label_No_Records_Found}
+                                    </div>
+                                   <div class="gid_container_Customer" id="VI_Receivings_block_grid_container" ng-show="VORModel.VRHeaderList.length != 0">
+                                        <table class="table" id="VendorOrderInvoicing_Receivings_Grid">
+                                            <col width="1%"  />
+                                            <col width="4%"  />
+                                            <col width = "5%" />
+                                            <col width="20%" />
+                                            <col width="10%" />
+                                            <col width="15%" />
+                                            <col width="10%" />
+                                            <col width="10%" />
+                                            <col width="14%" />
+                                            <col width="1%" />
+                                            <thead>
+                                                <tr class="tableHeader T3 C2">
+                                                    <th></th>
+                                                    <th></th>
+                                                   <th></th>
+                                                   <th class="th_cursor_style text-uppercase"  ng-click="VORModel.Receiving_PageSortControlsAction();">
+                                                        <i class="fa fa-sort-asc" ng-show="VORModel.receivingPageSortAttrsJSON.Sorting[0].SortDirection == 'ASC'"/>
+                                                        <i class="fa fa-sort-desc" ng-show="VORModel.receivingPageSortAttrsJSON.Sorting[0].SortDirection == 'DESC'"/>
+                                                        <i class="fa fa-sort" ng-show="VORModel.receivingPageSortAttrsJSON.Sorting[0].SortDirection == ''"/>
+                                                    PACKAGING SLIP #
+                                                </th>
+                                                <th class="text-center text-uppercase">{!$Label.Label_Order} # </th>
+                                                <th class="text-center text-uppercase">{!$Label.Label_Date}</th>
+                                                <th class ="text-center text-uppercase">{!$Label.Label_Line} {!$Label.Items}</th>
+                                                <th class ="text-center text-uppercase">{!$Label.Label_Total} {!$Label.Label_Cost}</th>
+                                                <th class ="text-uppercase">{!$Label.Label_Received} {!$Label.Label_By}</th>
+                                                <th></th>
+                                                </tr>       
+                                            </thead>
+                                             <tbody ng-repeat="vRHeader in VORModel.VRHeaderList" ng-init="Receivingsindex = $index" class="parentBody">
+                                                    <tr id="rowGroup{{$index}}" rel="VOR_Vendor_Received_row{{$index}}_edit" 
+                                                        ng-class-even="'C2'" >
+                                                        <td style="background: #fff"></td>
+                                                        <td class="HG50" ></td>
+                                                        <td style="padding-top:12px; padding-bottom:12px;">
+                                                            <div class="form-group small" >
+                                                                <label class="checkbox">
+                                                                
+                                                                <span class="chk_tick" ng-attr-tabindex="100" ng-class="{'chked' : vRHeader.InProgressVIHeaderId !=null}" ng-click="VORModel.onClickSelectVO($event, $index, vRHeader.VRHeaderId);">
+                                                                    <i class="fa fa-check-square chksqure"></i>
+                                                                </span>
+                                                                </label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <a ng-mouseover="VORModel.showInvoiceDetail(vRHeader.VRHeaderId,$event)"
+                                                            ng-mouseleave="VORModel.hideInvoiceDetail()">
+                                                            {{vRHeader.PackingSlipNumber}}
+                                                         </a>
+    
+                                                    </td>
+                                                    <td class="text-center">{{vRHeader.OrderType}}</td>
+                                                    <td class="text-center">{{vRHeader.FinalizeDate}}</td>
+                                                    <td class ="text-center">{{vRHeader.TotalNumberOfLineItems}}</td>
+                                                    <td class ="text-center">{{vRHeader.TotalCost | currency}}</td>
+                                                    <td>{{vRHeader.ReceivedByName}}</td>
+                                                    <td style="background: #fff"></td>
+                                                 </tr>
+                                            </tbody>
+                                        
+                                        </table>
+                                   </div>
+                                   
+                                   
+                                  
+                                    <div class="row pagination_container" id="Invoicing_For_Vendor_Orders_Pagination" 
+                                       ng-if="VORModel.totalVendorOrderInvoicing != undefined && VORModel.totalVendorOrderInvoicing !=0"  >
+                                        <list-pagination id-value = "Invoicing_For_Vendor_Orders_Pagination_" 
+                                                 total-records-length = "VORModel.totalVendorOrderInvoicing"
+                                                 page-size = "VORModel.receivingPageSortAttrsJSON.PageSize"
+                                                 current-page = "VORModel.receivingPageSortAttrsJSON.CurrentPage"
+                                                 changes-count = "VORModel.receivingPageSortAttrsJSON.ChangesCount"
+                                                 pagination-control-method = "VORModel.Receiving_paginationControlsAction" />
+                                    </div>
+                               </div>
+                         </div>
+                         
+                        <div ng-if="VORModel.VIHeader.VendorId !=null" ng-show="VORModel.VIGroupList.length != 0"> 
+                        <div class="sectionHeader row">
+                            <div class="col-lg-4 col-lg-5 PL14">
+                                <div class="fixedHeaderText">
+                                    <span class="headerlabel">
+                                        <i class="fa fa-angle-right"  ng-show="!VORModel.displaySections.Invoicing"
+                                           ng-Click="VORModel.displaySections.Invoicing = true">
+                                        </i> 
+                                        <i class="fa fa-angle-down" 
+                                           ng-show="VORModel.displaySections.Invoicing"
+                                           ng-Click="VORModel.displaySections.Invoicing = false">
+                                        </i> 
+                                        <span class="divider">|</span>
+                                        <span class = "headdingFirstText">B</span>
+                                        <span class="T2">{!$Label.Label_Invoicing}</span>
+                                     </span>
+                                     <span class="ActionIcons pull-left">
+                                        <div class="dropdown selectDropdown checkboxDropdown">
+                                            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{!$Label.Label_Actions}
+                                            <span class="caret"></span></button>
+                                        </div>
+                                    </span>
+                                     <span class="T3  pull-right total">
+                                        <a id="CO_Merchandise_total_price_row_h3_a" >{{VORModel.ItemsTotal | currency}} </a>
+                                    </span> 
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="VOI_invoicing_Block" ng-show="VORModel.VIGroupList.length != 0">
+                              <div class="main_section_COU row"  ng-show="VORModel.displaySections.Invoicing" >
+                                 <div class="main_section_COU_Header row" >
+                                    <p class="actionRow T2">
+                                        <span class="sectionText">{!$Label.Items}
+                                            <!-- <i class="fa fa-plus cou_plus_icon " ng-click="AddToSearch('Invoice:')"></i> -->
+                                        </span>
+                                        <!-- <span class="actionText">{!$Label.Label_Actions}</span> -->
+                                        <span class="ActionIcons">
+                                            <!-- <i class="fa fa-th"></i> -->
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="Invoice Items Section"></i>
+                                        </span> 
+                                     </p>
+                                   </div>
+                                   
+                                   <div class="gid_container T6 VOR_Vendor_Received_Block_grid_container_Empty_Div1_class" id="VOR_Vendor_Received_Block_grid_container_Empty_Div1" 
+                                        ng-show="VORModel.VIGroupList.length == 0">
+                                        {!$Label.Label_No_Records_Found}
+                                    </div>
+                                   <div class="gid_container_Customer" id="VO_Order_block_grid_container" ng-show="VORModel.VIGroupList.length != 0">
+                                    <div class="gid_container_Customer_headerWrapper">
+                                        <div class="gid_container_Customer_headerContainer1 linetext" >
+                                               <div ><span>{!$Label.Label_Receiving}</span> </div>
+                                        </div>
+                                        <div class="gid_container_Customer_headerContainer2 linetext" >
+                                                <div ><span>{!$Label.Vendor_Object_Display_Label} {!$Label.Label_Invoicing}</span> </div>
+                                        </div>
+                                    </div> 
+                                        <table class="table" id="VendorOrderItem_Grid">
+                                            <col width="1%"  />
+                                            <col width="4%"  />
+                                            <col width="32%"  />
+                                            <col width="16%"  />
+                                            <col width="7%"  />
+                                            <col width="7%" />
+                                            <col width="8%"  />
+                                            <col width="8%"  />
+                                            <col width="8%"  />
+                                            <col width="8%"  />
+                                            <col width="1%"  />
+                                            <thead>
+                                                <tr class="tableHeader T3 C2">
+                                                    <th></th>
+                                                    <th></th>
+                                                    <th ng-click="VORModel.GroupItems_PageSortControlsAction();" class="text-uppercase">
+                                                            <i class="fa fa-sort-asc" ng-show="VORModel.groupItemsPageSortAttrsJSON.Sorting[0].SortDirection == 'ASC'"/>
+                                                            <i class="fa fa-sort-desc" ng-show="VORModel.groupItemsPageSortAttrsJSON.Sorting[0].SortDirection == 'DESC'"/>
+                                                            <i class="fa fa-sort" ng-show="VORModel.groupItemsPageSortAttrsJSON.Sorting[0].SortDirection == ''"/>
+                                                            {!$Label.Part_Object_Item_Description}
+                                                    </th>
+                                                    <th class="text-center">PACKAGING SLIP#</th>
+                                                    <th class="text-center">{!$Label.Label_Quantity}</th>
+                                                    <th class="text-center">{!$Label.Label_Cost}</th>
+                                                    <th class="text-center">{!$Label.Label_Quantity}</th>
+                                                    <th class="text-center">{!$Label.Label_Cost}</th>
+                                                    <th class="text-center">{!$Label.Discount}</th>
+                                                    <th class="text-center">{!$Label.Label_Subtotal}</th>
+                                                    <th></th>
+                                                </tr>       
+                                            </thead>
+                                            <tbody ng-repeat="VIGroup in  VORModel.VIGroupList" class="parentBody">
+                                                <tr id="rowGroup{{$index}}" rel="vogroup_item_row{{$index}}_edit" ng-click="VORModel.editGroupItem($event, $index)"  class="T7" ng-class-even="'C2'"
+                                                ng-class="{'disabledCheckOut' : VORModel.VIHeader.Status == 'Invoiced' }">
+                                                    <td class="td_background_style"></td>
+                                                    <td id="VO_Group_block_grid_container_tbody_tr_td_1_{{$index}}" class="VO_Group_block_grid_container_tbody_tr_td_1_index_class" style="padding-top:12px; padding-bottom:12px;">
+                                                        <img src="{!URLFOR($Resource.Images, 'sparkplug.png')}" />
+                                                    </td>
+                                                    <td  id="VO_Group_block_grid_container_tbody_tr_td_2_{{$index}}" class="VO_Group_block_grid_container_tbody_tr_td_2_index_class">
+                                                        <a ng-mouseover="VORModel.showPartPopUp($event, VIGroup.PartId);" ng-mouseleave="VORModel.hidePartPopUp();">
+                                                                {{ VIGroup.Item}}
+                                                        </a>
+                                                        <div ng-if="VIGroup.PackageUnit !=null && VIGroup.PackageUnit !='NUll'"  >{{VIGroup.OrderType}}</div>  
+                                                    </td>
+                                                    <td class="text-center">
+                                                            {{ VIGroup.PackingNumber}}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{VIGroup.ReceivingQty}}<span ng-if="VIGroup.PackageUnit !=null && VIGroup.PackageUnit !='NUll'">{{VIGroup.PackageUnit}}</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                            {{VIGroup.ReceivingCost | currency}}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{VIGroup.InvoiceQty}}<span ng-if="VIGroup.PackageUnit !=null && VIGroup.PackageUnit !='NUll'">{{VIGroup.PackageUnit}}</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div  ng-show="VORModel.VIGroupListItems_editRow[$index].isEdit !=true" >{{VIGroup.InvoiceCost | currency}}</div>
+                                                        <div  ng-show="VORModel.VIGroupListItems_editRow[$index].isEdit ==true" >
+                                                            <input ng-model="VIGroup.InvoiceCost"  class="form-control"  />
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <div  ng-show="VORModel.VIGroupListItems_editRow[$index].isEdit !=true" >{{VIGroup.Discount | number : 2}}%</div>
+                                                        <div  ng-show="VORModel.VIGroupListItems_editRow[$index].isEdit ==true"  ng-keydown="VORModel.editRowTabOutLast($event,$index)"> 
+                                                            <input ng-model ="VIGroup.Discount"  class="form-control"  />
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">
+                                                            {{VIGroup.SubTotal | currency}}
+                                                    </td>
+                                                    <td class="td_background_style"></td>
+                                                </tr>
+                                                
+                                                
+                                                <tr ng-show="VORModel.VIGroupListItems_editRow[$index].isEdit">
+                                                    <td class="td_background_style"></td>
+                                                    <td class="td_background_style" ></td>
+                                                    <td class="available_td" colspan="8" style="padding-left:0px;padding-right:0px;">
+                                                        <div class="show_Availableline" >  
+                                                              INVENTORY ITEM COST @  {{parseInt(VIGroup.InvoiceCost) + parseInt(VIGroup.Discount)}} - 
+                                                              {{VIGroup.DiscountAmout | currency}} ({{VIGroup.Discount}}%) + 
+                                                              {{(VIGroup.SubTotal * 1) | currency}}FX + {{VIGroup.LcaAmount | currency}}LCA =
+                                                                 {{VIGroup.SubTotal + (VIGroup.SubTotal * 1) + VIGroup.LcaAmount }} /{{ VIGroup.PackageUnit !=null ? VIGroup.PackageQty: 1}} = 
+                                                                 {{(VIGroup.SubTotal + (VIGroup.SubTotal * 1) + VIGroup.LcaAmount )/(VIGroup.PackageUnit !=null ? VIGroup.PackageQty: 1)}} 
+                                                        </div>
+                                                    </td>
+                                                    <td class="td_background_style"></td> 
+                                                </tr>  
+                                        </tbody>
+                                    </table>
+                                   </div>
+                                   <!-- Pagination container -->
+                                    <div class="pagination_container" id="Vendor_Order_Items_Pagination"
+                                        ng-if="VORModel.totalGroupItems != undefined && VORModel.totalGroupItems != 0">
+                                        <list-pagination
+                                            total-records-length = "VORModel.totalGroupItems"
+                                                             page-size = "VORModel.groupItemsPageSortAttrsJSON.PageSize"
+                                                             current-page = "VORModel.groupItemsPageSortAttrsJSON.CurrentPage"
+                                                             changes-count = "VORModel.groupItemsPageSortAttrsJSON.ChangesCount"
+                                                             pagination-control-method = "VORModel.GroupItems_paginationControlsAction" />
+                                    </div>
+                                </div>
+                         </div>
+                         
+                         <div class="sectionHeader row" ng-show="VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0 && VORModel.VIHeader.InvoiceNumber != undefined && VORModel.VIHeader.InvoiceNumber != '' && VORModel.VIHeader.InvoiceNumber != null">
+                            <div class="col-lg-4 col-lg-5 PL14">
+                                <div class="fixedHeaderText">
+                                    <span class="headerlabel">
+                                        <i class="fa fa-angle-right"
+                                           ng-show="!VORModel.displaySections.FinalizeOrder"
+                                           ng-Click="VORModel.displaySections.FinalizeOrder = true">
+                                        </i> 
+                                        <i class="fa fa-angle-down"
+                                           ng-show="VORModel.displaySections.FinalizeOrder"
+                                           ng-Click="VORModel.displaySections.FinalizeOrder = false">
+                                        </i> 
+                                        <span class="divider">|</span>
+                                        <span class = "headdingFirstText">C</span>
+                                        <span class="T2">{!$Label.Finalize}</span>
+                                     </span>
+                                     <span class="ActionIcons pull-left">
+                                        <div class="dropdown selectDropdown checkboxDropdown">
+                                            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">{!$Label.Label_Actions}
+                                            <span class="caret"></span></button>
+                                        </div>
+                                    </span> 
+                                </div>
+                            </div>
+                        </div>
+                        
+                         <div id="VOI_Finalize_Block" ng-show="VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0 && VORModel.VIHeader.InvoiceNumber != undefined && VORModel.VIHeader.InvoiceNumber != '' && VORModel.VIHeader.InvoiceNumber != null">
+                              <div class="main_section_COU row"  ng-show="VORModel.displaySections.FinalizeOrder" >
+                                <div class="main_section_COU_Header row" >
+                                    <p class="actionRow T2">
+                                        <span class="sectionText">{!$Label.Finalize}</span>
+                                        <!-- <span class="actionText">{!$Label.Label_Actions}</span> -->
+                                        <span class="ActionIcons">
+                                            <!-- <i class="fa fa-th"></i> -->
+                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="Finalize Invoice Section"></i>
+                                        </span> 
+                                     </p>
+                                 </div>
+                                 <div class="gid_container_Customer">
+                                     <div class="col-lg-3 col-md-3 col-lg-offset-9 col-md-offset-9 finalizeInvoiceBtnSection">
+                                        <button class="btn C11 T4 addmoreinfoBtn active_btn" 
+                                              ng-class="{'active_btn' : (VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0), 'C5': !(VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0)}"  
+                                            ng-disabled="VORModel.VIHeader.Status == 'Invoiced' || VORModel.VIGroupList.length == 0 || VORModel.VIHeader.InvoiceNumber == undefined || VORModel.VIHeader.InvoiceNumber == '' || VORModel.VIHeader.InvoiceNumber == null" 
+                                            ng-click="VORModel.finalizeOrder($event)" 
+                                            ng-attr-tabindex="{{CustomerOrderModel.tabIndexValue + ($index * 12) + 101}}" style="margin: auto; width: 80%; text-transform: uppercase;">{!$Label.Finalize} {!$Label.Invoice_Object_Display_Label} 
+                                              <i class="fa fa-angle-right" ></i>
+                                        </button><!-- ng-disabled="!(VORModel.VIHeader.Status != 'Invoiced' && VORModel.VIGroupList.length != 0)" -->
+                                        <p>{{VORModel.vendorOrderLineItemGroupList}}</p>
+                                     </div>
+                                 </div>
+                                  
+                              </div>
+                         </div>
+                         </div>
+                         <div class="VOI_Final_Div"></div>
+                    </div>
+                 </div>
+             <!-- center div end here -->
+       </div>
+    <!--  content end here --> 
+     
+</body>
+</html>
+</apex:page>

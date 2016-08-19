@@ -1,0 +1,304 @@
+<apex:component controller="HomeSearchPageCtrl" >
+
+	<script type="text/javascript">
+		app.service("SearchTextService", function ($q) {
+            this.searchTextInOrg = function (textToSearch, pageNumber, pageSize) {
+                textToSearch = encodeString(textToSearch);
+                
+                var deferred = $q.defer();
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.getOrgSearchResults}',
+                    textToSearch, pageNumber, pageSize,
+                    function (result, event) {  
+                    if (event.type == 'exception') {   
+                        deferred.reject(event.message);
+                    } else {
+                        var searchResult = decodeString(result);
+                        var find = '\'';   
+                        var re = new RegExp(find, 'g');
+                        searchResult = searchResult.replace(re, '');
+                        deferred.resolve(JSON.parse(searchResult));     
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+        });
+        
+        app.service("FilterGridService", function ($q) {
+            this.filterData = function (filterJSONData, pageAndSortFiltersJSON) {
+            	filterJSONData = encodeString(filterJSONData);
+            	pageAndSortFiltersJSON = encodeString(pageAndSortFiltersJSON);
+            	
+                var deferred = $q.defer();
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.getFilterSearchResult}',
+                    filterJSONData, pageAndSortFiltersJSON,
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterList = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterList = filterList.replace(re, '');
+                        deferred.resolve(JSON.parse(filterList));
+                    }
+                }, {
+                    escape : true
+                });
+                
+                return deferred.promise;
+            }
+        });
+
+        app.service("CommonAndCustomFiltersService", function ($q) {
+            // Service method to retrieve all defined filters JSON to display in Common and Custom filter div
+            this.populateFiltersList = function () {
+                var deferred = $q.defer();
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.getFilterJSON}',
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterList = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterList = filterList.replace(re, '');
+                        //debug(JSON.parse(filterList));
+                        deferred.resolve(JSON.parse(filterList));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            
+            // Service method to get defined JSON for particular selected filter
+            this.getJSONForFilter = function (filterId) {
+            	filterId = encodeString(filterId);
+            	
+                var deferred = $q.defer();
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.getFieldJSONForFilter}',
+                    filterId,
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterJSON = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterJSON = filterJSON.replace(re, '');
+                        deferred.resolve(JSON.parse(filterJSON));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            
+            // Service method to save JSON of custom Filter
+            this.saveCustomFilterJSON = function (customFilterLabel, filterId, customFilterJSONString, isDateFilterChanged) {
+            	customFilterLabel = encodeString(customFilterLabel);
+            	filterId = encodeString(filterId);
+            	customFilterJSONString = encodeString(customFilterJSONString);
+            	
+                var deferred = $q.defer();
+                //debug('Inside Service')
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.saveCustomFilterJSON}',
+                    customFilterLabel, filterId, customFilterJSONString, isDateFilterChanged,
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterJSON = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterJSON = filterJSON.replace(re, '');
+                        deferred.resolve(JSON.parse(filterJSON));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            // Service method to Delete custom Filter
+            this.deleteCustomFilter = function (filterId) {
+            	filterId = encodeString(filterId);
+            	
+                var deferred = $q.defer();
+                //debug('Inside Service')
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.deleteCustomFilter}',
+                      filterId,
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterJSON = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterJSON = filterJSON.replace(re, '');
+                        deferred.resolve(JSON.parse(filterJSON));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            
+            // Service method to Delete custom Filter
+            this.renameCustomFilter = function (filterId, filterNewName) {
+            	filterId = encodeString(filterId);
+            	filterNewName = encodeString(filterNewName);
+            	
+                var deferred = $q.defer();
+                //debug('Inside Service')
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.renameCustomFilter}',
+                      filterId, filterNewName, 
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterJSON = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterJSON = filterJSON.replace(re, '');
+                        deferred.resolve(JSON.parse(filterJSON));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            
+            // Service method to Delete custom Filter
+            this.copyCustomFilter = function (customFilterId, filterCopyName) {
+            	customFilterId = encodeString(customFilterId);
+            	filterCopyName = encodeString(filterCopyName);
+                var deferred = $q.defer();
+                //debug('Inside Service')
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.copyCustomFilter}',
+                      customFilterId, filterCopyName, 
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var filterJSON = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        filterJSON = filterJSON.replace(re, '');
+                        deferred.resolve(JSON.parse(filterJSON));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+        });
+
+        app.service('PageNavigationService', function ($q) {
+            var _currentPageNumber = 1;
+            this.getCurrentPageNumber = function () {
+                return _currentPageNumber;
+            }
+            this.setCurrentPageNumber = function (newPageNumber) {
+                _currentPageNumber = newPageNumber;
+                if(_currentPageNumber > _totalPages){
+                    _totalPages = _currentPageNumber;
+                }
+            }
+
+            var _totalPages = 1;
+            this.getTotalPages = function () {
+                return _totalPages;
+            }
+        });
+
+        app.service('PageSizeService', function ($q) {
+            var _currentPageSize = globalPageSize;
+            this.getCurrentPageSize = function () {
+                return _currentPageSize;
+            }
+            this.setCurrentPageSize = function (newPageSize) {
+                _currentPageSize = newPageSize;
+
+            }
+        });
+        
+        
+        app.service("CustomerOrderService", function ($q) {
+            this.createCOHeader = function () {
+                var deferred = $q.defer();
+
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.createCustomerOrder}',
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var coHeaderId = decodeString(result);
+                        deferred.resolve(coHeaderId);
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            
+            this.createVOHeader = function () {
+                var deferred = $q.defer();
+
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.createVendorOrder}',
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var voHeaderId = decodeString(result);
+                        deferred.resolve(voHeaderId);
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+            
+            this.createVOReceivingHeader = function () {
+                var deferred = $q.defer();
+
+                // make AJAX request to the remote service
+                Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.HomeSearchPageCtrl.createVOReceiving}',
+                    function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var voHeaderId = decodeString(result);
+                        deferred.resolve(voHeaderId);
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+            }
+        });
+	</script>
+
+</apex:component>

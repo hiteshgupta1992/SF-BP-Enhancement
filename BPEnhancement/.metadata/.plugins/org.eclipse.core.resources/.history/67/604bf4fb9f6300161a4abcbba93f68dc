@@ -1,0 +1,102 @@
+<apex:component id="CountryStateDropdown" >
+    <!-- Component Attributes -->
+    <!-- Required: TRUE -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for component here."/>
+    <apex:attribute name="countryElemId" required="true" type="String" description="Html element id for country picklist."/>
+    <apex:attribute name="stateElemId" required="true" type="String" description="Html element id states picklist."/>
+    
+    <!-- Required: FALSE -->
+    <apex:attribute name="countryDisabled" required="false" type="boolean" default="false" description="If to set Country field disabled after load."/>
+    <apex:attribute name="stateDisabled" required="false" type="boolean" default="false" description="If to set State field disabled after load."/>
+    <apex:attribute name="selectedCountryValue" required="false" type="String" default="" description="Selected Country Display value."/>
+    <apex:attribute name="selectedStateValue" required="false" type="String" default="" description="Selected State Display value."/>
+    <apex:attribute name="callbackMethodName" required="false" type="String" default="" description="Callback JS method name for dropdown changes."/>
+    
+    <script>
+    	$(document).ready( function(){
+    		// Generate countries data JSON and populate countries picklist datasource
+    		var callbackToPopulatePicklist = {!uniqueId}populateCountriesPicklist;
+    		generateCountriesPicklistJSON( callbackToPopulatePicklist );
+    	});
+    	
+    	// Method which populates countries picklist datasource
+    	function {!uniqueId}populateCountriesPicklist(countriesJSON){
+    		// create DropDownList from Countries input HTML element
+            $("#{!countryElemId}").kendoDropDownList({
+                dataTextField: "C_Name",
+                dataValueField: "C_Id",
+                dataSource: countriesJSON,
+                index: 0,
+                enable: !{!countryDisabled},
+                change: {!uniqueId}onChangeCountriesDropDown
+            });
+            var countryElemDrodown = $("#{!countryElemId}").data("kendoDropDownList");
+			countryElemDrodown.wrapper.attr("title", $("#{!countryElemId}").attr("title"));
+			
+            var customerCountry = '{!selectedCountryValue}';
+			if(customerCountry == null || customerCountry.trim().length == 0){
+				customerCountry = systemDefaultCountry;
+			}
+			$("#{!countryElemId}").data("kendoDropDownList").text(customerCountry);
+			
+            // Now populate states picklist
+            {!uniqueId}createAndPopulateStatesPicklist();
+    	};
+    	
+    	// On-Change event method for Countries dropdown
+    	function {!uniqueId}onChangeCountriesDropDown() {
+			{!uniqueId}createAndPopulateStatesPicklist();
+			
+			if("{!callbackMethodName}" != ""){
+				// Call back for page to track form changes
+				{!callbackMethodName}();
+			}
+		};
+		
+		// Method which populates States picklist datasource
+		function {!uniqueId}createAndPopulateStatesPicklist(){
+            var selectedCountryValue = $("#{!countryElemId}").data("kendoDropDownList").value();
+			{!uniqueId}generateStatesDropdownDS(selectedCountryValue);
+		}
+		
+		// Generate countries data JSON and populate countries picklist datasource by selected country value
+		function {!uniqueId}generateStatesDropdownDS(selectedCountryValue){
+			var callbackToPopulatePicklist = {!uniqueId}populateStatesPicklist;
+    		generateStatesPicklistJSON( callbackToPopulatePicklist, selectedCountryValue );
+		}
+		
+		// Method which populates states picklist datasource
+    	function {!uniqueId}populateStatesPicklist(statesJSON){
+    		// create DropDownList from Countries input HTML element
+    		if($("#{!stateElemId}").data("kendoDropDownList") == null){
+    			$("#{!stateElemId}").kendoDropDownList({
+	                dataTextField: "S_Name",
+	                dataValueField: "S_Id",
+	                dataSource: statesJSON,
+	                index: 0,
+	                enable: !{!stateDisabled},
+	                change: {!uniqueId}onChangeStatesDropDown
+	            });
+	            var statesElemDrodown = $("#{!stateElemId}").data("kendoDropDownList");
+				statesElemDrodown.wrapper.attr("title", $("#{!stateElemId}").attr("title"));
+				
+	            var customerState = '{!selectedStateValue}';
+				if(customerState == null || customerState.trim().length == 0){
+					customerState = systemDefaultState;
+				}
+				
+				$("#{!stateElemId}").data("kendoDropDownList").text(customerState);
+    		}else{
+	    		$("#{!stateElemId}").data("kendoDropDownList").setDataSource(statesJSON);
+	    	}
+    	};
+    	
+    	// On-Change event method for States dropdown
+    	function {!uniqueId}onChangeStatesDropDown() {
+			if("{!callbackMethodName}" != ""){
+				// Call back for page to track form changes
+				{!callbackMethodName}();
+			}
+		};
+    </script>
+</apex:component>

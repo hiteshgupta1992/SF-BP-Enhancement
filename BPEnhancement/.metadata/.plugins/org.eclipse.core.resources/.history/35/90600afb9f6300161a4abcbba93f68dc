@@ -1,0 +1,565 @@
+<apex:component controller="ViewCustomerCtrl">
+	<!-- Styles inclusion -->
+	<c:AddNewCOU_Styles />
+	
+	<script>
+		$(document).ready(function () {
+		
+			$(".form-control").focus(function () {
+				$('.controls').hide();
+				$('#' + $(this).attr('rel')).show();
+			})
+		
+			$('#closemodal').click(function () {
+				$('#pop').modal('hide');
+			});
+		
+			setTimeout(function () {
+				$('[data-toggle="tooltip"]').tooltip({
+					placement : 'bottom'
+				});
+			}, 1000);
+			
+			/*var getleftheight = $(".right_heading_container").height() + $(".tabbtn_container").height() + $(".tabconainer").height();
+			$("#topsection").height(getleftheight - 30);*/
+		});
+		
+		var addNewCOUModule = angular.module('addNewCOUModule', []);
+		addNewCOUModule.controller('newCOUCtrl', function ($scope, CustomerOwnedUnitService, VINOperationsService) {
+			$scope.COUModal.CustomerMasterData = {};
+			
+			// Set current year
+			var Curryear = parseInt(new Date().getFullYear());
+			
+			// START: Form modals
+			$scope.COUModal.ownedUnitRec = {};
+			$scope.COUModal.currentCOUId = null;
+			
+			$scope.COUModal.Years = [];
+			$scope.COUModal.UnitYearSelected = {};
+			
+			$scope.COUModal.UnitMake = [];
+			$scope.COUModal.UnitMakeSelected = {};
+			
+			$scope.COUModal.UnitModel = [];
+			$scope.COUModal.UnitModelSelected = {};
+			
+			$scope.COUModal.SimilarCOU = {};
+			// END: Form modals
+			
+			// COU form fields validation model:
+			$scope.COUModal.COUFormValidationModal = {};
+			
+			// Load modals values which needs be loaded only once while page lifetime
+			for (i = (Curryear - 100); i < (Curryear + 2); i++) {
+				var year = {
+					year : i
+				};
+				$scope.COUModal.Years.push(year);
+			}
+			
+			// Method to set default values for validation model
+			$scope.COUModal.setDefaultValidationModel = function() {
+				$scope.COUModal.COUFormValidationModal = {
+					VIN : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'VIN, Required'
+					},
+					Mileage : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Numeric'
+					}
+				};
+			}
+			
+			// Event listener to open and set data in Add Customer Owned Unit popup
+			$scope.$on('AddCustomerOwnedUnitEvent', function () {
+				$scope.COUModal.addNewCOUModal();
+			});
+			
+			// Set popup data and Open popup for Add purpose
+			$scope.COUModal.addNewCOUModal = function () {
+				$scope.COUModal.clearAllData();
+				
+				$scope.COUModal.openPopup();
+			}
+			
+			// Event listener to open and set data in EDIT Customer Owned Unit popup
+			$scope.$on('EditCustomerOwnedUnitEvent', function (event, args) {
+				$scope.COUModal.setDefaultValidationModel();
+				$scope.COUModal.SimilarCOU.length = 0;
+				$scope.COUModal.editCOU(args.couId);
+			});
+			
+			// Set popup data and Open popup for EDIT purpose
+			$scope.COUModal.editCOU = function (couId) {
+				// Get current COU id and fill the form with related information
+				$scope.COUModal.currentCOUId = couId;
+				$scope.COUModal.getCurrentCOUData($scope.COUModal.currentCOUId);
+			}
+			
+			// Open popup box
+			$scope.COUModal.openPopup = function(){
+				angular.element('#AddNewCOU').modal({
+					backdrop : 'static',
+					keyboard : false
+				});
+			}
+			
+			// Clear and Set Default Values and validations for popup
+			$scope.COUModal.clearAllData = function () {
+				$scope.COUModal.UnitMake = $scope.$parent.CustomerModal.CustomerMasterData.UnitMakeList;
+				$scope.COUModal.UnitModel.length = 0;
+				$scope.COUModal.UnitYearSelected = {};
+				$scope.COUModal.UnitMakeSelected = {};
+				$scope.COUModal.UnitModelSelected = {};
+				$scope.COUModal.UnitModel.length = 0;
+				
+				$scope.COUModal.ownedUnitRec = {};
+				$scope.COUModal.setDefaultValidationModel();
+				$scope.COUModal.SimilarCOU.length = 0;
+			}
+			
+			// Set form Values from record and validations for popup
+			$scope.COUModal.setRecordData = function () {
+				$scope.COUModal.UnitYearSelected = {
+					year : $scope.COUModal.ownedUnitRec.Year
+				};
+				
+				$scope.COUModal.UnitMake = $scope.$parent.CustomerModal.CustomerMasterData.UnitMakeList;
+				$scope.COUModal.UnitMakeSelected = {
+					Id : $scope.COUModal.ownedUnitRec.Make,
+					UnitMakeName : $scope.COUModal.ownedUnitRec.MakeName
+				};
+				
+				$scope.COUModal.UnitModelSelected = {
+					Id : $scope.COUModal.ownedUnitRec.Model,
+					SubModelName : $scope.COUModal.ownedUnitRec.SubModel,
+					UnitModelName : $scope.COUModal.ownedUnitRec.ModelName
+				};
+				$scope.COUModal.UnitModel = $scope.$parent.CustomerModal.CustomerMasterData.UnitModelList[0].unitMakeNameToUnitModelMap[$scope.COUModal.UnitMakeSelected.UnitMakeName];
+			}
+			
+			// Get COU related data from server and fill form
+			$scope.COUModal.getCurrentCOUData = function () {
+				// get the current COU info and then fill out form fields
+				CustomerOwnedUnitService.getCOUInfoById($scope.COUModal.currentCOUId).then(function(couRecord) {
+                   	// Set all the form fields with existing COU record
+					$scope.UpdateFormFieldsWithExistingCOU(couRecord);
+                }, function(errorSearchResult) {
+                	//$scope.ViewCustomer.CustomerInfo = errorSearchResult;
+                });
+			}
+			
+			// Set all the form fields with existing COU record
+			$scope.UpdateFormFieldsWithExistingCOU = function (couRecord){
+				$scope.COUModal.ownedUnitRec = couRecord[0];
+				$scope.COUModal.setRecordData();
+				$scope.COUModal.openPopup();
+			}
+			// END: Set and reset values for popup method
+			
+			// Method to set selected year modal value in Owned unit Year field value
+			$scope.COUModal.changeYear = function () {
+				if (typeof $scope.COUModal.UnitYearSelected.year == 'undefined') {
+					$scope.COUModal.ownedUnitRec.Year = null;
+				} else {
+					var selectedYear = parseInt($scope.COUModal.UnitYearSelected.year);
+					$scope.COUModal.ownedUnitRec.Year = selectedYear;
+				}
+			}
+			
+			// Method to set selected Make related value in Owned unit Year field value
+			$scope.COUModal.changeUnitMake = function () {
+				$scope.COUModal.UnitModel = $scope.$parent.CustomerModal.CustomerMasterData.UnitModelList[0].unitMakeNameToUnitModelMap[$scope.COUModal.UnitMakeSelected.UnitMakeName];
+				$scope.COUModal.ownedUnitRec.Make = $scope.COUModal.UnitMakeSelected.Id;
+			}
+			
+			// Method to set selected Model related value in Owned unit Year field value
+			$scope.COUModal.changeUnitmodel = function () {
+				$scope.COUModal.ownedUnitRec.Model = $scope.COUModal.UnitModelSelected.Id;
+				$scope.COUModal.ownedUnitRec.SubModelName = $scope.COUModal.UnitModelSelected.SubModelName;
+			}
+			
+			// OnBlur method for VIN field
+			$scope.COUModal.OnBlurVin = function () {
+				// Validate the VIN value
+				var vinValue = $scope.COUModal.ownedUnitRec.VIN;
+				$scope.COUModal.ValidateForm("VIN");
+				debug($scope.COUModal.COUFormValidationModal);
+				// After successful validation, Identify similar VIN records in database and populate modals
+				if( $scope.COUModal.COUFormValidationModal["VIN"].isError == false ){
+					$scope.COUModal.getSimilarCOUs(vinValue);
+				}
+			}
+			
+			// OnBlur method for Mileage field
+			$scope.COUModal.OnBlurMileage = function () {
+				// Validate the Milage value
+				$scope.COUModal.ValidateForm("Mileage");
+			}
+			
+			// Method to find similar COU records with similar VIN numbers in database
+			$scope.COUModal.getSimilarCOUs = function (vinValue) {
+				VINOperationsService.getSimilarCOUs(vinValue)
+				.then(function (SimilarCOU) {
+					$scope.COUModal.SimilarCOU = SimilarCOU;
+				},
+					function (errorSearchResult) {
+					responseData = errorSearchResult;
+				});
+			}
+			
+			// Method to perform SAVE action for popup
+			$scope.COUModal.CancelCOUForm = function() {
+				angular.element('#AddNewCOU').modal('hide');
+			}
+			
+			// Method to perform CANCEL action for popup
+			$scope.COUModal.SaveCOUForm = function() {
+				// Check if any COU record with the same VIN number already exists in database, if so then decline the operation
+				if ($scope.COUModal.SimilarCOU.length > 0) {
+					Notification.error('VIN is already Present');
+					return;
+				}
+				
+				// Check if any error exists in the form
+				var isValidForm = $scope.COUModal.validateFormValidationModel();
+				
+				// Process only if the form is valid
+				if(isValidForm){
+					var ownedRecs = [];
+					ownedRecs.push($scope.COUModal.ownedUnitRec);
+					$scope.$parent.ViewCustomer.SaveCustomerOwnedUnitsToserver(angular.toJson(ownedRecs));
+				}
+			}
+			
+			// Method to perform a validation process on over the whole validation model and returns the form valid status
+			$scope.COUModal.validateFormValidationModel = function(){
+				var isValidForm = true;
+				angular.forEach($scope.COUModal.COUFormValidationModal, function(value, key) {
+					$scope.COUModal.ValidateForm(key);
+					if($scope.COUModal.COUFormValidationModal[key].isError){
+						isValidForm = false;
+					}
+				});
+				return isValidForm;
+			}
+			
+			// START: COU Form VALIDATIONS methods
+			// Form validation method
+			$scope.COUModal.ValidateForm = function (modelKey) {
+				/*
+				angular.element('[data-toggle="tooltip"]').tooltip({
+					placement : 'bottom'
+				});
+				*/
+				
+				var fieldValue = $scope.COUModal.ownedUnitRec[modelKey];
+				var numericRegex = /^[0-9]*$/;
+				
+				var validateType = $scope.COUModal.COUFormValidationModal[modelKey].Type;
+				
+				// If validation type has Vin type validation, then perform VIN validation first
+				if (validateType.indexOf('VIN') > -1) {
+					
+					if (fieldValue != '' && fieldValue != undefined) {
+						result = $scope.COUModal.validateVin(fieldValue);
+					} else {
+						result = true;
+					}
+					
+					if (result == false) {
+						$scope.COUModal.COUFormValidationModal[modelKey].isError = true;
+						$scope.COUModal.COUFormValidationModal[modelKey].ErrorMessage = 'Invalid Vin No';
+			
+					} else {
+						$scope.COUModal.COUFormValidationModal[modelKey].isError = false;
+						$scope.COUModal.COUFormValidationModal[modelKey].ErrorMessage = '';
+					}
+				}
+				
+				// Numeric fields validation
+				if (validateType.indexOf('Numeric') > -1) {
+					if (fieldValue != '' && fieldValue != undefined && !numericRegex.test(fieldValue)) {
+						$scope.COUModal.COUFormValidationModal[modelKey].isError = true;
+						$scope.COUModal.COUFormValidationModal[modelKey].ErrorMessage = 'Invalid ' + modelKey + ' Value';
+					} else {
+						$scope.COUModal.COUFormValidationModal[modelKey].isError = false;
+						$scope.COUModal.COUFormValidationModal[modelKey].ErrorMessage = '';
+					}
+				}
+				if (validateType.indexOf('Required') > -1) {
+					if(fieldValue == undefined || fieldValue == null || $scope.COUModal.ownedUnitRec[modelKey] == ''){
+						$scope.COUModal.COUFormValidationModal[modelKey].isError = true;
+						$scope.COUModal.COUFormValidationModal[modelKey].ErrorMessage = 'Field is Required';
+					}
+				}
+			}
+			
+			// VIN Code validator
+			$scope.COUModal.validateVin = function (vin) {
+				// Reject based on bad pattern match
+				var no_ioq = '[a-hj-npr-z0-9]'; // Don't allow characters I,O or Q
+				var matcher = new RegExp("^" + no_ioq + "{8}[0-9xX]" + no_ioq + "{8}$", 'i'); // Case insensitive
+				if (vin.match(matcher) == null) {
+					return false;
+				}
+			
+				// Reject base on bad check digit
+				return $scope.COUModal.checkDigitCalculation(vin);
+			};
+			
+			// Check digit calculation for ViN validation
+			$scope.COUModal.checkDigitCalculation = function (vin) {
+				var upperCaseVin = vin.toUpperCase();
+			
+				var letterMap = {
+					A : 1,
+					B : 2,
+					C : 3,
+					D : 4,
+					E : 5,
+					F : 6,
+					G : 7,
+					H : 8,
+					J : 1,
+					K : 2,
+					L : 3,
+					M : 4,
+					N : 5,
+					P : 7,
+					R : 9,
+					S : 2,
+					T : 3,
+					U : 4,
+					V : 5,
+					W : 6,
+					X : 7,
+					Y : 8,
+					Z : 9,
+					1 : 1,
+					2 : 2,
+					3 : 3,
+					4 : 4,
+					5 : 5,
+					6 : 6,
+					7 : 7,
+					8 : 8,
+					9 : 9,
+					0 : 0
+				};
+			
+				var weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2];
+				var products = 0;
+			
+				for (var i = 0; i < upperCaseVin.length; i++) {
+					products += letterMap[upperCaseVin[i]] * weights[i];
+				}
+			
+				var checkDigitShouldBe = products % 11;
+				if (checkDigitShouldBe == 10) {
+					checkDigitShouldBe = 'X';
+				}
+				return checkDigitShouldBe == upperCaseVin[8];
+			}
+			// END: COU Form validation methods
+		});
+		
+		// Service related to Customer Owned Unit record
+        addNewCOUModule.service("CustomerOwnedUnitService", function ($q) {
+        
+        	// Get method for retrival of all field values of a COU
+            this.getCOUInfoById = function(couId)
+            {
+            	couId = encodeString(couId);
+                 var deferred = $q.defer();
+                 Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.ViewCustomerCtrl.getCOURecordById}', couId,
+                     function (result, event) {
+                        if (event.type == 'exception') {
+                             deferred.reject(event.message);
+                         } else {
+                             var couRecord = decodeString(result);
+                             var find = '\'';
+                             var re = new RegExp(find, 'g');
+                             couRecord = couRecord.replace(re, '');
+                             deferred.resolve(JSON.parse(couRecord));
+                         }
+                     }, {
+                         escape : true
+                 });
+                 return deferred.promise;
+            }
+        });
+        
+        // Service related VIN number operations
+        addNewCOUModule.service("VINOperationsService", function ($q) {
+        
+        	// Method to find out similar VIN number COU records
+            this.getSimilarCOUs = function(vinNumber)
+            {
+            	vinNumber = encodeString(vinNumber);
+                var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction(
+				'{!$RemoteAction.ViewCustomerCtrl.getSimilarCOUs}', vinNumber,
+                    function (result, event) {
+                       if (event.type == 'exception') {
+                            deferred.reject(event.message);
+                        } else {
+                            var SimilarCOURecords = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            SimilarCOURecords = SimilarCOURecords.replace(re, '');
+                            deferred.resolve(JSON.parse(SimilarCOURecords));
+                        }
+                    }, {
+                        escape : true
+                });
+                return deferred.promise;
+            }
+		});
+	
+	</script>
+	
+    <div id="AddNewCOU" class="modal fade" ng-controller="newCOUCtrl">
+	   <div class="modal-dialog" ng-init="COUModal.LoadCustomerInfoDetail()" >
+	      <div class="modal-content">
+	         <div class="modal-body popup_container">
+				<div class="popupinside">
+	               <div class="popupleft col-lg-4 col-lg-4">
+	                  <div class="popupleft_container">
+	                     <h1 class="letpanel_heading">
+	                        Existing Customer Owned Units Like This 
+	                     </h1>
+	                     <i class="fa fa-question-circle helptip" style=" float:left; font-weight: bold; color: #f89420;  margin-top: 20px; margin-bottom: 10px;   font-size: 20px;"></i>
+	                     <div class="goldbox exists col-lg-11 col-md-11" ng-repeat="SimilarCOU in  COUModal.SimilarCOU" ng-show="COUModal.SimilarCOU.length != 0">
+	                        <div class="leftgoldbox">
+	                           <img src="{!URLFOR($Resource.Images, 'StandardUserImage.png') }" />
+	                        </div>
+	                        <div class="rightgoldbox type2">
+	                           <p class="cust_name address"><span class="titletxt">{{SimilarCOU.Model}}</span><br/>
+	                              Last Mileage: {{SimilarCOU.Mileage}} km
+	                              Color: {{SimilarCOU.Color}}
+	                              VIN:{{SimilarCOU.VIN}}, Plate: {{SimilarCOU.Plate}}
+	                           </p>
+	                           <a href="#" class="boxedit">
+								<img src="{!URLFOR($Resource.Images, 'editicon_30x30.png') }" />
+	                           </a>
+	                           <a href="#" class="boxenum">
+	                           100
+	                           </a> 
+	                        </div>
+	                        <div class="bottomgoldbox">
+	                           <i> Customer-Owned Unit</i>
+	                        </div>
+	                     </div>
+	                  </div>
+	               </div>
+	               <div class="popupright col-lg-8 col-lg-8">
+	                  <div class="right_heading_container col-lg-12 col-md-12">
+	                     <h1 class="right_panel_heading" ng-show="COUModal.ownedUnitRec.Id == null">Add Customer Owned Unit</h1>
+	                     <h1 class="right_panel_heading" ng-show="COUModal.ownedUnitRec.Id != null">Edit Customer Owned Unit</h1>
+	                     <div class="savecancle_btncntnr">
+	                        <button type="button" id="closemodal" class="btn btn-default themebtn_gray" ng-click="COUModal.CancelCOUForm()">Cancel</button>
+	                        <button type="button" class="btn btn-default themebtn_orange" ng-click="COUModal.SaveCOUForm()">Save</button>
+	                     </div>
+	                  </div>
+	                  <div class="tabconainer noborder" style="border-top: 1px solid #cccccc;">
+	                     <form>
+	                        <div class="option_field">
+	                           <div class="lable_fields">
+	                              <span class="form_lable_icons text">
+	                              100
+	                              </span>
+	                              <p>Customer Owned Unit</p>
+	                           </div>
+	                           <div class="form_fields">
+	                           	  <div class="form-group large required">
+	                                 <label for="exampleInputEmail1" class="control-label">VIN</label>
+	                                 <input type="text" class="form-control" ng-model="COUModal.ownedUnitRec.VIN" 
+	                                 		ng-blur="COUModal.OnBlurVin();" rel="VINId"
+	                                 		ng-disabled="COUModal.ownedUnitRec.Id != null"
+	                                 		ng-class="{'redborder' : COUModal.COUFormValidationModal['VIN']['isError'] == true}"
+	                                 		data-toggle="tooltip" title="{{COUModal.COUFormValidationModal['VIN']['ErrorMessage']}}" />
+	                              </div>
+	                              	<div class="controls1 controls"  id="VINId">
+								  		<i class="fa fa-question-circle" data-toggle="tooltip" title="Add Vehicle Identification Number of the Unit"></i>
+									 	<i class="fa fa-times" ></i>
+								  	</div>
+								  
+	                              <div class="form-group half">
+	                                 <label for="exampleInputEmail1">Year</label>
+	                                 <select class="form-control" placeholder="Year" rel="customerUnitMainyearMakeId" ng-change="COUModal.changeYear()" ng-model="COUModal.UnitYearSelected"
+                                             ng-options="i as i.year for i in COUModal.Years track by i.year">
+									 </select>
+	                              </div>
+	                              <div class="form-group half">
+	                                 <label for="exampleInputEmail1">Make</label>
+	                                 <select class="form-control"  ng-model="COUModal.UnitMakeSelected" rel="customerUnitMainyearMakeId"
+	                                    ng-options="make as make.UnitMakeName for make in COUModal.UnitMake track by make.Id" 
+	                                    ng-change="COUModal.changeUnitMake()">
+	                                 </select>
+	                              </div>
+	                               <div class="controls1 controls" id="customerUnitMainyearMakeId">
+										<i class="fa fa-question-circle"  data-toggle="tooltip" title="Select Year and Make of the Unit"></i>
+										<i class="fa fa-times" ></i>
+									</div>	
+											 
+	                              <div class="form-group half">
+	                                 <label for="exampleInputEmail1">Model</label>
+	                                 <select class="form-control"  ng-model="COUModal.UnitModelSelected" rel="customerUnitMainModelId"
+	                                    ng-options="model as model.UnitModelName for model in COUModal.UnitModel track by model.Id" 
+	                                    ng-change="COUModal.changeUnitmodel()" >
+	                                 </select>
+	                              </div>
+	                              <div class="form-group half">
+	                                 <label for="exampleInputEmail1">SubModel</label>
+	                                 <input type="text" class="form-control" ng-model="COUModal.ownedUnitRec.SubModelName" ng-disabled="true"/>
+	                              </div>
+	                              <div class="controls1 controls" id="customerUnitMainModelId">
+									 	<i class="fa fa-question-circle" data-toggle="tooltip" title="Select Model and Sub-Model of the Unit"></i>
+									 	<i class="fa fa-times" ></i>
+								  </div>
+	                              
+	                              <div class="form-group large">
+	                                 <label for="exampleInputEmail1">License Plate</label>
+	                                 <input type="text" class="form-control" ng-model="COUModal.ownedUnitRec.Plate"  rel="customerUnitMainLisenseId"/>
+	                              </div>
+	                              <div class="controls1 controls" id="customerUnitMainLisenseId">
+										 <i class="fa fa-question-circle"  data-toggle="tooltip" title="Add License PLate Number of the Unit"></i>
+										 <i class="fa fa-times"></i>
+								  </div>
+	                              <div class="form-group large">
+	                                 <label for="exampleInputEmail1">Mileage</label>
+	                                 <input type="text" class="form-control" ng-model="COUModal.ownedUnitRec.Mileage"
+	                                 		ng-blur="COUModal.OnBlurMileage();" rel="customerUnitMainMilageId"
+	                                 		ng-class="{'redborder' : COUModal.COUFormValidationModal['Mileage']['isError'] == true}"
+	                                 		data-toggle="tooltip" title="{{COUModal.COUFormValidationModal['Mileage']['ErrorMessage'] }}" />
+	                              </div>
+	                              <div class="controls1 controls" id="customerUnitMainMilageId">
+									 	<i class="fa fa-question-circle" data-toggle="tooltip" title="Add Mileage of the Unit"></i>
+										<i class="fa fa-times" ></i>
+								  </div>
+	                              <div class="form-group large">
+	                                 <label for="exampleInputEmail1">Color</label>
+	                                 <input type="text" class="form-control"  ng-model="COUModal.ownedUnitRec.Color" rel="customerUnitMainColorId"/>
+	                              </div>
+	                              <div class="controls1 controls" id="customerUnitMainColorId">
+									 	<i class="fa fa-question-circle"   data-toggle="tooltip" title="Add Color of the Unit" ></i>
+										<i class="fa fa-times"></i>
+								  </div>
+	                           </div>
+	                        </div>
+	                     </form>
+	                  </div>
+	               </div>
+	            </div>
+	            <div class="clearfix"></div>
+	         </div>
+	      </div>
+	   </div>
+	</div>
+</apex:component>

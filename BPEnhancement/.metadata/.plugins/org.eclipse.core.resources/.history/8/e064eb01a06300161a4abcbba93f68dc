@@ -1,0 +1,786 @@
+<apex:component controller="CustomerOrderCtrl">
+  <script>
+      /**
+ * Angucomplete
+ * Autocomplete directive for AngularJS
+ * By Subhrant singh
+ */
+var app = angular.module('angucomplete', ['ui-notification']);
+
+app.factory('userService', function ($q) {
+    return {
+        
+        searchText : function (textToSearch) {
+			textToSearch = encodeString(textToSearch);
+            var deferred = $q.defer();
+            // make AJAX request to the remote service
+            Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.CustomerOrderCtrl.getSearchResults}' ,textToSearch, 
+                function (result, event) {
+                if (event.type == 'exception') {
+                    deferred.reject(event.message);
+                } else {
+                    var responseData = decodeString(result);
+                    var find = '\'';
+                    var re = new RegExp(find, 'g');
+                    responseData = responseData.replace(re, '');
+
+                    deferred.resolve(JSON.parse(responseData));
+                }
+            }, {
+                escape : true
+            });
+            return deferred.promise;
+                    
+        },
+        SaveMerchandiseLineItem : function (coHeaderId, MerchendiseLineItem) {
+            var deferred = $q.defer();
+            coHeaderId = encodeString(coHeaderId);
+            MerchendiseLineItem = encodeString(MerchendiseLineItem);
+            Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.CustomerOrderCtrl.saveCOLineItem }', 
+            coHeaderId, MerchendiseLineItem, 
+            	function (result, event) {
+                if (event.type == 'exception') {
+                    //showPopupNotification(event.message, "error");
+                    deferred.reject(event.message);
+                } else {
+                    var responseData = decodeString(result);
+                    var find = '\'';
+                    var re = new RegExp(find, 'g');
+                    responseData = responseData.replace(re, '');
+
+                    deferred.resolve(JSON.parse(responseData));
+                }
+            }, {
+                escape : true
+            });
+            return deferred.promise;
+
+        },
+        addCustomer : function (coHeaderId, CustomerId) {
+			coHeaderId = encodeString(coHeaderId);
+			CustomerId = encodeString(CustomerId);
+            var deferred = $q.defer();
+            
+            Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.CustomerOrderCtrl.addCustomer }', 
+            coHeaderId, CustomerId,
+            	function (result, event) {
+                if (event.type == 'exception') {
+                    //showPopupNotification(event.message, "error");
+                    deferred.reject(event.message);
+                } else {
+                    var responseData = decodeString(result);
+                    var find = '\'';
+                    var re = new RegExp(find, 'g');
+                    responseData = responseData.replace(re, '');
+
+                    deferred.resolve(JSON.parse(responseData));
+                }
+            }, {
+                escape : true
+            });
+            return deferred.promise;
+
+        },
+        
+        SaveMerchandiseLineItem : function (coHeaderId, MerchendiseLineItem) {
+        	coHeaderId = encodeString(coHeaderId);
+        	MerchendiseLineItem = encodeString(MerchendiseLineItem);
+            var deferred = $q.defer();
+            
+            Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.CustomerOrderCtrl.saveCOLineItem }', 
+            coHeaderId, MerchendiseLineItem, 
+            	function (result, event) {
+                if (event.type == 'exception') {
+                    //showPopupNotification(event.message, "error");
+                    deferred.reject(event.message);
+                } else {
+                    var responseData = decodeString(result);
+                    var find = '\'';
+                    var re = new RegExp(find, 'g');
+                    responseData = responseData.replace(re, '');
+
+                    deferred.resolve(JSON.parse(responseData));
+                }
+            }, {
+                escape : true
+            });
+            return deferred.promise;
+
+        },
+         insertFeeInMerchGrid: function ( lineItemId , coHeaderId){
+         	lineItemId = encodeString(lineItemId);
+         	coHeaderId = encodeString(coHeaderId);
+            var deferred = $q.defer();
+            
+            Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.CustomerOrderCtrl.insertFeeInMerchGrid }', 
+            lineItemId, coHeaderId, 
+            	function (result, event) {
+                if (event.type == 'exception') {
+                    deferred.reject(event.message);
+                } else {
+                    var responseData = decodeString(result);
+                    var find = '\'';
+                    var re = new RegExp(find, 'g');
+                    responseData = responseData.replace(re, '');
+                    deferred.resolve(JSON.parse(responseData));
+                }
+            }, {
+                escape : true
+            });
+            return deferred.promise;
+         
+         
+         },
+         insertKitHeaderInMerchGrid: function ( lineItemId , coHeaderId){
+         	lineItemId = encodeString(lineItemId);
+         	coHeaderId = encodeString(coHeaderId);
+             var deferred = $q.defer();
+                Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.CustomerOrderCtrl.insertKitHeaderInMerchGrid }', 
+                	lineItemId, coHeaderId, 
+                	function (result, event) {
+                    if (event.type == 'exception') {
+                        deferred.reject(event.message);
+                    } else {
+                        var responseData = decodeString(result);
+                        var find = '\'';
+                        var re = new RegExp(find, 'g');
+                        responseData = responseData.replace(re, '');
+                        deferred.resolve(JSON.parse(responseData));
+                    }
+                }, {
+                    escape : true
+                });
+                return deferred.promise;
+         }
+    }
+      
+});
+
+
+app.directive('angucomplete', function ($parse, $sce, $timeout, $q, userService, Notification) {
+    return {
+        restrict : 'EA',
+        scope : {
+            "id" : "@id",
+            "placeholder" : "@placeholder",
+            "selectedObject" : "=selectedobject",
+            "url" : "@url",
+            "dataField" : "@datafield",
+            "titleField" : "@titlefield",
+            "descriptionField" : "@descriptionfield",
+            "otherDesc" : "@otherdesc",
+            "imageField" : "@imagefield",
+            "imageUri" : "@imageuri",
+            "inputClass" : "@inputclass",
+            "userPause" : "@pause",
+            "minLengthUser" : "@minlength",
+            "matchClass" : "@matchclass"
+
+        },
+        template : '<div class="angucomplete-holder"> <div class="{{inputClass}}"> <span >{{selectedObject.ObjectSelected.Name}}</span><input text" id="{{id}}_value" ng-model="searchStr" class="anguinput" ng-focus="GetIntialdata()"  type="text" placeholder="{{placeholder}}" class="" onmouseup="this.select();" ng-focus="resetHideResults()" ng-blur="hideResults()"/></div><div id="{{id}}_dropdown" class="angucomplete-dropdown" ng-if="showDropdown"><div class="angucomplete-searching" ng-show="searching">Searching...</div><div class="angucomplete-searching" ng-show="!searching && (!results || results.length == 0)">No results found</div><div class="angucomplete-row" ng-repeat="result in results" ng-click="selectResult(result)" ng-mouseover="hoverRow($index)" ng-class="{\'angucomplete-selected-row\': $index == currentIndex}"><div class="row"><div  class="angucomplete-AddResult col-lg-8" ng-if="result.description==\'AdditionalResults\'" >  {{ result.title }}</div ><div  class="angucomplete-AddtionalInfo col-lg-8" ng-if="result.description==\'AdditionalInfo\'"> {{ result.title }}</div ><div  ng-if="result.description !=\'AdditionalInfo\' && result.description !=\'AdditionalResults\'"><div class="angucomplete-title col-lg-8" ng-if="matchClass" ng-bind="result.title"></div><div ng-if="result.description !=\'Object\' && result.description !=\'section\'" class="angucomplete-description col-lg-4 pull-right" style="text-align:right" > &gt; {{result.description}}</div><div></div></div>',
+
+        link : function ($scope, elem, attrs,$rootScope) {
+            $scope.lastSearchTerm = null;
+            $scope.currentIndex = null;
+            $scope.justChanged = false;
+            $scope.searchTimer = null;
+            $scope.hideTimer = null;
+            $scope.searching = false;
+            $scope.pause = 500;
+            $scope.minLength = 3;
+            $scope.searchStr = null;
+            $scope.ObjectData = null;
+            $scope.ObjectDataValue = "";
+            $scope.testScopeVar = "0";
+            $scope.UserDetails = null;
+
+            $scope.GetIntialdata = function () {
+                
+                $scope.selectedObject.searchDivActive = true;
+                
+                if (!$scope.searchStr) {
+
+                    $scope.searchStr = null;
+                }
+
+                if (($scope.searchStr == null || $scope.searchStr == "") && ($scope.selectedObject.ObjectSelected == "" || $scope.selectedObject.ObjectSelected == null || angular.isDefined($scope.selectedObject.ObjectSelected) == false)) {
+                    $scope.lastSearchTerm = $scope.searchStr;
+                    $scope.showDropdown = true;
+                    $scope.currentIndex = -1;
+                    $scope.results = [];
+                    $scope.searching = true;
+                    $scope.searchTimerComplete($scope.searchStr);
+
+                }
+            }
+
+            if ($scope.minLengthUser && $scope.minLengthUser != "") {
+                $scope.minLength = $scope.minLengthUser;
+            }
+
+            if ($scope.userPause) {
+                $scope.pause = $scope.userPause;
+            }
+
+            isNewSearchNeeded = function (newTerm, oldTerm) {
+                return newTerm.length >= $scope.minLength && newTerm != oldTerm
+            }
+            
+            $scope.processResults = function (responseData, str) {
+                
+                if($scope.selectedObject.SelectedSection.relatedSection.indexOf('ServiceOrderSection') <  0 ){
+                        
+                        var counter = 0;
+                        for( i= 0; i< responseData.length ;i++ ){
+                                if( responseData[i]['Info'] == 'Kit' ){
+                                    if(responseData[i]['AdditionalDetailsForPart'].IsServiceKit == true){
+                                        
+                                        responseData.splice(i, 1);
+                                        debug(responseData);
+                                        debug(responseData);
+                                        --i;
+                                    }
+                                }
+                                        if(i > 10){
+                                            break;
+                                        }                   
+                                }
+                        
+                        counter = ((responseData.length) > 10 ? 10 : responseData.length);
+                        $scope.ProcessResponsedataMerchandise(responseData, str,counter);   
+                
+                }
+                else{
+                        var counter = ((responseData.length) > 10 ? 10 : responseData.length);
+                        $scope.ProcessResponsedataMerchandise(responseData, str,counter);
+                }
+            }
+            
+            
+            $scope.ProcessResponsedataMerchandise = function(responseData, str,counter) {
+            
+            if (responseData && responseData.length >= 0 ) {
+                    $scope.results = [];
+                    var titleFields = [];
+                    if ($scope.titleField && $scope.titleField != "") {
+                        titleFields = $scope.titleField.split(",");
+                    }
+                    var compareval = 0;
+                    
+                        for (var i = 0; i < counter; i++) {
+                            // Get title variables
+                            var titleCode = [];
+                            for (var t = 0; t < titleFields.length; t++) {
+                                titleCode.push(responseData[i][titleFields[t]]);
+                            }
+                            var description = "";
+                            if ($scope.descriptionField) {
+                                if (responseData[i][$scope.descriptionField] != 'Object' && responseData[i][$scope.descriptionField] != 'section') {
+                                    compareval = 1;
+                                }
+                                description = responseData[i][$scope.descriptionField];
+                            }
+    
+                            var text = titleCode.join(' ');
+                            if ($scope.matchClass) {
+                                if (responseData[i][$scope.otherDesc] != null) {
+                                    text = text + " > " + responseData[i][$scope.otherDesc];
+                                }
+                               
+                            }
+    
+                            var resultRow = {
+                                title : text,
+                                description : description,
+                                originalObject : responseData[i],
+                            }
+                            $scope.results[$scope.results.length] = resultRow;
+                        }
+                        console.log(responseData);
+                    if (responseData.length > 10) {
+                        var AddationalRow = {
+                            title : "...and " + (responseData.length - counter).toString() + " other results",
+                            description : "AdditionalResults",
+                            image : "",
+                            originalObject : " ",
+                        }
+                        $scope.results.push(AddationalRow);
+                    }
+                    if (compareval == 0 && $scope.searchStr) {
+
+                        var AddationalRow = {
+                            title : "No other results",
+                            description : "AdditionalResults",
+                            image : "",
+                            originalObject : " ",
+                        }
+                        $scope.results.push(AddationalRow);
+
+                    }
+                    $scope.results.push({
+                        title : "ADVANCED SEARCH",
+                        description : "AdditionalInfo",
+                        originalObject : " ",
+
+                    });
+
+                    $scope.results.push({
+                        title : "+Add New" + " " + (($scope.selectedObject.ObjectSelected) ? $scope.selectedObject.ObjectSelected.Name : ""),
+                        description : "AdditionalInfo",
+                        originalObject : " ",
+
+                    });
+
+                } else {
+                    $scope.results = [];
+                }
+            
+            }
+            
+            
+            $scope.SerachSuggestion = function (str) {
+                var responseData = [];
+                var ObjectDatavar = (($scope.selectedObject.ObjectSelected) ?  $scope.selectedObject.ObjectSelected.Name : '');
+                debug(ObjectDatavar);
+                var itemsInSearch= $scope.selectedObject.SelectedSection['sectionType'];
+                if(str==''|| str==null){
+                    for(var i=0;i< itemsInSearch.length;i++){
+                                responseData.push({AdditionalDetailsForPart: null,
+                                                Description: null,
+                                                Info: "Object",
+                                                Name: itemsInSearch[i].Object,
+                                                Value: itemsInSearch[i].Value});
+                    
+                                }
+                                
+                    $scope.searching = false;
+                    $scope.processResults(responseData, str);   
+                
+                }
+                else{
+                            var ObjectLabel =''
+                            
+                            if($scope.selectedObject.ObjectSelected)
+                            {
+                                ObjectLabel = $scope.selectedObject.ObjectSelected['Value'];
+                            }
+                            else{
+                                    for(var i=0; i< itemsInSearch.length;i++){
+                                                                    
+                                            ObjectLabel +=(ObjectLabel=='' ? itemsInSearch[i].Value : ',' + itemsInSearch[i].Value ) 
+                                    }
+                            }
+                            
+                            var searchQueryJson = {  
+                                "ObjectLabel" : "",
+                                "SearchText" : str,
+                                "PreferredObject" : "Customer",
+                                "SearchableObjects" : ObjectLabel.replace(':','')
+                            }
+                            
+                            searchQueryJson = JSON.stringify(searchQueryJson);
+                            debug(searchQueryJson)
+                            userService.searchText(searchQueryJson)
+                            .then(function (successfulSearchResult) {
+                                    debug(successfulSearchResult);
+                                responseData = successfulSearchResult;
+                                $scope.searching = false;
+                                $scope.processResults((($scope.dataField) ? responseData[$scope.dataField] : responseData), str);
+                            },
+                                function (errorSearchResult) {
+            
+                                responseData = errorSearchResult;
+                                $scope.searching = false;
+                            });
+                }   
+
+            }
+
+            $scope.searchTimerComplete = function (str) {
+                // Begin the search
+                if (str != null) {
+                    if (str.length >= $scope.minLength) {
+
+                        $scope.SerachSuggestion(str);
+                    }
+
+                } else {
+
+                    $scope.SerachSuggestion("");
+                }
+            };
+
+            $scope.hideResults = function () {
+                $scope.hideTimer = $timeout(function () {
+                        $scope.selectedObject.searchDivActive = false;
+                        $scope.showDropdown = false;
+                        $scope.selectedObject.MerchandiseGhostItems = [];
+                        $scope.selectedObject.populateLeftSideHeadingLables();
+                    }, $scope.pause);
+            };
+
+            $scope.resetHideResults = function () {
+                if ($scope.hideTimer) {
+                    $timeout.cancel($scope.hideTimer);
+                };
+            };
+
+            $scope.hoverRow = function (index) {
+                var inputFieldEle = elem.find('.angucomplete-row');
+                inputFieldEle.addClass('angucomplete-selected-rowHover');
+                $scope.currentIndex = index;
+                $scope.GetGhostLine();
+
+            }
+
+            $scope.GetGhostLine = function () {
+
+                if ($scope.results[$scope.currentIndex]["description"] == "Merchandise")
+                    {
+                    var GhostKeys = $scope.results[$scope.currentIndex].originalObject["AdditionalDetailsForPart"];
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                    $scope.selectedObject.MerchandiseGhostItems.push(GhostKeys);
+
+                } else {
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                }
+                $scope.selectedObject.populateLeftSideHeadingLables();
+            }
+
+            $scope.keyPressed = function (event) {
+                if (!(event.which == 38 || event.which == 40 || event.which == 13)) {
+                    if (!$scope.searchStr || $scope.searchStr == "") {
+                        $scope.showDropdown = false;
+                        $scope.lastSearchTerm = null
+                    } else if (isNewSearchNeeded($scope.searchStr, $scope.lastSearchTerm)) {
+                        $scope.lastSearchTerm = $scope.searchStr;
+                        $scope.showDropdown = true;
+                        $scope.currentIndex = -1;
+                        $scope.results = [];
+
+                        if ($scope.searchTimer) {
+                            $timeout.cancel($scope.searchTimer);
+                        }
+                        $scope.searching = true;
+                    
+                        /*var delay = (function(){
+                        var timer = 0;
+                        return function(callback, ms){
+                        clearTimeout (timer);
+                        timer = setTimeout(callback, ms);
+                        };
+                        })();
+                        $('input').keyup(function() {
+                        delay(function(){
+                        alert('Time elapsed!');
+                        }, 1000 );
+                        });*/
+
+                        $scope.searchTimer = $timeout(function () {
+                                $scope.searchTimerComplete($scope.searchStr);
+                            }, $scope.pause);
+
+                    
+                    }
+                } else {
+                    event.preventDefault();
+                }
+            }
+
+            $scope.selectResult = function (result) {
+                    if($scope.selectedObject.SelectedSection.relatedSection.indexOf('ServiceOrderSection') >= 0 ){
+                            if (result["description"] == "Object") {
+                                    $scope.selectedObject.ObjectSelected = {
+                                        Name : result["title"],
+                                        Value : result.originalObject["title"]
+                                    }
+                                $scope.selectedObject.ObjectSelected.Value = result.originalObject["Value"];
+                                $scope.searchStr = "";
+                            }
+                            else {   
+                                    var Name= result.originalObject["Name"];
+                                    var Value = result.originalObject["Value"];
+                                    $scope.showDropdown = false;
+                                    $scope.results = [];
+                                    $scope.searchStr = "";
+                                    $scope.searching = false;
+                                    $scope.selectedObject.addServiceItem(Name,Value);
+                            }
+                    }
+                    else{
+                            if ($scope.matchClass) {
+                                result.title = result.title.toString().replace(/(<([^>]+)>)/ig, '');
+                            }
+                            if (result["description"] == "Object") {
+            
+                                $scope.selectedObject.ObjectSelected = {
+                                    Name : result["title"],
+                                    Value : result.originalObject["title"]
+                                }
+                                $scope.selectedObject.ObjectSelected.Value = result.originalObject["Value"];
+                                $scope.searchStr = "";
+            
+                            } else if ((result["description"]) == "Customer") {
+                                
+            
+                                debug($scope.selectedObject.coHeaderId);
+                                userService.addCustomer($scope.selectedObject.coHeaderId, result.originalObject["Value"])
+                                .then(function (successfulSearchResult) {
+                                    
+                                    
+                                    $scope.selectedObject.Customer = {
+                                        Name : result["title"],
+                                        Value : result.originalObject["Value"]
+                                    }  
+                                    debug(successfulSearchResult);
+                                    if($scope.selectedObject.coHeaderId == null || $scope.selectedObject.coHeaderId == 'undefined') {
+                                        $scope.selectedObject.coHeaderDetails = successfulSearchResult.coHeaderRec;
+                                        $scope.selectedObject.coHeaderId = successfulSearchResult.coHeaderRec.COHeaderId;
+                                        var url = '?id=' + $scope.selectedObject.coHeaderId;
+                                        window.history.pushState("string", "Title" , url);
+                                        $scope.selectedObject.loadCOonAdd();
+                                    }
+                                    
+                                    $scope.selectedObject.UpdateMerchandiseFromSearchResult(successfulSearchResult,false);
+                                    $scope.selectedObject.COUList = successfulSearchResult.COUList;
+                                    $scope.selectedObject.populateLeftSideHeadingLables();
+                                    
+                                    
+                                       
+                                },function (errorSearchResult) {
+                                    Notification.error(errorSearchResult);
+                                    $scope.searching = false;
+                                    $scope.selectedObject.MerchandiseGhostItems = [];
+                                });
+            
+                                $scope.searchStr = "";
+                            } else if (result["description"] == "User") {
+                                $scope.selectedObject.User = {
+                                    Name : result["title"],
+                                    Value : result.originalObject["Value"]
+            
+                                }
+                                //$scope.selectedUser=result["title"];
+                                $scope.searchStr = "";
+            
+                            } else if (result["description"] == "Merchandise") {
+                            
+                                $scope.SaveMerchandiseSearchSource();
+                                $scope.searchStr = "";
+            
+                            } else if (result["title"] == "+Add New Customer:") {
+                                $scope.searchStr = "";
+                                $scope.selectedObject.CreateCustomerFromCO();
+                                    
+                            } else if (result["title"] == "+Add New Merchandise:") {
+                                $scope.searchStr = "";
+                                $scope.selectedObject.CreateMerchandiseFromCO();
+                                        
+                            } else if(result["title"] == "+Add New Kit:" ){
+                              $scope.searchStr = "";
+                                $scope.selectedObject.CreateKitFromCO();
+                                
+                            } else if(result["title"] == "+Add New Labour:" ){
+                                $scope.searchStr = "";
+                                $scope.selectedObject.CreateLabourFromCO();
+                                
+                            } else if(result["title"] == "+Add New Fee:" ){
+                                $scope.searchStr = "";
+                                $scope.selectedObject.CreateFeeFromCO();
+                                
+                            } 
+                            else if (result["title"] == "ADVANCE SEARCH"){
+                                        $scope.searchStr = "";      
+                                        window.location="{!$Page.HomeSearch}";
+                            
+                            }
+                            else if(result["description"] == "Kit"){
+                                userService.insertKitHeaderInMerchGrid( result.originalObject["Value"],$scope.selectedObject.coHeaderId)
+                                .then(function (successfulSearchResult) {
+                                        debug(successfulSearchResult);
+                                        $scope.selectedObject.UpdateMerchandiseFromSearchResult(successfulSearchResult,true);
+                                        $scope.selectedObject.COUList = successfulSearchResult.COUList;
+                                        $scope.selectedObject.populateLeftSideHeadingLables();
+                                });
+                            }else if(result["description"] == "Fee"){  
+                                userService.insertFeeInMerchGrid( result.originalObject["Value"],$scope.selectedObject.coHeaderId)
+                                .then(function (successfulSearchResult) {
+                                        $scope.selectedObject.UpdateMerchandiseFromSearchResult(successfulSearchResult,true);
+                                        $scope.selectedObject.COUList = successfulSearchResult.COUList;
+                                        $scope.selectedObject.populateLeftSideHeadingLables();
+                                        
+                                        $scope.selectedObject.coHeaderDetails = successfulSearchResult.coHeaderRec;
+                                        $scope.selectedObject.coHeaderId = successfulSearchResult.coHeaderRec.COHeaderId;
+                                        var url = '?id=' + $scope.selectedObject.coHeaderId;
+                                        window.history.pushState("string", "Title" , url);
+                                });
+                                    
+                            }
+                            else if(result["description"] == ""){
+                            	$scope.searchStr = "";
+                                $scope.selectedObject.CreateCustomerFromCO();
+                            }
+                            else {  
+                                $scope.searchStr = $scope.lastSearchTerm = result.title;
+                            }
+                            $scope.showDropdown = false;
+                            $scope.results = []; 
+                            // $scope.$apply();
+                        }
+            }
+
+            //save Mechendise from save
+            $scope.SaveMerchandiseSearchSource = function () {
+                // Save Funciton called from
+                //var CoHeaderId = 'a06o000000ER77x';
+
+                //var MerchendiseLineItem=JSON.stringify($scope.selectedObject.MerchandiseGhostItems);
+                var MerchendiseLineItem = JSON.stringify($scope.selectedObject.MerchandiseGhostItems, function (key, val) {
+                        if (key == '$$hashKey') {
+                            return undefined;
+                        }
+                        return val;
+                    });
+
+                userService.SaveMerchandiseLineItem($scope.selectedObject.coHeaderId, MerchendiseLineItem)
+                .then(function (successfulSearchResult) {
+                        if($scope.selectedObject.coHeaderId == null || $scope.selectedObject.coHeaderId == 'undefined') {
+                            $scope.selectedObject.coHeaderDetails = successfulSearchResult.coHeaderRec;
+                            $scope.selectedObject.coHeaderId = successfulSearchResult.coHeaderRec.COHeaderId;
+                            var url = '?id=' + $scope.selectedObject.coHeaderId;
+                            window.history.pushState("string", "Title" , url);
+                            $scope.selectedObject.loadCOonAdd();
+                        }
+                        $scope.searching = false;
+                        $scope.selectedObject.MerchandiseGhostItems = [];
+                          $scope.selectedObject.UpdateMerchandiseFromSearchResult(successfulSearchResult,true);
+                        $scope.selectedObject.populateLeftSideHeadingLables();
+                          
+                        setTimeout(function () {
+                            if($scope.selectedObject.SelectedSection !='#MerchandiseSection'  )
+                            $scope.selectedObject.scrollToPanel(null,'MerchandiseSection')
+                        angular.element("#CustomerOrder_MerchandiseItemGrid tr.Editable_row:last").find('input').filter(':first').focus();
+                        }, 10);
+                
+
+                },
+                    function (errorSearchResult) {
+                    responseData = errorSearchResult;
+                    $scope.searching = false;
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                });
+
+            }
+
+            $scope.setSelectionRange = function (input, selectionStart, selectionEnd) {
+                if (input.setSelectionRange) {
+                    input.focus();
+                    input.setSelectionRange(selectionStart, selectionEnd);
+                    debug(input);
+                } else if (input.createTextRange) {
+                    debug(input);
+                    var range = input.createTextRange();
+                    range.collapse(true);
+                    range.moveEnd('character', selectionEnd);
+                    range.moveStart('character', selectionStart);
+                    range.select();
+                }
+            };
+
+            var inputField = elem.find('input');
+
+            inputField.on('keyup', $scope.keyPressed);
+
+            elem.on("keyup", function (event) {
+
+                debug('keypress' + event.which);
+
+                if (event.which === 40) {
+
+                    if ($scope.results && ($scope.currentIndex + 1) < $scope.results.length) {
+                        $scope.currentIndex++;
+                        
+                        if($scope.selectedObject.SelectedSection.relatedSection.indexOf('ServiceOrderSection') >= 0){
+                        
+                        }else{
+                            $scope.GetGhostLine();
+                        }
+                        
+                        $scope.$apply();
+
+                        var inputFieldEle = elem.find('.angucomplete-row');
+                        inputFieldEle.removeClass('angucomplete-selected-rowHover');
+                        //inputFieldEle.addClass('angucomplete-selected-rowHover');
+
+                        event.preventDefault;
+                        event.stopPropagation();
+
+                    }
+
+                    $scope.$apply();
+                } else if (event.which == 38) {
+
+                    if ($scope.currentIndex >= 1) {
+                        $scope.currentIndex--;
+                        if($scope.selectedObject.SelectedSection.relatedSection.indexOf('ServiceOrderSection') >= 0){
+                        
+                        }else{
+                            $scope.GetGhostLine();
+                        }
+                        //var len=$scope.searchStr.length();
+                        var inputtextField = elem.find('input');
+                        debug(inputtextField);
+                        $scope.setSelectionRange(inputtextField, 1, 2);
+
+                        $scope.$apply();
+                        event.preventDefault;
+                        event.stopPropagation();
+
+                    }
+
+                } else if (event.which == 13) {
+
+                    if ($scope.results && $scope.currentIndex >= 0 && $scope.currentIndex < $scope.results.length) {
+                        $scope.selectResult($scope.results[$scope.currentIndex]);
+                        $scope.$apply();
+                        event.preventDefault;
+                        event.stopPropagation();
+
+                    } else {
+                        $scope.showDropdown = true;
+                        event.preventDefault;
+                        event.stopPropagation();
+                    }
+
+                } else if (event.which == 27) {
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                    $scope.results = [];
+                    $scope.showDropdown = false;
+                    $scope.$apply();
+                } else if (event.which == 8) {
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                    if (($scope.lastSearchTerm == null || $scope.lastSearchTerm == "") && ($scope.testScopeVar == "0")) {
+                        $scope.testScopeVar = 1;
+                    } else if (($scope.lastSearchTerm == null || $scope.lastSearchTerm == "") && ($scope.testScopeVar == "1")) {
+                        $scope.testScopeVar = 0;
+                        $scope.selectedObject.ObjectSelected = "";
+                        $scope.selectedObject.ObjectSelected = "";
+                    }
+
+                    //$scope.selectedObject = null;
+                    $scope.$apply();
+                } else if (event.which == 8) {
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                    $scope.showDropdown = true;
+                    event.preventDefault;
+                    event.stopPropagation();
+                } else {
+                    $scope.selectedObject.MerchandiseGhostItems = [];
+                }
+            });
+
+        }
+    };
+});
+  </script>
+</apex:component>

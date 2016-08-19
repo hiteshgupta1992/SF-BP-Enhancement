@@ -1,0 +1,77 @@
+<apex:page showHeader="false" sidebar="false" controller="VendorOverviewCtrl">
+<!--     <link href="https://cdn.kendostatic.com/2014.2.1008/styles/kendo.common.min.css" rel="stylesheet" /> -->
+<!--     <link href="https://cdn.kendostatic.com/2014.2.1008/styles/kendo.default.min.css" rel="stylesheet" /> -->
+<!--     <link href="https://cdn.kendostatic.com/2014.2.1008/styles/kendo.dataviz.min.css" rel="stylesheet" /> -->
+<!--     <link href="https://cdn.kendostatic.com/2014.2.1008/styles/kendo.dataviz.default.min.css" rel="stylesheet" /> -->
+<!--     <c:GridStyles /> -->
+<!--     <c:GridStaticResources /> -->
+    
+    <script>
+        // Customer preferred contact drop down list item values in format: <li><a>value</a></li>
+        var CustomerPreferredContactsOptions = "{!JSENCODE(CustomerPreferredContactsOptions)}";
+
+        // Default state value in system
+        var systemDefaultState = "{!JSENCODE(defaultState)}";
+        
+        // Default country value in system
+        var systemDefaultCountry = "{!JSENCODE(defaultCountry)}";
+        
+        // Default country value in system
+        var defaultPriceLId = "{!JSENCODE(defaultPriceLId)}";
+        
+        // Default country value in system
+        var defaultPriceLName = "{!JSENCODE(defaultPriceLName)}";
+        
+        // Default country value in system
+        var defaultSalesTId = "{!JSENCODE(defaultSalesTId)}";
+        
+        // Default country value in system
+        var defaultSalesTName = "{!JSENCODE(defaultSalesTName)}";
+    </script>
+    
+    <body>
+        <br/>
+        <div id="{!JSENCODE(currentPN)}customerTabstrip" class="tabstrip-vertical">
+            <ul>
+                <li class="k-state-active" style="width:160px">Vendor Details</li>
+                <li style="width:160px">Chatter Feeds</li>
+                <li style="width:160px">Part Sales Transactions</li>
+                <li style="width:160px">Service Transactions</li>
+                <li style="width:160px">Part Purchase Orders</li>
+            </ul>
+            <div>
+                <div id="vendorDetails" style="min-height: 515px;">
+                    <c:VendorDetailForm uniqueId="{!JSENCODE(currentPN)}" vendor="{!vendor}" 
+                                        accountFieldsMap="{!VENDOR_LIST_FIELDS_TO_JSON_MAPPING}" />
+                </div>
+            </div>
+            <div>
+                <div id="vendorDetails" style="min-height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="vendorDetails" style="min-height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="vendorDetails" style="min-height: 515px;">
+                    
+                </div>
+            </div>
+            <div>
+                <div id="vendorDetails" style="min-height: 515px;">
+                    
+                </div>
+            </div>
+        </div>
+    </body>
+    
+    <script>
+        var {!JSENCODE(currentPN)}customerGridTabPanel = $("#{!JSENCODE(currentPN)}customerTabstrip").kendoTabStrip({
+            animation: false
+        }).data("kendoTabStrip");
+        {!JSENCODE(currentPN)}customerGridTabPanel.select(0);
+    </script>
+</apex:page>

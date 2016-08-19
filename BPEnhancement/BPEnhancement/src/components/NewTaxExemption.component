@@ -1,0 +1,243 @@
+<apex:component controller="NewViewCustomerCtrl">
+	<style>
+	    .modal-dialog {
+	        width: 1100px;
+	        -moz-box-shadow: 10px 10px 5px #6F6868;
+	        -webkit-box-shadow: 10px 10px 5px #6F6868;
+	        box-shadow: 10px 10px 5px #6F6868;
+	    }
+	    .modal-backdrop.in {
+	        height: 2000px !important;
+	    }
+	    .custom_modal {
+	        width: 700px;
+	    }
+	    .lable_fields.name_class {
+	        padding-top: 3%;
+	    }
+	    .popupright .tabconainer form .form_fields {
+	        width: 78%;
+	    }
+	    .popupright .tabconainer form .lable_fields {
+	        width: 20%;
+	    }
+	    #TaxExemptionPopup .popup_container{
+    	    left: 15%;
+   			right: 15%;
+	    }
+	    
+	    .phoneBookmark {
+	        right: 20px !important;
+	    }
+	    .popupright .tabconainer form .form_fields a.bookmarklink {
+	        position: absolute;
+	        right: 28px;
+	        top: 4px;
+	        font-size: 19px;
+	        color: #f1f1f1;
+	    }
+	    .popupright .tabconainer form .controls1 {
+	        position: relative;
+	        right: -91%;
+	        top: -31px;
+	    }
+	    .popupright .tabconainer form .controls .fa-question-circle {
+	        color: orange;
+	    }
+	    .popupright .tabconainer form .controls .fa-times {
+	        color: #9E9E9E;
+	    }
+	    .sub-text{
+    	    margin: 15px 0px;
+    	    text-transform: none;
+	    }
+	</style>
+	
+	<script>
+		var taxExemptionModule = angular.module('taxExemptionModule', []);
+		
+		taxExemptionModule.controller('taxExemptionCtrl', function ($scope, TaxExemptionService) {
+			$scope.TaxExemptionModel = {};
+			
+			$scope.TaxExemptionModel.TaxExemptionPageSortAttrsJSON = {
+                ChangesCount    :   0,
+                CurrentPage     :   1,
+                PageSize        :   10,
+                Sorting :   [{
+                    FieldName       :   "ItemDesc",
+                    SortDirection   :   "ASC"
+                }]
+            };
+            try{
+                $scope.TaxExemptionModel.TaxExemptionPageSortAttrsJSON.PageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+			
+			$scope.TaxExemptionModel.CancelTaxExemptionPopup = function(){
+				angular.element('#TaxExemptionPopup').modal('hide');
+			} 
+			
+			$scope.TaxExemptionModel.saveTaxExemptionRecords = function(){
+				TaxExemptionService.saveTaxExeptionList($scope.TaxExemptionModel.parentObjectId,
+														JSON.stringify($scope.TaxExemptionModel.TaxExemptionList),
+														JSON.stringify($scope.TaxExemptionModel.TaxExemptionPageSortAttrsJSON))
+														.then(function (parentTaxExemptionList) {
+					// Set all the data models
+					console.log(parentTaxExemptionList);
+					$scope.$emit('TaxExemptionCallback', parentTaxExemptionList);
+					angular.element('#TaxExemptionPopup').modal('hide');
+				}, function (errorSearchResult) {
+					console.log('Error');
+				});
+				
+			}
+			
+			$scope.$on('TaxExemptionPopupEvent', function (event, args) {
+				$scope.TaxExemptionModel.parentObjectId = args;
+				
+				TaxExemptionService.getAllActiveSalesTax($scope.TaxExemptionModel.parentObjectId).then(function (TaxExemptionList) {
+					// Set all the data models
+					$scope.TaxExemptionModel.TaxExemptionList = TaxExemptionList;
+					console.log(TaxExemptionList);
+
+					angular.element('#TaxExemptionPopup').modal({
+						backdrop : 'static',
+						keyboard : false
+					});
+				}, function (errorSearchResult) {
+					console.log('Error');
+				});
+				
+			
+			});
+		});
+		
+		
+		taxExemptionModule.service("TaxExemptionService", function ($q) {
+		
+			// Get method for retrival of all List of getAllActiveSalesTax
+			this.getAllActiveSalesTax = function (parentId) {
+				var deferred = $q.defer();
+				parentId = encodeString(parentId);
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.NewViewCustomerCtrl.getAllActiveSalesTax}', parentId,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var taxExemptionList = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						taxExemptionList = taxExemptionList.replace(re, '');
+						deferred.resolve(JSON.parse(taxExemptionList));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+			
+			// Get method for retrival of all List of getAllActiveSalesTax
+			this.saveTaxExeptionList = function (parentId, taxExemptionJSON, paginationJSON) {
+				var deferred = $q.defer();
+				parentId = encodeString(parentId);
+				taxExemptionJSON = encodeString(taxExemptionJSON);
+				paginationJSON = encodeString(paginationJSON);
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.NewViewCustomerCtrl.saveTaxExeptionList}', parentId, taxExemptionJSON, paginationJSON,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var taxExemptionList = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						taxExemptionList = taxExemptionList.replace(re, '');
+						deferred.resolve(JSON.parse(taxExemptionList));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+			
+		});
+	</script>
+	
+	<div class="modal fade" id="TaxExemptionPopup" ng-controller="taxExemptionCtrl">
+	    <div class="modal-dialog custom_modal">
+	        <div class="modal-content">
+	            <div class="modal-body popup_container">
+	                <div class="popupinside">
+	                    <div class="row">
+	                        <div class="popupright col-lg-12 col-lg-12">
+	                            <div class="right_heading_container col-lg-12 col-md-12">
+	                                <h1 class="right_panel_heading">Select Tax Exemption</h1>
+	                                <div class="savecancle_btncntnr">
+	                                    <button type="button" id="closemodal" class="btn btn-default grayBtn" 
+	                                    	ng-click="TaxExemptionModel.CancelTaxExemptionPopup()" 
+	                                    	ng-attr-tabindex="{{CustomerModal.tabIndexValue + 204}}">Cancel</button>
+	                                    <button type="button" class="btn btn-default greenBtn" 
+	                                    	ng-click="TaxExemptionModel.saveTaxExemptionRecords()" 
+	                                    	ng-attr-tabindex="{{CustomerModal.tabIndexValue + 202}}">Save</button>
+	                                </div>
+	                            </div>
+	                            <div class="tabconainer">
+	                            	<p class="T3 sub-text">Select individual sales taxes the Customer is exempt from</p>
+	                            	<form>
+		                            	<div class="gid_container_Customer">
+		                            		<table class="table" id="CM_Owned_UnitsGrid">
+			                                    <col width="1%"  />
+			                                    <col width="10%"  />
+			                                    <col width="25%"  />
+			                                    <col width="25%"  />
+			                                    <col width="40%" />
+			                                    <col width="1%"  />
+			                                    <tr  class="tableHeader T3 C2">
+			                                        <th></th>
+			                                        <th class="text-center">EXEMPT</th>
+			                                        <th class="text-center">TAX NAME</th>
+			                                        <th class="text-center">TAX RATE</th>
+			                                        <th class="text-center">APPLIES TO</th>
+			                                        <th></th>
+			                                    </tr>
+			                                    <tbody>
+			                                        <!-- Display rows -->
+			                                        <tr class="clickable_row" ng-class-even="'C2'" 
+			                                        	ng-repeat="taxItem in TaxExemptionModel.TaxExemptionList">
+			                                            <td style="background:#fff"></td>
+			                                            <td class="text-center">
+			                                            	<div class="form-group">
+				                                                <label class="checkbox smschkbox">
+					                                                <span class="chk_tick" 
+					                                                	ng-class="{'chked' : taxItem.IsSelected == true}" 
+					                                                    ng-click="taxItem.IsSelected = !taxItem.IsSelected">
+					                                                	<i class="fa fa-check-square chksqure" ></i>
+				                                                	</span>
+				                                                </label>
+			                                                </div>
+			                                            </td>
+			                                            <td class="text-center">     
+			                                                <span>{{taxItem.SalesTaxName}}</span> 
+			                                            </td>
+			                                            <td class="text-center">     
+			                                                {{taxItem.Rate}}%               
+			                                            </td>
+			                                            <td class="text-center">
+			                                                {{taxItem.Description}}
+			                                            </td>
+			                                            <td style="background:#fff"></td>
+			                                        </tr>
+	                                    		</tbody>
+	                                      	</table>
+		                            	</div>
+	                            	</form>
+	                            </div>
+	                            
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>    
+</apex:component>

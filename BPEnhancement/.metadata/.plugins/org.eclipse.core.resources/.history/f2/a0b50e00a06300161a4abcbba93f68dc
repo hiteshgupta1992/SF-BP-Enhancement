@@ -1,0 +1,308 @@
+<apex:component >
+
+<script>
+angular.module('partsChart', []).
+   
+   directive('partsChart', function ($timeout) {
+     
+     var directiveDefinitionObject = {
+         restrict: 'E',
+         replace: false,
+         scope: {data: '=chartData' ,partChartsDetails :'=partChartsDetails',labelDataValue:'=labelDataValue'},
+         link: function (scope, element, attrs) {
+			
+			debug(scope);
+         
+									/*{QtyComitted : 500 , QtyAvalable : 5 , QtyInstock : 505 , OnOrder : 570 , ReorderMin : 100,
+									ReorderMax : 700 , Total : 800 }*/
+									
+									
+			
+			function changeGraphAngle(){
+			d3.select("svg")
+       .remove();
+			 var chart = d3.select(element[0]).append("svg")
+		.attr("width", 400)
+		.attr("height", 300)
+		.append("g")
+		.attr("transform", "translate(" + 400 / 2 + "," + 300 / 2 + ")");
+			
+			
+        //data entry to the chart
+			scope.lastvalue=  .45 * Math.PI * 2
+              var r=100;
+              var p =Math.PI * 2
+              var r1=108;
+				
+              var arc=d3.svg.arc()
+              .innerRadius(r)
+              .outerRadius(r-20)
+              
+              var arcDown=d3.svg.arc()
+              .innerRadius(r-20)
+              .outerRadius(r - 21 )
+              
+               var arcUp=d3.svg.arc()
+              .innerRadius(r)
+              .outerRadius(r + 1 )
+              
+            
+			  
+			  var arc1=d3.svg.arc()
+			.innerRadius(r)
+			.outerRadius(r-20)
+			
+			
+			
+			  var arc2=d3.svg.arc()
+			.innerRadius(r1)
+			.outerRadius(r1-4)
+			
+			  var arcOnOrder=d3.svg.arc()
+			.innerRadius(r)
+			.outerRadius(r-20)
+			
+			
+			
+			chart.append("path")
+			.datum({startAngle:.45 * p  , endAngle: p * 1.35})
+			.style("fill", "#BCBDC0")
+			.attr("d", arcDown);
+			
+			
+			
+			chart.append("path")
+			.datum({startAngle:.45 * p  , endAngle: p * 1.35})
+			.style("fill", "#BCBDC0")
+			.attr("d", arcUp);
+			
+			chart.append("path")
+			.datum({startAngle:.45 * p  , endAngle: p * 1.35})
+			.style("fill", "#fff")
+			.attr("d", arc);
+			
+
+			 
+
+			var foreground=chart.append("path")
+			.datum(getEndAngle('QtyComitted'))
+			.style("fill", "#00AEEF")
+			.attr("d", arc);
+			
+			var Angle= getEndAngle('QtyComitted')
+			
+				foreground.transition()
+			      .duration(750)
+			      .call( arcTween , Angle , arc);
+			      
+			
+			var foreground = chart.append("path")
+			.datum(getEndAngle('QtyAvalable'))
+			.style("fill", "#FAC645 ")
+			.attr("d", arc1);
+			
+			
+			var Angle1 = getEndAngle('QtyAvalable')
+			
+				foreground.transition()
+			      .duration(750)
+			      .call( arcTween , Angle1 , arc1);
+			      
+			      
+			var foreground=   chart.append("path")
+			.datum(getEndAngle('Instock'))
+			.style("fill", "#00A651")
+			.attr("d", arc2);
+			
+				var Angle2 = getEndAngle('Instock')
+			
+				foreground.transition()
+			      .duration(750)
+			      .call( arcTween , Angle2 , arc2);
+			
+			
+			var foreground= chart.append("path")
+			.datum(getEndAngle('QtyOnOrder'))
+			.style("fill", "#BCBDC0")
+			.attr("d", arcOnOrder);
+			
+				var Angle3 = getEndAngle('QtyOnOrder')
+			
+				foreground.transition()
+			      .duration(750)
+			      .call( arcTween , Angle3 , arcOnOrder);
+				
+				
+			
+			//intial and last Value calculation
+			
+			var ticksCommitedextent = chart.append("line");
+			ticksCommitedextent.attr("x1", 80 * Math.cos(scope.data['minPoint']['Angle'] - 1.5707963267948966 ) )
+			.attr("x2", 120 * Math.cos(scope.data['minPoint']['Angle'] - 1.5707963267948966)  )
+			.attr("y1", 80 *  Math.sin(scope.data['minPoint']['Angle']- 1.5707963267948966)  )
+			.attr("y2",120 *  Math.sin(scope.data['minPoint']['Angle'] - 1.5707963267948966) )
+			.attr("stroke", "#000")
+			.attr("stroke-width", "2");
+			
+			// data label line
+			
+			// text to the field
+			
+			
+			var labelCommited=chart.append('text');
+			
+			labelCommited.attr("x",  120 *  Math.cos(scope.data['minPoint']['Angle'] - 1.5707963267948966 ) +5)
+			.attr("y", 120 * Math.sin(scope.data['minPoint']['Angle']- 1.5707963267948966) +15 )
+			.text("0")
+			.attr("fill","#000")
+		
+			var ticksCommitedextent = chart.append("line");
+			ticksCommitedextent.attr("x1", 80 * Math.cos(scope.data['maxPoint']['Angle'] - 1.5707963267948966 ) )
+			.attr("x2", 120 * Math.cos(scope.data['maxPoint']['Angle'] - 1.5707963267948966)  )
+			.attr("y1", 80 *  Math.sin(scope.data['maxPoint']['Angle']- 1.5707963267948966)  )
+			.attr("y2",120 *  Math.sin(scope.data['maxPoint']['Angle'] - 1.5707963267948966) )
+			.attr("stroke", "#000")
+			.attr("stroke-width", "2");
+
+			
+			// data label line
+			
+			var labelCommited=chart.append('text');
+			
+			
+			labelCommited.attr("x",  120 *  Math.cos(scope.data['maxPoint']['Angle'] - 1.5707963267948966 ) +5)
+			.attr("y", 120 * Math.sin(scope.data['maxPoint']['Angle']- 1.5707963267948966) +15 )
+			.text(scope.labelDataValue['maxPoint'])
+			.attr("fill","#000");
+			
+			var ticksCommitedextent = chart.append("line");
+			ticksCommitedextent.attr("x1", 100 * Math.cos(scope.data['ReOrderMin']['Angle'] - 1.5707963267948966 ) )
+			.attr("x2", 60 * Math.cos(scope.data['ReOrderMin']['Angle'] - 1.5707963267948966)  )
+			.attr("y1", 100 *  Math.sin(scope.data['ReOrderMin']['Angle']- 1.5707963267948966)  )
+			.attr("y2",60 *  Math.sin(scope.data['ReOrderMin']['Angle'] - 1.5707963267948966) )
+			.attr("stroke", "red")
+			.attr("stroke-width", "3");
+			
+			
+			var labelCommited=chart.append('text');
+			labelCommited.attr("x",  60 *  Math.cos(scope.data['ReOrderMin']['Angle'] - 1.5707963267948966 ) - 10)
+			.attr("y", 60 * Math.sin(scope.data['ReOrderMin']['Angle']- 1.5707963267948966) -20  )
+			.text("Reorder " )
+			.attr("class", "fonts_red");
+			
+			
+			
+			var labelCommited=chart.append('text');
+			labelCommited.attr("x",  60 *  Math.cos(scope.data['ReOrderMin']['Angle'] - 1.5707963267948966 ) -10 )
+			.attr("y", 60 * Math.sin(scope.data['ReOrderMin']['Angle']- 1.5707963267948966) - 10  )
+			.text("Min : " +scope.labelDataValue['ReOrderMin'])
+			.attr("class", "fonts_red");
+			
+			
+			
+			var ticksCommitedextent = chart.append("line");
+			ticksCommitedextent.attr("x1", 100 * Math.cos(scope.data['ReOrderMax']['Angle'] - 1.5707963267948966 ) )
+			.attr("x2", 60 * Math.cos(scope.data['ReOrderMax']['Angle'] - 1.5707963267948966)  )
+			.attr("y1", 100 *  Math.sin(scope.data['ReOrderMax']['Angle']- 1.5707963267948966)  )
+			.attr("y2",60 *  Math.sin(scope.data['ReOrderMax']['Angle'] - 1.5707963267948966) )
+			.attr("stroke", "red")
+			.attr("stroke-width", "3");
+			
+			
+			
+			var labelCommited=chart.append('text');
+			labelCommited.attr("x",  60 *  Math.cos(scope.data['ReOrderMax']['Angle'] - 1.5707963267948966 ) - 40)
+			.attr("y", 60 * Math.sin(scope.data['ReOrderMax']['Angle']- 1.5707963267948966) -10 )
+			.text("Reorder " )
+			.attr("class", "fonts_red");
+			
+			
+			
+			var labelCommited=chart.append('text');
+			labelCommited.attr("x",  60 *  Math.cos(scope.data['ReOrderMax']['Angle'] - 1.5707963267948966 ) -20 )
+			.attr("y", 60 * Math.sin(scope.data['ReOrderMax']['Angle']- 1.5707963267948966) - 20  )
+			.text("Max : " +scope.labelDataValue['ReOrderMax'])
+			.attr("class", "fonts_red");
+
+			}
+			
+
+			
+		
+			
+			function getEndAngle(segmentName){
+								//debug(scope)
+								
+				var value =(scope.partChartsDetails[segmentName]);
+				
+				
+				return value;
+				
+			}
+			
+			
+			
+			function arcTween(transition, Angle,arc) {
+				  transition.attrTween("d", function(d) {
+				  debug('123');
+						var interpolate = d3.interpolate(Angle.startAngle, Angle.endAngle);
+						return function(t) {
+							d.endAngle = interpolate(t);
+							return arc(d);
+						};
+			  	})
+			  };
+			
+			function getDistance(key,value,type){
+				
+				
+				if((scope.data[key]['Angle'] - 1.5707963267948966) > 5.0)
+				{
+						
+							return  value;
+						
+						
+				}
+				else
+				{
+						if(type==1){
+						
+							return 0- value -90;
+						}
+						else if(type==2){
+						
+								return 0- value -80;
+						}
+						else{
+						
+							return 0- value ;
+						
+						}
+						
+				}
+			
+			
+			}
+			
+			
+			
+			 scope.$watch('data',  function (newValue,oldValue)  { 
+       			 if(newValue != oldValue){
+       			 	
+       			 		debug(newValue);
+       					changeGraphAngle()
+       				}
+       			 
+   		   });
+			
+			
+	   } 
+	   
+      };
+      return directiveDefinitionObject;
+   });
+
+
+</script>
+
+</apex:component>

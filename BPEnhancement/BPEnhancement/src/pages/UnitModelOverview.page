@@ -1,0 +1,3 @@
+<apex:page showHeader="false" sidebar="false" controller="UnitModelOverviewCtrl">
+	<c:UnitModelList uniqueId="{!JSENCODE(currentPN)}_Unit_Model_" id="tttt"/>
+</apex:page>

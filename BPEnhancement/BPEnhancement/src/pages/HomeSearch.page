@@ -1,0 +1,2734 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" controller="HomeSearchCtrl">
+
+<html ng-app="searchedGrid">
+<head>
+    <title>Search Results</title>
+</head>
+<c:Css_and_Js ></c:Css_and_Js>
+<link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.newjqueryUICss)}" media="all" />
+<apex:includeScript value="{!$Resource.JqueryUI}"/>
+<apex:includeScript value="{!URLFOR($Resource.AngularResources, 'js/underscore-min.js') }" />
+<apex:includeScript value="{!URLFOR($Resource.AngularResources, 'js/jquery.mousewheel.js') }" />
+
+
+<c:NewViewCustomerStyle />
+<apex:includeScript value="{!$Resource.niceScroll}"/>   
+<c:HomeSearchGridStyle ></c:HomeSearchGridStyle>
+<c:dirPagination rendered="{!!$Setup.General_Configurations__c.Load_New_UI__c}"/>
+<c:NewDirPagination rendered="{!$Setup.General_Configurations__c.Load_New_UI__c}"/>
+
+<script type="text/javascript">
+    // declare global variable will be defined in custom settings futhur
+    //var globalPageSize = 50;
+    //var clickedTab = 0;
+
+    // Jquery Function For UI Customisation no interference to model
+    $(document).ready(function() {
+    	$(document).on('click', '.dropdown-menu', function(e) {
+            $(this).hasClass('keep_open') && e.stopPropagation(); // This replace if conditional.
+        });
+        /*
+        setTimeout(function () {
+            $("body").niceScroll({
+                mousescrollstep : 50
+            });
+        }, 1000);
+        
+       
+        
+        
+        $(document).click(function(event) { 
+            if(($(event.target).closest('#ui-datepicker-div').length || 
+                $(event.target).closest('.ui-datepicker-header').length)){
+                    $('#date-dropdown-filter').parent().addClass("open");
+            }        
+        })*/
+    });
+    
+    // Angualr Model Defined Injection Ui-sortable ,nDialog angular libriraries
+    var app = angular.module('searchedGrid',['BPGlobalHeader', 'ui.date' , 'ngDialog', 'dir.listPagination', 'ui-notification', 'usersearch' , 'ui.sortable']);
+    
+    app.filter('tel', function () {
+	    return function (tel) {
+	        if (!tel) { return ''; }
+	
+	        var value = tel.toString().trim().replace(/^\+/, '');
+	
+	        if (value.match(/[^0-9]/)) {
+	            return tel;
+	        }
+	
+	        var country, city, number;
+	
+	        switch (value.length) {
+	            case 10: // +1PPP####### -> C (PPP) ###-####
+	                country = 1;
+	                city = value.slice(0, 3);
+	                number = value.slice(3);
+	                break;
+	
+	            case 11: // +CPPP####### -> CCC (PP) ###-####
+	                country = value[0];
+	                city = value.slice(1, 4);
+	                number = value.slice(4);
+	                break;
+	
+	            case 12: // +CCCPP####### -> CCC (PP) ###-####
+	                country = value.slice(0, 3);
+	                city = value.slice(3, 5);
+	                number = value.slice(5);
+	                break;
+	
+	            default:
+	                return tel;
+	        }
+	
+	        if (country == 1) {
+	            country = "";
+	        }
+	
+	        number = number.slice(0, 3) + '-' + number.slice(3);
+	
+	        return (country + " (" + city + ") " + number).trim();
+	    };
+	});
+    
+    app.controller('searchTableController', searchTableController);
+
+    
+    // Main controller
+    function searchTableController($scope, ngDialog, Notification,  HomeSearchFactory, SideBarFactory) {
+        //Delaration Scope Variables
+        $scope.HomeSearchGrid = {};
+        $scope.HomeSearchGrid.ForModel = {};
+        $scope.HomeSearchGrid.formMaterData = {};
+        $scope.HomeSearchGrid.showContent = false;   
+        $scope.HomeSearchGrid.displayGrid = false;
+		$scope.HomeSearchGrid.recentColumns = {};
+		$scope.HomeSearchGrid.initFilterFormJsonCopy = {};
+		$scope.HomeSearchGrid.OwnerNameStr = "";
+		$scope.HomeSearchGrid.currentActiveFilter = {};
+		$scope.HomeSearchGrid.isCriteriaSaved = true;
+		$scope.HomeSearchGrid.sidebarSearch = {};
+		
+		$scope.HomeSearchGrid.isfavorite = true;
+       	$scope.HomeSearchGrid.iscommon = false;
+       	$scope.HomeSearchGrid.iscustom = false;
+       	$scope.HomeSearchGrid.isSidePanelToggle = false;
+       	$scope.HomeSearchGrid.isSummaryInnerDiv = false;
+       	$scope.HomeSearchGrid.isSummaryActive = false;
+       	$scope.HomeSearchGrid.isReportMode = false;
+       	$scope.HomeSearchGrid.summaryDiv = false;
+       	$scope.HomeSearchGrid.exportDiv = false;
+       	$scope.HomeSearchGrid.outputResult = "";
+		$scope.HomeSearchGrid.groupNameResult = "";
+
+
+       	
+       	$scope.dateOptions = {
+			maxDate: new Date       	
+       	};
+		        
+        $scope.HomeSearchGrid.formMaterData.dateFilterOptions = [ 
+                                {label : "Anytime", optionValue : "0"},
+                                {label : "Today", optionValue : "1"},
+                                {label : "Yesterday", optionValue : "2"},
+                                {label : "Last 7 days", optionValue : "3"},
+                                {label : "Last 30 days", optionValue : "4"},
+                                {label : "Custom...", optionValue : "5"}
+        ]; 
+        
+        $scope.HomeSearchGrid.formMaterData.rangeFilterOptions = [ 
+                                {label : "Any", optionValue : "0"},
+                                {label : "Equal To", optionValue : "1"},
+                                {label : "Not Equal To", optionValue : "2"},
+                                {label : "Greater than", optionValue : "3"},
+                                {label : "Less Than", optionValue : "4"},
+                                {label : "Between", optionValue : "5"}
+        ]; 
+        
+        
+        $scope.HomeSearchGrid.primaryFieldsList = ['Type', 'SearchText', 'Owner', 'Status', 'ModifiedDate', 'CreatedDate'];
+        
+        $scope.$on('HomePage-SearchText', function(event, args) {
+            $scope.HomeSearchGrid.filterFormJson.SearchText = args.textToSearch;
+            $scope.HomeSearchGrid.getFilteredRecords(true);
+		});
+        
+        
+        
+        
+        
+        
+        var isOutside = false;
+        $scope.dragstart = false;
+        $scope.insideHeader = false;
+
+        // Drag-drop configurations for grid columns
+        $scope.HomeSearchGrid.insideSortable = {
+            placeholder : 'place_holder',
+            items: '.draggable',
+            cursor : 'move',
+            helper : 'clone',
+            tolerance : 'pointer',
+            cursorAt : {
+                left : 10
+            },
+            connectWith : '.insideDroppable1 ',
+            start : function(event, ui) {
+                $scope.dragstart = true;
+                insideHeader = true;
+                ui.item.css('display', ' table-cell');
+                ui.helper.css('width', '110px');
+                ui.helper.css('height', '35px');
+                ui.helper.css('border-bottom', '2px dashed green');
+                ui.helper.css('border', '2px dashed green');
+            },
+            over : function(event, ui) {
+                insideHeader = true;
+            },
+            out : function(event, ui) {
+                insideHeader = false;
+                angular.element('#dropArrowIcon').css('display', 'none');
+            },
+            change : function(event, ui) {
+                if (insideHeader) {
+                    var x = angular.element('.place_holder').next('th').position().left;
+                    angular.element('#dropArrowIcon').css('display', 'inline-block');
+                    angular.element('#dropArrowIcon').css('left', x - 10);
+                }
+                
+            },
+            stop : function(event, ui) {
+                angular.element('#dropArrowIcon').css('display', 'none');
+                $scope.dragstart = false;
+                $scope.HomeSearchGrid.recentColumns = angular.copy($scope.HomeSearchGrid.columns);
+                $scope.HomeSearchGrid.isCriteriaSaved = false;
+            }
+        };
+        
+        
+        $scope.HomeSearchGrid.isDisplayMore = function(){
+        	angular.element('.searchCriteriaWrapper').addClass('removeOverflow');
+        	var height = angular.element('.searchCriteriaWrapper').height();
+        	angular.element('.searchCriteriaWrapper').removeClass('removeOverflow');
+        	if(height > 40){
+        		return true;
+        	}
+        	return false;
+        }
+        
+        
+        
+        
+        // Pagination and sort related JSON
+        $scope.HomeSearchGrid.searchResultPageSortAttrsJSON = {};
+        
+        // Method to set default page sort attributes JSON
+        $scope.HomeSearchGrid.setDefaultPageSortAttrs = function() {
+            $scope.HomeSearchGrid.searchResultPageSortAttrsJSON = {
+                ChangesCount    :   0,
+                CurrentPage     :   1,
+                PageSize        :   10,
+                Sorting :   [{
+                    FieldName       :   "Modified",
+                    FieldLabel : 'Modified',
+                    ExportSort : 'Modified',
+                    SortDirection   :   "DESC",
+                    Type		: "Text"
+                }]
+            };
+            if(!$scope.HomeSearchGrid.isReportMode){
+            	$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting[0].FieldName = 'LastModifiedDate';  
+            }
+            
+            try{
+                $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.PageSize = parseInt('{!JSENCODE(TEXT(Home_Search_Grid_Page_Size))}');  
+            } catch (ex){}
+        }
+        $scope.HomeSearchGrid.setDefaultPageSortAttrs();
+        
+        
+        function getUrlVars() {
+			var vars = {};
+			var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+			vars[key] = value;
+			});
+			return vars;
+		}
+        
+        $scope.HomeSearchGrid.LoadGrid = function(){
+        	$scope.HomeSearchGrid.LoadMasterData();
+        }
+        
+        $scope.HomeSearchGrid.LoadMasterData = function(){
+            HomeSearchFactory.getFilterObjectTypes().then(function(successfulSearchResult) {
+                debug('1');
+                debug(successfulSearchResult); 
+                $scope.HomeSearchGrid.objectsList = successfulSearchResult.ObjectList;
+                $scope.HomeSearchGrid.filterFormJson = successfulSearchResult.FilterFormJSON;
+                $scope.HomeSearchGrid.filterList= successfulSearchResult.AllFilterJSON;
+                //$scope.HomeSearchGrid.isReportMode = successfulSearchResult.IsReportOn;
+                $scope.HomeSearchGrid.setDefaultPageSortAttrs();
+                if($scope.HomeSearchGrid.filterFormJson.Owner.OwnerId !=null){
+               		 $scope.HomeSearchGrid.OwnerNameStr =$scope.HomeSearchGrid.filterFormJson.Owner.OwnerName;
+                }
+                
+                $scope.HomeSearchGrid.updateFilterFormJSON();
+                if(getUrlVars()["q"] != undefined){
+                	$scope.HomeSearchGrid.filterFormJson.SearchText = decodeURI(getUrlVars()["q"]);
+                }
+                
+                if(getUrlVars()["type"] != undefined){
+                	$scope.HomeSearchGrid.filterFormJson.Type.Objects.push(decodeURI(getUrlVars()["type"]));
+                }
+                
+                if(getUrlVars()["owner"] != undefined){
+                	$scope.HomeSearchGrid.filterFormJson.Owner.SelectedOption = decodeURI(getUrlVars()["owner"]);
+                }
+                
+                
+                $scope.HomeSearchGrid.showContent = true;        
+                $scope.HomeSearchGrid.getFilteredRecords(true);
+                setTimeout(function(){ 
+	                var windowHeight = screen.height;
+					var bgHeaderHeight = angular.element(".headerNav").height();
+					var sideBarHeight = windowHeight-bgHeaderHeight;
+					var totalsideBarHeight = sideBarHeight-115;
+					debug("total height in side bar")
+					debug(totalsideBarHeight);
+					angular.element(".sidepanel").css("height", totalsideBarHeight);
+					var rightSideBarHeight = sideBarHeight-175;
+					angular.element(".rightSidePanel").css("height",rightSideBarHeight);
+					$scope.HomeSearchGrid.preventMouseWheel();
+                }, 1000);
+                
+            },
+            function(errorSearchResult){
+                $scope.HomeSearchGrid.searchedResult = errorSearchResult;
+                Notification.error("Some error occurred, please refresh the page");
+            });
+        }
+        
+        $scope.HomeSearchGrid.updateFilterFormJSON = function(){
+            angular.forEach($scope.HomeSearchGrid.filterFormJson, function(value, key) {
+                if(value != null  &&  value.SelectedOption == null){
+                    value.SelectedOption = "0";
+                }
+            });
+            $scope.HomeSearchGrid.initFilterFormJsonCopy = angular.copy($scope.HomeSearchGrid.filterFormJson);
+        }
+        
+        
+        
+        $scope.HomeSearchGrid.searchCriteriaJson = {};
+		$scope.HomeSearchGrid.isFilterCopy = false;
+        $scope.HomeSearchGrid.isFilterRename = false;
+        $scope.HomeSearchGrid.popUpFilterName = '';
+        $scope.HomeSearchGrid.popUpFilterId = null;
+		// filters
+		// Open dailogbox
+        $scope.HomeSearchGrid.clickToOpen = function() {
+        	$scope.HomeSearchGrid.newFilterName = angular.copy($scope.HomeSearchGrid.popUpFilterName);
+            $scope.HomeSearchGrid.isFilterNameError = false;
+            $scope.HomeSearchGrid.isHideRadioButton = false;
+            $scope.HomeSearchGrid.userChoice = 'Save';
+            if($scope.HomeSearchGrid.isFilterCopy){
+            	$scope.HomeSearchGrid.newFilterName = 'Copy of '+angular.copy($scope.HomeSearchGrid.popUpFilterName);
+            }
+            $scope.HomeSearchGrid.errorMsg = false;
+            if($scope.HomeSearchGrid.isFilterCopy || $scope.HomeSearchGrid.isFilterRename){
+            	$scope.HomeSearchGrid.isHideRadioButton = true;
+            }
+            
+            
+
+            var dialog = ngDialog
+                    .open({
+                        template : '<div class="dialogBox"><h2>Save Custom Filter</h2><br/>'
+                                + '<form ng-class=" { \'has-error\': HomeSearchGrid.isFilterNameError , \'\': !HomeSearchGrid.isFilterNameError }">'
+                                +
+                                '<span ng-hide="HomeSearchGrid.isHideRadioButton">'
+                                + '<span ng-hide="HomeSearchGrid.iscommon">'
+                                + '<input type="radio" ng-model="HomeSearchGrid.userChoice" value="Update" ng-hide="HomeSearchGrid.iscommon"> Update Existing Filter </input>'
+                                + '</span>'
+                                + '<br/>'
+                                + '<input type="radio" ng-model="HomeSearchGrid.userChoice" value="Save"> Save as New Filter </input>'
+                                + '</span>'
+                                + '<input type="text" ng-disabled="HomeSearchGrid.userChoice == \'Update\' || HomeSearchGrid.userChoice == \'\'" class="form-control" ng-model="HomeSearchGrid.newFilterName" placeholder="Filter Name" id="newFilter" style="width:70%;" />'
+                                +
+
+                                '<span class="help-block" ng-if= HomeSearchGrid.isFilterNameError > {{HomeSearchGrid.errorMsg}} </span><hr/>'
+                                +
+
+                                '<div style="text-align: right;">'
+                                + '<button style="margin-right:10px;" type="button" class="btn btn-default greenBtn" ng-click="HomeSearchGrid.saveFilter()  && closeThisDialog()">Save</button>'
+                                + '<button style="margin-right:10px;" type="button" class="btn btn-default grayBtn" ng-click="closeThisDialog()">Cancel</button>'
+                                +
+
+                                '</div>' + '</form>' + '</div>',
+                        showClose : false,
+                        scope : $scope,
+                        plain : true
+                    });
+        };
+		
+		
+		$scope.HomeSearchGrid.saveFilter = function(){
+			var FilterId = null;
+			if(typeof $scope.HomeSearchGrid.newFilterName == undefined){
+        		$scope.HomeSearchGrid.newFilterName = '';
+        	}
+			if($scope.HomeSearchGrid.userChoice == 'Save' && $scope.HomeSearchGrid.newFilterName.trim().length == 0){
+				$scope.HomeSearchGrid.isFilterNameError = true;
+                $scope.HomeSearchGrid.errorMsg = 'Please enter Filter Name';
+                return false;
+			}
+			if($scope.HomeSearchGrid.userChoice == 'Save'){
+				if( $scope.HomeSearchGrid.checkIfFilterNameAlreadyPresent($scope.HomeSearchGrid.newFilterName.trim()) == false) {
+	                $scope.HomeSearchGrid.isFilterNameError = true;
+	                $scope.HomeSearchGrid.errorMsg = 'Filter Name - ' + $scope.HomeSearchGrid.newFilterName
+	                        + ' already exists ';
+	                return false;
+            	}
+			}
+			if($scope.HomeSearchGrid.userChoice == 'Update'){
+				FilterId = angular.copy($scope.HomeSearchGrid.popUpFilterId);
+				$scope.HomeSearchGrid.newFilterName =  angular.copy($scope.HomeSearchGrid.popUpFilterName);
+				$scope.HomeSearchGrid.filterList.FilterType = 'Custom';
+			}
+			if($scope.HomeSearchGrid.isFilterRename || $scope.HomeSearchGrid.isFilterCopy){
+				FilterId = $scope.HomeSearchGrid.popUpFilterId;
+				debug($scope.HomeSearchGrid.popUpFilterName);
+				debug($scope.HomeSearchGrid.filterList.FilterType);
+				
+				SideBarFactory.renameCopyFilterRecord(FilterId, $scope.HomeSearchGrid.newFilterName, $scope.HomeSearchGrid.isFilterCopy)
+	        									.then(function(successfulSearchResult) {
+	              		debug(successfulSearchResult);
+	              		$scope.HomeSearchGrid.filterList.FilterType=successfulSearchResult.FilterType;
+	              		$scope.HomeSearchGrid.isFilterCopy = false;
+	        			$scope.HomeSearchGrid.isFilterRename = false;
+	        			$scope.HomeSearchGrid.popUpFilterName = '';
+	        			$scope.HomeSearchGrid.popUpFilterId = null;
+	        			
+	            }, function(errorSearchResult) {
+	                $scope.HomeSearchGrid.filterList.FilterType = errorSearchResult;
+	            });
+			}else{
+				if($scope.HomeSearchGrid.formMaterData.AdditionalFields == undefined){
+					$scope.HomeSearchGrid.formMaterData.AdditionalFields = [];
+				}
+				
+				var summaryColumnsObject  = {visible : $scope.HomeSearchGrid.summaryDisplayedColumns, Hidden: $scope.HomeSearchGrid.summaryHiddenColumns};
+				var exportColumnsObject  = {visible : $scope.HomeSearchGrid.summaryDisplayedColumns, Hidden: $scope.HomeSearchGrid.summaryHiddenColumns};
+				
+				SideBarFactory.saveFilterRecord(FilterId, $scope.HomeSearchGrid.newFilterName,
+        									JSON.stringify($scope.HomeSearchGrid.filterFormJson),
+        									JSON.stringify($scope.HomeSearchGrid.searchResultPageSortAttrsJSON),
+        									JSON.stringify($scope.HomeSearchGrid.columns),
+        									JSON.stringify($scope.HomeSearchGrid.formMaterData.AdditionalFields),
+        									JSON.stringify(summaryColumnsObject),
+        									JSON.stringify(exportColumnsObject),
+        									$scope.HomeSearchGrid.outputResult,
+        									$scope.HomeSearchGrid.groupNameResult,
+        									$scope.HomeSearchGrid.isReportMode)
+	        									.then(function(successfulSearchResult) {
+	              		debug('Save called');
+	              		debug(successfulSearchResult);
+	              		$scope.HomeSearchGrid.filterList.FilterType = successfulSearchResult.AllFilterJSON.FilterType;
+	              		$scope.HomeSearchGrid.currentActiveFilter = successfulSearchResult.CurrentFilter;
+	              		$scope.HomeSearchGrid.isFilterCopy = false;
+	        			$scope.HomeSearchGrid.isFilterRename = false;
+	        			$scope.HomeSearchGrid.popUpFilterName = '';
+	        			$scope.HomeSearchGrid.popUpFilterId = null;
+	        			$scope.HomeSearchGrid.isFilterMatched = true;
+	            }, function(errorSearchResult) {
+	                $scope.HomeSearchGrid.filterList.FilterType = errorSearchResult;
+	            });
+			
+			}
+			
+
+        	
+            return true;
+        }
+		
+		$scope.HomeSearchGrid.saveAsAction = function() {
+			debug('save as');
+			debug($scope.HomeSearchGrid.filterFormJson);
+            $scope.HomeSearchGrid.popUpFilterName = $scope.HomeSearchGrid.currentActiveFilter.Name;
+        	$scope.HomeSearchGrid.popUpFilterId = $scope.HomeSearchGrid.currentActiveFilter.Id;	
+        	$scope.HomeSearchGrid.clickToOpen();
+        }
+			
+        
+        $scope.HomeSearchGrid.renameOrCopyCustomFilter = function(FilterId, FilterName, isCopy) {
+			$scope.HomeSearchGrid.popUpFilterId = FilterId;
+            $scope.HomeSearchGrid.popUpFilterName = FilterName; 
+        	$scope.HomeSearchGrid.isFilterCopy = isCopy;
+        	$scope.HomeSearchGrid.isFilterRename = !isCopy;
+        	$scope.HomeSearchGrid.clickToOpen();
+        }
+        
+        
+        // Method to show pop up box to confrim delete operation.
+        $scope.HomeSearchGrid.confirmDelete = function(customFilterId, customFilterName) {
+        	debug(customFilterId);
+            var dialog = ngDialog
+                    .open({
+                        template : '<div class="dialogBox"><h3>Delete Filter: '
+                                + customFilterName
+                                + '</h3><hr/>'
+                                + '<form >'
+                                + '<span > Are you sure ? <hr/>'
+                                + '<div style="text-align: right;">'
+                                + '<button style="margin-right:10px;" type="button" class="btn btn-default greenBtn" ng-click="HomeSearchGrid.deleteCustomFilter(\''
+                                + customFilterId
+                                + '\') && closeThisDialog()">Delete</button>'
+                                + '<button style="margin-right:10px;" type="button" class="btn btn-default grayBtn" ng-click="closeThisDialog()">Cancel</button>'
+                                + '</div>' + '</form>' + '</div>',
+                        showClose : false,
+                        scope : $scope,
+                        plain : true
+                    });
+        };
+        
+        
+        
+        $scope.HomeSearchGrid.deleteCustomFilter = function(FilterId){
+        		debug(FilterId);
+				SideBarFactory.deleteFilterRecord(FilterId).then(function(successfulSearchResult) {
+	               $scope.HomeSearchGrid.filterList.FilterType = successfulSearchResult.FilterType;
+	               if(FilterId == $scope.HomeSearchGrid.currentActiveFilter.Id){
+	               		$scope.HomeSearchGrid.currentActiveFilter = {};
+	               }
+	            }, function(errorSearchResult) {
+	                $scope.filterList = errorSearchResult;
+	            });
+	            return true;
+        }
+        
+        $scope.HomeSearchGrid.applySavedFilter = function(filterObj, filterType){
+        	//$scope.HomeSearchGrid.isCriteriaSaved = true;
+        	debug(filterObj);
+        	$scope.HomeSearchGrid.displayGrid = false;
+        	var FilterRecord;
+        	$scope.HomeSearchGrid.currentActiveFilter = {Id : filterObj.Id, Name : filterObj.FilterLabel, Type : filterType };
+        	setTimeout(function(){
+			SideBarFactory.getFilterFields(filterObj.Id).then(function(successfulSearchResult) {
+              		debug(successfulSearchResult);
+              		debug('----------------------------')
+              		FilterRecord = successfulSearchResult;
+              		
+              		
+              		FilterRecord.FieldFilterJson = JSON.parse(FilterRecord.FieldFilterJson);
+              		
+              		HomeSearchFactory.getGridFilterConfigurations(JSON.stringify(FilterRecord.FieldFilterJson.Type.Objects)).then(function(successfulSearchResult) {
+		            	debug(successfulSearchResult);
+		                $scope.HomeSearchGrid.formMaterData.CategoryList = successfulSearchResult.CategoryList;
+		                $scope.HomeSearchGrid.formMaterData.POTypeList = successfulSearchResult.POTypeList;
+		                $scope.HomeSearchGrid.formMaterData.PriceLevelList = successfulSearchResult.PriceLevelList;
+		                $scope.HomeSearchGrid.formMaterData.PurchaseTaxList = successfulSearchResult.PurchaseTaxList;
+		                $scope.HomeSearchGrid.formMaterData.SalesTaxList = successfulSearchResult.SalesTaxList;
+		                $scope.HomeSearchGrid.formMaterData.StatusValues = successfulSearchResult.StatusValues;
+		                debug($scope.HomeSearchGrid.filterFormJson.People_SalesTax);
+		                setTimeout(function(){
+							$scope.HomeSearchGrid.filterFormJson = FilterRecord.FieldFilterJson;
+	                        $scope.HomeSearchGrid.searchResultPageSortAttrsJSON = JSON.parse(FilterRecord.SortJson);
+	                        $scope.HomeSearchGrid.columns = JSON.parse(FilterRecord.DisplayHiddenColumn);
+	                        $scope.HomeSearchGrid.recentColumns = angular.copy(JSON.parse(FilterRecord.DisplayHiddenColumn));
+	                        $scope.HomeSearchGrid.formMaterData.AdditionalFields = JSON.parse(FilterRecord.AdditionalFieldJson);
+	                        if(JSON.parse(FilterRecord.SummaryFieldsJSON) != undefined){
+		                       	$scope.HomeSearchGrid.summaryDisplayedColumns = JSON.parse(FilterRecord.SummaryFieldsJSON).visible;
+						        debug($scope.HomeSearchGrid.summaryDisplayedColumns);
+						        debug('$scope.HomeSearchGrid.summaryDisplayedColumns');
+						        $scope.HomeSearchGrid.summaryHiddenColumns = JSON.parse(FilterRecord.SummaryFieldsJSON).Hidden;
+						        $scope.HomeSearchGrid.copySummaryDisplayColumns = angular.copy($scope.HomeSearchGrid.summaryDisplayedColumns);
+						        $scope.HomeSearchGrid.copySummaryHiddenColumns = angular.copy($scope.HomeSearchGrid.summaryHiddenColumns);
+					       	}	
+					        if(JSON.parse(FilterRecord.ExportFieldsJSON) != undefined){	
+						        $scope.HomeSearchGrid.exportDisplayedColumns = JSON.parse(FilterRecord.ExportFieldsJSON).visible;
+						        $scope.HomeSearchGrid.exportHiddenColumns = JSON.parse(FilterRecord.ExportFieldsJSON).Hidden;
+						        $scope.HomeSearchGrid.copyExportDisplayColumns = angular.copy($scope.HomeSearchGrid.exportDisplayedColumns);
+						        $scope.HomeSearchGrid.copyExportHiddenColumns = angular.copy($scope.HomeSearchGrid.exportHiddenColumns);
+		                    }
+	                        
+				        	$scope.HomeSearchGrid.outputResult = FilterRecord.ExportFileFormat;
+							$scope.HomeSearchGrid.groupNameResult = FilterRecord.ExportGroupField;
+							$scope.HomeSearchGrid.isReportMode = FilterRecord.IsReportOn;
+				        	$scope.HomeSearchGrid.getFilteredRecords(false);
+						    
+						}, 1000);
+		            },
+		            function(errorSearchResult) {
+		                $scope.HomeSearchGrid.searchedResult = errorSearchResult;
+		                Notification.error("Some error occurred, please refresh the page");
+		            });
+            }, function(errorSearchResult) {
+                $scope.HomeSearchGrid.filterList.FilterType = errorSearchResult;
+            });
+          },1000);
+           
+        }
+        
+        
+        $scope.HomeSearchGrid.checkIfFilterNameAlreadyPresent = function(customFilterLabel) {
+        	if($scope.HomeSearchGrid.filterList.FilterType.Common != undefined && $scope.HomeSearchGrid.filterList.FilterType.Custom != undefined){
+	            for (var i = 0; i < $scope.HomeSearchGrid.filterList.FilterType.Custom.length; i++) {
+	                if (customFilterLabel.toUpperCase() === $scope.HomeSearchGrid.filterList.FilterType.Custom[i].FilterLabel.toUpperCase()) {
+	                    $scope.HomeSearchGrid.isFilterNameError = true;
+	                    $scope.HomeSearchGrid.errorMsg = 'Filter Name - '
+	                            + customFilterLabel + ' already exists ';
+	                    return false;
+	                }
+	            }
+	            if( $scope.HomeSearchGrid.isFilterNameError == false){
+	            
+	            	for (var i = 0; i < $scope.HomeSearchGrid.filterList.FilterType.Common.length; i++) {
+	            		for(var j=0;j< $scope.HomeSearchGrid.filterList.FilterType.Common[i].subgroupList.length; j++){
+	            			if (customFilterLabel.toUpperCase() === $scope.HomeSearchGrid.filterList.FilterType.Common[i].subgroupList[j].FilterLabel.toUpperCase()) {
+			                    $scope.HomeSearchGrid.isFilterNameError = true;
+			                    $scope.HomeSearchGrid.errorMsg = 'Filter Name - '
+			                            + customFilterLabel + ' already exists ';
+			                    return false;
+			                }
+	            		}
+	            	}
+	            }
+	        }
+            return true;
+        }  
+        
+        
+        $scope.HomeSearchGrid.markFilterFav = function(FilterId, isFav){
+        	SideBarFactory.markFilterAsFavorite(FilterId, isFav).then(function(successfulSearchResult) {
+               debug(successfulSearchResult);
+          		if(isFav){
+               		$scope.HomeSearchGrid.currentActiveFilter.Type = 'favorite';
+               }else{
+               		$scope.HomeSearchGrid.currentActiveFilter.Type = 'Custom';
+               } 
+               $scope.HomeSearchGrid.filterList.FilterType = successfulSearchResult.FilterType;
+            }, function(errorSearchResult) {
+                $scope.filterList = [];
+            });
+        }
+        
+        
+        $scope.HomeSearchGrid.selectFilterObject = function(objectName){
+            if(typeof $scope.HomeSearchGrid.filterFormJson.Type.Objects == undefined){
+                $scope.HomeSearchGrid.filterFormJson.Type.Objects = [];
+            }  
+            if(_.indexOf($scope.HomeSearchGrid.filterFormJson.Type.Objects, objectName) == -1){
+                $scope.HomeSearchGrid.filterFormJson.Type.Objects.push(objectName);
+            }else{
+                $scope.HomeSearchGrid.filterFormJson.Type.Objects = _.without($scope.HomeSearchGrid.filterFormJson.Type.Objects ,objectName);
+            }
+            
+            HomeSearchFactory.getGridFilterConfigurations(JSON.stringify($scope.HomeSearchGrid.filterFormJson.Type.Objects)).then(function(successfulSearchResult) {
+            	debug(successfulSearchResult);
+                $scope.HomeSearchGrid.formMaterData.AdditionalFields = successfulSearchResult.AdditionalFields;
+                $scope.HomeSearchGrid.formMaterData.CategoryList = successfulSearchResult.CategoryList;
+                $scope.HomeSearchGrid.formMaterData.POTypeList = successfulSearchResult.POTypeList;
+                $scope.HomeSearchGrid.formMaterData.PriceLevelList = successfulSearchResult.PriceLevelList;
+                $scope.HomeSearchGrid.formMaterData.PurchaseTaxList = successfulSearchResult.PurchaseTaxList;
+                $scope.HomeSearchGrid.formMaterData.SalesTaxList = successfulSearchResult.SalesTaxList;
+                $scope.HomeSearchGrid.formMaterData.StatusValues = successfulSearchResult.StatusValues;
+                
+                angular.forEach($scope.HomeSearchGrid.filterFormJson, function(value, key) {
+					if($scope.HomeSearchGrid.primaryFieldsList.indexOf(key) == -1){
+						$scope.HomeSearchGrid.filterFormJson[key] = angular.copy($scope.HomeSearchGrid.initFilterFormJsonCopy[key]);
+					}
+				});
+				
+				
+            },
+            function(errorSearchResult) {
+                $scope.HomeSearchGrid.searchedResult = errorSearchResult;
+                Notification.error("Some error occurred, please refresh the page");
+            });
+        }
+        
+        
+        $scope.HomeSearchGrid.isfilterActive = function(filterId, filterType){
+        	if(filterId == $scope.HomeSearchGrid.currentActiveFilter.Id){
+        		return true;
+        	}
+        	return false;
+       	}
+        
+        
+        $scope.HomeSearchGrid.isFilterObjectSelected = function(objectName){
+            if(_.indexOf($scope.HomeSearchGrid.filterFormJson.Type.Objects, objectName) != -1){
+                return true;
+            }else{
+                return false; 
+            }
+        }
+        
+  		 $scope.$on("userSelectCallBack", function(event, message){
+			$scope.HomeSearchGrid.filterFormJson.Owner.OwnerId=message.SearchResult.originalObject.Value;
+			$scope.HomeSearchGrid.filterFormJson.Owner.OwnerName=message.SearchResult.originalObject.Name;
+	 	});
+	 
+  	    $scope.HomeSearchGrid.getObjectFilterText = function(){
+            if(typeof $scope.HomeSearchGrid.filterFormJson.Type.Objects == undefined){
+                $scope.HomeSearchGrid.filterFormJson.Type.Objects = [];
+            }  
+            if($scope.HomeSearchGrid.filterFormJson.Type.Objects.length == 0){
+                return 'Any';
+            }else if($scope.HomeSearchGrid.filterFormJson.Type.Objects.length == 1){
+                return $scope.HomeSearchGrid.filterFormJson.Type.Objects[0];
+            }else{
+                return 'Multiple';
+            }
+        }
+        
+        $scope.HomeSearchGrid.showField = function(fieldKey){
+            var index = _.findIndex($scope.HomeSearchGrid.formMaterData.AdditionalFields, {UIFieldKey: fieldKey});
+            if(index != -1 ){
+                return $scope.HomeSearchGrid.formMaterData.AdditionalFields[index].IsDisplayed;
+            }
+            return false;
+        }
+        
+        
+        
+        
+        $scope.HomeSearchGrid.addAdditionalField = function(fieldKey){
+            var index = _.findIndex($scope.HomeSearchGrid.formMaterData.AdditionalFields, {UIFieldKey: fieldKey});
+            if(index != -1 ){
+                $scope.HomeSearchGrid.formMaterData.AdditionalFields[index].IsDisplayed = true;
+                setTimeout(function(){ 
+                    angular.element('#'+fieldKey).focus();
+                }, 1000);
+            }
+        }
+        
+        
+        $scope.HomeSearchGrid.removeAdditionalField = function(fieldKey){
+            var index = _.findIndex($scope.HomeSearchGrid.formMaterData.AdditionalFields, {UIFieldKey: fieldKey});
+            if(index != -1 ){
+                $scope.HomeSearchGrid.formMaterData.AdditionalFields[index].IsDisplayed = false;
+            }
+			$scope.HomeSearchGrid.filterFormJson[fieldKey] = angular.copy($scope.HomeSearchGrid.initFilterFormJsonCopy[fieldKey]);
+            
+        }
+        
+        
+        $scope.HomeSearchGrid.showFilterForm =  function(){
+        	$scope.HomeSearchGrid.filterFormJsonCopy =  angular.copy($scope.HomeSearchGrid.filterFormJson);
+        	$scope.HomeSearchGrid.openFilterForm();
+        	
+        }
+        
+        $scope.HomeSearchGrid.closeFilterForm = function(){
+        	$scope.HomeSearchGrid.filterFormJson =  angular.copy($scope.HomeSearchGrid.filterFormJsonCopy);
+        	$scope.HomeSearchGrid.hideFilterForm(); 
+        }
+        
+        $scope.HomeSearchGrid.clearFilterForm = function(){
+        	$scope.HomeSearchGrid.closeFilterForm();
+        	$scope.HomeSearchGrid.formMaterData.AdditionalFields = [];
+        	$scope.HomeSearchGrid.filterFormJson = angular.copy($scope.HomeSearchGrid.initFilterFormJsonCopy);
+        	$scope.HomeSearchGrid.currentActiveFilter = {};
+        	$scope.HomeSearchGrid.getFilteredRecords(true);
+        }
+        
+        $scope.HomeSearchGrid.loadingColumn = false;
+        $scope.HomeSearchGrid.openColumnsDropdown = function(){
+        	//$scope.HomeSearchGrid.loadingColumn = true;
+        	$scope.HomeSearchGrid.columnSearch = {};
+        	$scope.HomeSearchGrid.columnSearch.Label = '';
+        	debug("recentColumns");
+        	debug($scope.HomeSearchGrid.recentColumns);
+			//angular.extend($scope.HomeSearchGrid.columns, $scope.HomeSearchGrid.recentColumns)
+            $scope.HomeSearchGrid.columns = angular.copy($scope.HomeSearchGrid.recentColumns);
+        }
+        
+        $scope.HomeSearchGrid.closeColumnsDropdown = function(){
+        	angular.element('#column_dropdown').closest(".dropdown").removeClass("open");
+        }
+        
+        
+        $scope.HomeSearchGrid.updateColumnsDropdown = function(){
+        	$scope.HomeSearchGrid.isFilterMatched = false;
+        	var DisplayedCols = [];
+        	var HiddenCols = [];
+        	for(i=0; i< $scope.HomeSearchGrid.columns.DisplayedColumns.length; i++){
+        		if($scope.HomeSearchGrid.columns.DisplayedColumns[i].IsDisplayed){
+        			DisplayedCols.push($scope.HomeSearchGrid.columns.DisplayedColumns[i]);
+        		}else{
+        			HiddenCols.push($scope.HomeSearchGrid.columns.DisplayedColumns[i]);
+        		}
+        	}
+        	
+        	for(i=0; i< $scope.HomeSearchGrid.columns.HiddenColumns.length; i++){
+        		if($scope.HomeSearchGrid.columns.HiddenColumns[i].IsDisplayed){
+        			DisplayedCols.push($scope.HomeSearchGrid.columns.HiddenColumns[i]);
+        		}else{
+        			HiddenCols.push($scope.HomeSearchGrid.columns.HiddenColumns[i]);
+        		}
+        	}
+        	$scope.HomeSearchGrid.columns.DisplayedColumns = DisplayedCols;
+        	$scope.HomeSearchGrid.columns.HiddenColumns = HiddenCols;
+        	$scope.HomeSearchGrid.recentColumns = angular.copy($scope.HomeSearchGrid.columns);
+        	$scope.HomeSearchGrid.getActiveSummaryRecord();
+        	$scope.HomeSearchGrid.closeColumnsDropdown();
+        }
+        
+        $scope.HomeSearchGrid.restoreColumns = function(){
+        	//$scope.HomeSearchGrid.isCriteriaSaved = false;
+        	HomeSearchFactory.getGridColumnsConfiguration(JSON.stringify($scope.HomeSearchGrid.filterFormJson.Type.Objects), JSON.stringify($scope.HomeSearchGrid.filterFormJson)).then(function(successfulResult) {
+                $scope.HomeSearchGrid.columns.DisplayedColumns = successfulResult.DisplayedColumns;
+                $scope.HomeSearchGrid.columns.HiddenColumns = successfulResult.HiddenColumns;
+                if(successfulResult.MatchFilter == null){
+                	$scope.HomeSearchGrid.isFilterMatched = false;
+                }else{
+                	$scope.HomeSearchGrid.isFilterMatched = true;
+                	$scope.HomeSearchGrid.currentActiveFilter = successfulResult.MatchFilter;
+                }
+                $scope.HomeSearchGrid.recentColumns = angular.copy(successfulResult);
+                $scope.HomeSearchGrid.closeColumnsDropdown();
+               	$scope.HomeSearchGrid.getActiveSummaryRecord(); 
+              
+               
+        	},
+            function(errorSearchResult) {
+                $scope.HomeSearchGrid.searchedResult = errorSearchResult;
+                Notification.error("Some error occurred, please refresh the page");
+                $scope.HomeSearchGrid.closeColumnsDropdown
+            });
+             
+        }
+        
+        $scope.HomeSearchGrid.changeSort = function(Field, Direction){
+        	var FieldApiName = Field.FieldAPIName;
+        	var FieldLabel = Field.Label;
+        	var RecordKey = Field.RecordKey;
+        	var Type = Field.Type;
+        	if(!$scope.HomeSearchGrid.isReportMode){
+	        	if(FieldApiName == null){
+	        		Notification.error("Sorting can't be applied on this column");
+	        		return;
+	        	}
+	        	//$scope.HomeSearchGrid.isCriteriaSaved = false;
+	        	var SortingArray = angular.copy($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting);
+	        	debug(SortingArray); 
+	        	var index = _.findIndex(SortingArray, {FieldName: FieldApiName});
+	        	if(index != -1){
+	        		SortingArray[index].SortDirection = Direction;
+	        	}else{
+	        		SortingArray.push({FieldName: FieldApiName, FieldLabel : FieldLabel, ExportSort : RecordKey,  SortDirection:Direction, Type:Type});
+	        	}
+	        	debug(SortingArray);
+	        	$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting = SortingArray;
+	        	$scope.HomeSearchGrid.getFilteredRecords(false);
+        	
+        	}else{
+        		if(RecordKey == null){
+	        		Notification.error("Sorting can't be applied on this column");
+	        		return;
+	        	}
+	        	//$scope.HomeSearchGrid.isCriteriaSaved = false;
+	        	var SortingArray = angular.copy($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting);
+	        	debug(SortingArray);
+	        	var index = _.findIndex(SortingArray, {FieldName: RecordKey});
+	        	if(index != -1){
+	        		SortingArray[index].SortDirection = Direction;
+	        	}else{
+	        		SortingArray.push({FieldName: RecordKey, FieldLabel : FieldLabel, ExportSort : RecordKey, SortDirection:Direction, Type:Type});
+	        	}
+	        	debug(SortingArray);
+	        	$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting = SortingArray;
+        		$scope.HomeSearchGrid.SearchedReportData.sort($scope.dynamicSortMultiple($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting));
+        		$scope.HomeSearchGrid.HSGrid_paginationControlsAction();
+        	}
+        }
+        
+        
+        $scope.HomeSearchGrid.getSortDirection = function(FieldApiName, RecordKey){
+        	var SortingArray = angular.copy($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting);
+        	var index;
+        	if(!$scope.HomeSearchGrid.isReportMode){
+        		index = _.findIndex(SortingArray, {FieldName: FieldApiName});
+        	}else{
+        		index = _.findIndex(SortingArray, {FieldName: RecordKey});
+        	}
+        	
+        	if(index != -1){
+        		return SortingArray[index].SortDirection;
+        	}else{
+        		return '';
+        	}
+        }
+        
+        
+        $scope.HomeSearchGrid.isSummaryActiveToggle = function(){
+        	$scope.HomeSearchGrid.isSummaryActive = !$scope.HomeSearchGrid.isSummaryActive;
+        }
+        
+        $scope.HomeSearchGrid.removeFilterCriteria = function(event, key){
+        	event.stopPropagation();
+        	//$scope.HomeSearchGrid.isCriteriaSaved = false;
+        	debug(key);
+        	if(key == 'Owner'){
+        		$scope.HomeSearchGrid.OwnerNameStr = '';
+        	}
+        	$scope.HomeSearchGrid.filterFormJson[key] = angular.copy($scope.HomeSearchGrid.initFilterFormJsonCopy[key]);
+        	if(key == 'Type'){
+        		$scope.HomeSearchGrid.filterFormJson = angular.copy($scope.HomeSearchGrid.initFilterFormJsonCopy);
+        		$scope.HomeSearchGrid.setDefaultPageSortAttrs();
+       		}
+       		$scope.HomeSearchGrid.getFilteredRecords(true);
+        }
+        
+        $scope.HomeSearchGrid.removeSortCriteria = function(index){
+        	var SortingArray = angular.copy($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting);
+        	//var index = _.findIndex(SortingArray, {FieldName: FieldApiName});
+        	if(index != -1){
+        		SortingArray.splice(index, 1);
+        	}
+        	$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting = SortingArray;
+        	if(!$scope.HomeSearchGrid.isReportMode){
+        		$scope.HomeSearchGrid.getFilteredRecords(false);
+        	}else{
+        		$scope.HomeSearchGrid.SearchedReportData.sort($scope.dynamicSortMultiple($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting));
+        		$scope.HomeSearchGrid.HSGrid_paginationControlsAction();
+        	}
+        	
+        }
+        
+        
+        $scope.HomeSearchGrid.applyFilter = function(){
+        	if(angular.equals($scope.HomeSearchGrid.filterFormJsonCopy,$scope.HomeSearchGrid.filterFormJson)){
+        		debug($scope.HomeSearchGrid.filterFormJson);
+        		$scope.HomeSearchGrid.hideFilterForm();
+        		return;
+        	}
+        	//$scope.HomeSearchGrid.isCriteriaSaved = false;
+            $scope.HomeSearchGrid.setDefaultPageSortAttrs();
+            $scope.HomeSearchGrid.getFilteredRecords(true);
+        }
+         
+        $scope.HomeSearchGrid.getFilteredRecords = function(isUpdateColumns){
+        	if(!$scope.HomeSearchGrid.isReportMode){
+				var totalRecordsCount = ($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.CurrentPage + 1) * $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.PageSize
+				
+				if(totalRecordsCount >= 50000) {
+					Notification.info("Records more than 50000 count cannot be displayed on grid.");
+					$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.CurrentPage--;
+					
+					setTimeout(function () {
+						angular.element('[data-toggle="tooltip"]').tooltip();
+						debug("1 hello"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+						$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount++;
+						debug("1 hello1"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+						if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest')
+							$scope.$apply();
+					}, 10);
+					return;
+				}
+			}
+        	
+        	$scope.HomeSearchGrid.displayGrid = false;
+        	$scope.HomeSearchGrid.hideFilterForm();
+            HomeSearchFactory.getGridColumnsConfiguration(JSON.stringify($scope.HomeSearchGrid.filterFormJson.Type.Objects), 
+            											JSON.stringify($scope.HomeSearchGrid.filterFormJson)).then(function(successfulResult) {
+                debug('Columns List');
+                debug(successfulResult);
+                if(isUpdateColumns){  
+                	$scope.HomeSearchGrid.columns = {};
+                	$scope.HomeSearchGrid.columns.DisplayedColumns = successfulResult.DisplayedColumns;
+	                $scope.HomeSearchGrid.columns.HiddenColumns = successfulResult.HiddenColumns;
+                	$scope.HomeSearchGrid.recentColumns = angular.copy(successfulResult);
+                }
+                if(successfulResult.MatchFilter == null){
+                	$scope.HomeSearchGrid.isFilterMatched = false;
+                }else{
+                	var a = successfulResult.MatchFilter.GridDisplayHiddenColumnsJSON;
+                	debug("ADdfsdfsdf");
+                	debug(a);
+                	debug(JSON.parse(a));
+                	
+                	$scope.HomeSearchGrid.isFilterMatched = true;
+                	$scope.HomeSearchGrid.currentActiveFilter = successfulResult.MatchFilter;
+                	
+                	/*
+                	$scope.HomeSearchGrid.columns.DisplayedColumns[4].IsDisplayed = false;
+                	$scope.HomeSearchGrid.columns.DisplayedColumns[4].IsHidden = true;
+                	$scope.HomeSearchGrid.columns.HiddenColumns.push($scope.HomeSearchGrid.columns.DisplayedColumns[4]);
+	                $scope.HomeSearchGrid.columns.DisplayedColumns.splice(4,1);
+	                JSON.parse(FilterRecord.ExportFieldsJSON).Hidden
+	                */
+	                
+	                /*
+	                var filterGridColumns = JSON.parse(successfulResult.MatchFilter.GridDisplayHiddenColumnsJSON);
+	                var filterSummaryColumns = JSON.parse(successfulResult.MatchFilter.SummaryDisplayHiddenColumnsJSON);
+	                var filterExportColumns = JSON.parse(successfulResult.MatchFilter.ExportDisplayHiddenColumnsJSON);
+	                
+	                // Grid columns update:
+	                var gridColKeyToVisibilityMap = {};
+	                debug("dfdfgf");
+	                debug(filterGridColumns);
+	                debug(gridColKeyToVisibilityMap);
+	                for(var i = 0; i < filterGridColumns.DisplayedColumns.length; i++) {
+	                	gridColKeyToVisibilityMap[filterGridColumns.DisplayedColumns[i].RecordKey] = filterGridColumns.DisplayedColumns.IsDisplayed;
+	                }
+	                for(var i = 0; i < filterGridColumns.HiddenColumns.length; i++) {
+	                	gridColKeyToVisibilityMap[filterGridColumns.HiddenColumns[i].RecordKey] = filterGridColumns.DisplayedColumns.IsHidden;
+	                }
+	                debug(gridColKeyToVisibilityMap);
+	                
+	                for(var i = 0; i < $scope.HomeSearchGrid.columns.DisplayedColumns.length; i++) {
+	                	if(gridColKeyToVisibilityMap[$scope.HomeSearchGrid.columns.DisplayedColumns[i].RecordKey] == null
+	                		|| gridColKeyToVisibilityMap[$scope.HomeSearchGrid.columns.DisplayedColumns[i].RecordKey] == false) {
+	                		$scope.HomeSearchGrid.columns.DisplayedColumns[i].IsDisplayed = false;
+                			$scope.HomeSearchGrid.columns.DisplayedColumns[i].IsHidden = true;
+                			$scope.HomeSearchGrid.columns.HiddenColumns.push($scope.HomeSearchGrid.columns.DisplayedColumns[i]);
+	                		$scope.HomeSearchGrid.columns.DisplayedColumns.splice(i,1);
+	                	}
+	                }
+	                for(var i = 0; i < $scope.HomeSearchGrid.columns.HiddenColumns.length; i++) {
+	                	if(gridColKeyToVisibilityMap[$scope.HomeSearchGrid.columns.HiddenColumns[i].RecordKey] == true) {
+	                		$scope.HomeSearchGrid.columns.HiddenColumns[i].IsDisplayed = true;
+                			$scope.HomeSearchGrid.columns.HiddenColumns[i].IsHidden = false;
+                			$scope.HomeSearchGrid.columns.DisplayedColumns.push($scope.HomeSearchGrid.columns.HiddenColumns[i]);
+	                		$scope.HomeSearchGrid.columns.HiddenColumns.splice(i,1);
+	                	}
+	                }
+	                */
+                }
+                
+                debug("Updated cols");
+                debug($scope.HomeSearchGrid.columns.DisplayedColumns);
+                debug($scope.HomeSearchGrid.columns.HiddenColumns);
+                
+                debug('Filter Json');
+                debug($scope.HomeSearchGrid.filterFormJson);
+                debug('Pagination Json');
+                debug($scope.HomeSearchGrid.searchResultPageSortAttrsJSON);
+                
+                $scope.HomeSearchGrid.isReportMode = false;
+                
+                if(!$scope.HomeSearchGrid.isReportMode){
+	                HomeSearchFactory.getFilteredRecords(JSON.stringify($scope.HomeSearchGrid.filterFormJson), 
+	                                                    JSON.stringify($scope.HomeSearchGrid.searchResultPageSortAttrsJSON))
+	                                                    .then(function(successfulSearchResult) {
+	                    debug('Searched Data');
+	                    debug(successfulSearchResult);
+	                    $scope.HomeSearchGrid.Total_Records = successfulSearchResult['Total_Records'];
+	                    $scope.HomeSearchGrid.SearchedResult = successfulSearchResult[successfulSearchResult.RecordsVariableName];
+	                    $scope.HomeSearchGrid.searchCriteriaJson = successfulSearchResult.FilterLabelList;
+	                    $scope.HomeSearchGrid.displayGrid = true;
+	                    
+	                    $scope.HomeSearchGrid.getGridSummary();
+	                    setTimeout(function () {
+	                    	angular.element('[data-toggle="tooltip"]').tooltip();
+	                    	debug("2 hello"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+	                        $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount++;
+	                        debug("2 hello1"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+	                        if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest')
+	                   			$scope.$apply();
+	                    }, 10);
+	                },
+	                function(errorSearchResult) { 
+	                    $scope.HomeSearchGrid.SearchedResult = [];
+	                    Notification.error("Some error occurred, please refresh the page");
+	                    $scope.HomeSearchGrid.displayGrid = true;
+	                });
+                }else{
+                	$scope.HomeSearchGrid.SearchedReportData = [];
+                	var ObjectsList;
+		           	if($scope.HomeSearchGrid.filterFormJson.Type.Objects.length != 0){
+		           		ObjectsList = angular.copy($scope.HomeSearchGrid.filterFormJson.Type.Objects);
+		           	}else{
+		           		ObjectsList = angular.copy($scope.HomeSearchGrid.objectsList);
+		           	}
+		           	ObjectsList = ObjectsList.remove('Any');
+		           	//ObjectsList = ['Parts'];
+                	$scope.HomeSearchGrid.objectsReportingDataCall(ObjectsList);
+                }
+            },
+            function(errorSearchResult) {
+                $scope.HomeSearchGrid.searchedResult = errorSearchResult;
+                Notification.error("Some error occurred, please refresh the page");
+                $scope.HomeSearchGrid.displayGrid = true;
+            });
+        }
+        
+        $scope.HomeSearchGrid.objectsReportingDataCall = function(ObjectsList) {
+       		if( ObjectsList.length != 0 ) {
+       			$scope.HomeSearchGrid.getAllReportData(ObjectsList[0], null, ObjectsList);
+       		} else {
+       			return;
+       		}
+        }
+        
+        $scope.HomeSearchGrid.getAllReportData = function(objectName, uniqueValueFieldLastValue, ObjectsList){
+        	debug(objectName);
+	       	HomeSearchFactory.getReportData(JSON.stringify($scope.HomeSearchGrid.filterFormJson), objectName , uniqueValueFieldLastValue)
+	                                                    .then(function(reportResult) {
+	            debug(reportResult.TotalRecords);
+	            debug(reportResult.IsProcessCompleted);                                        	
+	            debug('ReportData');
+	            debug(reportResult.ResultData[reportResult.ResultData.RecordsVariableName]);
+	            debug('UniqueFieldName');
+	            debug(reportResult.UniqueFieldName);
+	            debug('Before Length'+ $scope.HomeSearchGrid.SearchedReportData.length);
+	            //angular.extend($scope.HomeSearchGrid.SearchedReportData, reportResult.ResultData[reportResult.ResultData.RecordsVariableName]);
+	            $scope.HomeSearchGrid.SearchedReportData = $scope.HomeSearchGrid.SearchedReportData.concat(reportResult.ResultData[reportResult.ResultData.RecordsVariableName]);
+	            debug('After Length'+ $scope.HomeSearchGrid.SearchedReportData.length);
+		        if(!reportResult.IsProcessCompleted){
+	            	$scope.HomeSearchGrid.getAllReportData(objectName, reportResult.UniqueFieldName, ObjectsList);
+	            }else{
+	            	debug('Else');
+	            	if(ObjectsList.length > 1) {
+	            		ObjectsList.splice(0, 1);
+	            		$scope.HomeSearchGrid.objectsReportingDataCall(ObjectsList);
+	            	} else {
+	            		// All Process got completed here to get reporting data
+	            		debug('ALL Calls Completed');
+	            		debug('Total Records: ' + $scope.HomeSearchGrid.SearchedReportData.length);
+	            		$scope.HomeSearchGrid.Total_Records	= $scope.HomeSearchGrid.SearchedReportData.length;
+	            		$scope.HomeSearchGrid.searchCriteriaJson = reportResult.FilterLabelList;
+	            		setTimeout(function () {
+	                    	angular.element('[data-toggle="tooltip"]').tooltip();
+	                    	debug("3 hello"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+	                        $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount++;
+	                        debug("3 hello1"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+	                        if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest')
+	                   			$scope.$apply();
+	                    }, 10);
+	                    $scope.HomeSearchGrid.SearchedReportData.sort($scope.dynamicSortMultiple($scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting));
+	            		$scope.HomeSearchGrid.HSGrid_paginationControlsAction();
+						$scope.HomeSearchGrid.getGridSummary();
+	            	}
+	            	return true;
+	            }  
+	            
+	        },
+	        function(errorSearchResult) { 
+	            $scope.HomeSearchGrid.GridSummaryData = [];
+	            Notification.error("Some error occurred, please refresh the page");
+	        });
+        }
+        
+        
+        $scope.HomeSearchGrid.getGridSummary = function(){
+        	HomeSearchFactory.getReportingRecords(JSON.stringify($scope.HomeSearchGrid.filterFormJson))
+                                                    .then(function(GridSummaryResult) {
+              debug('GridSummaryResult');
+              debug(GridSummaryResult);
+              $scope.HomeSearchGrid.GridSummaryData = GridSummaryResult;
+              var index = _.findIndex(GridSummaryResult, {RecordKey: "TotalRecords"});
+              debug(index);
+              if($scope.HomeSearchGrid.filterFormJson.Type.Objects.length == 0 &&  $scope.HomeSearchGrid.Total_Records != -1) {
+              	$scope.HomeSearchGrid.TotalRecords = $scope.HomeSearchGrid.Total_Records;
+              } else {
+              	$scope.HomeSearchGrid.TotalRecords = $scope.HomeSearchGrid.GridSummaryData[index].TotalValue;
+              }
+              $scope.HomeSearchGrid.GridSummaryData.splice(index,1);
+			  $scope.HomeSearchGrid.GridSummaryDataForExport = angular.copy($scope.HomeSearchGrid.GridSummaryData);	
+			  
+			  debug($scope.HomeSearchGrid.isFilterMatched);
+			  debug($scope.HomeSearchGrid.currentActiveFilter);
+			  
+              if(!$scope.HomeSearchGrid.isFilterMatched){
+			  	$scope.HomeSearchGrid.getActiveSummaryRecord();
+			  }	else {
+			  	debug("CALLING:::::");
+			  	//$scope.HomeSearchGrid.applySavedFilter($scope.HomeSearchGrid.currentActiveFilter, $scope.HomeSearchGrid.currentActiveFilter.Type);
+			  	var filterObj = $scope.HomeSearchGrid.currentActiveFilter;
+			  	debug(filterObj);
+	        	var FilterRecord;
+	        	$scope.HomeSearchGrid.currentActiveFilter = {Id : filterObj.Id, Name : filterObj.FilterLabel, Type : filterObj.Type };
+	        	if($scope.HomeSearchGrid.currentActiveFilter.Name == null || $scope.HomeSearchGrid.currentActiveFilter.Name == "") {
+	        		$scope.HomeSearchGrid.currentActiveFilter.Name = filterObj.Name;
+	        	}
+	        	
+	        	SideBarFactory.getFilterFields(filterObj.Id).then(function(successfulSearchResult) {
+	              		debug(successfulSearchResult);
+	              		FilterRecord = successfulSearchResult;
+	              		
+	              		FilterRecord.FieldFilterJson = JSON.parse(FilterRecord.FieldFilterJson);
+	              		
+	              		HomeSearchFactory.getGridFilterConfigurations(JSON.stringify(FilterRecord.FieldFilterJson.Type.Objects)).then(function(successfulSearchResult) {
+			            	debug(successfulSearchResult);
+			                
+			                setTimeout(function(){
+								$scope.HomeSearchGrid.filterFormJson = FilterRecord.FieldFilterJson;
+		                        $scope.HomeSearchGrid.searchResultPageSortAttrsJSON = JSON.parse(FilterRecord.SortJson);
+		                        /*
+		                        debug("Columns");
+		                        debug($scope.HomeSearchGrid.columns);
+		                        $scope.HomeSearchGrid.columns = JSON.parse(FilterRecord.DisplayHiddenColumn);
+		                        debug(FilterRecord.DisplayHiddenColumn);
+		                        debug($scope.HomeSearchGrid.columns);
+		                        */
+		                        //$scope.HomeSearchGrid.recentColumns = angular.copy(JSON.parse($scope.HomeSearchGrid.columns.DisplayHiddenColumn));
+		                        $scope.HomeSearchGrid.formMaterData.AdditionalFields = JSON.parse(FilterRecord.AdditionalFieldJson);
+		                        
+
+                            if(JSON.parse(FilterRecord.SummaryFieldsJSON) != undefined){
+		                       	$scope.HomeSearchGrid.summaryDisplayedColumns = JSON.parse(FilterRecord.SummaryFieldsJSON).visible;
+						        $scope.HomeSearchGrid.summaryHiddenColumns = JSON.parse(FilterRecord.SummaryFieldsJSON).Hidden;
+						        $scope.HomeSearchGrid.copySummaryDisplayColumns = angular.copy($scope.HomeSearchGrid.summaryDisplayedColumns);
+						        $scope.HomeSearchGrid.copySummaryHiddenColumns = angular.copy($scope.HomeSearchGrid.summaryHiddenColumns);
+					       	}	
+					        if(JSON.parse(FilterRecord.ExportFieldsJSON) != undefined){	
+						        $scope.HomeSearchGrid.exportDisplayedColumns = JSON.parse(FilterRecord.ExportFieldsJSON).visible;
+						        $scope.HomeSearchGrid.exportHiddenColumns = JSON.parse(FilterRecord.ExportFieldsJSON).Hidden;
+						        $scope.HomeSearchGrid.copyExportDisplayColumns = angular.copy($scope.HomeSearchGrid.exportDisplayedColumns);
+						        $scope.HomeSearchGrid.copyExportHiddenColumns = angular.copy($scope.HomeSearchGrid.exportHiddenColumns);
+		                       }
+		                        
+					        	$scope.HomeSearchGrid.outputResult = FilterRecord.ExportFileFormat;
+								$scope.HomeSearchGrid.groupNameResult = FilterRecord.ExportGroupField;
+								$scope.HomeSearchGrid.isReportMode = FilterRecord.IsReportOn;
+							}, 0);
+			            },
+			            function(errorSearchResult) {
+			                $scope.HomeSearchGrid.searchedResult = errorSearchResult;
+			                Notification.error("Some error occurred, please refresh the page");
+			            });
+	              		
+	            }, function(errorSearchResult) {
+	                $scope.HomeSearchGrid.filterList.FilterType = errorSearchResult;
+	            });
+			  }
+			  
+			  setTimeout(function () {
+               	angular.element('[data-toggle="tooltip"]').tooltip();
+               	debug("4 hello"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+                   $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount++;
+                   debug("4 hello1"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+                   if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest')
+              			$scope.$apply();
+               }, 10);
+          },
+          function(errorSearchResult) { 
+              $scope.HomeSearchGrid.GridSummaryData = [];
+              Notification.error("Some error occurred, please refresh the page");
+          });
+        }
+        
+         $scope.HomeSearchGrid.getActiveSummaryRecord = function(){
+         /* Summary Info*/
+         debug('active records')
+         	angular.forEach($scope.HomeSearchGrid.GridSummaryData, function(value, key) {
+         	  var index = _.findIndex($scope.HomeSearchGrid.columns.DisplayedColumns , {RecordKey: value['RecordKey']});
+         		if(index>=0){
+         			value['IsDisplayed'] = $scope.HomeSearchGrid.columns.DisplayedColumns[index].IsDisplayed;
+         		}
+         		else{
+         			value['IsDisplayed'] = false;
+         		}
+			});
+			var DisplayedCols = [];
+        	var HiddenCols = [];
+        	debug($scope.HomeSearchGrid.GridSummaryData);
+        	debug('$scope.HomeSearchGrid.GridSummaryData---------');
+        	for(i=0; i< $scope.HomeSearchGrid.GridSummaryData.length; i++){
+	        	if($scope.HomeSearchGrid.GridSummaryData[i].Type == 'Number' || $scope.HomeSearchGrid.GridSummaryData[i].Type == 'Currency'){
+	        		if($scope.HomeSearchGrid.GridSummaryData[i].IsDisplayed ){
+	        			DisplayedCols.push($scope.HomeSearchGrid.GridSummaryData[i]);
+	        		}else{
+	        			HiddenCols.push($scope.HomeSearchGrid.GridSummaryData[i]);
+	        		}
+	        	}
+        	}
+        	$scope.HomeSearchGrid.summaryDisplayedColumns = DisplayedCols;
+        	$scope.HomeSearchGrid.summaryHiddenColumns = HiddenCols;
+        	$scope.HomeSearchGrid.copySummaryDisplayColumns = angular.copy($scope.HomeSearchGrid.summaryDisplayedColumns);
+        	$scope.HomeSearchGrid.copySummaryHiddenColumns = angular.copy($scope.HomeSearchGrid.summaryHiddenColumns);
+        	/* Summary Info*/
+        	
+        	/* Export  Info*/
+			angular.forEach($scope.HomeSearchGrid.GridSummaryDataForExport, function(value, key) {
+         	  var index = _.findIndex($scope.HomeSearchGrid.columns.DisplayedColumns , {RecordKey: value['RecordKey']});
+         		if(index>=0){
+         			value['IsDisplayed'] = $scope.HomeSearchGrid.columns.DisplayedColumns[index].IsDisplayed;
+         		}
+         		else{
+         			value['IsDisplayed'] = false;
+         		}
+			});
+			
+
+
+
+			var DisplayedExportCols = [];
+        	var HiddenExportCols = [];
+        	for(i=0; i< $scope.HomeSearchGrid.GridSummaryDataForExport.length; i++){
+	        	if($scope.HomeSearchGrid.GridSummaryDataForExport[i].Type == 'Number' || $scope.HomeSearchGrid.GridSummaryDataForExport[i].Type == 'Currency'){
+	        		if($scope.HomeSearchGrid.GridSummaryDataForExport[i].IsDisplayed ){
+	        			DisplayedExportCols.push($scope.HomeSearchGrid.GridSummaryDataForExport[i]);
+	        		}else{
+	        			HiddenExportCols.push($scope.HomeSearchGrid.GridSummaryDataForExport[i]);
+
+	        		}
+	        	}
+        	}
+
+
+
+
+
+        	debug($scope.HomeSearchGrid.exportDisplayedColumns);
+        	$scope.HomeSearchGrid.exportDisplayedColumns = DisplayedExportCols;
+        	$scope.HomeSearchGrid.exportHiddenColumns = HiddenExportCols;
+        	$scope.HomeSearchGrid.copyExportDisplayColumns = angular.copy($scope.HomeSearchGrid.exportDisplayedColumns);
+        	$scope.HomeSearchGrid.copyExportHiddenColumns = angular.copy($scope.HomeSearchGrid.exportHiddenColumns);
+        
+        /* Export  Info*/
+         }
+         
+         $scope.HomeSearchGrid.seeMoreTotalsDropdown = function(){
+         	$scope.HomeSearchGrid.summaryMoreTotal = {};
+        	$scope.HomeSearchGrid.summaryMoreTotal.Label = '';
+        	$scope.HomeSearchGrid.summaryDisplayedColumns = angular.copy($scope.HomeSearchGrid.copySummaryDisplayColumns);
+        	$scope.HomeSearchGrid.summaryHiddenColumns = angular.copy($scope.HomeSearchGrid.copySummaryHiddenColumns);
+         }
+		$scope.HomeSearchGrid.ExportTotalsDropdown = function(){
+         	$scope.HomeSearchGrid.summaryMoreTotal = {};
+        	$scope.HomeSearchGrid.summaryMoreTotal.Label = '';
+        	$scope.HomeSearchGrid.exportDisplayedColumns = angular.copy($scope.HomeSearchGrid.copyExportDisplayColumns);
+        	$scope.HomeSearchGrid.exportHiddenColumns = angular.copy($scope.HomeSearchGrid.copyExportHiddenColumns);
+        }
+        $scope.HomeSearchGrid.collapseAllFilter = function(){
+        	$scope.HomeSearchGrid.isfavorite = true;
+        	$scope.HomeSearchGrid.iscommon = true;
+        	$scope.HomeSearchGrid.iscustom = true;
+        }
+        
+        $scope.HomeSearchGrid.summaryDropDownClose = function(){
+        	angular.element('#summaryDropDown').closest(".summaryDropdownList").removeClass("open");
+        }
+		$scope.HomeSearchGrid.exportDropDownClose = function(){
+        	angular.element('#exportDropDown').closest(".exportDropdownList").removeClass("open");
+        }
+        $scope.HomeSearchGrid.updateSummaryRecord = function(){
+        	var DisplayedCols = [];
+        	var HiddenCols = [];
+        	for(i=0; i< $scope.HomeSearchGrid.summaryDisplayedColumns.length; i++){
+        		if($scope.HomeSearchGrid.summaryDisplayedColumns[i].IsDisplayed){
+        			DisplayedCols.push($scope.HomeSearchGrid.summaryDisplayedColumns[i]);
+        		}else{
+        			HiddenCols.push($scope.HomeSearchGrid.summaryDisplayedColumns[i]);
+        		}
+        	}
+        	
+        	for(i=0; i< $scope.HomeSearchGrid.summaryHiddenColumns.length; i++){
+        		if($scope.HomeSearchGrid.summaryHiddenColumns[i].IsDisplayed){
+        			DisplayedCols.push($scope.HomeSearchGrid.summaryHiddenColumns[i]);
+        		}else{
+        			HiddenCols.push($scope.HomeSearchGrid.summaryHiddenColumns[i]);
+        		}
+        	}
+        	 $scope.HomeSearchGrid.summaryDisplayedColumns = DisplayedCols;
+        	 $scope.HomeSearchGrid.summaryHiddenColumns = HiddenCols;
+        	 $scope.HomeSearchGrid.copySummaryDisplayColumns = angular.copy($scope.HomeSearchGrid.summaryDisplayedColumns);
+        	 $scope.HomeSearchGrid.copySummaryHiddenColumns = angular.copy($scope.HomeSearchGrid.summaryHiddenColumns);
+        	 $scope.HomeSearchGrid.summaryDropDownClose();
+        }
+        
+		$scope.HomeSearchGrid.updateExportRecord = function(){
+        	var DisplayedExportCols = [];
+        	var HiddenExportCols = [];
+        	for(i=0; i< $scope.HomeSearchGrid.exportDisplayedColumns.length; i++){
+        		if($scope.HomeSearchGrid.exportDisplayedColumns[i].IsDisplayed){
+        			DisplayedExportCols.push($scope.HomeSearchGrid.exportDisplayedColumns[i]);
+        		}else{
+        			HiddenExportCols.push($scope.HomeSearchGrid.exportDisplayedColumns[i]);
+        		}
+        	}
+        	
+        	for(i=0; i< $scope.HomeSearchGrid.exportHiddenColumns.length; i++){
+        		if($scope.HomeSearchGrid.exportHiddenColumns[i].IsDisplayed){
+        			DisplayedExportCols.push($scope.HomeSearchGrid.exportHiddenColumns[i]);
+        		}else{
+        			HiddenExportCols.push($scope.HomeSearchGrid.exportHiddenColumns[i]);
+        		}
+        	}
+        	 $scope.HomeSearchGrid.exportDisplayedColumns = DisplayedExportCols;
+        	 $scope.HomeSearchGrid.exportHiddenColumns = HiddenExportCols;
+        	 $scope.HomeSearchGrid.copyExportDisplayColumns = angular.copy($scope.HomeSearchGrid.exportDisplayedColumns);
+        	 $scope.HomeSearchGrid.copyExportHiddenColumns = angular.copy($scope.HomeSearchGrid.exportHiddenColumns);
+        	 $scope.HomeSearchGrid.exportDropDownClose();
+        }
+		
+        // Method to handle any updates in sort controls
+		$scope.HomeSearchGrid.HSGrid_PageSortControlsAction = function () {
+			var newSortOrder = sortOrderMap[$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting[0].SortDirection];
+			if (newSortOrder == null || newSortOrder == undefined) {
+				newSortOrder = "ASC";
+			}
+			$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting[0].SortDirection = newSortOrder;
+		
+			// Set current page to 1
+			$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.CurrentPage = 1;
+			$scope.HomeSearchGrid.HSGrid_paginationControlsAction();
+		}
+		
+		
+		// Method to handle any updates in pagination controls
+		$scope.HomeSearchGrid.HSGrid_paginationControlsAction = function (pageSizeParam) {
+			if(pageSizeParam != undefined) {
+				$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.PageSize = pageSizeParam;
+			}
+			console.log("ABCD: " + $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.PageSize);
+			if($scope.HomeSearchGrid.isReportMode){
+				$scope.HomeSearchGrid.SearchedResult = [];
+				var currentPage = $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.CurrentPage;
+				var pageSize = $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.PageSize;
+				for(var i = ((currentPage - 1) * pageSize); i < (currentPage * pageSize); i++) {
+					if(i < $scope.HomeSearchGrid.Total_Records){
+						$scope.HomeSearchGrid.SearchedResult.push($scope.HomeSearchGrid.SearchedReportData[i]);
+					}
+				}
+				setTimeout(function () {	
+                	angular.element('[data-toggle="tooltip"]').tooltip();
+                	debug("5 hello"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+                    $scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount++;
+                    debug("5 hello1"+$scope.HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount);
+                    if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest')
+               			$scope.$apply();
+                }, 10);
+				$scope.HomeSearchGrid.displayGrid = true;
+				debug('----------------------------------');
+				debug($scope.HomeSearchGrid.SearchedResult);
+			}else{
+				$scope.HomeSearchGrid.getFilteredRecords(false);
+			}
+		}
+		
+		$scope.dynamicSort = function(propertyObject) { 
+		    return function (obj1,obj2) {
+
+		    	if(propertyObject.Type == "Number" || propertyObject.Type == "Currency" || propertyObject.Type == "Icon") {
+		    		var obj1Val = parseFloat(obj1[propertyObject.ExportSort]);
+		    		var obj2Val = parseFloat(obj2[propertyObject.ExportSort]);
+		    		
+		    		
+		    		if(propertyObject.SortDirection == 'DESC'){
+		    			obj1Val = isNaN(obj1Val) ? -1 : obj1Val;
+		    			obj2Val = isNaN(obj2Val) ? -1 : obj2Val;
+		    			
+		    			return (obj1Val < obj2Val) ? 1
+		    					: (obj1Val > obj2Val) ? -1 : 0;
+			    	}else{
+			    		obj1Val = isNaN(obj1Val) ? Number.MAX_VALUE : obj1Val;
+		    			obj2Val = isNaN(obj2Val) ? Number.MAX_VALUE : obj2Val;
+		    			 
+			    		return (obj1Val < obj2Val) ? -1
+			    				: (obj1Val > obj2Val) ? 1 : 0;
+			    	}
+		    	} else {
+		    		var obj1Val = (obj1[propertyObject.ExportSort] != null) ? obj1[propertyObject.ExportSort].toLowerCase() : obj1[propertyObject.ExportSort];
+			    	var obj2Val = (obj2[propertyObject.ExportSort] != null) ? obj2[propertyObject.ExportSort].toLowerCase() : obj2[propertyObject.ExportSort];
+			    	if(propertyObject.SortDirection == 'DESC'){
+			    		return (obj1Val == null || obj1Val == '') ? 1
+			    				: ((obj2Val == null || obj2Val == '') ? -1
+			    				: ((obj1Val < obj2Val) ? 1
+			            		: ((obj1Val > obj2Val) ? -1 : 0)
+
+			            		));
+			    	}else{
+			    		return (obj1Val == null || obj1Val == '') ? -1
+			    				: ((obj2Val == null || obj2Val == '') ? 1
+			    				: ((obj1Val < obj2Val) ? -1
+			            		: ((obj1Val > obj2Val) ? 1 : 0)
+
+			            		));
+			    	}
+		    	}
+		    }
+		}
+		
+		$scope.dynamicSortMultiple = function() {
+		    /*
+		     * save the arguments object as it will be overwritten
+		     * note that arguments object is an array-like object
+		     * consisting of the names of the properties to sort by
+		     */
+		    var props = arguments[0];
+		    debug('props');
+		    debug(props);
+		    return function (obj1, obj2) {
+		    	// Add grouped result in "gridGroupResult" model simultaneously
+		    	
+		        var i = 0, result = 0, numberOfProperties = props.length;
+		        /* try getting a different result from 0 (equal)
+		         * as long as we have extra properties to compare
+		         */
+		        while(result === 0 && i < numberOfProperties) {
+		            result = $scope.dynamicSort(props[i])(obj1, obj2);
+		            i++;
+		        }
+		        return result;
+		    }
+		}
+		
+		$scope.HomeSearchGrid.changeUserReportMode = function(){
+
+			HomeSearchFactory.updateUserReportMode(JSON.stringify(!$scope.HomeSearchGrid.isReportMode)).then(function(GridSummaryResult) {
+				$scope.HomeSearchGrid.isReportMode = !$scope.HomeSearchGrid.isReportMode;
+				$scope.HomeSearchGrid.setDefaultPageSortAttrs();
+            	$scope.HomeSearchGrid.getFilteredRecords(true);
+          },
+          function(errorSearchResult) { 
+              $scope.HomeSearchGrid.GridSummaryData = [];
+              Notification.error("Some error occurred, please refresh the page");
+          });
+		}
+        
+        $scope.HomeSearchGrid.PreviewGridRecordsAction =  function(type){
+        	var summaryColumnsObject  = {visible : $scope.HomeSearchGrid.exportDisplayedColumns, Hidden: $scope.HomeSearchGrid.exportHiddenColumns};
+        	HomeSearchFactory.previewExportRecords(JSON.stringify($scope.HomeSearchGrid.filterFormJson),
+		        									JSON.stringify($scope.HomeSearchGrid.searchResultPageSortAttrsJSON),
+		        									JSON.stringify($scope.HomeSearchGrid.columns),
+		        									JSON.stringify(summaryColumnsObject),
+		        									$scope.HomeSearchGrid.outputResult,
+		        									$scope.HomeSearchGrid.groupNameResult).then(function(previewResult) {
+				debug(previewResult);
+				if(type == 'Preview'){
+					window.open('{!$Page.PreviewGridRecords}?filterId='+previewResult, "", "scrollbars=1, width=1200, height=600");
+				}else if(type == 'Export'){
+					if($scope.HomeSearchGrid.outputResult == 'Excel (.xls)') {
+						window.open('{!$Page.ExportGridRecords}?filterId='+previewResult,"_blank");
+					} else if($scope.HomeSearchGrid.outputResult == 'Excel (.csv)') {
+						window.open('{!$Page.ExportGridRecords}?filterId='+previewResult,"_blank");
+					} else if($scope.HomeSearchGrid.outputResult == 'PDF File') {
+						window.open('{!$Page.ExportGridRecords_PDF}?filterId='+previewResult,"_blank");
+					}
+				}
+				
+          },
+          function(errorSearchResult) { 
+              $scope.HomeSearchGrid.GridSummaryData = [];
+              Notification.error("Some error occurred, please refresh the page");
+          });
+        }
+        
+        
+        
+        $scope.HomeSearchGrid.hideFilterForm = function(){
+            angular.element('#homeSearchFilterWrapper').hide();
+            angular.element(".backdropsSearchFilter").hide();
+        }
+         
+        $scope.HomeSearchGrid.openFilterForm = function(){
+            angular.element('#homeSearchFilterWrapper').show();
+            angular.element(".backdropsSearchFilter").show(); 
+        }
+		
+		$scope.HomeSearchGrid.showSummarySidePanel = function(){
+			$scope.HomeSearchGrid.isSidePanelToggle = true;
+			$scope.HomeSearchGrid.exportDiv = false;
+			$scope.HomeSearchGrid.summaryDiv = true;
+			//$scope.HomeSearchGrid.outputResult = '';
+		} 
+        
+         $scope.HomeSearchGrid.showExportSidePanel = function(){
+			$scope.HomeSearchGrid.isSidePanelToggle = true;
+			$scope.HomeSearchGrid.summaryDiv = false;
+			//$scope.HomeSearchGrid.outputResult = '';
+			$scope.HomeSearchGrid.exportDiv = true;
+
+		} 
+        
+        $scope.HomeSearchGrid.hideSidePanel = function(){
+			$scope.HomeSearchGrid.isSidePanelToggle = false;
+			$scope.HomeSearchGrid.summaryDiv = false;
+			$scope.HomeSearchGrid.exportDiv = false;
+			$scope.HomeSearchGrid.outputResult = '';
+
+
+		} 
+		$scope.HomeSearchGrid.outputExport = function (outputName){
+       		$scope.HomeSearchGrid.outputResult = outputName;
+       		$scope.HomeSearchGrid.closeCreateDropDown();
+      	}
+		$scope.HomeSearchGrid.GroupExport = function (groupName){
+			$scope.HomeSearchGrid.groupNameResult = groupName;
+			$scope.HomeSearchGrid.closeCreateDropDown();
+		
+		}
+		$scope.HomeSearchGrid.closeCreateDropDown = function(){
+           	angular.element(".customDropdownDiv").removeClass("open");
+        }
+		
+		$scope.HomeSearchGrid.saveSummarySidePanel = function(){
+			
+			var FilterId = $scope.HomeSearchGrid.currentActiveFilter.Id;
+			var FilterName = $scope.HomeSearchGrid.currentActiveFilter.Name;
+			var filterFormJson = '';
+			var searchResultPageSortAttrsJSON = '';
+			var columns = '';
+			var AdditionalFields = '';
+			var summaryColumnsObject = '';
+			var exportColumnsObject = '';
+			var outputResult = '';
+			var groupNameResult = '';
+			var isReportMode = $scope.HomeSearchGrid.isReportMode;
+			
+			if($scope.HomeSearchGrid.summaryDiv){
+				summaryColumnsObject  = {visible : $scope.HomeSearchGrid.summaryDisplayedColumns, Hidden: $scope.HomeSearchGrid.summaryHiddenColumns};
+			}
+			else if($scope.HomeSearchGrid.exportDiv){
+				exportColumnsObject  = {visible : $scope.HomeSearchGrid.exportDisplayedColumns, Hidden: $scope.HomeSearchGrid.exportHiddenColumns};
+				outputResult = $scope.HomeSearchGrid.outputResult;
+				groupNameResult = $scope.HomeSearchGrid.groupNameResult
+			}
+			
+			SideBarFactory.saveFilterRecord(FilterId, FilterName,
+       									filterFormJson, 
+       									searchResultPageSortAttrsJSON,
+       									columns,
+       									AdditionalFields,
+       									JSON.stringify(summaryColumnsObject),
+       									JSON.stringify(exportColumnsObject),
+       									outputResult,
+       									groupNameResult,
+       									isReportMode)
+        									.then(function(successfulSearchResult) {
+              		debug('Save called');
+              		debug(successfulSearchResult);
+              		$scope.HomeSearchGrid.filterList.FilterType = successfulSearchResult.AllFilterJSON.FilterType;
+              		$scope.HomeSearchGrid.currentActiveFilter = successfulSearchResult.CurrentFilter;
+              		$scope.HomeSearchGrid.isFilterCopy = false;
+        			$scope.HomeSearchGrid.isFilterRename = false;
+        			$scope.HomeSearchGrid.popUpFilterName = '';
+        			$scope.HomeSearchGrid.popUpFilterId = null;
+        			$scope.HomeSearchGrid.isFilterMatched = true;
+            }, function(errorSearchResult) {
+                $scope.HomeSearchGrid.filterList.FilterType = errorSearchResult;
+            });
+		}
+		
+		
+		
+		
+        $scope.HomeSearchGrid.notSorted = function(obj){
+            if (!obj) {
+                return [];
+            }
+            return Object.keys(obj);
+        }        
+        
+        $scope.HomeSearchGrid.preventMouseWheel = function(){
+        	angular.element('.sidepanel').bind('mousewheel', function(e, d) {
+		        var toolbox = $('.sidepanel'),
+	            height = toolbox.height(),
+	            scrollHeight = toolbox.get(0).scrollHeight;
+		        if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+	        		e.preventDefault();
+		        }
+	        });
+	        
+	        angular.element('#TypeFixedHeight').bind('mousewheel', function(e, d) {
+	            var toolbox = angular.element('#TypeFixedHeight'),
+	            height = toolbox.height(),
+	            scrollHeight = toolbox.get(0).scrollHeight;
+	            $scope.HomeSearchGrid.isTypeScroll = true;
+	            if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+	                e.preventDefault();
+	            }
+	        });
+	        
+	        
+	        angular.element('.homeSearchFilterWrapper').bind('mousewheel', function(e, d) {
+	        	if(e.target.closest(".fixedHeight") == null){
+	            	e.preventDefault();
+	            }
+                
+	        });
+	        
+	        angular.element('.fixedHeight').bind('mousewheel', function(e, d) {
+	            var toolbox = angular.element('.fixedHeight'),
+	            height = toolbox.height(),
+	            scrollHeight = toolbox.get(0).scrollHeight;
+	            if(e.target.closest("#TypeFixedHeight") != null){
+	            
+	            }
+	            else if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+	                e.preventDefault();
+	            }
+	        });
+	        
+	        angular.element('#additional_column_fix').bind('mousewheel', function(e, d) {
+	            var toolbox = angular.element('#additional_column_fix'),
+	            height = toolbox.height(),
+	            scrollHeight = toolbox.get(0).scrollHeight;
+	            if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
+	                e.preventDefault();
+	            }
+	        });
+        }
+        
+                   
+    } // Controller END
+    
+    
+    app.factory('HomeSearchFactory', function($q){
+        return {
+            getFilterObjectTypes: function(){
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.getFilterObjectTypes}',
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var objectsList = decodeString(result);
+                       var find = '\'';
+                       var re = new RegExp(find, 'g');
+                       objectsList = objectsList.replace(re, '');
+                       deferred.resolve(JSON.parse(objectsList));
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            },
+            
+            getGridFilterConfigurations: function(objectName){
+            	objectName = encodeString(objectName);
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.getGridFilterConfigurations}', objectName,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var objectsConfig = decodeString(result);
+                       var find = '\'';
+                       var re = new RegExp(find, 'g');
+                       objectsConfig = objectsConfig.replace(re, '');
+                       deferred.resolve(JSON.parse(objectsConfig));
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            },  
+            
+            
+            getFilteredRecords: function(filterJSON, PaginationJSON){
+            	filterJSON = encodeString(filterJSON);
+            	PaginationJSON = encodeString(PaginationJSON);
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.getFilteredRecords}', filterJSON, PaginationJSON,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var searchResult = decodeString(result);
+                       var find = '\'';
+                       var re = new RegExp(find, 'g');
+                       searchResult = searchResult.replace(re, '');
+                       deferred.resolve(JSON.parse(searchResult));
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            },  
+            
+            
+            getReportData: function(filterJSON, ObjectName, uniqueValueFieldLastValue){
+            	filterJSON = encodeString(filterJSON);
+            	ObjectName = encodeString(ObjectName);
+            	uniqueValueFieldLastValue = encodeString(uniqueValueFieldLastValue);
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.getReportData}', filterJSON, ObjectName, uniqueValueFieldLastValue,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var searchResult = decodeString(result);
+                       var find = '\'';
+                       var re = new RegExp(find, 'g');
+                       searchResult = searchResult.replace(re, '');
+                       deferred.resolve(JSON.parse(searchResult));
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            },  
+            
+            
+            updateUserReportMode: function(isReportModeOn){
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.updateUserReportMode}', isReportModeOn,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var searchResult = decodeString(result);
+                       deferred.resolve(searchResult);
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            },  
+            
+            getReportingRecords: function(filterJSON){
+            	filterJSON = encodeString(filterJSON);
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.getReportingRecords}', filterJSON,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var searchResult = decodeString(result);
+                       var find = '\'';
+                       var re = new RegExp(find, 'g');
+                       searchResult = searchResult.replace(re, '');
+                       deferred.resolve(JSON.parse(searchResult));
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            },  
+            
+            
+            previewExportRecords: function(fieldFilterJson, sortJson, displayHiddenColumn, summaryColumnsJSON, exportFileFormat, exportGroupFieldType){
+            	fieldFilterJson = encodeString(fieldFilterJson);
+            	sortJson = encodeString(sortJson);
+            	displayHiddenColumn = encodeString(displayHiddenColumn);
+            	summaryColumnsJSON = encodeString(summaryColumnsJSON);
+            	exportFileFormat = encodeString(exportFileFormat);
+            	exportGroupFieldType = encodeString(exportGroupFieldType);
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.previewExportRecords}', fieldFilterJson, sortJson, displayHiddenColumn, 
+                   													summaryColumnsJSON, exportFileFormat, exportGroupFieldType,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var searchResult = decodeString(result);
+                       deferred.resolve(searchResult);
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            }, 
+            
+            getGridColumnsConfiguration: function(objectName, filterJSON){
+            	objectName = encodeString(objectName);
+            	filterJSON = encodeString(filterJSON);
+                var deferred = $q.defer();
+               // make AJAX request to the remote service
+               Visualforce.remoting.Manager.invokeAction(
+                   '{!$RemoteAction.HomeSearchCtrl.getGridColumnsConfiguration}', objectName, filterJSON,
+                   function (result, event) {
+                   if (event.type == 'exception') {
+                       deferred.reject(event.message);
+                   } else {
+                       var searchResult = decodeString(result);
+                       var find = '\'';
+                       var re = new RegExp(find, 'g');
+                       searchResult = searchResult.replace(re, '');
+                       deferred.resolve(JSON.parse(searchResult));
+                   }
+               }, {
+                   escape : true
+               });
+               return deferred.promise;
+            }
+        }               
+    });    
+    
+    app.factory('SideBarFactory',function($q){
+    	return {
+    		renameCopyFilterRecord : function(filterId,filterName, isCopy){
+    			filterId = encodeString(filterId);
+    			filterName = encodeString(filterName);
+    			 var deferred = $q.defer();
+	           // make AJAX request to the remote service
+	           Visualforce.remoting.Manager.invokeAction(
+	               '{!$RemoteAction.HomeSearchCtrl.renameCopyFilterRecord}', filterId, filterName, isCopy,
+	               function (result, event) {
+	               if (event.type == 'exception') {
+	                   deferred.reject(event.message);
+	               } else {
+	                   var renamefilter = decodeString(result);
+	                   deferred.resolve(JSON.parse(renamefilter));
+	               }
+	           }, {
+	               escape : true
+	           });
+	           return deferred.promise;
+    		},
+    	
+    		deleteFilterRecord:function(filterId){
+    			filterId = encodeString(filterId);
+    			 var deferred = $q.defer();
+	           // make AJAX request to the remote service
+	           Visualforce.remoting.Manager.invokeAction(
+	               '{!$RemoteAction.HomeSearchCtrl.deleteFilterRecord}',filterId,
+	               function (result, event) {
+	               if (event.type == 'exception') {
+	                   deferred.reject(event.message);
+	               } else {
+	                   var deleteFilter = decodeString(result);
+	                   deferred.resolve(JSON.parse(deleteFilter));
+	               }
+	           }, {
+	               escape : true
+	           });  
+	           return deferred.promise;
+    		},
+    		
+    		
+    		saveFilterRecord : function(filterId, filterName, fieldFilterJSON, pageAndSortJson, columns, additionalFieldJson,
+    									summaryFieldsJSON, exportFieldsJSON, exportFileFormat, exportFieldType, showAllrecords){
+    			 filterId = encodeString(filterId);
+    			 filterName = encodeString(filterName);
+    			 fieldFilterJSON = encodeString(fieldFilterJSON);
+    			 pageAndSortJson = encodeString(pageAndSortJson);
+    			 columns = encodeString(columns);
+    			 additionalFieldJson = encodeString(additionalFieldJson);
+    			 summaryFieldsJSON = encodeString(summaryFieldsJSON);
+    			 exportFieldsJSON = encodeString(exportFieldsJSON);
+    			 exportFileFormat = encodeString(exportFileFormat);
+    			 exportFieldType = encodeString(exportFieldType);
+    			 var deferred = $q.defer();
+	           // make AJAX request to the remote service
+	           Visualforce.remoting.Manager.invokeAction(
+	               '{!$RemoteAction.HomeSearchCtrl.saveFilterRecord}',filterId, filterName, fieldFilterJSON, pageAndSortJson, columns, additionalFieldJson,
+	               												summaryFieldsJSON, exportFieldsJSON, exportFileFormat, exportFieldType, showAllrecords,
+	               function (result, event) {
+	               if (event.type == 'exception') {
+	                   deferred.reject(event.message);
+	               } else {
+	                   var saveFilter = decodeString(result);
+	                   var find = '\'';
+	                   var re = new RegExp(find, 'g');
+	                   saveFilter = saveFilter.replace(re, '');
+	                   deferred.resolve(JSON.parse(saveFilter));
+	               }
+	           }, {
+	               escape : true
+	           });
+	           return deferred.promise;
+    		},
+    		
+    		getFilterFields :function(filterId){
+    			filterId = encodeString(filterId);
+    			 var deferred = $q.defer();
+	           // make AJAX request to the remote service
+	           Visualforce.remoting.Manager.invokeAction(
+	               '{!$RemoteAction.HomeSearchCtrl.getFilterFields }',filterId,
+	               function (result, event) {
+	               if (event.type == 'exception') {
+	                   deferred.reject(event.message);
+	               } else {
+	                   var saveFilter = decodeString(result);
+	                   var find = '\'';
+	                   var re = new RegExp(find, 'g');
+	                   saveFilter = saveFilter.replace(re, '');
+	                   deferred.resolve(JSON.parse(saveFilter));
+	               }
+	           }, {
+	               escape : true
+	           });
+	           return deferred.promise;
+    		},
+    		
+    		markFilterAsFavorite :function(filterId, isFav){
+				filterId = encodeString(filterId);
+    			 var deferred = $q.defer();
+	           // make AJAX request to the remote service
+	           Visualforce.remoting.Manager.invokeAction(
+	               '{!$RemoteAction.HomeSearchCtrl.markFilterAsFavorite }',filterId, isFav,
+	               function (result, event) {
+	               if (event.type == 'exception') {
+	                   deferred.reject(event.message);
+	               } else {
+	                   var saveFilter = decodeString(result);
+	                   var find = '\'';
+	                   var re = new RegExp(find, 'g');
+	                   saveFilter = saveFilter.replace(re, '');
+	                   deferred.resolve(JSON.parse(saveFilter));
+	               }
+	           }, {
+	               escape : true
+	           });
+	           return deferred.promise;
+    		}
+    	}
+    });
+    
+</script>
+<c:UserSearchComponent />
+<c:HomePageServices />
+
+
+<body data-ng-controller="searchTableController" data-ng-init="HomeSearchGrid.LoadGrid()" ng-cloak="ng-cloak">
+    
+    <c:BPGlobalHeader />
+     <!-- content start here -->
+    <div style="margin-top: 48px;" ng-if="HomeSearchGrid.showContent">
+        <div class="row">
+              
+              
+              
+               <!-- Side panel start -->
+    		   <div class="col-lg-2 col-md-3 P0 sidepanel">  
+	            	<div class="navbar-default col-md-12 P0">
+	            		<div class="sidebarSearchbox col-md-12 P0">
+	            			<i class="fa fa-search fa-flip-horizontal"></i>
+	            			<input type="search" class="sideBarSearch" placeholder="Sidebar Search" ng-model="HomeSearchGrid.sidebarSearch.FilterLabel"
+	            				ng-keyup = "HomeSearchGrid.collapseAllFilter()"/>
+	            		</div>
+	            		<div class="P0 col-md-12 MB2" >
+	            			<div class="filterHeaddingWrapper P0 col-md-12" ng-click="HomeSearchGrid.isfavorite= !HomeSearchGrid.isfavorite" >
+	            				<span class="col-md-3"> 
+	            					<i class="fa fa-angle-down downArrow" ng-show="HomeSearchGrid.isfavorite"></i>
+	            					<i class="fa fa-angle-right downArrow" ng-show="!HomeSearchGrid.isfavorite"></i>
+	            				</span>
+	            				<p class="filterHeadding text-uppercase T3 col-md-8 P0">favorite search</p>
+	            			</div>
+	            			<div class="homeSearchFilterListwrapper P0 col-md-12 filterWrapper" ng-show="HomeSearchGrid.isfavorite"  >
+			            		<ul class="homeSearchFilterList P0 col-md-12" >
+			            			<li class="P0 col-md-12"  ng-mouseover="show = true" ng-mouseleave="show = false" 
+			            				ng-repeat="favoriteFilter  in HomeSearchGrid.filterList.FilterType.Favorite | orderBy:'FilterLabel' | filter:HomeSearchGrid.sidebarSearch"
+			            				ng-class="{'activeFilter' : HomeSearchGrid.isfilterActive(favoriteFilter.Id, 'favorite')}">
+			            				<span class="col-md-3"> <i class="fa fa-star pull-left"></i></span>
+			            				<p class="text-uppercase T3 col-md-7 P0" data-original-title="{{favoriteFilter.FilterLabel}}" data-toggle="tooltip" ng-click="HomeSearchGrid.applySavedFilter(favoriteFilter, 'favorite' )">
+			            					{{favoriteFilter.FilterLabel}}
+			            				</p>
+			            				<span class="col-md-1 P0 dropdown-toggle" data-toggle="dropdown" role="button"  ng-show="show"><i class="fa fa-cog PT5 "></i></span>
+			            				 <ul class="dropdown-menu" role="menu">
+	                                    	<li ng-click="HomeSearchGrid.markFilterFav(favoriteFilter.Id, false)">
+	                                    		<a  class="T7" >Remove From Favorites</a>
+	                                    	</li>
+	                                    	<li ng-click="HomeSearchGrid.renameOrCopyCustomFilter(favoriteFilter.Id, favoriteFilter.FilterLabel, false)"
+	                                    		ng-hide="favoriteFilter.IsCommon">
+	                                    		<a class="T7">Rename</a>
+	                                    	</li>
+	                                    	<li ng-click="HomeSearchGrid.renameOrCopyCustomFilter(favoriteFilter.Id, favoriteFilter.FilterLabel, true)">
+	                                    		<a class="T7">Copy</a>
+	                                    	</li>
+	                                    	<li ng-click="HomeSearchGrid.confirmDelete(favoriteFilter.Id, favoriteFilter.FilterLabel)"
+	                                    		ng-hide="favoriteFilter.IsCommon">
+	                                    		<a class="T7">Delete</a>
+	                                    	</li>
+	                                    	
+                                		</ul>
+			            			</li>
+			            		</ul>
+		            	</div>
+	            		</div>
+	            		<div class="P0 col-md-12 MB2">
+	            			<div class="filterHeaddingWrapper P0 col-md-12" ng-click="HomeSearchGrid.iscommon= !HomeSearchGrid.iscommon">
+	            				<span class="col-md-3"> 
+	            					<i class="fa fa-angle-down downArrow" ng-show="HomeSearchGrid.iscommon"></i>
+	            					<i class="fa fa-angle-right downArrow" ng-show="!HomeSearchGrid.iscommon"></i>
+	            				</span>
+	            				<p class="filterHeadding text-uppercase T3 col-md-8 P0">COMMON SEARCH</p>
+	            			</div>
+	            			
+	            			<div class="col-md-12 P0 filterWrapper " ng-repeat="commonFilter  in HomeSearchGrid.filterList.FilterType.Common | orderBy : 'Order'" ng-show="HomeSearchGrid.iscommon">
+		            			<div class="filterHeadding P0 col-md-12  ">
+		            				<span class="col-md-3"  ng-if="commonFilter.FilterLabel=='Customer Sales'"> <i class="fa fa-male"></i></span>
+		            				<span class="col-md-3" ng-if="commonFilter.FilterLabel=='Product'"> <i class="fa fa-suitcase" ></i></span>
+		            				<span class="col-md-3" ng-if="commonFilter.FilterLabel=='People'"> <i class="fa fa-users" ></i></span>
+		            				<span class="col-md-3" ng-if="commonFilter.FilterLabel=='Settings'"> <i class="fa fa-wrench" ></i></span>
+		            				<span class="col-md-3" ng-if="commonFilter.FilterLabel=='Vendor Orders'"> <i class="fa fa-shopping-cart" ></i></span>
+		            				<p class="filterHeadding MT9  text-uppercase T3 col-md-8 P0 commonHeadding">{{commonFilter.FilterLabel}}</p>
+		            			</div>
+		            			<div class="homeSearchFilterListwrapper commonSearchFilterWrapper P0 col-md-12">
+				            		<ul class="homeSearchFilterList P0 col-md-12 commonSearchFilter">
+				            			<li class="P0 col-md-12" ng-repeat="commonfilterval in commonFilter.subgroupList | orderBy : 'Order' | filter:HomeSearchGrid.sidebarSearch" 
+				            				ng-mouseover="show = true" ng-mouseleave="show = false"
+				            				ng-class="{'activeFilter' : HomeSearchGrid.isfilterActive(commonfilterval.Id, 'Common')}">
+				            				<p class="text-uppercase FT col-md-7 P0 col-md-offset-3" data-original-title="{{commonfilterval.FilterLabel}}" data-toggle="tooltip" ng-click="HomeSearchGrid.applySavedFilter(commonfilterval, 'Common')">
+				            					{{commonfilterval.FilterLabel}}
+				            				</p>
+				            				<span class="col-md-1 P0 dropdown-toggle" data-toggle="dropdown" role="button" ng-show="show"><i class="fa fa-cog "></i></span>
+				            				 <ul class="dropdown-menu" role="menu">
+		                                    	<li><a class="T7" ng-click="HomeSearchGrid.renameOrCopyCustomFilter(commonfilterval.Id, commonfilterval.FilterLabel, true)">Copy</a></li>
+	                                		</ul>
+				            			</li>
+				            		</ul>
+			            		</div>
+		            	</div>
+	            		</div>
+	            		<div class="P0 col-md-12 MB2">
+	            			<div class="filterHeaddingWrapper P0 col-md-12" ng-click="HomeSearchGrid.iscustom= !HomeSearchGrid.iscustom">
+	            				<span class="col-md-3"> 
+	            					<i class="fa fa-angle-down downArrow" ng-show = "HomeSearchGrid.iscustom"></i>
+	            					<i class="fa fa-angle-right downArrow" ng-show = "!HomeSearchGrid.iscustom"></i>
+	            				</span>
+	            				<p class="filterHeadding text-uppercase T3 col-md-8 P0">Custom Search</p>
+	            			</div>
+	            			<div class="homeSearchFilterListwrapper P0 col-md-12 filterWrapper" ng-show = "HomeSearchGrid.iscustom"
+	            				style="margin-bottom: 100px;">
+			            		<ul class="homeSearchFilterList P0 col-md-12">
+			            			<li class="P0 col-md-12" ng-repeat="customFilter  in HomeSearchGrid.filterList.FilterType.Custom | orderBy:'FilterLabel' | filter:HomeSearchGrid.sidebarSearch" 
+			            				ng-mouseover="show = true" ng-mouseleave="show = false"
+			            				ng-class="{'activeFilter' : HomeSearchGrid.isfilterActive(customFilter.Id, 'Custom')}">
+			            				<span class="col-md-3 text-center"> <i class="fa fa-square squaretrans"></i></span>
+			            				<p class="text-uppercase T3 col-md-7 P0" data-original-title="{{customFilter.FilterLabel}}" data-toggle="tooltip" ng-click="HomeSearchGrid.applySavedFilter(customFilter, 'Custom')">
+			            					{{customFilter.FilterLabel}}
+			            				</p>
+			            				<span class="col-md-1 P0 dropup  dropdown-toggle" data-toggle="dropdown" role="button" ng-show="show">
+			            					<i class="fa fa-cog PT5  "></i>
+			            				</span>
+			            				 <ul class="dropdown-menu" role="menu">
+	                                    	<li><a class="T7" ng-click="HomeSearchGrid.renameOrCopyCustomFilter(customFilter.Id, customFilter.FilterLabel, false)">Rename</a></li>
+	                                    	<li><a class="T7" ng-click="HomeSearchGrid.renameOrCopyCustomFilter(customFilter.Id, customFilter.FilterLabel, true)">Copy</a></li>
+	                                    	<li><a class="T7" ng-click="HomeSearchGrid.confirmDelete(customFilter.Id, customFilter.FilterLabel)">Delete</a></li>
+	                                    	<li><a class="T7">Share a Copy</a></li>
+	                                    	<li><a class="T7">Change Visibility</a></li>
+                                		</ul>
+			            			</li>
+			            		</ul>
+		            	</div>
+	            		</div>
+	            	</div> 
+	            </div>
+	         	<!-- Side panel End Here -->
+
+
+
+
+
+                <!-- center Div start here -->
+                <div class="col-lg-10 col-md-9 col-sm-9 contentDiv">
+                    <div ng-show="HomeSearchGrid.displayGrid">
+	                    <div class="row top_row">
+	                        <div class="col-md-10 homeSearchTopBar">
+	                            <div class="homeSearchTopBarContaint"> 
+	                                <div class="col-md-7 P0">
+	                                    <img class="starimg pull-left" src="{!URLFOR($Resource.Images, 'star.png')}" 
+	                                    	ng-show="HomeSearchGrid.currentActiveFilter.Type == 'favorite'"
+	                                    	ng-click="HomeSearchGrid.markFilterFav(HomeSearchGrid.currentActiveFilter.Id, false)"/>
+	                                    <i class="fa fa-star pull-left"
+	                                    	ng-show="HomeSearchGrid.currentActiveFilter.Type != 'favorite' && HomeSearchGrid.isFilterMatched"
+	                                    	ng-click="HomeSearchGrid.markFilterFav(HomeSearchGrid.currentActiveFilter.Id, true)"></i>
+	                                    <p class="T3 text-uppercase pull-left" ng-show="!HomeSearchGrid.isFilterMatched">Search</p>
+	                                    <p class="T3 text-uppercase pull-left" ng-show="HomeSearchGrid.isFilterMatched">{{HomeSearchGrid.currentActiveFilter.Name}}</p>
+	                                    <i class="fa fa-question-circle pull-left" data-original-title="Search" data-toggle="tooltip"
+	                                    	data-placement="right"></i>
+	                                    <div class="col-md-3 homeSearchTopSaveBtn"> 
+	                                    <button class="btn C11 T4 active_btn" ng-click="HomeSearchGrid.saveAsAction()"
+	                                    	ng-class="{'grayBtn': HomeSearchGrid.isFilterMatched, 'addmoreinfoBtn' : !HomeSearchGrid.isFilterMatched} " 
+	                                    	ng-disabled="HomeSearchGrid.isFilterMatched"
+	                                    	style="margin: auto; width: 80%;" tabindex="112">Save As</button>
+	                                    </div>
+	                                    <p class="homeSearchcriteriaerror T3"
+	                                    	ng-show="!HomeSearchGrid.isFilterMatched"> New Search criteria has not been saved</p>
+	                                </div>
+	                                
+	                            </div>
+	                        
+	                        </div>
+	
+							  <div class="rightHeaderIcon pull-right col-md-3">
+	                                    <div class="pull-right P0  homeSearchTopBarIcon">
+	                                        <i class="fa fa-pie-chart" ng-click = "HomeSearchGrid.showSummarySidePanel()"></i>
+	                                        <i class="fa fa-print" ng-click = "HomeSearchGrid.showExportSidePanel()"></i>
+
+	                                        <div class="tripleDotDropdown">
+	                                        <i class="fa fa-ellipsis-v dropdown-toggle pull-right" style="cursor: pointer;"  data-toggle="dropdown" ></i>
+	                                         <ul class="dropdown-menu headerCustomeDropDown">
+											      <li ng-click="HomeSearchGrid.showSummarySidePanel()"><a href="#" class="col-md-12"><i class="fa fa-pie-chart pull-left"></i> <span class="T7 pull-left">Summary</span></a></li>
+											      <li ng-click = "HomeSearchGrid.showExportSidePanel()"><a href="#" class="col-md-12"><i class="fa fa-print pull-left"></i><span class="T7 pull-left">Export / Print</span> </a></li>
+											      <li><a href="#" class="col-md-12"><i class="fa fa-tachometer pull-left"></i><span class="T7 pull-left">Dashboard</span> </a></li>
+											      <li><a href="#" class="col-md-12"><i class="fa fa-print pull-left"></i><span class="T7 pull-left">Action</span> </a></li>
+											      <li><a href="#" class="col-md-12"><i class="fa fa-calendar pull-left"></i><span class="T7 pull-left">Scheduling</span> </a></li>
+										    </ul>
+	                                        </div>
+	                                    </div>
+	                                </div>
+	                           
+	
+	                    </div>
+		                <!-- filter Div start here -->
+		                <div class="row filter_row">
+			                	<div  ng-class="{'searchBoxMultiselectWrappereNew': HomeSearchGrid.isSidePanelToggle, 'searchBoxMultiselectWrappereNewDiv' : !HomeSearchGrid.isSidePanelToggle} ">
+			                   		<div class="searchBoxMultiselectWrappere pull-left">
+				                        <div class="searchBoxMultiselect pull-left" ng-click="HomeSearchGrid.showFilterForm()">
+				                            <div class="searchCriteriaWrapper"
+				                            	ng-mouseover="showMore = false" ng-mouseleave="showMore = true">
+				                                <div class="searchCriteria pull-left" ng-repeat="filter in HomeSearchGrid.searchCriteriaJson">
+				                                    <label class="T3 pull-left">{{filter.Label}}:</label>
+				                                    <span class="T7 filterValue" data-original-title="{{filter.Value}}" data-toggle="tooltip">
+				                                    	{{filter.Value}}
+				                                    </span>
+				                                    <span class="crossIcon" ng-click="HomeSearchGrid.removeFilterCriteria($event, filter.Key)">&#10006;</span>   
+				                                </div>
+				                            </div>
+				                            <span class="moreState" ng-show="HomeSearchGrid.isDisplayMore() && showMore">More ...</span>
+				                            <span class="pull-right dropdownicon">
+				                                <i class="fa fa-caret-down"></i>
+				                            </span>
+				                        </div>
+				                        <div class="pull-left searchBoxIcondiv">
+				                            <i class="fa fa-search"></i>
+				
+				
+				                        </div>
+					                    <c:HomeSearchFilterForm />
+					                </div>
+			            			<div class="sortingDiv">
+				            			<span class="T3 pull-left" style="margin-top: 3px;">Sorting:</span>
+				            			<div class="pull-left">
+				            				<div class="sorting-badge pull-left" ng-repeat="sort in HomeSearchGrid.searchResultPageSortAttrsJSON.Sorting">
+			                                    <label>
+			                                    	<i class="fa fa-chevron-up" ng-if="sort.SortDirection == 'ASC'"></i>
+			                                    	<i class="fa fa-chevron-down" ng-if="sort.SortDirection == 'DESC'"></i>
+			                                    </label>  
+			                                    <span class="T7" style="font-size:12px; color: #fff;">{{sort.FieldLabel}}</span>
+			                                    <span class="crossIcon" ng-click="HomeSearchGrid.removeSortCriteria($index)">&#10006;</span>   
+			                                </div>
+				            			</div>
+				            		</div>
+			            		</div>
+			            		<div class="extraBackDropDiv" ng-class="{'extraBackDropDivHide': HomeSearchGrid.isSidePanelToggle, 'extraBackDropDiv' : !HomeSearchGrid.isSidePanelToggle} "></div>
+			            		
+								<!-- Side Panel Div start here -->
+			            		<div class="rightSidePanel"  ng-class="{'summaryDivShow': HomeSearchGrid.isSidePanelToggle, 'summaryDivHide' : !HomeSearchGrid.isSidePanelToggle} " >
+			            			<div class = "summaryInner" ng-show = "HomeSearchGrid.isSidePanelToggle">
+			            			 <div class = "summaryWrapper" ng-show = "HomeSearchGrid.summaryDiv">
+				            			<div  class="summaryHeader col-md-12">
+				            				<p class="col-md-12 P0 BBW">
+					            				<i class="fa fa-pie-chart F25 color939CA9 pull-left summaryIcon"></i>
+					            				<span class="summaryHeadding T3 pull-left">Summary Total</span>
+					            				<i class="fa fa-times pull-right color939CA9 F20 PB5 closeSummary" aria-hidden="true" 
+					            					ng-click = "HomeSearchGrid.hideSidePanel()"></i>
+					            				<i class="fa fa-cloud-upload pull-right color939CA9 F20 PB5 closeSummary" aria-hidden="true" 
+					            					ng-show="HomeSearchGrid.isFilterMatched"
+					            					ng-click = "HomeSearchGrid.saveSummarySidePanel()"></i>
+				            				</p>
+				            			</div>
+
+
+				            			<div class="col-md-12">
+			            				<p class="col-md-12 P0 sectionText">Summary for {{HomeSearchGrid.TotalRecords}} record(s)</p>
+			            				<!--
+			            				<div class="row" style="margin: 0 0 25px -15px;">
+		                           			<p class="chk_tick" ng-class="{'chked' : HomeSearchGrid.isReportMode}"
+		                           				ng-click="HomeSearchGrid.changeUserReportMode()">
+	                                            <i class="fa fa-check-square chksqure"></i>
+	                                        </p>
+	                                        <span class="color939CA9" style="padding-top: 3px; display: inline-block; margin-left: -10px;">
+	                                        	Always load all records
+	                                        </span>
+		                           		</div>
+		                           		-->
+			            				<table class="col-md-12 P0 summartTotal" ng-show = "HomeSearchGrid.summaryDisplayedColumns.length>0">
+				            				<thead>
+				            					<tr>
+				            						<th class="color939CA9 text-capitalize col-md-8 P0">visible columns</th>
+				            						<th class="color939CA9 text-capitalize col-md-4 P0">Total</th>
+				            					</tr>
+				            				</thead>
+				            				<tbody>
+				            					<tr class="color939CA9"  ng-repeat="totalRec in HomeSearchGrid.summaryDisplayedColumns">
+				            						<td class="text-capitalize">{{totalRec.Label}}</td>
+				            						<td ng-if="totalRec.Type == 'Number'">{{totalRec.TotalValue | number:2}}</td>
+				            						<td ng-if="totalRec.Type == 'Currency'">{{totalRec.TotalValue | currency}}</td>
+				            					</tr>
+				            				</tbody>
+			            				</table>
+			            				<div class="col-md-12 P0 MT20 summaryDropdownList" 
+			            					ng-show = "HomeSearchGrid.summaryDisplayedColumns.length != 0 || HomeSearchGrid.summaryHiddenColumns.length != 0">
+			            					<button class = "btn btn-default grayBtn col-md-12 text-uppercase" data-toggle="dropdown" ng-click="HomeSearchGrid.seeMoreTotalsDropdown()">see more totals</button>
+			            					<ul class="add_info_dropdown dropdown-menu keep_open summaryDropDown" id = "summaryDropDown">
+		                                    	<div class="right-inner-addon" style="margin: 0 10px;">
+		                                        	<i class="glyphicon glyphicon-search"></i> 
+		                                        	<input class="form-control" ng-model="HomeSearchGrid.summaryMoreTotal.Label" 
+		                                            		 placeholder="Search" type="search" />
+		                                    	</div>
+
+		                                    	<li  ng-repeat="totalRec in HomeSearchGrid.summaryDisplayedColumns | filter: HomeSearchGrid.summaryMoreTotal " ng-click="totalRec.IsDisplayed = !totalRec.IsDisplayed" >
+			                                    	<p class="chk_tick" ng-attr-tabindex="100" ng-class="{'chked' : totalRec.IsDisplayed}">
+			                                            <i class="fa fa-check-square chksqure"></i>
+			                                        </p>
+			                                        <span class = "seeMoreSummaryText T7">{{totalRec.Label}}</span>
+		                                    	</li>
+		                                    	<li  ng-repeat="totalRec in HomeSearchGrid.summaryHiddenColumns | filter: HomeSearchGrid.summaryMoreTotal " ng-click="totalRec.IsDisplayed = !totalRec.IsDisplayed" >
+			                                    	<p class="chk_tick" ng-attr-tabindex="100" ng-class="{'chked' : totalRec.IsDisplayed}">
+			                                            <i class="fa fa-check-square chksqure"></i>
+			                                        </p>
+			                                        <span class = "seeMoreSummaryText T7">{{totalRec.Label}}</span>
+		                                    	</li>
+		                                    <div class="summaryHeader col-md-12">
+						            			<div class="savecancle_btncntnr">
+				                                    <button class="btn btn-default greenBtn" ng-click = "HomeSearchGrid.updateSummaryRecord()"> Apply </button>
+		                               			 </div>
+			            	   				</div>
+                                			</ul>
+			            				</div>
+			            			</div>
+			            			</div>
+			            		
+			            		
+			            		
+			            			<div class = "exportWrapper" ng-show = "HomeSearchGrid.exportDiv">
+				            			<div  class="summaryHeader col-md-12">
+				            				<p class="col-md-12 P0 BBW">
+					            				<i class="fa fa-print F25 color939CA9 pull-left summaryIcon"></i>
+					            				<span class="summaryHeadding T3 pull-left">export/Print</span>
+					            				<i class="fa fa-times pull-right color939CA9 F20 PB5 closeSummary" aria-hidden="true" 
+					            					ng-click = "HomeSearchGrid.hideSidePanel()"></i>
+					            				<i class="fa fa-cloud-upload pull-right color939CA9 F20 PB5 closeSummary" aria-hidden="true" 
+					            					ng-show="HomeSearchGrid.isFilterMatched"
+					            					ng-click = "HomeSearchGrid.saveSummarySidePanel()"></i>
+					            				
+				            				</p>
+				            			</div>
+				            			<div class="col-md-12">
+			            				<p class="col-md-12 P0 sectionText">Export for {{HomeSearchGrid.TotalRecords}} record(s)</p>
+			            				<table class="col-md-12 P0 summartTotal" 
+			            					 ng-show = "HomeSearchGrid.exportDisplayedColumns.length>0">
+				            				<thead>
+				            					<tr>
+				            						<th class="color939CA9 text-capitalize col-md-8 P0">Totals to include:</th>
+				            						<th class="color939CA9 text-capitalize col-md-4 P0">Total</th>
+				            					</tr>
+				            				</thead>
+				            				<tbody>
+
+				            					<tr class="color939CA9"  ng-repeat="totalRec in HomeSearchGrid.exportDisplayedColumns"  >
+				            						<td class="text-capitalize">{{totalRec.Label}}</td>
+				            						<td ng-if="totalRec.Type == 'Number'">{{totalRec.TotalValue | number:2}}</td>
+				            						<td ng-if="totalRec.Type == 'Currency'">{{totalRec.TotalValue | currency}}</td>
+				            					</tr>
+				            				</tbody>
+			            				</table>
+			            				<div class="col-md-12 P0 MT20 exportDropdownList"
+			            					ng-show = "HomeSearchGrid.exportDisplayedColumns.length != 0 || HomeSearchGrid.exportHiddenColumns != 0">
+			            					<button class = "btn btn-default grayBtn col-md-12 text-uppercase" data-toggle="dropdown"  ng-click="HomeSearchGrid.ExportTotalsDropdown()" >select totals to include</button>
+			            					<ul class="add_info_dropdown dropdown-menu keep_open summaryDropDown" id="exportDropDown">
+		                                    	<div class="right-inner-addon" style="margin: 0 10px;">
+		                                        	<i class="glyphicon glyphicon-search"></i> 
+		                                        	<input class="form-control" ng-model="HomeSearchGrid.summaryMoreTotal.Label" 
+		                                            		 placeholder="Search" type="search" />
+		                                    	</div>
+		                                    	
+		                                    	<li  ng-repeat="totalRec in HomeSearchGrid.exportDisplayedColumns | filter: HomeSearchGrid.summaryMoreTotal " ng-click="totalRec.IsDisplayed = !totalRec.IsDisplayed"  >
+		                                        	<p class="chk_tick" ng-attr-tabindex="100" ng-class="{'chked' : totalRec.IsDisplayed}">
+		                                           	 <i class="fa fa-check-square chksqure"></i>
+
+		                                      	   </p>
+		                                        	<span class = "seeMoreSummaryText T7">{{totalRec.Label}}</span>
+
+		                                    	</li>
+		                                    	<li  ng-repeat="totalRec in HomeSearchGrid.exportHiddenColumns | filter: HomeSearchGrid.summaryMoreTotal " ng-click="totalRec.IsDisplayed = !totalRec.IsDisplayed"  >
+		                                        	<p class="chk_tick" ng-attr-tabindex="100" ng-class="{'chked' : totalRec.IsDisplayed}">
+		                                           	 <i class="fa fa-check-square chksqure"></i>
+		                                      	   </p>
+		                                        	<span class = "seeMoreSummaryText T7">{{totalRec.Label}}</span>
+		                                    	</li>
+	                                    	<div class="summaryHeader col-md-12">
+						            			<div class="savecancle_btncntnr">
+				                                    <button class="btn btn-default greenBtn" ng-click="HomeSearchGrid.updateExportRecord()"> Apply </button>
+		                               			 </div>
+			            	   				</div>
+		                                    	
+                                		</ul>
+			            				
+			            				</div>
+			            			</div>
+			            				<div class="summaryHeader col-md-12">
+				            				<p class="col-md-12 P0 BBW"></p>
+				            				<table class="col-md-12 P0 summartTotal">
+				            				<thead>
+				            					<tr>
+				            						<th class="color939CA9 text-capitalize col-md-8 P0">Group Records By:</th>
+				            					</tr>
+				            				</thead>
+				            				<tbody>
+				            					<tr class="color939CA9" >
+				            						<td class="text-capitalize">{{HomeSearchGrid.groupNameResult}}</td>
+				            					</tr>
+				            				</tbody>
+			            				</table>
+			            				<div class="col-md-12 P0 MT20 customDropdownDiv">
+			            					<button class = "btn btn-default grayBtn col-md-12 text-uppercase" data-toggle="dropdown" >select column to group</button>
+			            					<ul class="add_info_dropdown dropdown-menu keep_open summaryDropDown">
+		                                    	<div class="right-inner-addon" style="margin: 0 10px;">
+		                                        	<i class="glyphicon glyphicon-search"></i> 
+		                                        	<input class="form-control" ng-model="HomeSearchGrid.summaryMoreTotal.Label" 
+		                                            		 placeholder="Search" type="search" />
+		                                    	</div>
+		                                    	
+		                                    	<li  ng-repeat="totalRec in HomeSearchGrid.GridSummaryDataForExport"
+		                                    	ng-class="{'activeFilter' : HomeSearchGrid.groupNameResult == totalRec.Label}" ng-if="totalRec.Type == 'Text' || totalRec.Type == 'Date'" ng-click = "HomeSearchGrid.GroupExport(totalRec.Label)">
+		                                        	<span class = "seeMoreSummaryText T7 PL10">{{totalRec.Label}}</span>
+		                                        	
+		                                    	</li>
+                                		</ul>
+			            				
+			            				</div>
+				            			</div>
+			            			
+			            				<div class="summaryHeader col-md-12">
+				            				<p class="col-md-12 P0 BBW"></p>
+				            				<table class="col-md-12 P0 summartTotal">
+				            				<thead>	
+				            					<tr>
+				            						<th class="color939CA9 text-capitalize col-md-8 P0">output results to:</th>
+				            					</tr>
+				            				</thead>
+				            				<tbody>
+				            					<tr class="color939CA9" >
+				            						<td class="text-capitalize">{{HomeSearchGrid.outputResult}}</td>
+				            					</tr>
+				            				</tbody>
+			            				</table>
+			            				<div class="col-md-12 P0 MT20 customDropdownDiv">
+			            					<button class = "btn btn-default grayBtn col-md-12 text-uppercase" data-toggle="dropdown" >select output results</button>
+			            					<ul class="add_info_dropdown dropdown-menu keep_open summaryDropDown">
+		                                    	<li ng-click = "HomeSearchGrid.outputExport('Excel (.xls)')"
+		                                    		ng-class="{'activeFilter' : HomeSearchGrid.outputResult == 'Excel (.xls)'}"><span class = "seeMoreSummaryText T7 PL10">Excel (.xls)</span>
+		                                    	</li>
+		                                    	<li ng-click = "HomeSearchGrid.outputExport('Excel (.csv)')" 
+		                                    	ng-class="{'activeFilter' : HomeSearchGrid.outputResult == 'Excel (.csv)'}">
+		                                    	<span class = "seeMoreSummaryText T7 PL10">Excel (.csv)</span>
+		                                    	</li>
+		                                    	<li ng-click = "HomeSearchGrid.outputExport('PDF File')"
+		                                    	ng-class="{'activeFilter' : HomeSearchGrid.outputResult == 'PDF File'}" ><span class = "seeMoreSummaryText T7 PL10">PDF File</span>
+		                                    	</li>
+		                                    	<li ng-click = "HomeSearchGrid.outputExport('Printer')" 
+		                                    	ng-class="{'activeFilter' : HomeSearchGrid.outputResult == 'Printer'}"><span class = "seeMoreSummaryText T7 PL10">Printer</span>
+		                                    	</li>		
+                                		</ul>
+			            				
+			            				</div>
+				            			</div>
+			            			
+			            			
+			            			
+			            			<div class="summaryHeader col-md-12">
+				            				<p class="col-md-12 P0 BBW"></p>
+				            			<div class="savecancle_btncntnr">
+		                                    <button class="btn btn-default grayBtn" ng-click="HomeSearchGrid.PreviewGridRecordsAction('Preview')"> Preview </button>
+		                                    <button class="btn btn-default greenBtn" ng-click="HomeSearchGrid.PreviewGridRecordsAction('Export')"> Apply </button>
+                               			 </div>
+				            	   </div>
+			            			
+			            			</div>
+			            		</div>
+			            		</div>    
+			             
+			             		<!-- Side Panel Div end here -->
+			             
+				              <!--  Export/Print Div start here -->
+				              
+				              
+				             <!--  Export/Print Div end here -->
+			             
+			             </div>
+		                 <!-- filter Div End here --> 
+		                 <div class="row gid_container_wrapper ">
+		          		<div class="gid_container_Customer pull-left">
+	                        <div class="resultDiv" ng-if="HomeSearchGrid.SearchedResult.length != 0">
+	                        	<i class="fa fa-caret-down" id="dropArrowIcon"></i>
+			                    <table class="table table-striped" id="myTable">
+			                        <thead>
+			                            <tr class="tableHeader T3 insideDroppable1"
+			                            	ui-sortable="HomeSearchGrid.insideSortable"
+			                                ng-model="HomeSearchGrid.columns.DisplayedColumns">
+			                                <th class="draggable" ng-repeat="col in HomeSearchGrid.columns.DisplayedColumns">
+			                               		<div style="padding-left: 10px" class="thtext">
+			                               			<div class="sortIcons" ng-if="col.FieldAPIName != null">
+			                                            <span class="Up-arrow"
+			                                            	ng-click="HomeSearchGrid.changeSort(col, 'ASC')"
+			                                            	ng-class="{'activeSort' : HomeSearchGrid.getSortDirection(col.FieldAPIName, col.RecordKey) == 'ASC'}">
+			                                            	<i class="fa fa-chevron-up"></i> 
+			                                            </span>
+			                                            <span class="Down-arrow"
+			                                            	ng-click="HomeSearchGrid.changeSort(col, 'DESC')"
+			                                            	ng-class="{'activeSort' : HomeSearchGrid.getSortDirection(col.FieldAPIName, col.RecordKey) == 'DESC'}">
+			                                            	<i class="fa fa-chevron-down"></i>
+			                                            </span>
+			                                        </div>
+				                                    <span class="colLabel">{{col.Label}}</span>
+	                                        	</div> 
+			                                </th>
+			                                
+			                                <th style="padding: 0;background: #fff;"> 
+			                                	<div class="customDropdown" ng-class="{'colDynamicWidth': HomeSearchGrid.isSidePanelToggle} ">       
+							                      	<div class="dropdown">
+							                      		 <button type="button" data-toggle="dropdown"
+							                                class="my-dropdown btn btn-default dropdown-toggle"
+							                                ng-click="HomeSearchGrid.openColumnsDropdown()">
+							                                <span class="filter-wrap"> 
+							                                	<span class="filterLabel" ng-show="!HomeSearchGrid.loadingColumn"><i class="fa fa-plus"></i></span>
+						                                	</span>   
+						                                	<span class="caret"></span>
+							                            </button>
+							                             <ul class="column_dropdown chkbox_dropdown dropdown-menu keep_open " ng-class="{'dropDownAfterSummary': HomeSearchGrid.isSidePanelToggle} "  id="column_dropdown">
+								                            	<h4 class="columnHeading">Columns</h4>
+								                            	 <div class="right-inner-addon">
+								                                   <i class="glyphicon glyphicon-search"></i> <input type="search"
+								                                       class="form-control" placeholder="Search"
+								                                       ng-model="HomeSearchGrid.columnSearch.Label" />
+								                               </div>
+								                               <hr />
+								                               <a class="restoreDefaultTxt" ng-click="HomeSearchGrid.restoreColumns()">Restore Defaults</a>
+								                               <div class="column_fixHeight" id="additional_column_fix">
+									                               <li ng-repeat="displayedCol in HomeSearchGrid.columns.DisplayedColumns | filter:HomeSearchGrid.columnSearch"
+									                               		ng-click="displayedCol.IsDisplayed = !displayedCol.IsDisplayed">
+									                                   <label>
+									                                     <p class="chk_tick" ng-class="{'chked': displayedCol.IsDisplayed}">
+																	     	<i class="fa fa-check-square chksqure"></i>
+																	     </p>
+																	     <label class="css-label"></label>
+																	     <span>{{displayedCol.Label}}</span>
+																     </label>
+									                               </li>
+									                               <li ng-repeat="hiddenCol in HomeSearchGrid.columns.HiddenColumns  | filter:HomeSearchGrid.columnSearch"
+									                               		ng-click="hiddenCol.IsDisplayed = !hiddenCol .IsDisplayed">
+									                                   <label>
+									                                     <p class="chk_tick" ng-class="{'chked': hiddenCol.IsDisplayed}">
+																	     	<i class="fa fa-check-square chksqure"></i>
+																	     </p>
+																	     <label class="css-label"></label>
+																	     <span>{{hiddenCol.Label}}</span>
+																     </label>
+									                               </li>
+								                               </div>
+								                               <div class="btnWrapper pull-right">
+							                                    <button type="button" class="greenBtn btn btn-default btnDone"
+							                                    	ng-click="HomeSearchGrid.updateColumnsDropdown()">Done</button>
+							                                    <a href=""  class="grayBtn btn btn-default btnCancel"
+							                                    	ng-click="HomeSearchGrid.closeColumnsDropdown()">Cancel</a>
+							                                </div>
+							                             </ul>
+							                      	</div>
+						                      </div>
+			                                	
+			                                	
+			                                	
+			                                </th>
+			                            </tr>        
+			                        </thead>    
+			                        <tbody class="parentBody">
+			                            <tr data-ng-repeat="data in HomeSearchGrid.SearchedResult">
+			                                <td ng-repeat="col in HomeSearchGrid.columns.DisplayedColumns">
+			                                	<span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 1"
+			                                		data-toggle="tooltip" title="Customer">
+			                                        <i class="fa fa-users  Plr5 FC7"></i>
+			                                    </span> 
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 2"
+			                                    	data-toggle="tooltip" title="Vendor">
+			                                        <i class="fa fa-industry  Plr5 FC7 F18"></i>
+			                                    </span> 
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 3"
+			                                    	data-toggle="tooltip" title="Part">
+			                                        <img src="{!URLFOR($Resource.Images, 'sparkplug.png')}" style="height: 26px;width: 26px;"/>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 4"
+			                                    	data-toggle="tooltip" title="Kit">
+			                                        <i class="fa fa-link  Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 5"
+			                                    	data-toggle="tooltip" title="Fee">
+			                                        <img src="{!URLFOR($Resource.Images, 'dollor.png')}"  style="height: 26px;width: 26px;border-radius: 13px;"/>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 6"
+			                                    	data-toggle="tooltip" title="Labour Code">
+			                                        <img src="{!URLFOR($Resource.Images, 'hammer.png')}"  style="height: 26px;width: 26px;"/>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 7"
+			                                    	data-toggle="tooltip" title="User">
+			                                        <i class="fa fa-user  Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 8"
+			                                    	data-toggle="tooltip" title="Customer Order">
+			                                        <i class="fa fa-list  Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 9"
+			                                    	data-toggle="tooltip" title="Customer Invoice">
+			                                        <i class="fa fa-file-text-o  Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 10"
+			                                    	data-toggle="tooltip" title="Vendor Order">
+			                                        <i class="fa fa-list  Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 11"
+			                                    	data-toggle="tooltip" title="Vendor Receiving">
+			                                        <!-- <img src="https://cloud.githubusercontent.com/assets/11593748/6771103/40ccb170-d0ab-11e4-9f26-808d5fcaef11.png"  style="height: 26px;width: 26px;"/> --> 
+			                                    	<img src="{!URLFOR($Resource.Images, 'Vendor_Receiving.png')}" style="height: 26px;width: 26px;"/>
+			                                    </span> 
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 12"
+			                                    	data-toggle="tooltip" title="Vendor Invoice">
+			                                        <i class="fa fa-file-text-o  Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 13"
+			                                    	data-toggle="tooltip" title="Category">
+			                                        <i class="fa fa-tags Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 14"
+			                                    	data-toggle="tooltip" title="Price Level">
+			                                        <i class="fa fa-money Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 15"
+			                                    	data-toggle="tooltip" title="Sales Tax">
+			                                        <i class="fa fa-percent Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 16"
+			                                    	data-toggle="tooltip" title="Sublet">
+			                                        <i class="fa fa-scribd Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Icon' && data[col.RecordKey] == 17"
+			                                    	data-toggle="tooltip" title="Customer Payment">
+			                                        <i class="fa fa-money Plr5 FC7 F18"></i>
+			                                    </span>
+			                                    
+			                                    
+			                                    <a href="{!$Page.newViewCustomer}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 1"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.NewViewVendor}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 2"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.newviewPart}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 3"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.viewKit}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 4"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.viewFee}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 5"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.viewLabour}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 6"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="#" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 7"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.NewCustomerOrder}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 8"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.NewCustomerOrder}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 9"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.NewVendorOrder}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 10"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.NewVendorOrderReceiving}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 11"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.NewVendorOrderInvoicing}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 12"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.BlackPurlHome}?pageName=CategoryMgmt" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 13"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.BlackPurlHome}?pageName=SystemSettings" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 14"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.BlackPurlHome}?pageName=SystemSettings" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 15"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="#" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 16"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    <a href="{!$Page.newCustomerOrder}?id={{data['Id']}}" target="_blank"
+			                                        ng-if="col.Type == 'Link' && data['Type'] == 17"> 
+			                                        <span>{{data[col.RecordKey]}}</span>
+			                                    </a>
+			                                    
+			                                    <span ng-if="col.Type == 'Number'">
+			                                         {{data[col.RecordKey] | number:2}}
+			                                    </span>
+			                                    
+			                                    <span ng-if="col.Type == 'Currency'">
+			                                         {{data[col.RecordKey] | currency}}
+			                                    </span>
+			                                    
+			                                    <span ng-if="col.Type == 'Text' || col.Type == 'Email'  || col.Type == 'Date'">
+			                                         {{data[col.RecordKey]}}
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Phone'">
+			                                         {{data[col.RecordKey] | tel}}
+			                                    </span>
+			                                    <span ng-if="col.Type == 'Boolean'">
+			                                         {{data[col.RecordKey] ? 'Yes' : 'No'}}
+			                                    </span>
+		                                   </td>
+			                            </tr> 
+			                        </tbody> 
+			                    </table>
+			                    
+	                      		<!-- Pagination container -->
+								<div class="row pagination_container" id="HSGrid_Pagination" ng-if="HomeSearchGrid.SearchedResult.length != 0" ng-class="{'paginationDynamicWidth': HomeSearchGrid.isSidePanelToggle} ">
+									<list-pagination id-value = "HSGrid_Pagination_" 
+													total-records-length = "(HomeSearchGrid.Total_Records != -1) ? HomeSearchGrid.Total_Records : HomeSearchGrid.TotalRecords"
+													page-size = "HomeSearchGrid.searchResultPageSortAttrsJSON.PageSize"
+													current-page = "HomeSearchGrid.searchResultPageSortAttrsJSON.CurrentPage"
+													changes-count = "HomeSearchGrid.searchResultPageSortAttrsJSON.ChangesCount"
+													pagination-control-method = "HomeSearchGrid.HSGrid_paginationControlsAction" />
+								</div>
+		            		</div> 
+		            		<div class="noResult" ng-if="HomeSearchGrid.SearchedResult.length == 0">
+		            			<h3 style="color: #939CA9; text-align: center;">No Result Found.</h3>
+		            		</div>
+		            	</div>
+	                </div>
+					</div>
+					<div class="gridLoadingDiv" style="position: fixed; top: 32%; left: 40%;" ng-show="!HomeSearchGrid.displayGrid">
+                			<!-- <img src="https://www.criminalwatchdog.com/images/assets/loading.gif" style="width: 200px; height: 200px; margin-left: 40%; margin-top: 100px;"/> -->
+                			<img src="{!URLFOR($Resource.Images, 'Home_Search_loading.gif')}" title="Please wait ..." style="width: 200px; height: 200px; margin-left: 40%; margin-top: 100px;"/>
+                	</div>	                             
+            	</div>   
+          <!-- center Div End here -->
+    </div>
+    
+  </div>
+    
+    <div style="height: 50px;" id="VO_dummydiv"></div>
+    <div class="modal modal-fullscreen fade backdropsSearchFilter" ng-click="HomeSearchGrid.closeFilterForm()" ></div>
+    <!-- content end here -->
+
+
+
+
+
+
+ </body>
+
+</html>
+</apex:page>

@@ -1,0 +1,2759 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" controller="UserSettingCtrl" docType="html-5.0">
+    <html ng-app="userSetting" doctype="html5">
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-beta.6/angular-animate.js"></script>
+      
+    <head>
+        <title>User Setting</title>
+         <!-- Styles -->
+         <c:NewViewCustomerStyle />
+         <c:Css_and_Js ></c:Css_and_Js>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+        <apex:includeScript value="{!$Resource.AngularMap}"/>
+        <apex:includeScript value="{!$Resource.niceScroll}"/>
+        <apex:includeScript value="{!$Resource.d3}"/>  
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-beta.6/angular-animate.js"></script>
+        <apex:stylesheet value="{!URLFOR($Resource.simpleCalender, 'assets/css/style.css')}"/>
+        <apex:includeScript value="{!URLFOR($Resource.simpleCalender, 'assets/js/simplecalendar.js') }" />
+        <apex:includeScript value="{!$Resource.JqueryUI}"/>
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.newjqueryUICss)}" media="all" />
+        <style type="text/css">
+            .MLR0MB30{
+                margin-left: 0px;
+                margin-right: 0px;
+                margin-bottom: 30px;
+            }
+            .hoverClass:hover .iconClass ,.hoverClass:hover p  {
+                color:#00AEEF !important;
+            }
+            .billingPaid{
+                margin-top: 15px;
+            }
+            
+              .PopupPanel{
+                  position: fixed;
+			      top: 50%;
+			      left: 44%;
+			      z-index: 50;
+                }
+                #preloader_1{
+                    position: fixed;
+				    top: 50%;
+				    left: 45%;
+                }
+                #preloader_1 span{
+                    display:block;
+                    bottom:0px;
+                    width: 9px;
+                    height: 5px;
+                    background:#9b59b6;
+                    position:absolute;
+                    -webkit-animation: preloader_1 1.5s  infinite ease-in-out;
+                    -moz-animation: preloader_1 1.5s     infinite ease-in-out;
+                    -ms-animation: preloader_1 1.5s  infinite ease-in-out;
+                    -o-animation: preloader_1 1.5s   infinite ease-in-out;
+                    animation: preloader_1 1.5s  infinite ease-in-out;
+                }
+                #preloader_1 span:nth-child(2){
+                    left:11px;
+                    -webkit-animation-delay: .2s;
+                    -moz-animation-delay: .2s;
+                    -ms-animation-delay: .2s;
+                    -o-animation-delay: .2s;
+                    animation-delay: .2s;
+                
+                }
+                #preloader_1 span:nth-child(3){
+                    left:22px;
+                    -webkit-animation-delay: .4s;
+                    -moz-animation-delay: .4s;
+                    -ms-animation-delay: .4s;
+                    -o-animation-delay: .4s;
+                    animation-delay: .4s;
+                }
+                #preloader_1 span:nth-child(4){
+                    left:33px;
+                    -webkit-animation-delay: .6s;
+                    -moz-animation-delay: .6s;
+                    -ms-animation-delay: .6s;
+                    -o-animation-delay: .6s;
+                    animation-delay: .6s;
+                }
+                #preloader_1 span:nth-child(5){
+                    left:44px;
+                    -webkit-animation-delay: .8s;
+                    -moz-animation-delay: .8s;
+                    -ms-animation-delay: .8s;
+                    -o-animation-delay: .8s;
+                    animation-delay: .8s;
+                }
+                @-webkit-keyframes preloader_1 {
+                    0% {height:5px;-webkit-transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;-webkit-transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;-webkit-transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;-webkit-transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                @-moz-keyframes preloader_1 {
+                    0% {height:5px;-moz-transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;-moz-transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;-moz-transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;-moz-transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                @-ms-keyframes preloader_1 {
+                    0% {height:5px;-ms-transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;-ms-transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;-ms-transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;-ms-transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                @keyframes preloader_1 {
+                    0% {height:5px;transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                .loadingText{
+                    padding-top: 30px;
+                    text-align: center;
+                    font-size: 20px;
+                    color: #000;
+                    font-family: arial sans-serif;
+                 }
+        </style>
+        <script>
+            // Module app for angular controller of UserSetting page
+            var userSetting = angular.module(  'userSetting', 
+                                            ['BPGlobalHeader','ngAnimate', 'ui-notification', 'ui.date']
+                                        );
+            
+            // Angular controller for UserSetting page
+            userSetting.controller('userSettingController', function ($scope, $timeout, $rootScope, UserSettingService,Notification,$location) {
+                // UserSetting page variable
+                $scope.currentusername = '{!JSENCODE($User.FirstName)}';
+                $scope.currentuseremail = '{!JSENCODE($User.Email)}';
+                $scope.showAddNewCustomer = true;
+                $scope.UserSettingModel = {};
+                $scope.UserSettingModel.IsTrialOrg = {!IsTrialOrg}; 
+                $scope.UserSettingModel.communityURL = '{!JSENCODE(communityURL)}';
+                $scope.UserSettingModel.communityQuestionURL = '{!JSENCODE(communityQuestionURL)}';
+                $scope.UserSettingModel.communityCaseURL = '{!JSENCODE(communitycaseURL)}';
+                $scope.UserSettingModel.isLoading = false;
+                $scope.UserSettingModel.UserList= [];
+                
+                
+                //SIDE NAV BAR     
+                $scope.UserSettingsHomePage = {};             
+                $scope.UserSettingsHomePage.isShow=true;  
+                
+                $scope.dateOptions = {
+                    minDate: new Date,
+                    dateFormat: 'dd-M-yy'           
+                };
+                
+				
+				$scope.$on('UpgradeAccount', function () {   
+	                debug('Upgrade Account'); 
+	                $scope.UserSettingModel.navigateToScreen('/Billing');
+	            });
+                
+              
+               /*
+                * USER SECTION
+                */
+                $scope.UserSettingModel.Users ={};
+                $scope.UserSettingModel.Users.toggleShowLicensedUsers = function(){
+                    $scope.UserSettingModel.Users.showUsersSection = !$scope.UserSettingModel.Users.showUsersSection;
+                    $scope.UserSettingModel.Users.showLicensedUsersSection = !$scope.UserSettingModel.Users.showLicensedUsersSection;
+                };
+            
+                
+                
+                // PRICE AND TAX SECTION
+                $scope.UserSettingModel.PriceAndTax = {};
+                $scope.UserSettingModel.PriceAndTaxSectionData = {};
+                $scope.UserSettingModel.PriceAndTax.PriceIncludeTax = [{"Label" : "No", "Value" : false},
+                                                                          {"Label" : "Yes", "Value" : true}];
+                
+                $scope.UserSettingModel.PriceAndTax.toggleAppSectionView = function(){
+                    $scope.UserSettingModel.PriceAndTax.showAppSetting = !$scope.UserSettingModel.PriceAndTax.showAppSetting;
+                };
+                
+                $scope.UserSettingModel.PriceAndTax.toggleTaxSectionView = function(){
+                    $scope.UserSettingModel.PriceAndTax.showTaxSetting = !$scope.UserSettingModel.PriceAndTax.showTaxSetting;
+                };
+                
+                $scope.UserSettingModel.PriceAndTax.togglePriceSectionView = function(){
+                    $scope.UserSettingModel.PriceAndTax.showPriceSetting = !$scope.UserSettingModel.PriceAndTax.showPriceSetting;
+                };
+                
+                $scope.UserSettingModel.PriceAndTax.loadPriceAndTaxData = function(){
+                	$scope.UserSettingModel.isLoading = true; 
+                    UserSettingService.getPriceAndTaxMasterData().then(function(MasterData) {
+                         $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData = MasterData;
+                         debug(MasterData);
+                        debug("PRICE AND TAX MASTER DATA  " +$scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData);
+                        //$scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList= MasterData.countryList;
+                        // $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.stateList = MasterData.stateList;
+                        debug($scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.stateList);
+                        
+                        UserSettingService.getCurrentConfiguration().then(function(configurationData) {
+                            debug(configurationData); 
+                            $scope.UserSettingModel.PriceAndTax.PriceAndTaxData = configurationData;
+                            if($scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList.length > 0)
+                            {
+                                if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultLaborTax == '')
+                                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultLaborTax = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList[0].id;
+                                if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultVendorItemTax == '')
+                                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultVendorItemTax = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList[0].id;
+                                if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultPartTax == '')
+                                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultPartTax = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList[0].id;
+                                if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultFeeTax == '')
+                                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultFeeTax = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList[0].id;
+                                if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.orderingTaxRate == '')
+                                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.orderingTaxRate = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList[0].id;
+                            }
+                            if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultPriceLevel == '' && $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.priceLevelList.length > 0)
+                                $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultPriceLevel = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList[0].id;
+                                
+                                $scope.UserSettingModel.PriceAndTax.SetDefaultBillingCountry();  
+                                $scope.UserSettingModel.PriceAndTax.SetDefaultBillingState();
+                                $scope.UserSettingModel.PriceAndTax.SetDefaultTimeZone();
+                                $scope.UserSettingModel.PriceAndTax.SetDefaultPriceLevel()  
+                            $scope.UserSettingModel.isLoading = false; 
+                        }, function(errorSearchResult) {
+                        	$scope.UserSettingModel.isLoading = false; 
+                        });  
+                    }, function(errorSearchResult) {
+                    	$scope.UserSettingModel.isLoading = false; 
+                    });  
+                };
+                
+                $scope.UserSettingModel.PriceAndTax.countryChange = function(){
+                     debug("ALL STATE debug");
+                     debug($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry);
+                     if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.CountryName == 'Australia'){
+	                   $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.priceIncludeTax= true;
+	                 }else{
+	                   $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.priceIncludeTax = false;
+	                 }
+                     //$scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.stateList[0].countryNameToStateMap[$scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.CountryName];
+                     $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.StateList;
+                     $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.state = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec[0];
+                     $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.TimezoneList;
+                     $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[0];
+                     debug("STATE debug");
+                     debug($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec);
+                }
+                $scope.UserSettingModel.PriceAndTax.stateTimeChange = function(){
+                   for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec.length ; i++){
+	                   if( $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i].CountryId == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.Id && $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i].StateId == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.state.Id){
+	                       $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i];
+	                       return;
+	                   }
+	                   else{
+	                        debug('outside if')
+	                        $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time = '';
+	                   }
+                    }
+                }
+
+                $scope.UserSettingModel.PriceAndTax.savePriceAndTaxData = function(){
+                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.regionId = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.Id;
+                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.stateId = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.state.Id;
+                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.timezoneId = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time.Id;
+                    $scope.UserSettingModel.isLoading = true;
+                    UserSettingService.savePriceAndTaxData($scope.UserSettingModel.PriceAndTax.PriceAndTaxData).then(function(configurationData) {
+                        debug($scope.UserSettingModel.PriceAndTax.PriceAndTaxData);
+                        Notification.success('Saved successfully');
+                        $scope.UserSettingModel.isLoading = false;
+                    }, function(errorSearchResult) {  
+                      	$scope.UserSettingModel.isLoading = false;
+                    });
+                };
+                
+               $scope.UserSettingModel.PriceAndTax.SetDefaultBillingCountry= function (){
+                    if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.regionId == ''){
+                       for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList.length ; i++){
+	                       if($scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList[i].IsDefault){
+	                           $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList[i];
+	                       }
+                       }
+                     }else{
+	                     for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList.length ; i++){
+	                     	if($scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList[i].Id == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.regionId){
+	                        	$scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry = $scope.UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList[i];
+	                      	}
+	                 	 }
+                     }
+                }
+                
+                $scope.UserSettingModel.PriceAndTax.SetDefaultPriceLevel= function (){
+	                
+                }
+                
+                $scope.UserSettingModel.PriceAndTax.SetDefaultBillingState = function(){
+                	if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry != undefined){
+	                    $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.StateList;
+	                    if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.stateId == ''){
+	                       for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec.length ; i++){
+		                       if( $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec[i].IsDefault){
+		                           $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.state = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec[i];
+		                       }
+	                       }
+	                    }else{
+	                        for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec.length ; i++){
+	                            if( $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec[i].Id == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.stateId){
+	                                $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.state = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec[i];
+	                            }
+	                        }
+	                   }
+                   }
+                }
+                 
+                $scope.UserSettingModel.PriceAndTax.SetDefaultTimeZone= function (){
+                	if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry != undefined){
+						$scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.TimezoneList;
+						debug($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec);
+						if($scope.UserSettingModel.PriceAndTax.PriceAndTaxData.timezoneId == ''){
+						    for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec.length ; i++)
+						    {
+						            if( $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i].CountryId == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry.Id && $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i].StateId == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.state.Id  )
+						            {
+						                $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i];
+						                $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultTime = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time;
+						            }
+						    }
+						}else{
+						     for(i=0;i < $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec.length ; i++)
+						    {
+						         if( $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i].Id == $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.timezoneId)
+						         {
+						             $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec[i];
+						             $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.defaultTime = $scope.UserSettingModel.PriceAndTax.PriceAndTaxData.Time;
+						         }
+						     }
+						 }
+                    }
+                } 
+             
+     
+                // BUSINESS PROFILE SECTION
+                $scope.UserSettingModel.BusinessProfile = {};
+                $scope.UserSettingModel.BusinessProfile.SameAsBusiness = [{"Level" : "No", "Value" : false},
+                                                                          {"Level" : "Yes", "Value" : true}]; 
+                                                      
+                $scope.UserSettingModel.BusinessProfile.IsSaveButtonEnabled = function(){
+                    var isButtonEnable = true;
+                    angular.forEach($scope.UserSettingModel.BusinessProfileValidation,function(value, key){
+                        if($scope.UserSettingModel.BusinessProfileValidation[key]['isError'] == true){
+                            isButtonEnable =  false;
+                            return;
+                        }
+                    });
+                    return isButtonEnable;
+                } 
+                                 
+                $scope.UserSettingModel.BusinessProfileValidation = {
+                                            BusinessName : {isError : false, ErrorMessage:'', Type:'required'},
+                                            BusinessEmail : {isError : false, ErrorMessage:'', Type:'email,required'},
+                                            BusinessPhone : {isError : false, ErrorMessage:'',  Type:'phone,Maxlength,Minlength,required', Maxlength: 10, Minlength: 10}, 
+                                            BusinessStreetAddress1 : {isError : false, ErrorMessage:'', Type:'required'},
+                                            BusinessCity : {isError : false, ErrorMessage:'', Type:'required '},
+                                            BusinessZipCode : {isError : false, ErrorMessage:'', Type:'required Maxlength',Maxlength: 10},
+                                            BusinessCountry : {isError : false, ErrorMessage:'', Type:'required'}, 
+                                            BusinessState : {isError : false, ErrorMessage:'', Type:'required'},
+                                            
+                                            ShippingStreetAddress1 : {isError : false, ErrorMessage:'', Type:'required'},
+                                            ShippingCity : {isError : false, ErrorMessage:'', Type:'required'},
+                                            ShippingZipCode : {isError : false, ErrorMessage:'', Type:'required Maxlength',Maxlength: 10},
+                                            ShippingCountry : {isError : false, ErrorMessage:'', Type:'required'},
+                                            ShippingState : {isError : false, ErrorMessage:'', Type:'required'}
+                                         }   
+                
+                $scope.UserSettingModel.ValidateBusinessProfile = function(modelKey){
+                            debug(modelKey);
+                            var validationObj = $scope.UserSettingModel.BusinessProfileValidation[modelKey];
+                            var isError = false;
+                            var ErrorMessage = '';
+                            var phoneRegEx = /^([0-9\(\)\/\+ \-]*)$/;
+                            var emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+                            
+                            if(modelKey == 'IsSameAsBusinessAddress' && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj['IsSameAsBusinessAddress']){
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingStreetAddress1']['isError'] = false;
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingStreetAddress1']['ErrorMessage'] = '';
+                                
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingCity']['isError'] = false;
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingCity']['ErrorMessage'] = '';
+                                
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingZipCode']['isError'] = false;
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingZipCode']['ErrorMessage'] = '';
+                                
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingCountry']['isError'] = false;
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingCountry']['ErrorMessage'] = '';
+                                
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingState']['isError'] = false;
+                                $scope.UserSettingModel.BusinessProfileValidation['ShippingState']['ErrorMessage'] = '';
+                                
+                                return;
+                            }
+                            if(modelKey != 'IsSameAsBusinessAddress'){
+                                if(!(modelKey.indexOf('Shipping') > -1 && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj['IsSameAsBusinessAddress'])){
+                                    var validateType = validationObj.Type; 
+                                    if(validateType.indexOf('Minlength') > -1){
+                                        if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] != undefined && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey]!= '' && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey].length < validationObj.Minlength){
+                                            isError = true;
+                                            ErrorMessage = '{!JSENCODE($Label.Min_Length_Should_Be)} '+validationObj.Minlength;
+                                            debug('Error phone length less than 10 not valid');
+                                        }
+                                    }
+
+                                    if(validateType.indexOf('Maxlength') > -1){
+                                        if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] != undefined && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey]!= '' && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey].length > validationObj.Maxlength){
+                                            isError = true;
+                                            ErrorMessage = '{!JSENCODE($Label.Max_Length_Should_Be)} '+validationObj.Maxlength;
+                                             debug('Error phone length greater than 10 not valid');
+                                        }
+                                    }
+                                    
+                                    if(validateType.indexOf('phone') > -1){
+                                        if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] != undefined && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey]!= '' && !phoneRegEx.test($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey])){
+                                            isError = true;
+                                            ErrorMessage = '{!JSENCODE($Label.Label_Invalid)} {!JSENCODE($Label.Label_Phone_Number)}';
+                                            debug('Error phone not valid');
+
+                                        }
+                                    }
+
+                                    if(validateType.indexOf('email') > -1){
+                                        debug('validating email'); 
+                                        if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] != undefined && $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] != '' && !emailRegEx.test($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey])){
+                                            isError = true;
+                                            ErrorMessage = 'Please enter a valid email address';
+                                            debug('Error Email not valid');
+                                        }
+                                    }
+                                    
+                                    if(validateType.indexOf('required') > -1){
+                                        if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] == undefined || $scope.UserSettingModel.BusinessProfile.BusinessProfileObj[modelKey] == ''){
+                                            isError = true;
+                                            ErrorMessage = '{!JSENCODE($Label.Field_Is_Required)}';
+                                        }
+                                    }
+                                    
+                                }
+                                $scope.UserSettingModel.BusinessProfileValidation[modelKey]['isError'] = isError;
+                                    $scope.UserSettingModel.BusinessProfileValidation[modelKey]['ErrorMessage'] = ErrorMessage;
+                                debug($scope.UserSettingModel.BusinessProfileValidation[modelKey]);
+                                debug($scope.UserSettingModel.BusinessProfileValidation[modelKey]['isError']);
+                                }
+                      }
+                                                         
+                
+                $scope.UserSettingModel.BusinessProfile.toggleBusinessDetailSectionView = function(){
+                    $scope.UserSettingModel.BusinessProfile.showBusinessDetailSection = !$scope.UserSettingModel.BusinessProfile.showBusinessDetailSection;
+                };
+                
+                $scope.UserSettingModel.BusinessProfile.toggleBusinessAddressSectionView = function(){
+                    $scope.UserSettingModel.BusinessProfile.showBusinessAddressSection = !$scope.UserSettingModel.BusinessProfile.showBusinessAddressSection;
+                };
+                
+                $scope.UserSettingModel.BusinessProfile.toggleShippingAddressSectionView = function(){
+                    $scope.UserSettingModel.BusinessProfile.showShippingAddressSection = !$scope.UserSettingModel.BusinessProfile.showShippingAddressSection;
+                };
+                
+                $scope.UserSettingModel.BusinessProfile.loadBusinessProfileData = function(){
+                	console.log("load data in business profile")
+                	$scope.UserSettingModel.isLoading = true; 
+                    UserSettingService.getBusinessProfileMasterData().then(function(BusinessProfileData) {
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData = BusinessProfileData.CountryList;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj = BusinessProfileData.BusinessProfileObj;
+                        $scope.UserSettingModel.BusinessProfile.SetDefaultCountry();
+                        $scope.UserSettingModel.BusinessProfile.SetDefaultState();
+                        $scope.UserSettingModel.isLoading = false; 
+                    }, function(errorSearchResult) {
+                    	$scope.UserSettingModel.isLoading = false; 
+                    });  
+                };
+                
+                
+                $scope.UserSettingModel.BusinessProfile.SetDefaultCountry = function()
+                {
+                    if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountryId == ''){
+                       $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData[0];
+                   }else{
+                        for(i=0;i < $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.length ; i++)
+                        {
+                            if($scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData[i].Id == $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountryId){
+                                $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData[i];
+                            }
+                        }
+                   }
+                   
+                   if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountryId == ''){
+                       $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData[0];
+                   }else{
+                        for(i=0;i < $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.length ; i++)
+                        {
+                            if($scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData[i].Id == $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountryId){
+                                $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData[i];
+                            }
+                        }
+                   }
+                }
+                
+                $scope.UserSettingModel.BusinessProfile.SetDefaultState = function()
+               {
+                    if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStateId == ''){
+                       $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.StateList;
+                       $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec[0];
+                   }else{
+                        for(i=0;i < $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.StateList.length ; i++)
+                        {
+                            if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.StateList[i].Id == $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStateId){
+                                $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.StateList;
+                                $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.StateList[i];
+                            }
+                        }
+                   }
+                   
+                   if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStateId == ''){
+                       $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.StateList;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec[0];
+                   }else{
+                        for(i=0;i < $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.StateList.length ; i++)
+                        {
+                            if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.StateList[i].Id == $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStateId){
+                                $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.StateList;
+                                $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.StateList[i];
+                            }
+                        }
+                   }
+             } 
+                $scope.UserSettingModel.BusinessProfile.countryChange = function(){
+                     debug("Country debug");
+                     $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.StateList;
+                     $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec[0];
+                     debug(" States debug");
+                     debug($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState);
+                }
+                
+                $scope.UserSettingModel.BusinessProfile.shippingCountryChange = function(){
+                     debug("ALL Shipping Countries debug");
+                     debug($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry);
+                     $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.StateList;
+                     
+                     debug("Shipping States list debug");
+                     if($scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec.length != 0){
+                     	$scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec[0];
+                     }
+                     debug("ALL Shipping States debug");
+                     debug($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState);
+                }
+                  
+                
+                $scope.UserSettingModel.BusinessProfile.setShippingAddressData = function() {
+                    if(!$scope.UserSettingModel.BusinessProfile.BusinessProfileObj.IsSameAsBusinessAddress) {
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStreetAddress1 = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStreetAddress1;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStreetAddress2 = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStreetAddress2;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCity = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCity;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingZipCode = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessZipCode;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec = $scope.UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec;
+                        $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState;
+                        
+                        
+                        console.log($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState);
+                    } else {
+                        return;
+                    }
+                }
+                
+                $scope.UserSettingModel.BusinessProfile.saveBusinessProfileData = function(){
+                    if(!($scope.UserSettingModel.BusinessProfile.IsSaveButtonEnabled())){
+                        return;
+                    }
+                    
+                    var isError = false;
+                    var elementWithError = '';
+                    angular.forEach($scope.UserSettingModel.BusinessProfileValidation,function(value, key){
+                        $scope.UserSettingModel.ValidateBusinessProfile(key);
+                        if($scope.UserSettingModel.BusinessProfileValidation[key]['isError'] == true){
+                            debug(key);
+                            if(!isError)
+                            {
+                                elementWithError = key;
+                                isError = true;
+                            }
+                        }
+                    });           
+                    if(isError){
+                        Notification.error('Error in save, please review all errors before save');
+                        return;
+                    }          
+                    if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry != undefined){
+                    	$scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountryId = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry.Id;
+                    }
+                    if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState != undefined){
+                    	$scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStateId = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState.Id;
+					}   
+					
+                    if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry != undefined){
+                    	$scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountryId = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry.Id;
+					}
+                    if($scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState != undefined){
+                    	$scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStateId = $scope.UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState.Id;
+					}
+                    $scope.UserSettingModel.isLoading = true; 
+                    UserSettingService.saveBusinessProfileData($scope.UserSettingModel.BusinessProfile.BusinessProfileObj).then(function(configurationData) {
+                        Notification.success('Saved successfully');
+                        $scope.UserSettingModel.isLoading = false; 
+                    });
+                };
+                
+                // BILLING SECTION
+                
+                $scope.UserSettingModel.Billing = {};
+                $scope.UserSettingModel.Billing.DataToUpgrade = {};
+                $scope.UserSettingModel.Billing.TimeList = [];
+                
+                $scope.UserSettingModel.countryCodeToIDDMap = {
+                   'IN' : 91,
+                   'CN' : 01,
+                   'US' : 01,
+                   'AU' : 61,
+                   'FR' : 33
+                };
+                
+                jQuery.ajax({ 
+                   url: '//freegeoip.net/json/', 
+                   type: 'POST', 
+                   dataType: 'jsonp',
+                   success: function(locationInfo) {
+                       debug(locationInfo);
+                       $scope.UserSettingModel.LocationInfo = locationInfo;
+                       $scope.UserSettingModel.Billing.DataToUpgrade.IDDCode = $scope.UserSettingModel.countryCodeToIDDMap[$scope.UserSettingModel.LocationInfo.country_code];
+                   }
+                });
+                
+                $scope.UserSettingModel.Billing.getTimeList = function(){
+                    for(var i=0; i<12; i++){
+                        $scope.UserSettingModel.Billing.TimeList.push((i < 10 && i > 0 ? '0' : '')+""+(i == 0 ? 12 : i)+"-"+((i+1) < 10 && (i+1) > 0 ? '0' : '')+""+(i+1)+" AM");
+                    }
+                    for(var i=0; i<12; i++){
+                    	$scope.UserSettingModel.Billing.TimeList.push((i < 10 && i > 0 ? '0' : '')+""+(i == 0 ? 12 : i)+"-"+((i+1) < 10 && (i+1) > 0 ? '0' : '')+""+(i+1)+" PM");
+                    }
+                };
+                
+                $scope.UserSettingModel.Billing.toggleTrialAccountSectionView = function(){
+                    $scope.UserSettingModel.Billing.showTrialAccountSection = !$scope.UserSettingModel.Billing.showTrialAccountSection;
+                };
+                
+                // support start 
+                 $scope.UserSettingModel.Support = {};
+                
+                 $scope.UserSettingModel.Support.toggleTrialAccountSectionView = function(){
+                    $scope.UserSettingModel.Support.showTrialAccountSection = !$scope.UserSettingModel.Support.showTrialAccountSection;
+                };
+                
+                $scope.UserSettingModel.Billing.toggleUpgradeAccountSectionView = function(){
+                    $scope.UserSettingModel.Billing.showUpgradeAccountSection = !$scope.UserSettingModel.Billing.showUpgradeAccountSection;
+                };
+                
+                $scope.UserSettingModel.Billing.upgradeAccount = function(){
+                    
+                    $scope.UserSettingModel.Billing.TimeList = [];
+                    $scope.UserSettingModel.Billing.getTimeList();
+                    
+                    $scope.UserSettingModel.Billing.DataToUpgrade.UpgradeTime = $scope.UserSettingModel.Billing.TimeList[0];
+                    
+                    $scope.UserSettingModel.Billing.viewTrialAccountScreen = false;
+                    $scope.UserSettingModel.Billing.ViewUpgradeAccountScreen = true;
+                    $scope.UserSettingModel.Billing.showUpgradeAccountSection = true;
+                };
+                
+                $scope.UserSettingModel.Billing.showLicenseDetails = function(){
+                    $scope.UserSettingModel.Billing.viewTrialAccountScreen = false;
+                    $scope.UserSettingModel.Billing.ViewLicenseDetailScreen = true;
+                    $scope.UserSettingModel.Billing.showLicenseDetailSection = true;
+                };
+                
+                // IMPORT AND EXPORT SECTION
+                
+                $scope.UserSettingModel.ImportAndExport = {};
+
+                $scope.UserSettingModel.ImportAndExport.toggleImportDataSectionView = function(){
+                    $scope.UserSettingModel.ImportAndExport.showImportDataSection = !$scope.UserSettingModel.ImportAndExport.showImportDataSection;
+                };
+                
+                $scope.UserSettingModel.ImportAndExport.toggleExportDataSectionView = function(){
+                    $scope.UserSettingModel.ImportAndExport.showExportDataSection = !$scope.UserSettingModel.ImportAndExport.showExportDataSection;
+                };
+                
+                $scope.UserSettingModel.ImportAndExport.showTable = function(){
+                    $scope.UserSettingModel.ImportAndExport.showExportDataTable = true;
+                     UserSettingService.exportData().then(function (exportresult) {
+                         Notification.success(exportresult);
+                    }, function (errorSearchResult) {});
+                }
+                
+                /*
+                    NIDHI : END HERE
+                */
+                 $scope.UserSettingModel.BillingValidation = {
+                      Phone : {isError : false, ErrorMessage:'',  Type:'required,phone,Maxlength,Minlength', Maxlength: 10, Minlength: 10},
+                }
+                $scope.UserSettingModel.isSendActive = false;
+                 $scope.UserSettingModel.billingValidateForm = function(modelKey){
+                    var validationObj = $scope.UserSettingModel.BillingValidation[modelKey];
+                   
+                    var isError = false;
+                    var ErrorMessage = '';
+                    var phoneRegEx = /^([0-9\(\)\/\+ \-]*)$/;   
+                     var validateType = validationObj.Type; 
+                     if(validateType.indexOf('Minlength') > -1){
+                         if($scope.UserSettingModel.Billing.DataToUpgrade[modelKey] != undefined && $scope.UserSettingModel.Billing.DataToUpgrade[modelKey]!= '' && $scope.UserSettingModel.Billing.DataToUpgrade[modelKey].length < validationObj.Minlength){
+                             isError = true;
+                             ErrorMessage = '{!JSENCODE($Label.Min_Length_Should_Be)} '+validationObj.Minlength;
+                             
+                         }
+                     }
+
+                     if(validateType.indexOf('Maxlength') > -1){
+                         if($scope.UserSettingModel.Billing.DataToUpgrade[modelKey] != undefined && $scope.UserSettingModel.Billing.DataToUpgrade[modelKey]!= '' && $scope.UserSettingModel.Billing.DataToUpgrade[modelKey].length > validationObj.Maxlength){
+                             isError = true;
+                             ErrorMessage = '{!JSENCODE($Label.Max_Length_Should_Be)} '+validationObj.Maxlength;
+                         }
+                     }
+                      if(validateType.indexOf('Phone') > -1){
+                         if($scope.UserSettingModel.Billing.DataToUpgrade[modelKey] != undefined && $scope.UserSettingModel.Billing.DataToUpgrade[modelKey]!= '' && !phoneRegEx.test($scope.UserSettingModel.Billing.DataToUpgrade[modelKey])){
+                             isError = true;
+                             ErrorMessage = '{!JSENCODE($Label.Label_Invalid)} {!JSENCODE($Label.Label_Phone_Number)}';
+      
+                         }       
+                     }
+                      if(validateType.indexOf('required') > -1){
+                       if($scope.UserSettingModel.Billing.DataToUpgrade[modelKey] == undefined || $scope.UserSettingModel.Billing.DataToUpgrade[modelKey] == ''){
+                           isError = true;
+                           ErrorMessage = '{!JSENCODE($Label.Field_Is_Required)}';
+
+                       }
+                   }
+                                    debug($scope.UserSettingModel.Billing.DataToUpgrade);
+                                    debug($scope.UserSettingModel.BillingValidation[modelKey]);
+                                    $scope.UserSettingModel.BillingValidation[modelKey]['isError'] = isError;
+                                    $scope.UserSettingModel.BillingValidation[modelKey]['ErrorMessage'] = ErrorMessage;
+                      if(!isError){
+                        $scope.UserSettingModel.isSendActive = true;
+                      }
+                      else{
+                        $scope.UserSettingModel.isSendActive = false;
+                      }
+                 }
+                
+                
+                var emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+                $scope.UserSettingModel.validationModelInit = function(){
+                    $scope.UserSettingModel.UserSettingModelValidationList = [];
+                    angular.forEach($scope.UserSettingModel.NewUserList,function(index,newuser){
+                        $scope.UserSettingModel.UserSettingModelValidation = {
+                                                        email : {
+                                                            isError : false,
+                                                            ErrorMessage : '',
+                                                            Type : 'email'
+                                                        }, 
+                                                        name : {
+                                                            isError : false,
+                                                            ErrorMessage : '',
+                                                            Type : 'required,Maxlength,Minlength',
+                                                            Maxlength : 80,
+                                                            Minlength : 2 
+                                                        }
+                                                    };
+                        $scope.UserSettingModel.UserSettingModelValidationList.push($scope.UserSettingModel.UserSettingModelValidation);
+                        
+                    })
+                }
+                
+                 $scope.UserSettingModel.validateForm = function (modelKey, index) {
+                    var validationObj = $scope.UserSettingModel.UserSettingModelValidationList[index][modelKey];
+                    var isError = false;
+                    var ErrorMessage = '';
+                    var emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+            
+                    var validateType = $scope.UserSettingModel.UserSettingModelValidationList[index][modelKey].Type;
+                    //debug('validateType=  '+validateType);
+                    if (validateType.indexOf('Minlength') > -1) {
+                        if ($scope.UserSettingModel.NewUserList[index][modelKey] != undefined && $scope.UserSettingModel.NewUserList[index][modelKey] != '' && $scope.UserSettingModel.NewUserList[index][modelKey].length < validationObj.Minlength) {
+                            isError = true;
+                            ErrorMessage = 'Min length should be ' + validationObj.Minlength;
+                        }
+                    }
+            
+                    if (validateType.indexOf('Maxlength') > -1) {
+                        if ($scope.UserSettingModel.NewUserList[index][modelKey] != undefined && $scope.UserSettingModel.NewUserList[index][modelKey] != '' && $scope.UserSettingModel.NewUserList[index][modelKey].length > validationObj.Maxlength) {
+                            isError = true;
+                            ErrorMessage = 'Max length should be ' + validationObj.Maxlength;
+                        }
+                    }
+                    if($scope.UserSettingModel.NewUserList[index].name != undefined && $scope.UserSettingModel.NewUserList[index].name != ''){
+                        if (validateType.indexOf('email') > -1) {
+                            debug('validating email');
+                            debug(emailRegEx.test($scope.UserSettingModel.NewUserList[index][modelKey]));
+                            debug($scope.UserSettingModel.NewUserList[index][modelKey]);
+                            if ($scope.UserSettingModel.NewUserList[index][modelKey] == undefined || $scope.UserSettingModel.NewUserList[index][modelKey] == '' || !emailRegEx.test($scope.UserSettingModel.NewUserList[index][modelKey])) {
+                                isError = true;
+                                ErrorMessage = 'Invalid Email Id';
+                            }
+                        }
+                    }
+                    if($scope.UserSettingModel.NewUserList[index].email != undefined && $scope.UserSettingModel.NewUserList[index].email != ''){
+                        if (validateType.indexOf('required') > -1) {
+                            if ($scope.UserSettingModel.NewUserList[index][modelKey] == '') {
+                                isError = true;
+                                ErrorMessage = 'Field is Required';  
+                            }
+                        }
+                    }
+                    
+                    $scope.UserSettingModel.UserSettingModelValidationList[index][modelKey].isError = isError;
+                    $scope.UserSettingModel.UserSettingModelValidationList[index][modelKey].ErrorMessage = ErrorMessage;
+                }
+      
+                
+                $scope.UserSettingModel.loadUserInfo = function () {
+                    $scope.UserSettingModel.enableAddNewButton = false;
+                    $scope.UserSettingModel.enableUpgradeProButton = false;
+                    $scope.UserSettingModel.isLoading = true; 
+                    UserSettingService.getAllUsers().then(function (UserList) {
+                        debug(UserList);  
+                        $scope.UserSettingModel.bindUsersList(UserList);
+                        $scope.UserSettingModel.isLoading = false; 
+                    }, function (errorSearchResult) {
+                    	$scope.UserSettingModel.isLoading = false; 
+                    });
+                }
+                
+                $scope.UserSettingModel.bindUsersList = function(UserList){
+                    $scope.UserSettingModel.UserList = UserList;
+                    $scope.UserSettingModel.NewUserList = [];
+                    if($scope.UserSettingModel.UserList.length < 5) {
+                        $scope.showAddNewCustomer = true;
+                        while(($scope.UserSettingModel.UserList.length + $scope.UserSettingModel.NewUserList.length) < 5) {
+                            $scope.UserSettingModel.NewUserList.push({
+                                'name' : '',
+                                'email' : '',
+                                'isNew' : true
+                            });
+                        } 
+                    }
+                    $scope.UserSettingModel.validationModelInit();
+                    if($scope.UserSettingModel.NewUserList.length == 0){
+                        $scope.UserSettingModel.enableUpgradeProButton = true;
+                    }
+                }
+                $scope.UserSettingModel.goTOCommunity = function() {
+                	if($scope.UserSettingModel.isSendActive){
+                		window.open($scope.UserSettingModel.communityURL);
+                	}
+                	 
+                }
+                 
+                
+                 $scope.UserSettingModel.createNewUserRow = function () {
+                    $scope.UserSettingModel.NewUserList.push({
+                        'name' : '',
+                        'email' : '',
+                        'isNew' : true
+                    });
+                    $scope.UserSettingModel.enableUpgradeProButton = false;
+                    $scope.UserSettingModel.validationModelInit();
+                }
+                
+                $scope.UserSettingModel.IsAddNewButtonEnabled = function(){
+                    var isvalidData = true;
+                    if($scope.UserSettingModel.UserSettingModelValidationList == undefined){
+                        isvalidData = false;
+                    }else{
+                        for(var i=0; i<$scope.UserSettingModel.UserSettingModelValidationList.length; i++){
+                            if($scope.UserSettingModel.UserSettingModelValidationList[i].name.isError
+                                || $scope.UserSettingModel.UserSettingModelValidationList[i].email.isError){
+                                isvalidData = false;
+                                break;
+                            }
+                        }
+                        if($scope.UserSettingModel.NewUserList != undefined && $scope.UserSettingModel.NewUserList.length > 0 && ($scope.UserSettingModel.NewUserList[0].name == '' || $scope.UserSettingModel.NewUserList[0].email == '')){
+                            isvalidData = false;
+                        }
+                    }
+                    debug($scope.UserSettingModel.UserSettingModelValidationList);
+                    return isvalidData;
+                    
+                }
+                
+                $scope.UserSettingModel.sendEmail = function(arg){
+                
+                	$scope.UserSettingModel.subjectKey = arg;
+                	$scope.UserSettingModel.isLoading = true; 
+                	UserSettingService.sendEmail($scope.UserSettingModel.subjectKey).then(function (emailResult) {
+                         Notification.success(emailResult);  
+                         $scope.UserSettingModel.isLoading = false; 
+                    }, function (errorSearchResult) {
+                    	$scope.UserSettingModel.isLoading = false; 
+                    });
+                
+                }
+                
+                $scope.UserSettingModel.upgradeAccount = function(){
+                	if($scope.UserSettingModel.isSendActive){
+                		$scope.UserSettingModel.isLoading = true; 
+                		console.log($scope.UserSettingModel.Billing.DataToUpgrade);
+                		UserSettingService.upgradeAccount(angular.toJson($scope.UserSettingModel.Billing.DataToUpgrade)).then(function (emailResult) {
+	                         Notification.success(emailResult);  
+	                         $scope.UserSettingModel.isLoading = false; 
+	                    }, function (errorSearchResult) {
+	                    	Notification.error(errorSearchResult);
+	                    	$scope.UserSettingModel.isLoading = false; 
+	                    });
+                	}
+                }
+                
+                
+                $scope.UserSettingModel.ImportAndExport.loadExportData = function (){
+                	$scope.UserSettingModel.isLoading = true; 
+                	UserSettingService.getExportFiles().then(function (exportResult) {
+                            debug(exportResult);
+                            $scope.UserSettingModel.ImportAndExport.exportdata = exportResult;
+                            $scope.UserSettingModel.isLoading = false; 
+                        }, function (errorMessage) {
+                            Notification.error(errorMessage);
+                            $scope.UserSettingModel.isLoading = false; 
+                        });
+                
+                }
+                $scope.UserSettingModel.createUsers = function () {
+                    if($scope.UserSettingModel.IsAddNewButtonEnabled){
+                    	$scope.UserSettingModel.isLoading = true; 
+                        UserSettingService.createUsers($scope.UserSettingModel.NewUserList).then(function (UserList) {
+                            debug(UserList);
+                            $scope.UserSettingModel.bindUsersList(UserList);
+                            $scope.UserSettingModel.isLoading = false; 
+                        }, function (errorMessage) {
+                            Notification.error(errorMessage);
+                            $scope.UserSettingModel.isLoading = false; 
+                        });
+                    }
+                }
+                $scope.UserSettingModel.loadUserSetting = function(){
+                	UserSettingService.setSystemSettingVisited().then(function (successResul) {
+                          
+                      }, function (errorMessage) {
+                          Notification.error(errorMessage);
+                      });
+                }
+                 var path = $location.path();
+             	  $location.path( path);
+            	  $location.replace()
+             	  var url = $location.url();
+             	  if(url == '/' || url == ''){
+             	  	url = '/Home';
+             	  }
+                
+                $scope.UserSettingModel.navigateToScreen = function(value){
+                	value = value.indexOf('/') == -1 ? '/'+value : value;
+                    $scope.UserSettingModel.navigationItem = value;
+                    console.log($scope.UserSettingModel.navigationItem);
+                    $location.path( value);
+              	    $location.replace()
+               	    url = $location.url();
+                    if(value=='/Users')
+                    {	  
+                        $scope.UserSettingModel.Users.showUsersSection = true;
+                        $scope.UserSettingModel.loadUserInfo();
+                    }
+                    if(value=='/Price_And_Tax')
+                    {	
+                        $scope.UserSettingModel.PriceAndTax.loadPriceAndTaxData();
+                        $scope.UserSettingModel.PriceAndTax.showAppSetting = true;
+                        $scope.UserSettingModel.PriceAndTax.showTaxSetting = true;
+                        $scope.UserSettingModel.PriceAndTax.showPriceSetting = true;
+                    }
+                    
+                    if(value=='/Business_Profile')
+                    {	
+                        $scope.UserSettingModel.BusinessProfile.loadBusinessProfileData();
+                        $scope.UserSettingModel.BusinessProfile.showBusinessDetailSection = true;
+                        $scope.UserSettingModel.BusinessProfile.showBusinessAddressSection = true;
+                        $scope.UserSettingModel.BusinessProfile.showShippingAddressSection = true;
+                        $scope.UserSettingModel.BusinessProfile.isSameAsBusiness = $scope.UserSettingModel.BusinessProfile.SameAsBusiness[0];
+                    }
+                    
+                    if(value=='/Billing')
+                    {  
+                    	$scope.UserSettingModel.isLoading = true; 
+                        UserSettingService.getBillingProfile().then(function(successresult) {
+                             $scope.UserSettingModel.Billing.noOfDays = successresult ;
+                             $scope.UserSettingModel.isLoading = false;
+                        }, function(errorSearchResult) {  
+                        	$scope.UserSettingModel.isLoading = false;
+                        });  
+                        $scope.UserSettingModel.Billing.viewTrialAccountScreen = true;
+                        $scope.UserSettingModel.Billing.showTrialAccountSection = true;
+                        
+                        $scope.UserSettingModel.Billing.ViewUpgradeAccountScreen = false;
+                        $scope.UserSettingModel.Billing.ViewLicenseDetailScreen = false;
+                    }
+                     if(value=='/Support')
+                    {	
+                        $scope.UserSettingModel.Support.viewTrialAccountScreen = true;
+                        $scope.UserSettingModel.Support.showTrialAccountSection = true;
+                        
+                        $scope.UserSettingModel.Support.ViewUpgradeAccountScreen = false;
+                        $scope.UserSettingModel.Support.ViewLicenseDetailScreen = false;
+                    }
+                    
+                    
+                    if(value == '/Import_And_Export')
+                    {	$scope.UserSettingModel.ImportAndExport.loadExportData()
+                        $scope.UserSettingModel.ImportAndExport.showImportDataSection = true;
+                        $scope.UserSettingModel.ImportAndExport.showExportDataSection = true;
+                    }
+                };
+                $scope.UserSettingModel.navigateToScreen(url);
+                
+                
+            });
+            
+            
+            
+            userSetting.service("UserSettingService", function ($q) {
+                this.getAllUsers= function()
+                {
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.getAllUsers}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.reject(event.message);
+                                } else {
+                                    var partInfo = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    if(re !=null){
+                                    partInfo = partInfo.replace(re, '');
+                                    }
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.createUsers = function (newUserList){
+                      newUserList = encodeString(angular.toJson(newUserList));
+                      var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.createUsers}',newUserList,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.reject(event.message);
+                                } else {
+                                    var usersList = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    deferred.resolve(JSON.parse(usersList));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.getPriceAndTaxMasterData= function()
+                {
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.getPriceAndTaxMasterData}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.reject(event.message); 
+                                } else {
+                                    var partInfo = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    if(re !=null){
+                                    partInfo = partInfo.replace(re, '');
+                                    }
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                this.getCurrentConfiguration= function()
+                {
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.getCurrentConfiguration}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.reject(event.message); 
+                                } else {
+                                    var partInfo = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    if(re !=null){
+                                    partInfo = partInfo.replace(re, '');
+                                    }
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.savePriceAndTaxData = function (priceAndTaxConfigurationData){
+                      priceAndTaxConfigurationData = encodeString(angular.toJson(priceAndTaxConfigurationData));
+                      var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.savePriceAndTax}',priceAndTaxConfigurationData,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                    var partInfo = '[]';
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.getBusinessProfileMasterData= function()
+                {
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.getBusinessProfileMasterData}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                    var partInfo = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    if(re !=null){
+                                        partInfo = partInfo.replace(re, '');
+                                    }
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.getExportFiles= function()
+                {
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.getExportFiles}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                    var exportResult = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    if(re !=null){
+                                        exportResult = exportResult.replace(re, '');
+                                    }
+                                    deferred.resolve(JSON.parse(exportResult));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+            	
+            	this.exportData= function()
+                {
+                        var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.exportData}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                    var exportData = decodeString(result);
+                                    deferred.resolve(exportData);
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.saveBusinessProfileData = function (businessProfile){
+                      businessProfile = encodeString(angular.toJson(businessProfile));
+                      var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.saveBusinessProfile}',businessProfile,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                    var partInfo = '[]';
+                                    deferred.resolve(JSON.parse(partInfo));
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.sendEmail = function (subjectKey ){
+                	subjectKey = encodeString(subjectKey);
+                      var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.sendEmail}',subjectKey,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                    var emailResult = decodeString(result);
+                                    deferred.resolve(emailResult);
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.setSystemSettingVisited = function ( ){
+                      var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.setSystemSettingVisited}',
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                }
+                            }, {
+                                escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                this.upgradeAccount = function (bilingInfo ){	
+                	bilingInfo = encodeString(bilingInfo);
+                      var deferred = $q.defer();
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.UserSettingCtrl.upgradeAccount}', bilingInfo,
+                            function (result, event) {
+                               if (event.type == 'exception') {
+                                    deferred.resolve(event.message);
+                                } else {
+                                	var emailResult = decodeString(result);
+                                    deferred.resolve(emailResult);
+                                }
+                            }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                },
+                
+                
+                 this.getBillingProfile = function (){
+                 	var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                         '{!$RemoteAction.UserSettingCtrl.getBillingProfile}',
+                         function (result, event) {
+                            if (event.type == 'exception') {
+                                 deferred.resolve(event.message);
+                             } else {
+                                 var partInfo = result;
+                                 deferred.resolve(partInfo);
+                             }
+                         }, {
+                             escape : true
+                    });
+                    return deferred.promise;
+                }
+            });
+        </script>
+        <style>
+        .row_margin{
+            margin-top: 15px;
+        }
+        button.btn.btn-default.greenBtn.buttondisabled{
+            opacity:1;
+            background: #71BF3E;
+            color: #ffffff;
+        }
+        .bigIcon{
+            font-size: 27px;
+            color: #37BDF4;
+            padding-right: 7px;
+        }
+        .toppadding48 {
+            margin-top: 48px;
+        }
+        button.btn.btn-default.greenBtn.alignbutton{
+            margin-left: 37.1%;
+            margin-top: 15px;
+            width : auto;
+        }
+        .removeuppercase{
+        text-transform: none;
+        }
+        /* changes by KV */
+        .subheadingcolor{
+           /*  color: #9EA8B5; */   
+            /* margin-bottom:10px; */
+            margin: 0 0 25px 17px;
+            
+            /*added similar to T3*/
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            color: #414449;
+        }
+        /* changes by KV */
+        
+        .T3.subheadingcolor{
+            color: #9EA8B5;
+        }
+        .gen_heading.T2.removeborderbottom{
+            font-size : 25px;
+            border-bottom: none;
+        }
+        
+        .removegap{
+                margin-left: -5%;
+        }
+        @media (min-width: 992px)
+        {   
+            .removegap{
+                margin-left: -3%;
+            }
+        }
+        .width22{
+            width : 22%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .width46{
+            width : 46%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+        .usersInputElement{
+            width: 100%;
+            border: 1px solid;
+            border-radius: 3px;
+            cursor: default;
+            padding-left: 10px;
+        }
+        .redborder {
+            border: 2px solid red;
+        }
+        .userSetting_nav_item {
+            margin-right : 20px;
+            text-align : center;
+            cursor : pointer;
+        }
+        .userSetting_nav_item>.fa {
+            color : #939CA9;
+            font-size : 40px;
+        }
+        .description_text{
+            width:100px;
+            font-size : 12px;
+        }
+        .marginbottom16{
+            margin-bottom: 16px;
+        }
+        /* .settings_Header{
+            height : 30px;
+            margin-top : 10px; 
+            background-color : SlateGray;
+            color : white;
+        } */
+        /* changes by KV */
+        .settings_Header{
+            height : 48px;/* 30px; */
+            /* margin-top : 10px;  */
+            background-color : #B7BEC6;/* SlateGray; */
+            /* color : white; */
+        }
+        /* changes by KV */
+        .settings_Header>.fa{
+            cursor : pointer;
+        }
+        .margin8{
+            margin : 8px;
+        }
+        /* .screen_section{
+            margin: 24px 20px 48px 20px;
+        } */
+        /* changes by KV */
+        .screen_section{
+            /* margin: 24px 20px 48px 20px; */
+            margin: 12px 0 48px 0px;
+        }
+        /* changes by KV */
+        
+        .UserSettingsHomePageList{
+            border-top:1px solid #ECF0F1;
+        }
+        .homeSearchFilterListwrapper .UserSettingsHomePageList li{
+            height: 40px;
+        }
+        .UserSettingsHomePageList li .fa{
+            font-size: 22px;
+            color: #939CA9;
+        }
+        .UserSettingsHomePageList li.active .activeChild{
+            color: #FFF;
+        }      
+        .hideslideSidepanel{
+            width: 100%;
+            -webkit-transition: width .5s; 
+                transition: width .5s;
+        }
+        .hidemainSidepanel{
+            width: 4%;
+            -webkit-transition: width .5s; 
+                transition: width .5s;
+        }
+        .showmainSidepanel{
+            width: 16.6%;
+            position: fixed;
+            top: 49px;
+            z-index: 999;
+        }
+        
+        .slideSidepanel{
+            width: 25%;
+            -webkit-transition: width .5s; 
+                transition: width .5s;
+        }
+        .showSidepanel{
+                width: 75%;
+                -webkit-transition: width .5s; 
+                transition: width .5s;
+        }
+        .hideSidepanel{
+                width: 0%;
+                -webkit-transition: width .5s; 
+                transition: width .5s;
+        }
+        .hideSidepanel .homeSearchFilterList li p{
+            display: none;
+        }
+        .showSidepanel .homeSearchFilterList li p{
+            display: block;
+        }
+        .UserSettingHomePageSidePanel {
+            position: fixed;
+            z-index: 1000;
+        }
+        
+        .m0{
+            margin: 0;
+        }
+        .topMargin48{
+            margin-top: 48px;
+        }
+        .upgradeAccountFormElement{
+            width: 107px;
+            padding-top: 9px;
+        }
+        .marginLeft0{
+            margin-left : 0px;
+        }
+        .upgradeAccount>.timepickerdropdown{
+            overflow-y: scroll;
+            max-height: 150px;
+        }
+        
+        /* added by richa for category page */
+        .categorySection {
+            margin: 24px 15px 48px 20px;
+        }
+        .categoryHeader {
+            margin-left: 2%;
+        }
+        .categoryIcon {
+            color: #939CA9;
+            font-size: 40px;
+            float: left;
+        }
+        .categoryText {
+            display: inline-block;
+            float: left;
+            margin-top: 3px;
+            margin-left: 7px;
+        }
+        .section_Header{
+            background-color: #B7BEC6;
+            height: 48px;
+        }
+        .categoryBody {
+            margin: 24px 20px 48px 26px;
+            border-top: 1px solid #ECF0F1;
+        }
+        .chartsSection {
+            margin: 24px 20px 48px 26px;
+            background-color: #ecf0f1;
+            height: 350px;
+        }
+        .innerText {
+            color: #b7bec6;
+            font-size: large;
+            text-transform: uppercase;
+            margin: 0 auto;
+            width: 500px;
+            margin-top: 8%;
+        }
+        
+        .menuItems i:hover {
+            color: #00AEEF;
+        }
+        
+        /* changes by KV */
+        .fixedHeaderText {
+            padding: 0 5px 0 10px;
+            margin-top: 7px;
+            width: 295px;/* 500px; */
+            background: #FFFFFF;
+            height: 41px;
+            border-top-right-radius: 2px;
+            border-top-left-radius: 2px;
+            border-top: 1px solid #D1D2D2;
+            border-left: 1px solid #D1D2D2;
+            border-right: 1px solid #D1D2D2;
+        }
+        .fixedHeaderText .headerlabel {
+            margin: 7px 0;
+            display: inline-block;
+            float: left;
+        }
+        .T2 {
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 800;
+            text-transform: capitalize;
+            font-size: 13px;
+            margin: 0.01em;
+            color: #00AEEF;
+        }
+        .fixedHeaderText .fa-angle-down, .fixedHeaderText .fa-angle-right {
+            float: left;
+            margin-top: 3px;
+            /* width: 10px; */
+            padding: 0px 3px;
+        }
+        .main_section {
+            margin:24px 20px 48px 20px;
+            padding-top: 24px;
+            border-top: 1px solid #ECF0F1;
+        }
+        .greenBtn, .grayBtn{
+            border-radius:2px;
+        }
+        .priceAndTaxHeader{
+            margin:15px;
+        }
+        .priceAndTaxText{
+            display: inline-block;
+            margin-top: 3px;
+            margin-left: 10px;
+            float: left;
+        }
+        .priceAndTaxIcon{
+            font-size: 40px;
+            color: #939CA9;
+            float: left;
+        }
+        .fixedHeaderText .T2 {
+            text-transform: uppercase;
+        }
+        /* style added for nice scroll */
+        ::-webkit-scrollbar{
+            width: 11px;
+            height: 20px;
+        }
+        ::-webkit-scrollbar-button{
+            background: #ECF0F1;
+        }
+        ::-webkit-scrollbar-track-piece{
+            background: #ECF0F1;
+        }
+        ::-webkit-scrollbar-thumb{
+            background: #B7BEC6;
+            border-radius : 3px;
+            border: 1px solid #fff;
+        } 
+        /* end style for nice scroll */
+        /* changes by KV */
+        
+        /* changes by nidhi */
+        .usersListHeadElement
+        {
+            font-weight: 600;
+            color: #939CA9;
+        }
+        .userSection input{
+            font-size : 14px;
+        }
+        .mt7{
+            margin-top: 7px;
+        }
+        .mt30{
+             margin-top:30px;
+        }
+        .userSection input:focus::-webkit-input-placeholder {
+            color: black;
+        }
+        .userLabels{
+            font-family: 'Open Sans', sans-serif;
+            font-weight: 600;
+            text-transform: capitalize;
+            font-size: 13px;
+            margin: 0.01em;
+            color: #414449;
+        }
+        .userSettingSectionHeaderText{
+            display: inline-block;
+            margin-top: 3px;
+            margin-left: 10px;
+            float: left;
+        }
+        .userSettingSectionHeaderIcon{
+            font-size: 40px;
+            color: #939CA9;
+            float: left;
+        }
+        
+        .disableBtn, 
+        .disableBtn:hover, 
+        .disableBtn:focus, 
+        .disableBtn:active{
+            cursor: not-allowed;
+            background: #727983 !important;
+            box-shadow: none !important;
+        }
+        
+        .userSection{
+            margin-left :  35px;
+        }
+        .iconClass{
+            color: #939CA9; 
+            font-size: 55px; 
+            cursor: pointer;
+        }
+        </style>
+        
+        
+     </head>
+     
+<body>
+    <c:BPGlobalHeader />
+    <div ng-cloak="ng-cloak" ng-controller="userSettingController" style="margin-top: 48px;" ng-init = "UserSettingModel.loadUserSetting()">
+    	
+    	
+    	<div style="width: 100%; height: 100%; position: fixed; opacity:.6; z-index: 10; background: #FFF;" 
+		    ng-show="UserSettingModel.isLoading">
+    		<div id="loading" class="PopupPanel">
+	            <table border="0" bordercolor="red" width="100%" height="100%">
+	                
+	                <tr>
+	                    <td valign="center" align="center">
+	                        <div id="preloader_1"> 
+	                            <span></span>
+	                            <span></span>
+	                            <span></span>
+	                            <span></span>
+	                            <span></span>
+	                       </div> 
+	                    </td>
+	                </tr>
+	                <tr>
+	                    <td class="loadingText"><b>{!$Label.Label_Loading}...</b></td>
+	                </tr>
+	            </table>
+	        </div>
+    	</div>
+        <div class="row m0">
+            <div class="main_section_body">
+            
+                <div class="row m0 topMargin48 menuItems" ng-show="UserSettingModel.navigationItem=='/Home'">
+                    <div class="row MLR0MB30">
+                        <div class="col-md-4 hoverClass" ng-click="UserSettingModel.navigateToScreen('/Users');">
+                            
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-users iconClass" ></i>
+                            </div> 
+                            <div class="col-md-10">    
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1" style="">Users</p>
+                                    <p class="T7">Add &amp; view users</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 hoverClass" ng-click="UserSettingModel.navigateToScreen('/Import_And_Export');">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-cubes iconClass"></i> 
+                            </div>
+                            <div class="col-md-10">    
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Import &amp; Export</p>
+                                    <p class="T7">Import and export data</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="col-md-4 hoverClass" href="{!$Page.BlackPurlHome}?pageName=SystemSettings" target = "_blank">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-university iconClass"></i> 
+                            </div>
+                            <div class="col-md-10">
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Tax Management</p>
+                                    <p class="T7">Price levels &amp; Sales Tax</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="row MLR0MB30" >
+                        <div class="col-md-4 hoverClass" ng-click="UserSettingModel.navigateToScreen('/Business_Profile');">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-building iconClass"></i>
+                            </div>
+                            <div class="col-md-10"> 
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Business profile</p>
+                                    <p class="T7">Update information about your business</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 hoverClass" ng-click="UserSettingModel.navigateToScreen('/Price_And_Tax');">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-usd iconClass"></i>
+                            </div>
+                            <div class="col-md-10"> 
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Price &amp; Tax</p>
+                                    <p class="T7">Default price &amp; tax settings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="col-md-4 hoverClass" href="{!$Page.BlackPurlHome}?pageName=MakeMgmt" target = "_blank">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-plus-square iconClass"></i>
+                            </div>
+                            <div class="col-md-10"> 
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Make &amp; Models</p>
+                                    <p class="T7">Create make &amp; models</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="row MLR0MB30" >
+                        <div class="col-md-4 hoverClass" ng-click="UserSettingModel.navigateToScreen('/Billing');">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-credit-card iconClass"></i>
+                            </div>
+                            <div class="col-md-10"> 
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Billing</p>
+                                    <p class="T7">Billing &amp; payment history</p>
+                                </div>
+                            </div>
+                        </div>
+                       <a class="col-md-4 hoverClass" href="{!$Page.BlackPurlHome}?pageName=CategoryMgmt" target = "_blank">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-list iconClass"></i>
+                            </div> 
+                            <div class="col-md-10">
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Categories</p>
+                                    <p class="T7">Create &amp; manage categories</p>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="col-md-4 hoverClass" ng-click="UserSettingModel.navigateToScreen('/Support');">
+                            <div class="col-md-2 text-center">
+                                <i class="fa fa-life-ring iconClass"></i>
+                            </div> 
+                            <div class="col-md-10">
+                                <div style="cursor: pointer; margin-left: 10px;">
+                                    <p class="T1">Support</p>
+                                    <p class="T7">Help and community</p>
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+                <!-- changes by KV -->
+                <div  ng-switch="UserSettingModel.navigationItem"> <!--  class="topMargin48" -->
+                  <div ng-switch-when="/Users">
+                     <div class="screen_section row userSection">          <!-- userSection -->
+                        <div class="col-sm-12 col-lg-12 col-md-12  ">  <!-- col-lg-10 col-md-10 col-sm-10 -->
+                            <div class="row "><!--  marginbottom16 -->
+                                <div class="col-lg-4 col-md-4 priceAndTaxHeader">
+                                     <i class="fa fa-users userSettingSectionHeaderIcon"></i>
+                                     <span class="T1 userSettingSectionHeaderText">Users</span>
+                                </div>
+                            </div>
+                            <div ng-show="UserSettingModel.Users.showUsersSection">
+                                <div>
+                                    <div ng-if="UserSettingModel.IsTrialOrg">
+                                        <span ng-show="UserSettingModel.NewUserList.length > 0">
+                                            Add up to {{UserSettingModel.NewUserList.length}} additional users.New user accounts will be created within 24 hours.  
+                                        </span>
+                                        <span ng-show="UserSettingModel.NewUserList.length == 0">
+                                            You are on a free trial and you have reached the maximum number of users. Please upgrade to add more.
+                                        </span>
+                                    </div>
+                                    
+                                    <div ng-if="!UserSettingModel.IsTrialOrg">
+                                        You have 5 active licenses. Please upgrade to add more.
+                                    </div>
+                                    
+                                </div>
+                                 <div class="form">
+                                    <div class="row row_margin" ng-repeat="user in UserSettingModel.UserList">
+                                        <div class="col-md-1" ng-show="user.id !=currentUserId">
+                                            <span class="T7 removeuppercase">Name</span> 
+                                        </div>
+                                        <div class="col-md-1" ng-show="user.id == currentUserId">
+                                            <span class="T7 removeuppercase">You</span> 
+                                        </div>
+                                        <div class="col-md-3 removegap" ng-show="user.name !=''">
+                                            <span class="T7 removeuppercase">{{user.name}}</span>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <span class="T7 removeuppercase">Email</span> 
+                                        </div>
+                                        <div class="col-md-4 removegap" ng-show="user.name !=''">
+                                            <span class="T7 removeuppercase">{{user.email}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row row_margin" ng-repeat="newuser in UserSettingModel.NewUserList">
+                                        <div class="col-md-1 align_New_Entry">
+                                            <span class="T7 removeuppercase">Name</span> 
+                                        </div>
+                                        <div class="col-md-3 removegap">
+                                            <input type="text" 
+                                                ng-model="newuser.name" class="form-control" 
+                                                ng-class="{'redborder' : UserSettingModel.UserSettingModelValidationList[$index]['name']['isError']}" 
+                                                ng-blur="UserSettingModel.validateForm('name',$index); UserSettingModel.validateForm('email',$index);" 
+                                                title="{{UserSettingModel.UserSettingModelValidationList[$index]['name']['ErrorMessage'] }}"/>
+                                        </div>
+                                        <div class="col-md-1 align_New_Entry">
+                                            <span class="T7 removeuppercase">Email</span> 
+                                        </div>
+                                        <div class="col-md-4 removegap">
+                                            <input type="text" 
+                                            ng-model="newuser.email" 
+                                            class="form-control" 
+                                            ng-class="{'redborder' : UserSettingModel.UserSettingModelValidationList[$index]['email']['isError']}" 
+                                            ng-blur="UserSettingModel.validateForm('email',$index); UserSettingModel.validateForm('name',$index);"  
+                                            title="{{UserSettingModel.UserSettingModelValidationList[$index]['email']['ErrorMessage'] }}"/>
+                                        </div>
+                                    </div>
+                                    <div class="row row_margin m0" style="margin-top: 20px; float: right;width: 100%;padding-right: 5px;text-align: right;">
+                                        <button class="btn btn-default greenBtn"
+                                             type="button" 
+                                             ng-click="UserSettingModel.navigateToScreen('Billing');"
+                                             ng-if="UserSettingModel.IsTrialOrg">
+                                             Upgrade Now
+                                        </button>
+                                        <button class="btn T4 addmoreinfoBtn alignbutton" style="width: auto;"
+                                            ng-show="UserSettingModel.NewUserList.length != 0"
+                                            ng-click="UserSettingModel.createUsers();" type="button" 
+                                            ng-class="{'C5' : UserSettingModel.IsAddNewButtonEnabled() , 'disableBtn' : !UserSettingModel.IsAddNewButtonEnabled() }" >
+                                                Add new Users
+                                        </button>
+                                         <button class="btn T4 addmoreinfoBtn alignbutton" type="button" style="width: auto; margin-left: 10px;"
+                                    	 ng-click = "UserSettingModel.sendEmail('Add Licences')" ng-if="!UserSettingModel.IsTrialOrg">
+                                             Add Licenses
+                                        </button>
+                                        <button class="grayBtn btn btn-default btnCancel margin8" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                    </div>
+                                    <div class="row row_margin m0 pull-right" style="margin-top: 20px; padding-right: 15px;" 
+                                        ng-if="!UserSettingModel.IsTrialOrg">
+                                        <p style="display: inline-block; margin-right:15px;">To change or modify your users, please contact support</p>
+                                        <a class="btn btn-default greenBtn C5" type="button" href="{{UserSettingModel.communityURL}}" target="_blank">
+                                             Support
+                                        </a>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 
+                  </div>
+                    
+                  <div ng-switch-when="/Business_Profile">
+                     <div class="screen_section row" ng-if = "UserSettingModel.BusinessProfile.BusinessProfileMasterData.length != 0 "  >        
+                        <div class="col-sm-12 col-lg-12 col-md-12">
+                            <div class="row ">  <!-- class="marginbottom16" -->
+                                <div class="col-lg-4 col-md-4 priceAndTaxHeader">
+                                     <i class="fa fa-building Plr5 FC7 F18 bigIcon priceAndTaxIcon"></i>  <!-- class="bigIcon Plr5 FC7 F18" -->
+                                     <span class="T1 priceAndTaxText">Business profile</span>  <!-- class="gen_heading T2 removeborderbottom" -->
+                                </div>
+                            </div>
+                            <div class=" row subheadingcolor">  <!-- clas="T3 removeuppercase" -->
+                                You are the primary owner of this business. You can update your profile settings. 
+                            </div>
+                            <div id="BusinessDetailsSection">
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" ng-show="UserSettingModel.BusinessProfile.showBusinessDetailSection" ng-click="UserSettingModel.BusinessProfile.toggleBusinessDetailSectionView();"></i>
+                                                <i class="fa fa-angle-right" ng-show="!UserSettingModel.BusinessProfile.showBusinessDetailSection" ng-click="UserSettingModel.BusinessProfile.toggleBusinessDetailSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">Business details</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="BusinessDetails"  ng-show="UserSettingModel.BusinessProfile.showBusinessDetailSection">    
+                                    <div class="main_section row" >
+                                        <div class="form"> 
+                                            <div class="row margin8"> 
+                                                <div class="col-md-2 margin8">
+                                                    <label><span class="FC9">*</span>Business name</label> <!-- class="T7" -->
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input  class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessName"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessName');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessName']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['BusinessName']['ErrorMessage'] }}" />
+                                                </div>
+                                            </div>
+                                             
+                                            <div class="row margin8">
+                                                <div class="col-md-2 margin8">
+                                                    <label><span class="FC9">*</span>Business phone</label>
+                                                </div>
+                                                 <div class="col-md-2">
+                                                    <input type="text" class="form-control" 
+                                                     ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessPhone"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessPhone');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessPhone']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['BusinessPhone']['ErrorMessage'] }}" />
+                                                </div> 
+                                                <div class="col-md-3 col-md-offset-1">
+                                                    <label class="margin8"><span class="FC9">*</span>Business email</label>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="text" class="form-control" 
+                                                     ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessEmail"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessEmail');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessEmail']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['BusinessEmail']['ErrorMessage'] }}"/>
+                                                </div>  
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="BusinessAddressSection">
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" ng-show="UserSettingModel.BusinessProfile.showBusinessAddressSection" ng-click="UserSettingModel.BusinessProfile.toggleBusinessAddressSectionView();"></i>
+                                                <i class="fa fa-angle-right" ng-show="!UserSettingModel.BusinessProfile.showBusinessAddressSection" ng-click="UserSettingModel.BusinessProfile.toggleBusinessAddressSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">Business address</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="BusinessAddress" ng-show="UserSettingModel.BusinessProfile.showBusinessAddressSection">    
+                                    <div class="main_section row" >
+                                        <div class="form">
+                                            <div class="row margin8">
+                                                <div class="col-md-2 margin8">
+                                                    <label><span class="FC9">*</span>Street address 1</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStreetAddress1"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessStreetAddress1');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessStreetAddress1']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['BusinessStreetAddress1']['ErrorMessage'] }}" />
+                                                </div>
+                                                <div class="col-md-3 col-md-offset-1">
+                                                    <label class="margin8">Street address 2 (opt)</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessStreetAddress2"/>
+                                                </div>
+                                            </div>
+                                            
+                                             <div class="row margin8">
+                                                <div class="col-md-2 margin8">
+                                                    <label><span class="FC9">*</span>City</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCity"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessCity');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessCity']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['BusinessCity']['ErrorMessage'] }}" />
+                                                </div>
+                                                <div class="col-md-3 col-md-offset-1">
+                                                    <label class="margin8"><span class="FC9">*</span>Zip / post code</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessZipCode"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessZipCode');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessZipCode']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['BusinessZipCode']['ErrorMessage'] }}" />
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row margin8"> 
+                                                <div class="col-md-2 margin8">
+                                                    <label><span class="FC9">*</span>Country</label>
+                                                </div> 
+                                                <div class="col-md-2">
+                                                        <select class="form-control"
+                                                            ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessCountry"
+                                                            ng-change="UserSettingModel.BusinessProfile.countryChange()"
+                                                            ng-options="country.CountryName for country in UserSettingModel.BusinessProfile.BusinessProfileMasterData"
+                                                            ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessCountry');"
+                                                            ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessCountry']['isError'] == true}"
+                                                            title="{{UserSettingModel.BusinessProfileValidation['BusinessCountry']['ErrorMessage'] }}">
+                                                        </select>
+                                                        
+                                                    </div> 
+                                                <div class="col-md-3 col-md-offset-1">
+                                                    <label class="margin8"><span class="FC9">*</span>State / Country</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.BusinessState" 
+                                                        ng-options="state.StateName for state in UserSettingModel.BusinessProfile.BusinessProfileMasterData.StateRec"
+                                                        ng-blur="UserSettingModel.ValidateBusinessProfile('BusinessState');"
+                                                         ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['BusinessState']['isError'] == true}"
+                                                         title="{{UserSettingModel.BusinessProfileValidation['BusinessState']['ErrorMessage'] }}" >
+                                                        </select>
+                                                </div>
+                                            </div>
+                                         </div>
+                                      </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="ShippingAddressSection">
+                                    <div class="settings_Header row">
+                                        <div class="col-lg-3 col-md-3">
+                                            <div class="fixedHeaderText">
+                                                <span class="headerlabel">
+                                                    <i class="fa fa-angle-down" ng-show="UserSettingModel.BusinessProfile.showShippingAddressSection"  ng-click="UserSettingModel.BusinessProfile.toggleShippingAddressSectionView();"></i>
+                                                    <i class="fa fa-angle-right" ng-show="!UserSettingModel.BusinessProfile.showShippingAddressSection"  ng-click="UserSettingModel.BusinessProfile.toggleShippingAddressSectionView();"></i>
+                                                    <span class="divider">|</span>
+                                                    <span class="T2">Shipping address</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="ShippingAddress" ng-show="UserSettingModel.BusinessProfile.showShippingAddressSection">    
+                                        <div class="main_section row" >
+                                            <div class="form">
+                                                <div class="row margin8">
+                                                    <div class="col-md-2 margin8">
+                                                        <label>Same as business</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <select class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.IsSameAsBusinessAddress" 
+                                                                ng-options="item.Value as item.Level for item in UserSettingModel.BusinessProfile.SameAsBusiness" 
+                                                                ng-blur="UserSettingModel.ValidateBusinessProfile('IsSameAsBusinessAddress');"
+                                                                ng-change = "UserSettingModel.BusinessProfile.setShippingAddressData()" ></select>
+                                                    </div>
+                                                </div>  
+                                                
+                                                <div class="row margin8" ng-show="!UserSettingModel.BusinessProfile.BusinessProfileObj.IsSameAsBusinessAddress">
+                                                    <div class="col-md-2 margin8">
+                                                        <label>Company name (opt)</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCompanyName"/>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row margin8" ng-show="!UserSettingModel.BusinessProfile.BusinessProfileObj.IsSameAsBusinessAddress">
+                                                    <div class="col-md-2 margin8">
+                                                        <label><span class="FC9">*</span>Street address 1</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStreetAddress1"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('ShippingStreetAddress1');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['ShippingStreetAddress1']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['ShippingStreetAddress1']['ErrorMessage'] }}" />
+                                                    </div>
+                                                    <div class="col-md-3 col-md-offset-1">
+                                                        <label class="margin8">Street address 2 (opt)</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingStreetAddress2"/>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row margin8" ng-show="!UserSettingModel.BusinessProfile.BusinessProfileObj.IsSameAsBusinessAddress">
+                                                    <div class="col-md-2 margin8">
+                                                        <label><span class="FC9">*</span>City</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCity"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('ShippingCity');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['ShippingCity']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['ShippingCity']['ErrorMessage'] }}" />
+                                                    </div>
+                                                    <div class="col-md-3 col-md-offset-1">
+                                                        <label class="margin8"><span class="FC9">*</span>Zip / post code</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingZipCode"
+                                                     ng-blur="UserSettingModel.ValidateBusinessProfile('ShippingZipCode');"
+                                                     ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['ShippingZipCode']['isError'] == true}"
+                                                     title="{{UserSettingModel.BusinessProfileValidation['ShippingZipCode']['ErrorMessage'] }}" />
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row margin8" ng-show="!UserSettingModel.BusinessProfile.BusinessProfileObj.IsSameAsBusinessAddress">
+                                                    <div class="col-md-2 margin8">
+                                                        <label><span class="FC9">*</span>Country</label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <select class="form-control" ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingCountry"
+                                                                ng-change = "UserSettingModel.BusinessProfile.shippingCountryChange()" 
+                                                                ng-blur="UserSettingModel.ValidateBusinessProfile('ShippingCountry');"
+                                                                ng-options="country.CountryName for country in UserSettingModel.BusinessProfile.BusinessProfileMasterData"
+                                                                ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['ShippingCountry']['isError'] == true}"
+                                                                title="{{UserSettingModel.BusinessProfileValidation['ShippingCountry']['ErrorMessage'] }}">
+                                                                
+                                                                </select>
+                                                                <!-- 
+                                                               <option value="Select Country" ng-disabled="true">Select Country</option>
+                                                            <option value="{{country}}" ng-repeat="country in UserSettingModel.BusinessProfile.BusinessProfileMasterData">{{country.CountryName}}</option> -->
+                                                    </div>
+                                                    <div class="col-md-3 col-md-offset-1">
+                                                        <label class="margin8"><span class="FC9">*</span>State / County </label>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                            
+                                                        <select class="form-control" 
+                                                                ng-model="UserSettingModel.BusinessProfile.BusinessProfileObj.ShippingState" 
+                                                                ng-options="state.StateName for state in UserSettingModel.BusinessProfile.BusinessProfileMasterData.ShippingStateRec"
+                                                                ng-blur="UserSettingModel.ValidateBusinessProfile('ShippingState');"
+                                                                ng-class="{'redborder' : UserSettingModel.BusinessProfileValidation['ShippingState']['isError'] == true}"
+                                                                title="{{UserSettingModel.BusinessProfileValidation['ShippingState']['ErrorMessage'] }}">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="main_section row">
+                                    <span>
+                                        <button class="grayBtn btn btn-default btnCancel pull-right margin8 text-uppercase"  ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                        <button class="btn btn-default greenBtn pull-right margin8 text-uppercase" ng-class="{'C5' : UserSettingModel.BusinessProfile.IsSaveButtonEnabled(), 'disableBtn' : !UserSettingModel.BusinessProfile.IsSaveButtonEnabled()}" ng-click="UserSettingModel.BusinessProfile.saveBusinessProfileData();">Save</button>
+                                    </span>
+                                </div>
+                             </div>
+                         </div>
+                  </div>
+                             
+                <div ng-switch-when="/Billing">
+                    <div class="screen_section row">       
+                        <div class="col-sm-12">
+                            <div class="row marginbottom16">
+                                <div class="col-lg-4 col-md-4">
+                                    <i class="fa fa-credit-card Plr5 FC7 F18 bigIcon"></i><span class="gen_heading T2 removeborderbottom">Billing</span>
+                                </div>
+                            </div>
+                            <div class="T3 removeuppercase subheadingcolor" ng-if="UserSettingModel.IsTrialOrg"> 
+                                Sign-up for an account
+                            </div>
+                            <div ng-if="!UserSettingModel.IsTrialOrg" class="T3 removeuppercase subheadingcolor">
+                                View your payment details and payment history.
+                            </div>
+                            <div class="trialAccount" ng-show="UserSettingModel.Billing.viewTrialAccountScreen">
+                                    <div class="settings_Header row">
+                                        <div class="col-lg-3 col-md-3">
+                                            <div class="fixedHeaderText">
+                                                <span class="headerlabel">
+                                                    <i class="fa fa-angle-down" 
+                                                        ng-show="UserSettingModel.Billing.showTrialAccountSection" 
+                                                        ng-click="UserSettingModel.Billing.toggleTrialAccountSectionView();"></i>
+                                                    <i class="fa fa-angle-right" 
+                                                        ng-show="!UserSettingModel.Billing.showTrialAccountSection"  
+                                                        ng-click="UserSettingModel.Billing.toggleTrialAccountSectionView();"></i>
+                                                    <span class="divider">|</span>
+                                                    <span class="T2" ng-if="UserSettingModel.IsTrialOrg">Trial account</span>
+                                                    <span class="T2" ng-if="!UserSettingModel.IsTrialOrg">License details</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                      
+                                    <div class="form" ng-show="UserSettingModel.Billing.showTrialAccountSection" ng-if="UserSettingModel.IsTrialOrg" >
+                                        <div class="row margin8">
+                                            <div class="col-sm-12" style="margin-top: 8px;">
+                                            <span class = "col-md-8">
+                                                You are currently using a trial account. It will expire in {{UserSettingModel.Billing.noOfDays}} days.
+                                                </span>
+                                                <button class="btn btn-default greenBtn margin8"  ng-click="UserSettingModel.Billing.upgradeAccount();">Upgrade Now</button>
+                                            </div>
+                                        </div>
+                                        <div class="row margin8">
+                                            <div class="col-sm-12">
+                                            <span class = "col-md-8">
+                                                If you’d like to extend your trial, please, contact our support team.
+                                                </span>
+                                                <button class="btn btn-default  margin8 addmoreinfoBtn alignbutton"  style="width: 115px;" ng-click="UserSettingModel.Billing.showLicenseDetails();">Support</button>
+                                            </div>
+                                        </div>
+                                          <div class="row margin8">
+                                            <div class="col-sm-12">
+                                            <span class = "col-md-8">
+                                                </span>
+                                                <button class="grayBtn btn btn-default btnCancel margin8" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class = "form billingPaid" ng-show = "UserSettingModel.Billing.showTrialAccountSection" ng-if="!UserSettingModel.IsTrialOrg">
+                                        <p class = " col-md-6">You currently have an active subscription. If you’d like to buy or reduce your licenses, please, contact our support team.
+                                        </p>
+                                        <div class = "pull-right col-md-4">
+                                            <button class = "btn addmoreinfoBtn alignbutton T7 "  ng-click = "UserSettingModel.sendEmail('Cancel licenses')" style="width: auto; color: #FFF;"> Cancel licenses</button>
+                                            <button class = "btn addmoreinfoBtn alignbutton T7 " style="width: auto; color: #FFF;" ng-click = "UserSettingModel.sendEmail('Buy more licenses')"> Buy more licenses</button>
+                                            <button class="grayBtn btn btn-default btnCancel" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                            </div> 
+                                    </div>
+                            </div>
+                            <div class="upgradeAccount" ng-show="UserSettingModel.Billing.ViewUpgradeAccountScreen">
+                                
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" 
+                                                    ng-show="UserSettingModel.Billing.showUpgradeAccountSection" 
+                                                    ng-click="UserSettingModel.Billing.toggleUpgradeAccountSectionView();"></i>
+                                                <i class="fa fa-angle-right" 
+                                                    ng-show="!UserSettingModel.Billing.showUpgradeAccountSection"  
+                                                    ng-click="UserSettingModel.Billing.toggleUpgradeAccountSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">Upgrade your account</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                  
+                                <div class="form" ng-show="UserSettingModel.Billing.showUpgradeAccountSection">
+                                    <div class="row margin8">
+                                        <div class="col-sm-12 margin8">
+                                            Please enter your phone number and let us know when to call to upgrade your account
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row margin8">
+                                     <div class="col-sm-2 margin8 upgradeAccountFormElement">
+                                         <label>Country code</label>
+                                     </div>
+                                     <div class="col-sm-2 margin8">
+                                        <select class="form-control" 
+                                            ng-model="UserSettingModel.Billing.DataToUpgrade.IDDCode" 
+                                            ng-options="v as v for (k, v) in UserSettingModel.countryCodeToIDDMap" ></select>
+                                     </div>   
+                                     <div class="col-sm-2 margin8 upgradeAccountFormElement">
+                                         <label class="margin8">Phone no.</label>
+                                     </div>
+                                     <div class="col-sm-2 margin8">
+                                         <input class="form-control" ng-model="UserSettingModel.Billing.DataToUpgrade.Phone"
+                                         ng-class="{'redborder' : UserSettingModel.BillingValidation['Phone']['isError'] == true}"
+                                             ng-blur=" UserSettingModel.billingValidateForm('Phone');"
+                                             data-toggle="tooltip"
+                                            title="{{UserSettingModel.BillingValidation['Phone']['ErrorMessage'] }}"
+                                         />
+                                    </div>
+                                    <div class="col-sm-2 margin8">
+                                         <a class="btn T4 addmoreinfoBtn alignbutton " style="width: auto; color: #FFF; font-size: 14px;"
+	                                         ng-class="{'addmoreinfoBtn' : UserSettingModel.isSendActive , 'disableBtn' : !UserSettingModel.isSendActive}" 
+	                                         ng-click = "UserSettingModel.upgradeAccount()">
+                                         		Send
+                                         </a>
+                                         <button class="grayBtn btn btn-default btnCancel" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                    </div>
+                                    </div>  
+                                    <div class="row margin8">
+                                     <div class="col-sm-2 margin8 upgradeAccountFormElement">
+                                         <label>Date</label>
+                                     </div>
+                                     <div class="col-sm-2 margin8">
+                                         <input class="form-control" ui-date="dateOptions"  
+                                            ng-model="UserSettingModel.Billing.DataToUpgrade.UpgradeDate"/>
+                                     </div>
+                                    </div>
+                                    <div class="row margin8">
+                                         <div class="col-sm-2 margin8 upgradeAccountFormElement">
+                                             <label>Time</label>
+                                         </div>
+                                         <div class="col-sm-2 margin8">
+                                                             <!-- <select class="form-control" ng-model="UserSettingModel.Billing.DataToUpgrade.UpgradeTime" 
+                                                                ng-options="time for time in UserSettingModel.Billing.TimeList" ></select> -->
+                                                               
+                                            <button class="btn btn-primary margin8 marginLeft0 dropdown-toggle" type="button" 
+		                                            data-toggle="dropdown">{{UserSettingModel.Billing.DataToUpgrade.UpgradeTime}} 
+		                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu timepickerdropdown" style="overflow-y: scroll;max-height: 150px; position: relative; min-width: 120px;">
+                                              <li ng-repeat="time in UserSettingModel.Billing.TimeList" 
+                                              		ng-click="UserSettingModel.Billing.DataToUpgrade.UpgradeTime = time;"
+                                              		style="cursor:pointer;"><a>{{time}}</a></li>
+                                            </ul>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                            <div class="licenseDetail" ng-show="UserSettingModel.Billing.ViewLicenseDetailScreen">
+                                
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" 
+                                                    ng-show="UserSettingModel.Billing.showLicenseDetailSection" 
+                                                    ng-click="UserSettingModel.Billing.toggleLicenseDetailSectionView();"></i>
+                                                <i class="fa fa-angle-right" 
+                                                    ng-show="!UserSettingModel.Billing.showLicenseDetailSection"  
+                                                    ng-click="UserSettingModel.Billing.toggleLicenseDetailSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">License details</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                  
+                                <div class="form" ng-show="UserSettingModel.Billing.showLicenseDetailSection">
+                                    <div class="row margin8">
+                                        <div class="col-sm-6 margin8">
+                                            You currently have an active subscription. If you’d like to buy or reduce your licenses, please, contact our
+                                            support team.
+                                        </div>
+                                        <div class="col-sm-5 margin8 text-right">
+                                            <button class = "btn addmoreinfoBtn alignbutton T7 "  
+                                            	ng-click="UserSettingModel.sendEmail('Cancel Your Licences')" 
+                                            	style="width: auto; color: #FFF;"> Cancel licenses</button>
+                                            <button class = "btn addmoreinfoBtn alignbutton T7 " 
+                                            	style="width: auto; color: #FFF;" 
+                                            	ng-click = "UserSettingModel.sendEmail('Buy more licenses')"> Buy more licenses</button>
+                                            <button class="grayBtn btn btn-default btnCancel" 
+                                            	ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                            
+                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                            
+                <div ng-switch-when="/Import_And_Export">
+                    <div class="screen_section row">       
+                        <div class="col-sm-12">
+                        
+                            <div class="row marginbottom16">
+                                <div class="col-lg-4 col-md-4">
+                                    <i class="fa fa-cubes Plr5 FC7 F18 bigIcon"></i><span class="gen_heading T2 removeborderbottom">Import and export data</span>
+                                </div>
+                            </div>
+                            
+                            <div class="T3 removeuppercase subheadingcolor"> 
+                                Manage your data
+                            </div>
+                            
+                            <div class="importYourData">
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" 
+                                                    ng-show="UserSettingModel.ImportAndExport.showImportDataSection" 
+                                                    ng-click="UserSettingModel.ImportAndExport.toggleImportDataSectionView();"></i>
+                                                <i class="fa fa-angle-right" 
+                                                    ng-show="!UserSettingModel.ImportAndExport.showImportDataSection"  
+                                                    ng-click="UserSettingModel.ImportAndExport.toggleImportDataSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">Import your data</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form margin8" ng-show="UserSettingModel.ImportAndExport.showImportDataSection">
+	                                <div class = "col-md-12">
+	                                     <span class="margin8 col-md-8 ">Importing your existing parts inventory and vendor data is quick and easy. Get in touch and we’ll do it for you. </span>
+	                                     <a class="btn btn-default  margin8 addmoreinfoBtn alignbutton" style="width: auto; color: #FFF;" href="{{UserSettingModel.communityURL}}" target="_blanck" >Support</a>
+	                               	     <button class="btn btn-default grayBtn btnCancel margin8" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+	                                </div>
+	                               
+                                </div>
+                            </div>
+                            
+                            <div class="clearfix"></div>
+                          <div class="exportAccountingData">
+                                 <div class="settings_Header row">
+                                     <div class="col-lg-3 col-md-3">
+                                         <div class="fixedHeaderText">
+                                             <span class="headerlabel">
+                                                 <i class="fa fa-angle-down" 
+                                                     ng-show="UserSettingModel.ImportAndExport.showExportDataSection" 
+                                                     ng-click="UserSettingModel.ImportAndExport.toggleExportDataSectionView();"></i>
+                                                 <i class="fa fa-angle-right" 
+                                                     ng-show="!UserSettingModel.ImportAndExport.showExportDataSection"  
+                                                     ng-click="UserSettingModel.ImportAndExport.toggleExportDataSectionView();"></i>
+                                                 <span class="divider">|</span>
+                                                 <span class="T2">Export accounting data</span>
+                                             </span>
+                                         </div>
+                                     </div>  
+                                 </div>
+                                 <div class=" form margin8" ng-show="UserSettingModel.ImportAndExport.showExportDataSection">
+                                    <div class="col-md-12">
+	                                    <button class="btn btn-default  margin8 addmoreinfoBtn alignbutton" style="width: auto; color: #FFF;" ng-click="UserSettingModel.ImportAndExport.showTable();">Export all data</button>
+                                        <table class="table margin8 table-bordered table-responsive"
+                                        	ng-show="UserSettingModel.ImportAndExport.exportdata.lenght != 0">
+                                            <thead style="background-color:SlateGray; color:#fff;">
+                                                <tr>
+                                                    <th>Last modified</th>
+                                                    <th>Exported files</th>
+                                                    <th>Created by</th>
+                                                    <th>File</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody ng-repeat = "exportrec in UserSettingModel.ImportAndExport.exportdata">
+                                                <tr ng-repeat = "exportfile in exportrec.exportedFiles">
+                                                	
+                                                    <td style="vertical-align: middle;">{{exportfile.LastModifiedDate}}</td>
+                                                    <td style="vertical-align: middle;">{{exportfile.Name}}</td>
+                                                    <td style="vertical-align: middle;">{{exportfile.CreatedBy}}</td>
+                                                    <td>
+                                                        <span>
+                                                            <a class="btn btn-default greenBtn margin8"
+                                                            	href = "/servlet/servlet.FileDownload?file={{exportfile.Id}}">View</a>
+                                                            <a class="btn btn-default greenBtn margin8" 
+                                                            	href = "/servlet/servlet.FileDownload?file={{exportfile.Id}}"
+                                                            	download="download">Download</a>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                	</div>
+                                </div>
+                          </div>
+                          
+                          <button class="btn btn-default grayBtn pull-right margin8" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                            
+                           
+                             
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- changes by KV -->            
+                <div ng-switch-when="/Price_And_Tax">
+                    <div class="screen_section row" ng-if = "UserSettingModel.PriceAndTax.PriceAndTaxData.length != 0 || UserSettingModel.PriceAndTax.PriceAndTaxMasterData.length != 0">        
+                        <div class="col-sm-12 col-lg-12 col-md-12">
+                            <div class="row ">  <!-- class="marginbottom16" -->
+                                <div class="col-lg-4 col-md-4 priceAndTaxHeader">
+                                     <i class="fa fa-usd priceAndTaxIcon"></i>  <!-- class="bigIcon Plr5 FC7 F18" -->
+                                     <span class="T1 priceAndTaxText">Price &amp; tax</span>  <!-- class="gen_heading T2 removeborderbottom" -->
+                                </div>
+                            </div>
+                            <div class=" row subheadingcolor">  <!-- clas="T3 removeuppercase" -->
+                                You can set your price and tax settings for your parts, labor, fees and vendors.  
+                            </div>
+                            <div class="appSetting">
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" ng-show="UserSettingModel.PriceAndTax.showAppSetting" ng-click="UserSettingModel.PriceAndTax.toggleAppSectionView();"></i>
+                                                <i class="fa fa-angle-right" ng-show="!UserSettingModel.PriceAndTax.showAppSetting" ng-click="UserSettingModel.PriceAndTax.toggleAppSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">App settings</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                            <div id="app_settings"  ng-show="UserSettingModel.PriceAndTax.showAppSetting">    
+                                <div class="main_section row" >
+                                    <div class="form">
+                                        <div class="row margin8">
+                                            <div class="col-md-2 margin8">
+                                                <label>Region</label> <!-- class="" -->
+                                            </div>
+                                            <div class="col-md-2">
+                                                <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.SelectedCountry" ng-change = "UserSettingModel.PriceAndTax.countryChange()"
+                                                    ng-options="country.CountryName for country in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.countryList"></select>
+                                            </div>
+                                            <div class="col-md-3 col-md-offset-1">
+                                                <label class="margin8">Tax ID</label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.taxId"/>
+                                            </div>
+                                        </div>
+                                    
+                                        <div class="row margin8">
+                                            <div class="col-md-2 margin8">
+                                                <label>State / Province</label>
+                                            </div>
+                                             <div class="col-md-2">
+                                                <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.state"  ng-change = "UserSettingModel.PriceAndTax.stateTimeChange()"
+                                                    ng-options="state.StateName for state in UserSettingModel.PriceAndTax.PriceAndTaxData.StateRec track by state.Id"></select>
+                                            </div> 
+                                              <div class="col-md-3 col-md-offset-1">
+                                                <label class="margin8">Timezone</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.Time" 
+                                                    ng-options="timezone.Label for timezone in UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec"></select>
+                                            </div>  
+                                           <!--  <div class="col-md-3 col-md-offset-1">
+                                                <label class="margin8 ">Date fromat</label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <select class="form-control" ng-model="UserSettingModel.PriceAndTax.SelectedDateFormat" ng-options="dateFormat for dateFormat in UserSettingModel.PriceAndTax.DateFormats"></select>
+                                            </div> -->
+                                        </div>
+                                        
+                                        <div class="row margin8">
+                                           <!--  <div class="col-md-2 margin8">
+                                                <label>Currency</label>  
+                                            </div>
+                                            <div class="col-md-2">
+                                                <select class="form-control" ng-model="UserSettingModel.PriceAndTax.SelectedCurrency" ng-options="currency for currency in UserSettingModel.PriceAndTax.Currencies"></select>
+                                            </div> -->
+                                          <!--   <div class="col-md-3 col-md-offset-1">
+                                                <label class="margin8">Timezone</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.Time" 
+                                                    ng-options="timezone.Label for timezone in UserSettingModel.PriceAndTax.PriceAndTaxData.TimeRec"></select>
+                                            </div>   -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="taxSetting">
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" ng-show="UserSettingModel.PriceAndTax.showTaxSetting" ng-click="UserSettingModel.PriceAndTax.toggleTaxSectionView();"></i>
+                                                <i class="fa fa-angle-right" ng-show="!UserSettingModel.PriceAndTax.showTaxSetting" ng-click="UserSettingModel.PriceAndTax.toggleTaxSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">Tax settings</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="tax_Setting" ng-show="UserSettingModel.PriceAndTax.showTaxSetting">    
+                                    <div class="main_section row" >
+                                        <div class="form">
+                                            <div class="row margin8">
+                                                <div class="col-md-2 margin8">
+                                                    <label>Default tax on labor</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.defaultLaborTax" 
+                                                        ng-options="tax.id as tax.name for tax in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList"></select>
+                                                </div>
+                                                <div class="col-md-3 col-md-offset-1">
+                                                    <label class="margin8">Default tax on vendor item</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.defaultVendorItemTax" 
+                                                        ng-options="tax.id as tax.name for tax in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList"></select>
+                                                </div>
+                                            </div>
+                                        
+                                            <div class="row margin8">
+                                                <div class="col-md-2 margin8">
+                                                    <label>Default tax on part</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.defaultPartTax" 
+                                                        ng-options="tax.id as tax.name for tax in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList"></select>
+                                                </div>
+                                                <div class="col-md-3 col-md-offset-1">
+                                                    <label class="margin8">Default tax on fees</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.defaultFeeTax" 
+                                                        ng-options="tax.id as tax.name for tax in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList"></select>
+                                                </div>
+                                            </div>
+                                            <div class="row margin8">
+                                                <div class="col-md-2 margin8">
+                                                    <label>Ordering tax rate</label>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.orderingTaxRate" 
+                                                        ng-options="tax.id as tax.name for tax in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.salesTaxList"></select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="priceSetting">
+                                <div class="settings_Header row">
+                                    <div class="col-lg-3 col-md-3">
+                                        <div class="fixedHeaderText">
+                                            <span class="headerlabel">
+                                                <i class="fa fa-angle-down" ng-show="UserSettingModel.PriceAndTax.showPriceSetting"  ng-click="UserSettingModel.PriceAndTax.togglePriceSectionView();"></i>
+                                                <i class="fa fa-angle-right" ng-show="!UserSettingModel.PriceAndTax.showPriceSetting"  ng-click="UserSettingModel.PriceAndTax.togglePriceSectionView();"></i>
+                                                <span class="divider">|</span>
+                                                <span class="T2">Price settings</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="price_Setting" ng-show="UserSettingModel.PriceAndTax.showPriceSetting">    
+                                    <div class="main_section row" >
+                                        <div class="form">
+                                            <div class="row margin8">
+                                        <div class="col-md-2 margin8">
+                                            <label>Prices include tax</label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.priceIncludeTax" 
+                                                ng-options="item.Value as item.Label for item in UserSettingModel.PriceAndTax.PriceIncludeTax"></select>
+                                        </div>
+                                        <div class="col-md-3 col-md-offset-1">
+                                            <label class="margin8">Default price level</label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select class="form-control" ng-model="UserSettingModel.PriceAndTax.PriceAndTaxData.defaultPriceLevel" 
+                                                ng-options="pricelevel.id as pricelevel.name for pricelevel in UserSettingModel.PriceAndTax.PriceAndTaxMasterData.priceLevelList"></select>
+                                    </div>
+                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="main_section row">
+                            <span>
+                                <button class="grayBtn btn btn-default btnCancel pull-right margin8 text-uppercase" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                <button class="btn btn-default greenBtn pull-right margin8 text-uppercase" ng-click="UserSettingModel.PriceAndTax.savePriceAndTaxData();">Apply Settings</button>
+                            </span>
+                        </div>
+                        </div>
+                    </div>
+                </div>                                                      
+                         
+                 <div ng-switch-when="/Support">   
+                    <div class="screen_section row">        
+                        <div class="col-sm-12">
+                            <div class="row marginbottom16">
+                                <div class="col-lg-4 col-md-4">
+                                     <i class="fa fa-life-ring Plr5 FC7 F18 bigIcon"></i>
+                                     <span class="gen_heading T2 removeborderbottom">Support</span>
+                                </div>
+                            </div>
+                            <div class="T3 removeuppercase subheadingcolor">
+                                Get help and support others
+                            </div>
+                            <div class = "supportDiv">
+                                 <div class="settings_Header row">
+                                        <div class="col-lg-3 col-md-3">
+                                            <div class="fixedHeaderText">
+                                                <span class="headerlabel">
+                                                    <i class="fa fa-angle-down" 
+                                                        ng-show="UserSettingModel.Support.showTrialAccountSection" 
+                                                        ng-click="UserSettingModel.Support.toggleTrialAccountSectionView();"></i>
+                                                    <i class="fa fa-angle-right" 
+                                                        ng-show="!UserSettingModel.Support.showTrialAccountSection"  
+                                                        ng-click="UserSettingModel.Support.toggleTrialAccountSectionView();"></i>
+                                                    <span class="divider">|</span>
+                                                    <span class="T2" >Help &amp; community</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                 <div class="form" ng-show="UserSettingModel.Support.showTrialAccountSection" >
+                                        <div class="row margin8">
+                                            <div class="col-sm-12 margin8">
+                                            <span class = "col-md-8 ">
+                                               Join the BlackPurl community to share your knowledge and experience with others. You can also
+                                                help to improve BlackPurl by suggesting and voting for new features.
+                                                </span>
+                                                <a class="btn btn-default  margin8 addmoreinfoBtn alignbutton"  style="width: auto;" href="{{UserSettingModel.communityURL}}" target="_blanck" >Go to Community</a>
+                                            </div>
+                                        </div>
+                                        <div class="row margin8">
+                                            <div class="col-sm-12 margin8">
+                                            <span class = "col-md-8 ">
+                                                Get help from the community by asking a question
+                                                </span>
+                                                <a class="btn btn-default  margin8 addmoreinfoBtn alignbutton" style="width: auto;" href="{{UserSettingModel.communityQuestionURL}}" target="_blanck">Ask a Question</a>
+                                            </div>
+                                        </div>
+                                         <div class="row margin8">
+                                            <div class="col-sm-12 margin8">
+                                            <span class = "col-md-8 ">
+                                                Has something gone wrong? raise a support ticket for an issue you’re experiencing
+                                                </span>
+                                                <a class="btn btn-default  margin8 addmoreinfoBtn alignbutton" style="width: auto;" href="{{UserSettingModel.communityCaseURL}}" target="_blanck">Contact Support</a>
+                                            </div>
+                                        </div>
+                                        <div class="row margin8">
+                                            <div class="col-sm-12 margin8">
+                                            <span class = "col-md-8 T7">
+                                                </span>
+                                                <button class="grayBtn btn btn-default btnCancel margin8" style="width: auto;" ng-click="UserSettingModel.navigateToScreen('/Home')">Cancel</button>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                           
+                            </div>
+                    </div>
+                </div>
+                </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>       
+</apex:page>

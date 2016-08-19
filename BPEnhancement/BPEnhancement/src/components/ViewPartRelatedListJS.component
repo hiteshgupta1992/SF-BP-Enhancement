@@ -1,0 +1,861 @@
+<apex:component controller="ViewPartRelatedListCtrl">
+	
+	<!-- Register directives -->
+	<c:dirPagination />
+	
+	<script>
+		// Created module for component
+		var viewPartRelatedListModule = angular.module(	'viewPartRelatedListModule',
+														['dir.listPagination', 'ngAnimate', 'ui-notification']
+													);
+		
+		// Angular controller for component module
+		viewPartRelatedListModule.controller('viewPartRelatedListController', function ($scope, 
+																						Notification, 
+																						ActiveOrdersServices, 
+																						ActiveSalesOrdersServices, 
+																						AlternatePartsServices, 
+																						TaxExemptionsServices
+																					) {
+			// START: Modals definition
+			$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel = {
+				activeOrdersChangesCount	:	0,
+				activeOrdersCurrentPage		:	1,
+				activeOrdersPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"Name",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+            
+            $scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel = {
+				activeSalesOrdersChangesCount	:	0,
+				activeSalesOrdersCurrentPage		:	1,
+				activeSalesOrdersPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"Name",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.activeSalesOrdersPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+            
+            $scope.ViewPartRelatedListModal.AlternateParts_sectionModel = {
+				alternatePartsChangesCount	:	0,
+				alternatePartsCurrentPage	:	1,
+				alternatePartsPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"Item",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+            
+            $scope.ViewPartRelatedListModal.TaxExemptions_sectionModel = {
+				taxExemptionsChangesCount	:	0,
+				taxExemptionsCurrentPage	:	1,
+				taxExemptionsPageSize		:	10,
+				sorting	:	[{
+					fieldName		:	"SalesTax",
+					sortDirection	:	""
+				}]
+			};
+            try{
+            	$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsPageSize = '{!JSENCODE(TEXT(Related_List_Page_Size))}';
+            } catch (ex){}
+			// END: Modals definition
+			
+			// Map variable to hold order of sorting
+			var sortOrderMap = {
+				"ASC"	:	"DESC",
+				"DESC"	:	""
+			};
+			
+			// Help text for related lists
+			$scope.ViewPartRelatedListModal.helpText = {
+				Active_Orders_Help : '{!JSENCODE($Label.Tooltip_Active_Orders)}',
+				Active_Sales_Orders_Help : '{!JSENCODE($Label.Tooltip_Active_Sales_Orders)}',
+				Active_Orders_Settings_Help : '{!JSENCODE($Label.Tooltip_Active_Orders_Settings)}',
+				Active_Sales_Orders_Settings_Help : '{!JSENCODE($Label.Tooltip_Active_Sales_Orders_Settings)}',
+				Alternate_Parts_Help : '{!JSENCODE($Label.Tooltip_Alternate_Parts)}',
+				Alternate_Parts_Settings_Help : '{!JSENCODE($Label.Tooltip_Alternate_Parts_Settings)}',
+				Tax_Exemptions_Help : '{!JSENCODE($Label.Tooltip_Tax_Exemptions)}',
+				Tax_Exemptions_Settings_Help : '{!JSENCODE($Label.Tooltip_Tax_Exemptions_Settings)}'
+			};
+			
+			// END: Modals definition
+			
+			$scope.ViewPartRelatedListModal.hidePanel = function(event, id){
+                var targetelement = angular.element(event.target).closest('h1').find('.fa:first');
+                if(targetelement.hasClass('fa-chevron-right')){
+                    targetelement.removeClass('fa-chevron-right');
+                    targetelement.addClass('fa-chevron-down');
+                } else {
+                    targetelement.removeClass('fa-chevron-down');
+                    targetelement.addClass('fa-chevron-right');
+                }
+                $('#'+id).toggle();
+            }
+            
+            // Initialize/Update Related default modals
+            $scope.ViewPartRelatedListModal.initModals = function () {
+            	// Initialize/Update Alternate Parts default modals
+				$scope.ViewPartRelatedListModal.AlternateParts_initModals();
+				
+				// Initialize/Update Tax Exemptions default modals
+				$scope.ViewPartRelatedListModal.TaxExemptions_initModals();
+            }
+            
+            // Select callback when a record is selected in search to add autocomplete box
+            $scope.ViewPartRelatedListModal.searchToAddCallback = function (selectedRecord) {
+            	var selectedRecordId = selectedRecord.originalObject.Value;
+            	if( selectedRecordId.length == 18) {
+					selectedRecordId =  selectedRecordId.substring(0, 15);
+				}
+				
+				// If selected value is a Customer, then add the record in related cutomers list
+				if (selectedRecord.originalObject.Info == 'Merchandise') {
+					$scope.ViewPartRelatedListModal.AlternateParts_addActionSearchRecSelectCallback(selectedRecordId);
+				} else if (selectedRecord.originalObject.Info == 'Sales Tax Item') {
+					$scope.ViewPartRelatedListModal.TaxExemptions_addActionSearchRecSelectCallback(selectedRecordId);
+				}
+				
+				$scope.$parent.ViewPart.resetSearchBox();
+			}
+			
+			// START: Active Orders subsection methods
+			// Method to handle any updates in pagination controls
+            $scope.ViewPartRelatedListModal.Active_Orders_paginationControlsAction = function () {
+                ActiveOrdersServices.getPaginatedActiveOrdersForPart(	$scope.ViewPartRelatedListModal.PartId,
+             															$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel)
+				.then(function(activeOrdersInfo) {
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalActiveOrders = activeOrdersInfo.TotalActiveOrders;
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.ActiveOrders = activeOrdersInfo.activeOrders;
+                	
+            		setTimeout(function () {
+		            	$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewPartRelatedListModal.Active_Orders_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersCurrentPage = 1;
+            	$scope.ViewPartRelatedListModal.Active_Orders_paginationControlsAction();
+            }        
+            // END: Active Orders subsection methods
+            
+            // START: Active Sales Orders subsection methods
+			// Method to handle any updates in pagination controls
+            $scope.ViewPartRelatedListModal.Active_Sales_Orders_paginationControlsAction = function () {
+                ActiveSalesOrdersServices.getPaginatedActiveSalesOrdersForPart(	$scope.ViewPartRelatedListModal.PartId,
+             																	$scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel)
+				.then(function(activeSalesOrdersInfo) {
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalActiveSalesOrders = activeSalesOrdersInfo.TotalActiveSalesOrders;
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.ActiveSalesOrders = activeSalesOrdersInfo.activeSalesOrders;
+                	
+            		setTimeout(function () {
+		            	$scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.activeSalesOrdersChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewPartRelatedListModal.Active_Sales_Orders_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.activeOrdersCurrentPage = 1;
+            	$scope.ViewPartRelatedListModal.Active_Sales_Orders_paginationControlsAction();
+            }        
+            // END: Active Sales Orders subsection methods
+            
+            // START: Alternate Parts subsection methods
+            // Initialize/Update Alternate Parts default modals
+            $scope.ViewPartRelatedListModal.AlternateParts_initModals = function () {
+            	// Populate edit rows modal
+            	$scope.ViewPartRelatedListModal.AlternateParts_initEditRowsModal();
+            }
+            
+            // Method to handle any updates in pagination controls
+            $scope.ViewPartRelatedListModal.AlternateParts_paginationControlsAction = function () {
+                AlternatePartsServices.getPaginatedAlternatePartsForPart(	$scope.ViewPartRelatedListModal.PartId,
+                															$scope.ViewPartRelatedListModal.AlternateParts_sectionModel)
+				.then(function(alternatePartsInfo) {
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = alternatePartsInfo.TotalAlternateParts;
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = alternatePartsInfo.alternateParts;
+            		
+            		setTimeout(function () {
+		            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewPartRelatedListModal.AlternateParts_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsCurrentPage = 1;
+            	$scope.ViewPartRelatedListModal.AlternateParts_paginationControlsAction();
+            }
+            
+            // Init edit rows
+            $scope.ViewPartRelatedListModal.AlternateParts_initEditRowsModal = function () {
+            	$scope.ViewPartRelatedListModal.AlternateParts_editRow = [];
+            	for (i = 0; i < $scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length; i++) {
+                    $scope.ViewPartRelatedListModal.AlternateParts_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+                    });
+                }
+            }
+            
+            // Method for DOM action: Select record as preferred	
+			$scope.ViewPartRelatedListModal.AlternateParts_makeDefault = function (event, index) {
+				event.stopPropagation();
+				// Invoke add purchase order type UPDATE DEFAULT service
+                AlternatePartsServices.updateDefaultAlternatePart(	$scope.ViewPartRelatedListModal.PartId,
+				                									$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[index].Id.substring(0, 15),
+				          											!$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[index].IsPreferred
+				         										)
+                .then(function(resultInfo) {
+                	debug(resultInfo);
+                	if(resultInfo.indexOf(',') != -1){
+                		//Notification.info( resultInfo.substring(resultInfo.indexOf(',')) );
+                		$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = parseInt( resultInfo.substring(0, resultInfo.indexOf(",")) );
+                	} else {
+                		$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = parseInt(resultInfo);
+                	}
+                	
+               		// If new value to update is true, then update other default to false and then update new value
+               		if( !$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[index].IsPreferred == true ){
+                		for(i = 0; i < $scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length; i++){
+                			if($scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[i].IsPreferred){
+                				$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[i].IsPreferred = false;
+                			}
+                		}
+                	}
+               		$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[index].IsPreferred = !$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[index].IsPreferred;
+                	
+                	setTimeout(function () {
+		            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsChangesCount++;
+		            }, 10);
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                });
+			}
+            
+            // Method for DOM action: Add
+			$scope.ViewPartRelatedListModal.AlternateParts_addAction = function (event) {
+				$scope.$parent.ViewPart.setFocusToSearchBox('Merchandise');
+			}
+			
+			// Method for DOM action: Add after selecting a record in search box
+			$scope.ViewPartRelatedListModal.AlternateParts_addActionSearchRecSelectCallback = function (selectedRecordId) {
+				// First check if the selected record is the original part itself or is already added in the list.
+				// If so, then return and information message and do not process the request
+				if( (selectedRecordId.length == 15 && selectedRecordId == $scope.ViewPartRelatedListModal.PartId.substring(0, 15)) 
+					||
+					(selectedRecordId.length == 18 && selectedRecordId == $scope.ViewPartRelatedListModal.PartId)
+				){
+					Notification.info("{!JSENCODE($Label.Part_Not_Added_As_Alternate_Part)}");
+					return;
+				} else {
+					var doProcess = true;
+					angular.forEach($scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts, function (value, key) {
+						if( (selectedRecordId.length == 15 && selectedRecordId == value.AlternatePartId.substring(0, 15)) 
+							||
+							(selectedRecordId.length == 18 && selectedRecordId == value.AlternatePartId)
+						){
+							doProcess = false;
+						}
+					});
+					
+					if(!doProcess){
+						Notification.info("{!JSENCODE($Label.Part_Is_Already_Alternate_Part)}");
+						return;
+					}
+				}
+				
+				var newAlternateParts = [{
+                    AlternatePartId : selectedRecordId,
+                    Relation : "Alternate",
+                    PartId : $scope.ViewPartRelatedListModal.PartId
+                }];
+                
+                // Invoke add alternate part ADD service
+                AlternatePartsServices.addAlternatePartToPart(newAlternateParts).then(function(newAlternatePartDetails) {
+                    var newRecords = [newAlternatePartDetails[0].AlternatePartRecord];
+                    
+                    // Check for any error
+                    if(newAlternatePartDetails[0].isError == true){
+                    	Notification.info(newAlternatePartDetails[0].ErrorMsg);
+                    } else {
+	                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = newRecords.concat($scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts);
+	                    var initIndex = ($scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts == null || $scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length == 0)
+										? 0
+										: ($scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[0].IsPreferred) ? 1 : 0;
+						$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.splice(initIndex, 0, newRecords[0]);
+	                    $scope.ViewPartRelatedListModal.AlternateParts_initEditRowsModal();
+	                    
+	                    if( $scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length > $scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsPageSize){
+	                    	$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length = $scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsPageSize;
+	                    }
+	                    
+	                    $scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = newAlternatePartDetails[0].TotalAlternateParts;
+	            		
+	            		setTimeout(function () {
+			            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsChangesCount++;
+			            }, 10);
+	                    
+	                    Notification.success('{!JSENCODE($Label.Part_Saved_Successfully)}');
+	                    // Now focus to "Relation" field
+	                    angular.element("#Alternate_Parts_row" + initIndex).find("select").filter(':first').focus();
+					}
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = errorSearchResult;
+                });
+			}
+            
+            // Update relation field value action
+            $scope.ViewPartRelatedListModal.AlternateParts_updateRelation = function (alternatePartJunctionId, alternateOrderRelation, indexVal) {
+                // Invoke add alternate part UPDATE service
+                AlternatePartsServices.updateAlternatePartRelation($scope.ViewPartRelatedListModal.PartId, alternatePartJunctionId, alternateOrderRelation).then(function(totalAlternateParts) {
+                	if(totalAlternateParts.indexOf(',') != -1){
+                		Notification.error( totalAlternateParts.substring(totalAlternateParts.indexOf(',')) );
+                		$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = parseInt( totalAlternateParts.substring(0, totalAlternateParts.indexOf(",")) );
+                		$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[indexVal].Relation = "Alternate";
+                	} else {
+	                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = parseInt(totalAlternateParts);
+	            		
+	            		setTimeout(function () {
+			            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsChangesCount++;
+			            }, 10);
+	                	
+	                	Notification.success('{!JSENCODE($Label.Part_Saved_Successfully)}');
+	                }
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = errorSearchResult;
+                });
+            }
+            
+            // Method to open row in edit mode
+            $scope.ViewPartRelatedListModal.AlternateParts_openRowAsEdit = function (event, index) {
+           		event.stopPropagation();
+            	
+            	// Close previous open row first
+            	var editRowIndex = $scope.ViewPartRelatedListModal.AlternateParts_closeEditRows();
+                
+                if(editRowIndex != index){
+	                // Open selected row now
+	                $scope.ViewPartRelatedListModal.AlternateParts_editRow[index].isEdit = true;
+	                setTimeout(function () {
+                    	angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+	                }, 10);
+				}
+            }
+            
+            // Method to close row from edit mode
+            $scope.ViewPartRelatedListModal.AlternateParts_closeEditRows = function (event) {
+            	var editRowIndex;
+            	
+            	for (i = 0; i < $scope.ViewPartRelatedListModal.AlternateParts_editRow.length; i++) {
+                    if ($scope.ViewPartRelatedListModal.AlternateParts_editRow[i].isEdit == true) {
+                        $scope.ViewPartRelatedListModal.AlternateParts_editRow[i].isEdit = false;
+                        editRowIndex = i;
+                        break;
+                    }
+                }
+                return editRowIndex;
+            }
+            
+            // Edit row "GO" Action
+            $scope.ViewPartRelatedListModal.AlternateParts_GoAction = function (index) {
+            	// selected radio value == 1 Means delete the record from the list
+                if($scope.ViewPartRelatedListModal.AlternateParts_editRow[index].radioValue == 1){
+                   // Invoke add alternate part REMOVE service
+	                AlternatePartsServices.removeAlternatePartRelation(	$scope.ViewPartRelatedListModal.PartId, 
+	                													$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts[index].Id,
+	                													$scope.ViewPartRelatedListModal.AlternateParts_sectionModel
+	                												)
+	                .then(function(newAlternatePartsDetails) {
+	                	$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = newAlternatePartsDetails.alternateParts;
+	                	$scope.ViewPartRelatedListModal.AlternateParts_initEditRowsModal();
+	                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts = newAlternatePartsDetails.TotalAlternateParts;
+	                	
+	                	if($scope.ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts % $scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsPageSize == 0){
+	            			$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsCurrentPage--;
+	            			$scope.ViewPartRelatedListModal.AlternateParts_paginationControlsAction();
+	            		} else {
+		            		setTimeout(function () {
+				            	$scope.ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsChangesCount++;
+				            }, 10);
+			            }
+			            
+	                	Notification.success('{!JSENCODE($Label.Part_Updated_Successfully)}');
+	                }, function(errorSearchResult) {
+	                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+	                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = errorSearchResult;
+	                });
+                }
+            }
+            // END: Alternate Parts subsection methods
+            
+            // START: Tax Exemptions subsection methods
+            // Initialize/Update Tax Exemptions default modals
+            $scope.ViewPartRelatedListModal.TaxExemptions_initModals = function () {
+            	// Populate edit rows modal
+            	$scope.ViewPartRelatedListModal.TaxExemptions_initEditRowsModal();
+            }
+            
+            // Init edit rows
+            $scope.ViewPartRelatedListModal.TaxExemptions_initEditRowsModal = function () {
+            	$scope.ViewPartRelatedListModal.TaxExemptions_editRow = [];
+            	for (i = 0; i < $scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions.length; i++) {
+                    $scope.ViewPartRelatedListModal.TaxExemptions_editRow.push({
+                        isEdit : false,
+                        radioValue : 0,
+                        optionSelected : 0
+                    });
+                }
+            }
+            
+            // Method to handle any updates in pagination controls
+            $scope.ViewPartRelatedListModal.TaxExemptions_paginationControlsAction = function () {
+                TaxExemptionsServices.getPaginatedTaxExemptionsForPart(	$scope.ViewPartRelatedListModal.PartId,
+                														$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel
+                													).then(function(taxExemptionsInfo) {
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions = taxExemptionsInfo.TotalTaxExemptions;
+                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions = taxExemptionsInfo.taxExemptions;
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.AlternateParts = errorSearchResult;
+                });
+            }
+            
+            // Method to handle sorting controls
+            $scope.ViewPartRelatedListModal.TaxExemptions_sortControlsAction = function () {
+            	var newSortOrder = sortOrderMap[$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.sorting[0].sortDirection];
+            	if(newSortOrder == null || newSortOrder == undefined){
+            		newSortOrder = "ASC";
+            	}
+            	$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.sorting[0].sortDirection = newSortOrder;
+            	
+            	// Set current page to 1
+            	$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsCurrentPage = 1;
+            	$scope.ViewPartRelatedListModal.TaxExemptions_paginationControlsAction();
+            }
+            
+            // Method for DOM action: Add
+			$scope.ViewPartRelatedListModal.TaxExemptions_addAction = function (event) {
+				$scope.$parent.ViewPart.setFocusToSearchBox('Sales Tax Item');
+			}
+            
+            // Method for DOM action: Add
+			$scope.ViewPartRelatedListModal.TaxExemptions_addActionSearchRecSelectCallback = function (selectedRecordId) {
+				// First check if the selected record is already added in the list.
+				// If so, then return and information message and do not process the request
+				var doProcess = true;
+				angular.forEach($scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions, function (value, key) {
+					if(selectedRecordId == value.SalesTaxId.substring(0, 15)){
+						doProcess = false;
+					}
+				});
+				if(!doProcess){
+					Notification.info("{!JSENCODE($Label.Part_Sales_Tax_Is_Already_Tax_Exemption)}");
+					return;
+				}
+				
+				var newTaxExemptions = [{
+                    SalesTaxId : selectedRecordId,
+                    Description : "",
+                    PartId : $scope.ViewPartRelatedListModal.PartId
+                }];
+                
+                // Invoke add alternate part ADD service
+                TaxExemptionsServices.addTaxExemptionToPart(newTaxExemptions).then(function(newTaxExemptionDetails) {
+                    var newRecords = [newTaxExemptionDetails[0].TaxExemptionRecord];
+                    
+                    // Check for any error
+                    if(newTaxExemptionDetails[0].isError == true){
+                    	Notification.info(newTaxExemptionDetails[0].ErrorMsg);
+                    } else {
+	                    $scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions = newRecords.concat($scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions);
+	                    $scope.ViewPartRelatedListModal.TaxExemptions_initEditRowsModal();
+	                    
+	                    if( $scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions.length > $scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsPageSize){
+	                    	$scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions.length = $scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsPageSize;
+	                    }
+	                    
+	                    $scope.ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions = newTaxExemptionDetails[0].TotalTaxExemptions;
+	            		setTimeout(function () {
+			            	$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsChangesCount++;
+			            }, 10);
+	                    
+	                    Notification.success('{!JSENCODE($Label.Tax_Exemption_Saved_Successfully)}');
+	                    // Now focus to "Relation" field
+	                    angular.element("#Tax_Exemptions_row0").focus();
+					}
+                }, function(errorSearchResult) {
+                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions = errorSearchResult;
+                });
+			}
+			
+            // Method to open row in edit mode
+            $scope.ViewPartRelatedListModal.TaxExemptions_openRowAsEdit = function (event, index) {
+           		event.stopPropagation();
+            	
+            	// Close previous open row first
+            	var editRowIndex = $scope.ViewPartRelatedListModal.TaxExemptions_closeEditRows();
+                
+                if(editRowIndex != index){
+	                // Open selected row now
+	                $scope.ViewPartRelatedListModal.TaxExemptions_editRow[index].isEdit = true;
+	                setTimeout(function () {
+                    	angular.element(event.target).closest('tr').next().find('input').filter(':first').focus();
+	                }, 10);
+				}
+            }
+            
+            // Method to close row from edit mode
+            $scope.ViewPartRelatedListModal.TaxExemptions_closeEditRows = function (event) {
+            	var editRowIndex;
+            	
+            	for (i = 0; i < $scope.ViewPartRelatedListModal.TaxExemptions_editRow.length; i++) {
+                    if ($scope.ViewPartRelatedListModal.TaxExemptions_editRow[i].isEdit == true) {
+                        $scope.ViewPartRelatedListModal.TaxExemptions_editRow[i].isEdit = false;
+                        editRowIndex = i;
+                        break;
+                    }
+                }
+                return editRowIndex;
+            }
+            
+            // Edit row "GO" Action
+            $scope.ViewPartRelatedListModal.TaxExemptions_GoAction = function (index) {
+            	// selected radio value == 1 Means delete the record from the list
+                if($scope.ViewPartRelatedListModal.TaxExemptions_editRow[index].radioValue == 1){
+                   // Invoke add alternate part REMOVE service
+	                TaxExemptionsServices.removeTaxExemption(	$scope.ViewPartRelatedListModal.PartId, 
+	                											$scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions[index].Id,
+	                											$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel
+	                										)
+	                .then(function(newAlternatePartsDetails) {
+	                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions = newAlternatePartsDetails.taxExemptions;
+	                	$scope.ViewPartRelatedListModal.TaxExemptions_initEditRowsModal();
+	                	$scope.ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions = newAlternatePartsDetails.TotalTaxExemptions;
+	                	
+	                	if($scope.ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions % $scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsPageSize == 0){
+	            			$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsCurrentPage--;
+	            			$scope.ViewPartRelatedListModal.TaxExemptions_paginationControlsAction();
+	            		} else {
+		            		setTimeout(function () {
+				            	$scope.ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsChangesCount++;
+				            }, 10);
+			            } 
+	                	Notification.success('{!JSENCODE($Label.Tax_Exemption_Updated_Successfully)} Exeption record removed successfully.');
+	                }, function(errorSearchResult) {
+	                	Notification.error('{!JSENCODE($Label.Page_Server_Save_Error)}');
+	                    //$scope.ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions = errorSearchResult;
+	                });
+                }
+            }
+            // END: Tax Exemptions subsection methods
+		});
+		
+		// START: Services for component
+		viewPartRelatedListModule.service("ActiveOrdersServices", function ($q) {
+            // Service method to get Active Order records as per pagination and sorting attributes
+            this.getPaginatedActiveOrdersForPart = function(partId, pageSortAttrsJSON)
+            {
+            		partId = encodeString(partId);
+            		pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.getPaginatedActiveOrdersForPart}',
+                        partId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var activeOrdersInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                activeOrdersInfo = activeOrdersInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(activeOrdersInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+		});
+		
+		viewPartRelatedListModule.service("ActiveSalesOrdersServices", function ($q) {
+            // Service method to get Active Order records as per pagination and sorting attributes
+            this.getPaginatedActiveSalesOrdersForPart = function(partId, pageSortAttrsJSON)
+            {
+            		partId = encodeString(partId);
+            		pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.getPaginatedActiveSalesOrdersForPart}',
+                        partId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var activeSalesOrdersInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                activeSalesOrdersInfo = activeSalesOrdersInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(activeSalesOrdersInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+		});
+		
+		viewPartRelatedListModule.service("AlternatePartsServices", function ($q) {
+			// Service method to add an alternate part to a part alternate
+			// As result, the alternate part details are returned so as to add the detail in the original list
+            this.addAlternatePartToPart = function(alternatePartsJSON)
+            {
+            		alternatePartsJSON = encodeString(angular.toJson(alternatePartsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.addAlternatePartToPart}',
+                        alternatePartsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var alternatePartInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                alternatePartInfo = alternatePartInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(alternatePartInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+            
+            // Service method to update an alternate part relation
+            this.updateAlternatePartRelation = function(partId, alternatePartJunctionId, alternateOrderRelation)
+            {
+            		partId = encodeString(partId);
+            		alternatePartJunctionId = encodeString(alternatePartJunctionId);
+            		alternateOrderRelation = encodeString(alternateOrderRelation);
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.updateAlternatePartRelation}',
+                        partId, alternatePartJunctionId, alternateOrderRelation,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var totalAlternateParts = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                deferred.resolve(totalAlternateParts);
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+            
+            // Service method to update record as preffered record
+			this.updateDefaultAlternatePart = function (partId, alternatePartJunctionId, preferredValToUpdate) {
+				partId = encodeString(partId);
+				alternatePartJunctionId = encodeString(alternatePartJunctionId);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewPartRelatedListCtrl.updateDefaultAlternatePart}',
+					partId, alternatePartJunctionId, preferredValToUpdate,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var resultInfo = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						resultInfo = resultInfo.replace(re, '');
+						deferred.resolve(resultInfo);
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+            
+            // Service method to remove an alternate part relation
+            this.removeAlternatePartRelation = function(partId, alternatePartJunctionId, pageSortAttrsJSON)
+            {
+            		partId = encodeString(partId);
+            		alternatePartJunctionId = encodeString(alternatePartJunctionId);
+            		pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.removeAlternatePartRelation}',
+                        partId, alternatePartJunctionId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var alternatePartsInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                alternatePartsInfo = alternatePartsInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(alternatePartsInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+            
+            // Service method to get alternate part records as per pagination and sorting attributes
+            this.getPaginatedAlternatePartsForPart = function(partId, pageSortAttrsJSON)
+            {
+            		partId = encodeString(partId);
+            		pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.getPaginatedAlternatePartsForPart}',
+                        partId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var alternatePartsInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                alternatePartsInfo = alternatePartsInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(alternatePartsInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+        });
+		
+		viewPartRelatedListModule.service("TaxExemptionsServices", function ($q) {
+			// Service method to add an tax exemption
+			// As result, the tax exemption details are returned so as to add the detail in the original list
+            this.addTaxExemptionToPart = function(taxExemptionsJSON)
+            {
+            		taxExemptionsJSON = encodeString(angular.toJson(taxExemptionsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.addTaxExemptionToPart}',
+                        taxExemptionsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var taxExemptionInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                taxExemptionInfo = taxExemptionInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(taxExemptionInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+            
+            // Service method to remove an Tax Exemption
+            this.removeTaxExemption = function(partId, taxExemptionJunctionId, pageSortAttrsJSON)
+            {
+            
+            		partId = encodeString(partId);
+            		taxExemptionJunctionId = encodeString(taxExemptionJunctionId);
+            		pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.removeTaxExemption}',
+                        partId, taxExemptionJunctionId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var taxExemptionsInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                taxExemptionsInfo = taxExemptionsInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(taxExemptionsInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+            
+            // Service method to get alternate part records as per pagination and sorting attributes
+            this.getPaginatedTaxExemptionsForPart = function(partId, pageSortAttrsJSON)
+            {
+            		partId = encodeString(partId);
+            		pageSortAttrsJSON = encodeString(angular.toJson(pageSortAttrsJSON));
+                    var deferred = $q.defer();
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.ViewPartRelatedListCtrl.getPaginatedTaxExemptionsForPart}',
+                        partId, pageSortAttrsJSON,
+                        function (result, event) {
+                           if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var taxExemptionsInfo = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                taxExemptionsInfo = taxExemptionsInfo.replace(re, '');
+                                deferred.resolve(JSON.parse(taxExemptionsInfo));
+                            }
+                        }, {
+                            escape : true
+                    });
+                    return deferred.promise;
+            }
+        });
+		// START: Services for component
+	</script>
+	
+</apex:component>

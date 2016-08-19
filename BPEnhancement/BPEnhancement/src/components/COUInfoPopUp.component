@@ -1,0 +1,468 @@
+<apex:component Controller="ViewCustomerCtrl">
+<c:NewViewCustomerStyle />
+
+        <style>
+              .Vendor-Order-Part-Popup{
+                  display: none;
+                    background: #fff;
+                    color: #000;
+                    width: 650px;
+                    min-height: 100px;
+                    position: absolute;
+                    text-align: left;
+                    z-index: 1000;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    -moz-box-shadow: 0 0 20px #222;
+                    -webkit-box-shadow: 0 0 20px #222;
+                    box-shadow: 0 0 20px #222;
+              }
+              .Vendor-Order-Part-Popup .under-line-row{
+                  padding: 10px;
+                  border-bottom: 1px solid #939598;
+                  margin-left: 0px;
+              }
+              .button-On-PopUp {
+                    background-color: orange;
+                    color: white;
+                    font-weight: bold;
+              }
+              .my-legend .legend-title {
+                text-align: left;
+                margin-bottom: 5px;
+                font-weight: bold;
+                font-size: 90%;
+                }
+              .my-legend .legend-scale ul {
+                margin: 0;
+                margin-bottom: 5px;
+                padding: 0;
+                float: left;
+                list-style: none;
+                }
+              .my-legend .legend-scale ul li {
+                font-size: 80%;
+                list-style: none;
+                margin-left: 0;
+                line-height: 18px;
+                margin-bottom: 2px;
+                }
+              .my-legend ul.legend-labels li span {
+                display: block;
+                float: left;
+                height: 16px;
+                width: 30px;
+                margin-right: 5px;
+                margin-left: 0;
+                border: 1px solid #999;
+                }
+              .my-legend .legend-source {
+                font-size: 70%;
+                color: #999;
+                clear: both;
+                }
+              .my-legend a {
+                color: #777;
+                }
+                /* change by DK*/
+               .closeBtn{
+                  height: 32px;
+                }
+                .gid_container_Customer .table {
+                    border: 0;
+                }
+                .main_section_COU_Header .actionRow .actionText {
+                    margin-left: 5px;
+                    color: #939CA9;
+                }
+                .first_img {
+                    height: 30px;
+                }
+                .gid_container_Customer .table th {
+                    border: none;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                }
+                .gid_container_Customer .table tbody {
+                    border: none;
+                }
+                .gid_container_Customer .table tbody > tr > td {
+                    border: none;
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                    vertical-align: middle;
+                }
+                .gid_container_Customer .table tbody .tddropdown td {
+                    padding-top: 2px;
+                    padding-bottom: 2px;
+                    vertical-align: middle;
+                }
+                .angucomplete-dropdown {
+                    width: 100%;
+                    margin-top: 28px;
+                }
+                .gid_container_Customer .tableHeader {
+                    margin-left: -15px;
+                    margin-right: -15px;
+                }
+                .gid_container_Customer .S2 {
+                    margin-left: 12px;
+                    margin-right: 12px;
+                }
+                .gid_container_Customer table tr.edit_panel {
+                    background: #fff;
+                }
+                .gid_container_Customer table tr.edit_panel,
+                .gid_container_Customer table tr.Editable_row {} .gid_container_Customer table tr.edit_panel.show_tr {
+                    display: table-row;
+                }
+                .gid_container_Customer table tr.edit_panel input[type="radio"] {
+                    float: left;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body .editform_btn {
+                    position: absolute;
+                    right: 20px;
+                    top: 87px;
+                    width: 50px;
+                }
+                .gid_container_Customer table tr.edit_panel td {
+                    overflow: hidden;
+                    height: 0;
+                    padding-top: 5px;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box {
+                    border: 1px dashed #A8A8A8;
+                    margin: 10px 5px;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel.animate_tr td {
+                    border-left: 3px solid #939393;
+                    height: auto;
+                    padding: 4px;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box.ng-hide {
+                    height: 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box {
+                    transition: all 0.5s ease;
+                }
+                .edit_box {
+                    transition: .5s linear all;
+                    height: 130px;
+                }
+                .gid_container_Customer table tr.edit_panel.animate_tr {
+                    margin-top: 10px;
+                    transition: all 0.5s ease;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .its-heading {
+                    position: absolute;
+                    left: 24px;
+                    top: -15px;
+                    min-width: 175px;
+                    background: #fff;
+                    min-height: 30px;
+                    padding: 6px;
+                    font-size: 14px;
+                    color: #939CA9;
+                    font-weight: bold;
+                }
+                .gid_container_Customer .table .edite_btn {
+                    height: 38px;
+                    width: 38px;
+                    float: left;
+                    padding: 4px;
+                    margin: 4px 0;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body {
+                    margin: 26px;
+                }
+                
+                .gid_container_Customer table tr td .notification{
+                  color: #C9302C;
+                  display: block;
+                  clear: both;
+                  font-size: 11px;
+                  font-style: italic;
+                }
+                .gid_container_Customer table tr td .AvalaibleQtyNotification{
+                  color: #1abc9c;
+                  display: block;
+                  clear: both;
+                  font-size: 11px;
+                  font-style: italic;
+                }
+                .gid_container_Customer table tr td .Infonotification{
+                  color: #2E64FE;
+                  display: block;
+                  clear: both;
+                  font-size: 11px;
+                  font-style: italic;
+                }
+                
+                #CO_Merchandise_block_grid_container .Editable_row .form-control{
+                    width: 75%;
+                    border-color: #00AEEF;
+                    text-align: center;
+                    display: table-row;
+                    float: left;
+                }
+                
+                .gid_container_Customer table tr.edit_panel input[type="radio"]{
+                    float: left;
+                    position: relative;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body .radio label span {
+                    display: block;
+                    float: left;
+                    margin-top: 0px;
+                    font-size: 14px;
+                    color: #707070;
+                }
+                .gid_container_Customer table tr.edit_panel td .edit_box .edit-body .radio label span.select_box_container {
+                    display: block;
+                    float: left;
+                    margin-left: 22px;
+                    margin-top: -4px;
+                }
+                
+                .Vendor-Order-Part-line{
+                    float: left;
+                    width: 100%;
+                    margin: 24px 0 24px 0px;
+                    padding: 0;
+                    border-top: 1px solid #ECF0F1;
+                }
+                .MB24{
+                    margin-bottom: 24px;
+                }   
+                 ::-webkit-scrollbar{
+                    width: 11px;
+                    height: 20px;
+                }
+                ::-webkit-scrollbar-button{
+                    background: #ECF0F1;
+                }
+                ::-webkit-scrollbar-track-piece{
+                    background: #ECF0F1;
+                }
+                ::-webkit-scrollbar-thumb{
+                    background: #B7BEC6;
+                    border-radius : 3px;
+                    border: 1px solid #fff;
+                }  
+                
+                .savecancle_btncntnr .grayBtn, .savecancle_btncntnr .grayBtn:hover, .savecancle_btncntnr.grayBtn:focus, .savecancle_btncntnr.grayBtn:active{
+                    background: #727983;
+                    color: #ffffff;
+                    border: none !important;
+                    font-weight: bold;
+                    border-radius: 1px;
+                    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-delay: 0.2s;
+                    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+                }
+                .M20{
+                    margin-top: 20px;
+                }
+                .savecancle_btncntnr .greenBtn, .savecancle_btncntnr .greenBtn:hover, .savecancle_btncntnr .greenBtn:focus,.savecancle_btncntnr .greenBtn:active {
+                    background: #71BF3E;
+                    color: #ffffff;
+                    border: none !important;
+                    font-weight: bold;
+                    border-radius: 1px;
+                    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-delay: 0.2s;
+                    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+                }   
+                
+                .rectanglecont{
+                    margin-top: -15px;
+                    border-radius: 15px 15px 0px 0px;
+                 }
+                .rectanglecont1{
+                    margin-top:-7px;
+                }
+                .inorder_tringle{
+                    margin-top: -15px;
+                }
+                .rectanglecont text{
+                    margin-top: -20px;
+                }
+                .instocktext{
+                    margin-top: -15px;
+                }
+                .Vendor-Order-Part-Popup .row{
+                    margin: 0;
+                }
+                .COUInfoPopup .vendorOrder-flyout{
+                    height:240px;
+                }
+                /* change by DK*/
+        </style>
+        <script>
+            $(document).ready(function () {
+                   
+              hideFlyout = function() {
+                    $('#COUInfoPopup').hide(); 
+                } 
+            
+                 $('#COUInfoPopup').mouseover(function() {
+                    $('#COUInfoPopup').show(); 
+                }) 
+               
+                $('#COUInfoPopup').mouseout(function() {
+                    $('#COUInfoPopup').hide(); 
+                })
+                
+            });
+              
+            
+            var FeePopUpModule = angular.module('COUInfoModule', []);
+            FeePopUpModule.controller("COUInfoCtrl", function($scope, $q,  COUService ) {
+                if($scope.COUPopUp == undefined){
+                    $scope.COUPopUp = {};
+                     $scope.COUPopUp.COUModel={};
+                }
+                
+            
+           $scope.$on('COUPopUpEvent', function(event, feeId) {  
+                debug("inside event");
+                $scope.COUPopUp.COUModel={};
+                $scope.COUPopUp.loadData(feeId);
+           });
+            
+           
+           $scope.COUPopUp.loadData = function(COUId){
+                debug("inside load daata");
+                 COUService.getCOURecordById(COUId).then(function (COURecord) {
+                 		debug(COURecord);
+	                    $scope.COUPopUp.COUModel = COURecord[0];
+	                    debug( $scope.COUPopUp.COUModel);
+                    }, function (errorSearchResult) {
+                        $scope.VORModel.OverlayInfo = errorSearchResult;
+                    });
+               }
+         
+            
+        });
+        
+         FeePopUpModule.service("COUService", function ($q) {
+
+            //Get Part popup Data
+            this.getCOURecordById = function (COUId) {
+                        var deferred = $q.defer();
+        				COUId = encodeString(COUId);
+                        // make AJAX request to the remote service
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.ViewCustomerCtrl.getCOURecordById}', COUId, 
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var feeDetails = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+                                feeDetails = feeDetails.replace(re, '');
+                                deferred.resolve(JSON.parse(feeDetails));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+            }
+         });
+        
+                
+        </script>
+        
+        <div class="Vendor-Order-Part-Popup Vendor-Order-fee-Popup COUInfoPopup"  ng-controller="COUInfoCtrl" id="COUInfoPopup" >
+            <div>
+                <div class="row overlay-header">
+                    <div class="col-lg-6 col-md-6">
+                        <b style="font-size: 20px;"> {{COUPopUp.COUModel.Name}}</b> 
+                    </div>
+                    <div>
+                        <div class="row pull-right">
+                            <div class="savecancle_btncntnr">
+<!--                                 <button class="btn btn-default grayBtn">View</button> -->
+                                <button class="btn btn-default grayBtn closeBtn" onclick="hideFlyout()"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+                
+                <div class="row clearfix" style="height:20px;">
+                </div>  
+                    <div class="vendorOrder-flyout">
+                        <div style="width: 97%;">
+                            <div class="gid_container_Customer M20" >
+                                <table class="table" >
+                                    <col width="25%"  />
+                                    <col width="25%"  />
+                                    <col width="25%"  />
+                                    <col width="25%"  />  
+                                    <tr  class="tableHeader T3 C2">
+                                      <th class="T3">Make Name</th>
+                                      <th class="T3">Model Name</th>
+                                      <th class="T3">Model Make Name</th>
+                                      <th class="T3" >Color</th>
+                                    </tr>
+                                  <tbody >
+                                      <tr class="clickable_row" id="row1" rel="owned_unit_row{{$index}}_edit">
+                                          <td  class="T8">
+                                          	{{COUPopUp.COUModel.MakeName}}
+                                          </td>
+                                          <td  class="T8"  >
+                                            {{COUPopUp.COUModel.ModelName}}
+                                          </td>
+                                          <td  class="T8">
+                                            {{COUPopUp.COUModel.ModelMakeName}}
+                                          </td>
+                                          <td  class="T8">
+                                          	{{COUPopUp.COUModel.Color}} 
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                                </table>
+                             </div>  
+                             
+                             
+                             <div class="gid_container_Customer M20" >
+                                <table class="table" >
+                                    <col width="25%"  />
+                                    <col width="25%"  />
+                                    <col width="25%"  />
+                                    <col width="25%"  />  
+                                    <tr  class="tableHeader T3 C2">
+                                      <th class="T3">Plate</th>
+                                      <th class="T3">VIN</th>
+                                      <th class="T3">Year</th>
+                                      <th class="T3" >Mileage</th>
+                                    </tr>
+                                  <tbody >
+                                      <tr class="clickable_row" id="row1" rel="owned_unit_row{{$index}}_edit">
+                                          <td  class="T8">
+                                          	{{COUPopUp.COUModel.Plate}}
+                                          </td>
+                                          <td  class="T8"  >
+                                            {{COUPopUp.COUModel.VIN}}
+                                          </td>
+                                          <td  class="T8">
+                                            {{COUPopUp.COUModel.Year}}
+                                          </td>
+                                          <td  class="T8">
+                                          	{{COUPopUp.COUModel.Mileage}} 
+                                          </td>
+                                      </tr>
+                                  </tbody>
+                                </table>
+                             </div>  
+                             
+                        
+            </div> 
+         </div>
+      </div>
+  </div>
+      
+</apex:component>

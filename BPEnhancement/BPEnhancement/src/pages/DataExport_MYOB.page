@@ -1,0 +1,24 @@
+<apex:page controller="DataExportService" SideBar="false">
+	<apex:PageMessages />
+	<apex:ListViews type="Accounting_Data_Migration__c" />
+	<apex:form id="frm">
+		<apex:pageBlock title="Exported Files" id="exportedFilesPB">
+			<apex:pageBlockButtons location="top">
+				<apex:commandButton action="{!exportAccountingData}" value="Export All Data" id="theButton" rerender="frm">
+					<apex:param name="objName" value="" assignTo="{!objectName}" />
+				</apex:commandButton>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection id="exportedFilesPBS" columns="1">
+				<apex:pageBlockTable id="AccountingDataPBT" rendered="{!ExportedDataList.size != 0}" value="{!ExportedDataList}" var="adm" >
+					<apex:column value="{!adm.objectName}" headerValue="Object Name"/>
+					<apex:column headerValue="Exported Files">
+						<apex:repeat id="ExportedDataPBT" rendered="{!adm.exportedFiles.size != 0}" value="{!adm.exportedFiles}" var="admExport">
+							<a href="/{!admExport.Id}" target="_blank">{!admExport.Name}</a>
+							<br/>
+						</apex:repeat>
+					</apex:column>
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

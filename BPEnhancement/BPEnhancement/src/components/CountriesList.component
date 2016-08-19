@@ -1,0 +1,821 @@
+<apex:component id="CountriesListComp" controller="BlackPurlContentCtrl">
+	
+	<!-- Component Attributes -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for components here."/>
+	
+		<body>
+			<span id="{!uniqueId}Notification"></span>
+            <div id="{!uniqueId}grid" style="width:100%; min-height:50px !important"></div>
+            <apex:outputPanel id="NavigationPanel"> 
+            	<span id="NavigationDiv">
+	            	<span> Show </span>
+	            	<a href="" onclick="bindRecordsToGrid();" id="{!uniqueId}MoreLink" > More </a>
+	            	<sapn> / </sapn>
+	            	<a href="" onclick="decreaseCountryRecords();" id="{!uniqueId}FewerLink" class="linkDisable"> Fewer </a>
+	            	<span> Records </span>
+            	</span>
+            </apex:outputPanel>
+        </body>
+        <style>
+	        .bpGridAddButton {
+	            float:left;
+	         	position:relative;
+	        }
+	        .bpGridRowSelected {
+	        	text-align:left;
+	        }
+	        .ob-center {
+	        	text-align:center;
+	        }
+	        .ob-right {
+	        	text-align:center;
+	        }
+	        #NavigationDiv a {
+	        	text-decoration : none;
+	        	color : blue;
+	        	cursor : pointer;
+	        }
+	        .linkDisable {
+				color: #a0a0a0 !important;
+			    pointer-events: none;
+   				cursor: default;
+	        }
+	        #NavigationDiv {
+	        	margin-left:40%;
+	        	position: absolute;
+				z-index: 1;
+				margin-top: -1.7%;
+	        }
+	    </style>
+		
+		
+		<script>
+
+            
+            var {!uniqueId}currentRowIndex = -1;
+            var {!uniqueId}firstClickEvent = true;
+            var {!uniqueId}countryDefaultConfirm = true;
+            var {!uniqueId}countriesDefaultClickEventName = '';
+            var {!uniqueId}prevDefaultRowIndex = -1;
+            var EditOpen = false;
+            var noOfCountryOpened;
+            var preEditedRow;
+            var preDefaultCountry;
+            var countriesAjaxStatus=0;
+            var currRowCUid;
+			
+            $(document).ready(function () {
+            	// Notification Popup
+	            {!uniqueId}popupNotification = $("#{!uniqueId}Notification").kendoNotification({
+					// hide automatically after 2 seconds
+					autoHideAfter: 5000,
+					// prevent accidental hiding for 100 mili-second
+					allowHideAfter: 100,
+					// prevent to show a hide button
+					button: false,
+					// allow hiding by clicking on the notification content
+					hideOnClick: true,
+					// Set animation to false
+					animation: false
+	            }).data("kendoNotification");
+	            
+                // Load grid here
+                {!uniqueId}loadCountryGrid();
+                
+                if({!uniqueId}countryGrid == null){
+                    {!uniqueId}countryGrid = $("#{!uniqueId}grid").data("kendoGrid");
+                }
+                
+                $("#{!uniqueId}grid").data().kendoGrid.dataSource.bind('requestStart', {!uniqueId}start);
+                $("#{!uniqueId}grid").data().kendoGrid.dataSource.bind('requestEnd', {!uniqueId}end );
+                
+                function {!uniqueId}start(){
+                    $(".{!uniqueId}waitingSearchDiv").show();//i.e. make your loading gif visible
+                }
+                
+                function {!uniqueId}end(){
+                    $(".{!uniqueId}waitingSearchDiv").hide();//i.e. make your loading gif visible
+                }
+                
+                /********** Bind all Country events here  ************/
+                {!uniqueId}countryGrid.element.on("click", "tbody>tr>td", "click", function (event) {
+                 if(countriesAjaxStatus==0)
+						{
+                    {!uniqueId}CGridCellSingleClickEvent(this);
+                    }
+                    
+                    event.stopPropagation();
+                });
+                
+                // Load document click bindings
+                $(document).on('click', function (event) {
+                    if($(event.target).attr('class').indexOf("overlay") == -1)
+                    {
+                           event.stopPropagation(); 
+                    }
+
+                });
+            });
+            
+            function bindRecordsToGrid() {
+            	Visualforce.remoting.Manager.invokeAction(
+                    '{!$RemoteAction.BlackPurlContentCtrl.increaseCountries}', {!uniqueId}countryGrid.dataSource.view().length + 6 ,
+                    function(result, event){ 
+                        if (event.type == 'exception') {
+                            {!uniqueId}showPopupNotification(event.message, "error");
+                        } else {
+                            var countries = decodeString(result);
+                            var find = '\'';
+                            var re = new RegExp(find, 'g');
+                            countries = countries.replace(re,'');
+                            
+                            countries = JSON.parse(countries);
+                            if(countries.length < 6) {
+                            	$("#{!uniqueId}MoreLink").addClass("linkDisable");
+                            }
+                            $("#{!uniqueId}FewerLink").removeClass("linkDisable");
+                            for(var i = 0; i < 5; i++){
+                            	if(countries[i] != null) {
+                            		{!uniqueId}countryGrid.dataSource.view().push(countries[i]);
+                            	}
+                            }
+                        }
+                },
+                {escape: true}
+                );
+            }
+            
+            function decreaseCountryRecords() {
+            	var gridLength = {!uniqueId}countryGrid.dataSource.view().length;
+            	$("#{!uniqueId}MoreLink").removeClass("linkDisable");
+            	if(gridLength <= 6) {
+            		$("#{!uniqueId}FewerLink").addClass("linkDisable");
+            		if(gridLength <= 5) {
+            			return;
+            		}
+            	}
+            	for(var i = gridLength-1; i > gridLength - 6 ; i--){
+                	if(i == 4) {
+                		$("#{!uniqueId}FewerLink").addClass("linkDisable");
+                		break;
+                	}
+                	{!uniqueId}countryGrid.dataSource.view().pop(i);
+                }
+            }
+            
+            // Method: Load the grid
+            function {!uniqueId}loadCountryGrid(){
+            	
+                // Grid Data Source
+                var countryGridDataSource = new kendo.data.DataSource({
+                    transport: {
+                        read: function (options) {
+                        	if({!uniqueId}countryGrid == null) {
+			            		noOfCountryOpened = 5;
+			            	} else {
+			            		noOfCountryOpened = {!uniqueId}countryGrid.dataSource.view().length;
+			            	}
+                            // make AJAX request to the remote service
+                            Visualforce.remoting.Manager.invokeAction(
+                                '{!$RemoteAction.BlackPurlContentCtrl.generateJSONForCountries}', noOfCountryOpened, 
+                                function(result, event){
+                                    if (event.type == 'exception') {
+                                        {!uniqueId}showPopupNotification(event.message, "error");
+                                    } else {	
+                                        var countries = decodeString(result);
+                                        var find = '\'';
+                                        var re = new RegExp(find, 'g');
+                                        countries = countries.replace(re,'');
+                                        countries = JSON.parse(countries);
+                                        options.success(countries);
+						                if({!uniqueId}countryGrid != null && preEditedRow != null){
+						                	expandDetailRow();
+						                }
+                                    }
+                            },
+                            {escape: true}
+                            );
+                        }
+                    },
+                    create:function(e)
+                    {
+                        return false;
+                    },
+                    update:function(e)
+                    {
+                        return false;
+                    },
+                    schema: {
+                        model: {
+                            Id: "C_Id",
+                            fields: {
+                                C_Name: { type: "string" , editable : false},
+                                C_Visible: { type: "boolean" },
+                                C_Default: { type: "boolean", class:"ob-center" }
+                            }
+                        }
+                    }
+                });
+                
+                // Method: Load Data Grid here
+                $("#{!uniqueId}grid").kendoGrid({
+                    toolbar : true, 
+                    columns: [
+                            {
+                                field:"C_Name", title:"Country Name", width: "65%",
+                                template: "<span title=\'${C_Name}\'>${C_Name}</span>"
+                            },
+                            
+                            {
+                                field: "C_Visible", title: "<span style=\'margin-left:35%\'>Visible</span>", width: "15%",attributes:{ class:"ob-center" },
+                                template: '<img  #= C_Visible ? "src={!URLFOR($Resource.Images, '/Check_Selected.png')}" : "src=/img/checkbox_unchecked.gif"#  ></input>' 
+                            },
+                            
+                            {
+                                field: "C_Default", title: "<span style=\'margin-left:35%\'>Default</span>", width: "15%", attributes:{ class:"ob-center" },
+                                template: '<img  #= C_Default ? "src={!URLFOR($Resource.Images, '/Check_Selected.png')}" : "src=/img/checkbox_unchecked.gif"#  ></input>'
+                            }
+                        ],
+                        detailInit: {!uniqueId}initStateGrid,
+                        dataBound: {!uniqueId}onCDataBound,
+                        dataSource: countryGridDataSource,
+                        scrollable:false,
+                        sortable: {
+                            mode: "single",
+                            allowUnsort: false
+                        },
+                        reorderable: true,
+                        selectable: "single",
+                        editable: {
+                            mode: "inline",
+                            confirmation: false,
+                            update: true
+                        },
+                        edit:function(e)
+                            {   
+                           		
+                            },
+                            save:function(e)
+                            {
+                            
+                            }
+                });
+                
+            }
+            
+            // Country Grid Instance
+            var {!uniqueId}countryGrid = $("#{!uniqueId}grid").data("kendoGrid");
+            
+            function {!uniqueId}gridChange(currElem){
+                {!uniqueId}currentRowIndex = this.select().index();
+
+            } 
+            
+            function {!uniqueId}CGridCellSingleClickEvent(thisElem){
+
+             	var HaschildEdit=$('.k-detail-row').find('td.k-detail-cell #{!uniqueId}SGrid').find('tr.k-grid-edit-row').hasClass('k-grid-edit-row');
+             	
+                // Check if selected row is alreadey in edited mode
+                if($(thisElem).parent().hasClass('k-grid-edit-row')) {
+                    
+                }else {
+                    var isSuccessfullySaved = true;
+                    var hasEditedRow = {!uniqueId}countryGrid.tbody.children().hasClass("k-grid-edit-row");
+                    if(hasEditedRow) {
+                        // Save
+                        isSuccessfullySaved = {!uniqueId}validateAndSaveCRow();
+                    }
+                    
+                    if(isSuccessfullySaved) {
+                        if(!HaschildEdit) {
+		                	{!uniqueId}toggleSelectedRowClass($(thisElem).parent());
+		                    if({!uniqueId}countryGrid.tbody.children().hasClass("k-grid-edit-row")) {
+			                        
+			                } else {		
+		                         $("#{!uniqueId}grid").data("kendoGrid").editRow($(thisElem).parent());
+		                         preDefaultCountry = null;
+		                    }
+                      	}
+                        
+                        $( ".k-icon").on("change", function (event) {
+                        	var masterRow = this.tbody.find("tr.k-master-row");
+			                var visibleCheckBox = masterRow.find("td>input[name='C_Visible']").is(":checked");
+			                if(visibleCheckBox) {
+			               		this.expandRow(masterRow);
+			                }
+                        });
+                        
+                        // Unique DEFAULT bind
+                        $( "#{!uniqueId}grid input[name='C_Default']").on("change", function (event) {
+                            {!uniqueId}CCheckExistingDefault(this);
+                        });
+                        
+                        // Unique DEFAULT with its visible true bind.
+                        $( "#{!uniqueId}grid input[name='C_Visible']").on("change", function (event) {
+                            {!uniqueId}countryCheckVisibleAndDefault(this);
+                        });
+                      
+                    }else{
+                        if({!uniqueId}countryGrid.tbody.children().hasClass("k-grid-edit-row")) {
+                            var existingEditedCells = $("#{!uniqueId}grid .bpGridRowSelected");
+                            {!uniqueId}countryGrid.select( $(existingEditedCells[0]).parent() );
+                        }
+                    }
+                }
+            }
+            
+            // Validate and Save row
+            function {!uniqueId}validateAndSaveCRow(){
+                if( {!uniqueId}countryGrid.editable != null && ({!uniqueId}countryGrid.editable.validatable.validate())){
+                    {!uniqueId}saveCountry();
+                    
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+            
+            
+            function {!uniqueId}saveCountry(){
+           
+                if({!uniqueId}countryGrid.tbody.children().hasClass("k-grid-edit-row")) {
+               
+                    if(({!uniqueId}countryGrid.editable.validatable.validate())) {
+                        var rowIndex = {!uniqueId}countryGrid.tbody.find(".k-grid-edit-row");
+                        preEditedRow = rowIndex;
+                    
+                        if(rowIndex.length == 0){
+                            return;
+                        }
+                    
+                        var rowData = JSON.stringify({!uniqueId}countryGrid.dataItem(rowIndex));
+                        Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.BlackPurlContentCtrl.saveCountryJSON}',
+                                                                            encodeString(rowData),
+                                                                            function(result, event){
+                                                                                if (event.status) {
+                                                                                    {!uniqueId}refreshGridCountry();
+                                                                                     {!uniqueId}showPopupNotification("Saved", "success");
+                                                                                }else if (event.type === 'exception') {
+                                                                                    {!uniqueId}showPopupNotification(event.message, "error");
+                                                                                } else {
+                                                                                    {!uniqueId}showPopupNotification(event.message, "error");
+                                                                                }
+                                                                            },
+                                                                            {escape: true}
+                                );
+                    }
+                }
+            }
+            
+            function expandDetailRow() {
+            	editedCountryName = preEditedRow.closest("tr").find("td>span").text();
+
+            	
+            	if(preDefaultCountry == null ) {
+            		return;
+            	}
+            	editedCoutryDefaultValue = preEditedRow.closest("tr").find("input[name='C_Default']").is(":checked");
+            	 
+            	if(editedCoutryDefaultValue) {
+            		popupAction("info",'Please set a default State for the new default Country.');
+            		{!uniqueId}countryGrid.expandRow({!uniqueId}countryGrid.tbody.find("tr.k-master-row").first());
+            	}
+            	return false;
+            }
+            
+            // Refresh the grid:
+            function {!uniqueId}refreshGridCountry(){
+                {!uniqueId}countryGrid.dataSource.read();
+                {!uniqueId}countryGrid.refresh();
+            }
+            
+            function {!uniqueId}toggleSelectedRowClass(selectedRow){
+                // If previouslySelectedRow
+                var selectedCellElem = $(selectedRow.children()[0]);
+                var previouslySelectedRow = (selectedCellElem.attr("class") == "bpGridRowSelected") ? true : false;
+                
+                var lastColumnOfSelectedRow;
+                if(!previouslySelectedRow){
+                    for(var i = 0; i < selectedRow.children().length; i++){
+                        lastColumnOfSelectedRow = $(selectedRow.children()[i]);
+                        lastColumnOfSelectedRow.addClass("bpGridRowSelected");
+                    }
+                }
+            }
+            var {!uniqueId}prevDefaultDataRowIdx = -1;
+            
+             function {!uniqueId}CCheckExistingDefault(currElem){
+                
+
+                // Get current row Sales Tax Name:
+                var currRowCName = $(currElem).closest("tr").find("td>span").text();
+               
+                // Get current row Sales Tax Default:
+                var currRowCDefault = $(currElem).closest("tr").find("td>input[name='C_Default']").is(":checked");
+                
+                // Get current row Sales Tax Active:
+                var currRowCVisible = $(currElem).closest("tr").find("td>input[name='C_Visible']").is(":checked");
+                
+				currRowCUid = $(currElem).closest("tr").attr('data-uid');
+                
+                {!uniqueId}prevDefaultDataRowIdx = -1;
+                
+                if( currRowCDefault ){
+                    var prevDefaultCName = "";
+                    
+                    var gridData = {!uniqueId}countryGrid.dataSource.data();
+
+                    for(var item = 0; item < gridData.length; item++){
+                        {!uniqueId}prevDefaultDataRowIdx++;
+                        if( gridData[item].C_Name != currRowCName && gridData[item].C_Default == true ){
+                            prevDefaultCName = gridData[item].C_Name;
+                            break;
+                        }
+                    }
+                    preDefaultCountry = prevDefaultCName;
+
+                    if(prevDefaultCName.length > 0){
+                        var confirmMsg = 'Country ';
+                        if(currRowCVisible){
+                            confirmMsg += 'default will be changed from "' + prevDefaultCName + '" to "' + currRowCName + '".' + '\n';
+                        }else{
+                        	confirmMsg += 'record will be marked as VISIBLE and set to DEFAULT.' + '\n';
+                        }
+                        confirmMsg += 'Do you want to proceed ?';
+                        {!uniqueId}alertAndUpdateDefault(currElem, confirmMsg, {!uniqueId}prevDefaultDataRowIdx);
+                    }
+                }else{
+                    {!uniqueId}showPopupNotification('Cannot deselect a default Country record.', "error");
+                    currElem.checked = true;
+                    
+                    var gridDataSource = $("#{!uniqueId}grid").data("kendoGrid").dataSource;
+                    var currentDataRow = gridDataSource.view()[{!uniqueId}currentRowIndex];
+                    if(currentDataRow != null){
+                        currentDataRow.set("C_Default", true);
+                    }
+                }
+            }
+            
+            // If Country is visible and set as Default, then alert user that he cannot set the record as Invisible
+            function {!uniqueId}countryCheckVisibleAndDefault(currElem){
+            	var currentCountryIsVisible = $(currElem).closest("tr").find("input[name='C_Default']");
+            	if(currentCountryIsVisible.is(":checked") == true){
+            		{!uniqueId}showPopupNotification('Cannot Set a Default Country as INVISIBLE', "error");
+           			$(currElem).prop('checked', true);
+           			var gridDataSource = $("#{!uniqueId}grid").data("kendoGrid").dataSource;
+                    var currentDataRow = gridDataSource.view()[{!uniqueId}currentRowIndex];
+                    asd = currentDataRow;
+                    if(currentDataRow != null){
+                        currentDataRow.set("C_Visible", true);
+                    }
+            	}
+            }
+            
+            var {!uniqueId}CountryDefaultConfirm = function(isConfirmed){
+
+            	var gridDataSource = $("#{!uniqueId}grid").data("kendoGrid").dataSource;
+            	if(isConfirmed){
+                    var prevDefaultDataRow = gridDataSource.view()[{!uniqueId}prevDefaultDataRowIdx];
+                    if(prevDefaultDataRow != null){
+                        prevDefaultDataRow.set("C_Default", false);
+                        var currentDataRow = gridDataSource.getByUid(currRowCUid);
+                        
+                        currentDataRow.set("C_Default", true); 
+                        currentDataRow.set("C_Visible", true);  
+                    }
+                }else{
+                   // var currentDataRow = gridDataSource.view()[{!uniqueId}currentRowIndex];
+					var currentDataRow = gridDataSource.getByUid(currRowCUid);
+
+                    if(currentDataRow != null){
+                        currentDataRow.set("C_Default", false);
+                    }
+                }
+            }
+            
+            function {!uniqueId}alertAndUpdateDefault(currElem, confirmMsg, {!uniqueId}prevDefaultDataRowIdx){
+                var gridDataSource = $("#{!uniqueId}grid").data("kendoGrid").dataSource;
+                if({!uniqueId}currentRowIndex == -1){
+                    {!uniqueId}currentRowIndex = gridDataSource.view().length - 1;
+                }
+                confirmAction("Confirm Update", confirmMsg, {!uniqueId}CountryDefaultConfirm);
+            }
+            
+            function {!uniqueId}onCDataBound(e) {
+                $("#{!uniqueId}grid").find(".k-grid-toolbar").insertAfter($("#{!uniqueId}grid").children()[1]);
+                $("#{!uniqueId}grid .k-grid-toolbar").css("background-color", "#ffffff");
+                $("#{!uniqueId}grid .k-grid-toolbar").css("border-bottom", " solid 1px #ccc");
+                $("#{!uniqueId}grid .k-grid-toolbar").css("border-top", "none");
+                $("#{!uniqueId}grid .k-grid-toolbar").css("height", "25px");
+                $("#{!uniqueId}grid .k-grid-toolbar").css("vertical-align", "middle");
+                
+                {!uniqueId}countryGrid.bind('edit', {!uniqueId}gridChange);
+            }
+            
+            
+            
+            function {!uniqueId}initStateGrid(e) {
+                var ParentCountryID = e.data.C_Id ;
+                if(e.data.C_Name == null || e.data.C_Name.trim().length == 0){
+                    return;
+                }
+                var StateGridDataSource = new kendo.data.DataSource({
+                    transport: {
+                        read: function (options) {
+                            
+                            // make AJAX request to the remote service
+                            Visualforce.remoting.Manager.invokeAction(
+                                '{!$RemoteAction.BlackPurlContentCtrl.getJSONForStateByCountry}',
+                                encodeString(ParentCountryID),
+                                function (result, event) {
+                                    
+                                    if (event.type == 'exception') {
+                                        {!uniqueId}showPopupNotification(event.message, "error");
+                                    } else {
+                                           
+                                            var states = decodeString(result);
+                                            var find = '\'';
+                                            var re = new RegExp(find, 'g');
+                                            states = states.replace(re,'');
+                                            
+                                            states = JSON.parse(states);
+                                            options.success(states);
+                                    } // End else
+                                },
+                                {escape: true}
+                            );
+                        }
+                    },
+                    schema: {
+                        model: {
+                            Id: "S_Id",
+                            fields: {
+                                S_Name: { type: "string", editable : false },
+                                S_Default:{type:"boolean"}
+                            }
+                        }
+                    },
+                   
+                 });
+                 
+                 // Append grid to detail cell
+                 $("<div style=\' min-height:50px !important;\' class=\'STIGridClass\' id=\'{!uniqueId}SGrid\'/>").appendTo(e.detailCell).kendoGrid({
+                    dataSource: StateGridDataSource,
+                    
+                    columns: [
+                        {
+                            field:"S_Name",title:"State/Province Name", width: "10%", 
+                            template: "<span title=\'${S_Name}\'>${S_Name}</span>"
+                        },
+                        {
+                            field: "S_Default", title: "<span style=\'margin-left:47%\'>Default</span>", width: "25%", attributes:{ class:"ob-center" },
+                            template: '<img  #= S_Default ? "src={!URLFOR($Resource.Images, '/Check_Selected.png')}" : "src=/img/checkbox_unchecked.gif"#  ></input>'
+                        }
+                    ],
+                    editable: {
+                        mode: "inline",
+                        confirmation: false
+                    },
+                    sortable: {
+                           mode: "single",
+                           allowUnsort: false
+                    },
+                    scrollable: false,
+                    reorderable: false,
+                    dataBound: {!uniqueId}onStateDataBound,
+                    selectable: "single"
+                 });
+                 
+                 
+                 
+                 // Validate and Save row Sales Tax Item row
+                function {!uniqueId}validateAndSaveStateRow(a){
+                    if(a.sender.editable.validatable.validate()){
+                        {!uniqueId}saveState(a);
+                        return true;
+                    }else {
+                        return false;
+                    }
+                }
+                 
+                
+                function {!uniqueId}saveState(a){
+                  countriesAjaxStatus=1;
+                    if(a.sender.tbody.children().hasClass("k-grid-edit-row")) {
+                        if((a.sender.editable.validatable.validate())) {
+                            var rowIndex = a.sender.tbody.find(".k-grid-edit-row");
+                            if(rowIndex.length == 0){
+                                return;
+                            }
+                        
+                            var rowData = JSON.stringify(a.sender.dataItem(rowIndex));
+                            Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.BlackPurlContentCtrl.saveStateJSON}',
+                                                                                encodeString(rowData),
+                                                                                function(result, event){
+                                                                                    if (event.status) {
+                                                                                        rowData.S_Order=1; 
+                                                                                        {!uniqueId}refreshGridState(a);
+                                                                                        EditOpen=false;
+                                                                                        {!uniqueId}showPopupNotification("Saved", "success");
+                                                                                    }else if (event.type === 'exception') {
+                                                                                        {!uniqueId}showPopupNotification(event.message, "error");
+                                                                                    } else {
+                                                                                        {!uniqueId}showPopupNotification(event.message, "error");
+                                                                                    }
+                                                                                },
+                                                                                {escape: true}
+                                    );
+                        }
+                    }
+                }
+                 
+                 
+               // If Sales Tax Item is selected and set to non-Active, then alert user that he cannot set the record as Inactive
+               /* function {!uniqueId}SCheckStateDefault(currElem, a){
+                	var currentStateSelected = $(currElem).closest("tr").find("input[name='S_Default']");
+                	if(currentStateSelected.is(":checked") == true){
+                		{!uniqueId}showPopupNotification('Cannot deselect a default State record.', "error");
+               			$(currElem).prop('checked', true);
+                	}
+                }*/
+                
+                var {!uniqueId}prevDefaultStateDataRowIdx = -1;
+                function {!uniqueId}StateCheckExistingDefault(currElem, a){
+	                // Get current row Sales Tax Name:
+	                
+	                var currRowSName = $(currElem).closest("tr").find("td>span").text();
+
+	                // Get current row Sales Tax Default:
+	                var currRowSDefault = $(currElem).closest("tr").find("td>input[name='S_Default']").is(":checked");
+	               
+	                if( currRowSDefault ){
+	                    var prevDefaultSName = "";
+	                    
+						var gridData = a.sender.dataSource.data();
+						{!uniqueId}prevDefaultStateDataRowIdx = -1;
+						
+						for(var item = 0; item < gridData.length; item++){
+	                        {!uniqueId}prevDefaultStateDataRowIdx++;
+	                        if( gridData[item].S_Name != currRowSName && gridData[item].S_Default == true ){
+	                            prevDefaultSName = gridData[item].S_Name;
+	                            break;
+	                        }
+	                    }
+	                    
+	                    if(prevDefaultSName.length > 0){
+	                        var confirmMsg = 'State ';
+	                            confirmMsg += 'default will be changed from "' + prevDefaultSName + '" to "' + currRowSName + '".' + '\n';
+	                        confirmMsg += 'Do you want to proceed ?';
+	                        {!uniqueId}alertAndUpdateDefault(currElem, confirmMsg, {!uniqueId}prevDefaultStateDataRowIdx, a);
+	                    }
+	                }else{
+	                    {!uniqueId}showPopupNotification('Cannot deselect a default State record.', "error");
+	                    currElem.checked = true;
+	                    var gridDataSource = a.sender.dataSource;
+	                    var currentDataRow = gridDataSource.view()[{!uniqueId}currentSRowIndex];
+	                    if(currentDataRow != null){
+	                        currentDataRow.set("S_Default", true);
+	                    }
+	                }
+           	 	}
+           	 	
+           	 	var {!uniqueId}stateDefaultConfirm = true;
+           	 	var {!uniqueId}currentSRowIndex = -1;
+           	 	var currentRowa;
+           	 	var {!uniqueId}confirmStateDefaultUpdate = function(isConfirmed){
+           	 		var gridDataSource = currentRowa.sender.dataSource;
+           	 		if(isConfirmed){
+	                    var prevDefaultDataRow = gridDataSource.view()[{!uniqueId}prevDefaultStateDataRowIdx];
+	                    if(prevDefaultDataRow != null){
+	                        prevDefaultDataRow.set("S_Default", false);
+	                        var currentDataRow = gridDataSource.view()[{!uniqueId}currentSRowIndex];
+	                        currentDataRow.set("S_Default", true); 
+	                    }
+	                }else{
+	                    var currentDataRow = gridDataSource.view()[{!uniqueId}currentSRowIndex];
+	                    if(currentDataRow != null){
+	                        currentDataRow.set("S_Default", false);
+
+	                    }
+	                }
+           	 	}
+           	 	
+           	 	function {!uniqueId}alertAndUpdateDefault(currElem, confirmMsg, {!uniqueId}prevDefaultStateDataRowIdx, a){
+           	 		currentRowa = a;
+	                var gridDataSource = currentRowa.sender.dataSource;
+	                if({!uniqueId}currentSRowIndex == -1){
+	                    {!uniqueId}currentSRowIndex = gridDataSource.view().length - 1;
+	                }
+	                confirmAction("Confirm Update", confirmMsg, {!uniqueId}confirmStateDefaultUpdate);
+	            }
+                
+                // Refresh the grid:
+                function {!uniqueId}refreshGridState(a){
+                    a.sender.dataSource.read();
+                    a.sender.refresh();
+                    //{!uniqueId}refreshGridCountry();
+                }  
+                 
+                // Refresh grid locally
+                function {!uniqueId}refreshGridLocallyState(a, rowData){
+                    a.sender.removeRow(rowData);
+                    a.sender.dataSource.remove(rowData);
+                }
+               
+                function {!uniqueId}gridSChange(currElem){
+	                {!uniqueId}currentSRowIndex = this.select().index();
+
+	            }
+                
+                function {!uniqueId}onStateDataBound(a) {
+                    a.sender.unbind();
+                        a.sender.tbody.children().last().find("td").css("border-bottom", "0px");
+                    	$("#{!uniqueId}SGrid").data("kendoGrid").dataSource.bind('requestStart', {!uniqueId}startsmall);
+             			$("#{!uniqueId}SGrid").data("kendoGrid").dataSource.bind('requestEnd', {!uniqueId}endsamll );
+             			
+             			 function {!uniqueId}startsmall(){
+							 
+							
+		                   
+		                    
+		                }
+                
+		                function {!uniqueId}endsamll(){
+		               
+							 countriesAjaxStatus=0;
+							 
+		                   
+		                   
+		                }
+                    
+                     
+                    a.sender.bind('edit', {!uniqueId}gridSChange);
+                    
+                    // Add detail row click event
+                    a.sender.element.on("click", "tbody>tr:not(.k-grid-edit-row)", "click", function (o) {
+                    	
+                        if(countriesAjaxStatus==0)
+						{
+						
+                        if( a.sender.tbody.children().hasClass("k-grid-edit-row")) {
+                            {!uniqueId}validateAndSaveStateRow(a);
+                        }else {
+                            var parentHasEditedRow = {!uniqueId}countryGrid.tbody.children().hasClass("k-grid-edit-row");
+                            if(parentHasEditedRow){
+                                // Save
+                                var isSuccessfullySaved = {!uniqueId}validateAndSaveCRow(a);
+                            }
+                            else {
+	                            var parentRow = a.sender.tbody.closest("tr.k-detail-row").prev(".k-master-row");
+	                            var parentDefaultSelected = {!uniqueId}countryGrid.dataItem(parentRow).get("C_Default");
+	                            var isParentEdited = a.sender.tbody.children().hasClass("k-grid-edit-row");
+	                            if(parentDefaultSelected) {
+	                            	
+	                            	if(EditOpen == true) {
+	                            	
+		                            
+		                            } else {
+		                           		a.sender.editRow($(this));
+		                           		EditOpen=true;
+		                           	}
+                           		} 
+                           	}
+	                        
+	                        // Unique DEFAULT bind
+	                        $(this).find("input[name='S_Default']").on("change", function (event) {
+	                            {!uniqueId}StateCheckExistingDefault(this, a);
+	                        });
+                        }
+                        }
+                        o.stopPropagation();
+                    });
+                    
+                    
+                    
+                    // Load document click bindings
+                    $(document).on('click', function (event) {
+                    
+                        if( a.sender.tbody.children().hasClass("k-grid-edit-row")) {
+                            {!uniqueId}validateAndSaveStateRow(a);
+                        }else {
+                            var parentHasEditedRow = {!uniqueId}countryGrid.tbody.children().hasClass("k-grid-edit-row");
+                            if(parentHasEditedRow){
+                                // Save
+                                var isSuccessfullySaved = {!uniqueId}validateAndSaveStateRow(a);
+                            }
+                        }
+                    });
+                }
+                 
+                 
+              }
+            
+            // Display popup notiications:
+	        function {!uniqueId}showPopupNotification(message, msgType){
+	        	{!uniqueId}popupNotification.hide();
+	        	{!uniqueId}popupNotification.show(kendo.toString(message), msgType);
+	        }
+
+
+        </script>
+</apex:component>

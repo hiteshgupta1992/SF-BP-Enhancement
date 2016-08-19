@@ -1,0 +1,230 @@
+<apex:component >
+	<!------------------------------------------------------------------------------------------------------------------------------>
+	<!------------------------------------------------	Custom confirmation dialog	------------------------------------------------>
+	<script id="confirmationDiv_Global" type="text/x-kendo-template">
+    	<div class="message_Global">Are you sure...?</div>
+		
+    	<button class="confirm_Global k-button">Yes</button>
+		<button class="cancel_Global k-button">No</button>
+	</script>
+		
+    <script>
+        // Method to display confirm box
+        function confirmAction(actionTitle, actionMsg, callBackMethod){
+        	var kendoWindow = prepareConfirmDialog(actionTitle, actionMsg);
+		    openConfirmDialog(kendoWindow, callBackMethod);
+        }
+        
+        // Method to display confirm box
+        // Method has additional parameter: Yes and No button text
+    	function confirmActionCustomized(actionTitle, actionMsg, callBackMethod, yesButtonText, noButtonText){
+    		var kendoWindow = prepareConfirmDialog(actionTitle, actionMsg);
+    		$(".confirm_Global").text(yesButtonText);
+    		$(".cancel_Global").text(noButtonText);
+    		openConfirmDialog(kendoWindow, callBackMethod);
+    	}
+    	
+    	function prepareConfirmDialog(actionTitle, actionMsg){
+    		if(actionTitle == null){
+        		actionTitle = "";
+        	}
+		    var kendoWindow = $("<div />").kendoWindow({
+	            title: actionTitle,
+	            resizable: false,
+	            modal: true
+	        });
+		    
+		    kendoWindow.data("kendoWindow")
+		        .content($("#confirmationDiv_Global").html())
+		        .center().open();
+		        
+		    $(".message_Global").html(actionMsg + "<br/>");
+		    
+		    return kendoWindow;
+    	}
+    	
+    	function openConfirmDialog(kendoWindow, callBackMethod){
+    		kendoWindow
+		        .find(".confirm_Global,.cancel_Global")
+		            .click(function(clickEvent) {
+		            	var isConfirmed = false;
+		                if ($(this).hasClass("confirm_Global")) {
+		                	kendoWindow.data("kendoWindow").close();
+		                	isConfirmed = true;
+		                }
+		                
+		                kendoWindow.data("kendoWindow").close();
+		                callBackMethod(isConfirmed);
+		                kendoWindow
+					        .find(".confirm_Global,.cancel_Global")
+					        	.unbind("click");
+						clickEvent.stopPropagation();
+		            })
+		            .end();
+    	}
+    </script>
+	<!------------------------------------------------------------------------------------------------------------------------------>
+	
+	<!------------------------------------------------------------------------------------------------------------------------------>
+	<!------------------------------------------------	Custom Popup dialog	------------------------------------------------>
+	<script id="popopDiv_Global" type="text/x-kendo-template">
+    	<div class="popup_message_Global">ok...?</div>
+		
+    	<button class="popup_Global k-button">Ok</button>
+	</script>
+		
+    <script>
+        function popupAction(actionTitle, actionMsg){
+        	if(actionTitle == null){
+        		actionTitle = "";
+        	}
+		    var kendoWindowPopup = $("<div />").kendoWindow({
+	            title: actionTitle,
+	            resizable: false,
+	            modal: true
+	        });
+		    
+		    kendoWindowPopup.data("kendoWindow")
+		        .content($("#popopDiv_Global").html())
+		        .center().open();
+		        
+		    $(".popup_message_Global").html(actionMsg + "\n");
+		    
+		    kendoWindowPopup
+		        .find(".popup_Global")
+		            .click(function(clickEvent) {
+		                kendoWindowPopup.data("kendoWindow").close();
+		                kendoWindowPopup
+					        .find(".popup_Global")
+					        	.unbind("click");
+						clickEvent.stopPropagation();
+		            })
+		            .end();
+        }
+    </script>
+	<!------------------------------------------------------------------------------------------------------------------------------>
+	
+	<!------------------------------------------------------------------------------------------------------------------------------>
+	<!------------------------------------------------		Default-Active Check	------------------------------------------------>
+	<script>
+		function checkExistingDefaultActive_Global(	currElem, 
+													uniqueNameColAPI, defaultColAPI, activeColAPI,
+													gridId, gridRecordName, currentRowIndex,
+													showPopupNotification
+												){
+			// Get current row unique Name:
+			var currRowUniqueName = $(currElem).closest("tr").find("td>input[name='"+uniqueNameColAPI+"']").val();
+			
+			// Get current row Default:
+			var currRowDefault = $(currElem).closest("tr").find("td>input[name='"+defaultColAPI+"']").is(":checked");
+			
+			// Get current rowActive:
+			var currRowActive = $(currElem).closest("tr").find("td>input[name='"+activeColAPI+"']").is(":checked");
+			
+			var currRowCUid = $(currElem).closest("tr").attr('data-uid');
+			
+			var gridDataSource = $("#" + gridId).data("kendoGrid").dataSource;
+			if(currentRowIndex == -1){
+				currentRowIndex = gridDataSource.view().length - 1;
+			}
+			
+			if( !currRowActive ){
+				if( currRowDefault == true ) {
+					 showPopupNotification('{!JSENCODE($Label.Cannot_Mark_Inactive_Default)}.', 'error');
+					 currElem.checked = true;
+					 
+					 gridDataSource.getByUid(currRowCUid).set(activeColAPI, true);
+				 	//gridDataSource.view()[currentRowIndex].set(activeColAPI, true);
+				}
+			}
+		}
+		
+		function checkExistingDefault_Global(currElem, 
+											 uniqueNameColAPI, defaultColAPI, activeColAPI,
+											 gridId, gridRecordName, currentRowIndex,
+											 showPopupNotification
+											){
+			// Grid Instance
+            var gridInstance = $("#" + gridId).data("kendoGrid");
+            
+			// Get current row Unique Name:
+			var currRowUniqueName = $(currElem).closest("tr").find("td>input[name='"+uniqueNameColAPI+"']").val();
+			
+			// Get current row Default:
+			var currRowDefault = $(currElem).closest("tr").find("td>input[name='"+defaultColAPI+"']").is(":checked");
+			
+			// Get current row Active:
+			var currRowActive = $(currElem).closest("tr").find("td>input[name='"+activeColAPI+"']").is(":checked");
+			
+			var currRowCUid = $(currElem).closest("tr").attr('data-uid');
+			
+			if( currRowDefault ){
+				var prevDefaultUniqueName = "";
+				var prevDefaultDataRowIdx = -1;
+				var gridData = gridInstance.dataSource.data();
+				for(var item = 0; item < gridData.length; item++){
+					prevDefaultDataRowIdx++;
+					if( gridData[item].get(uniqueNameColAPI) != currRowUniqueName && gridData[item].get(defaultColAPI) == true ){
+						prevDefaultUniqueName = gridData[item].get(uniqueNameColAPI);
+						break;
+					}
+				}
+				
+				if(prevDefaultUniqueName.length > 0){
+					var confirmMsg = gridRecordName;
+					if(currRowActive){
+						confirmMsg += 'default will be changed from "' + prevDefaultUniqueName + '" to "' + currRowUniqueName + '".' + '\n';
+					}else{
+						confirmMsg += '\n' + 'record will be marked as ACTIVE and set to DEFAULT.' + '\n';
+					}
+					confirmMsg += 'Do you want to proceed ?';
+					alertAndUpdateDefault_Global(currElem, confirmMsg, prevDefaultDataRowIdx,
+												 uniqueNameColAPI, defaultColAPI, activeColAPI,
+											  	 gridId, gridRecordName, currentRowIndex
+											  	);
+				}
+			}else{
+				showPopupNotification('Cannot deselect a default '+ gridRecordName +' record.', 'error');
+				currElem.checked = true;
+				
+				var gridDataSource = $("#" + gridId).data("kendoGrid").dataSource;
+				var currentDataRow = (currRowCUid != null && currRowCUid != "") ? gridDataSource.getByUid(currRowCUid) : null;
+				if(currentDataRow != null){
+					currentDataRow.set(defaultColAPI, true);
+				}
+			}
+		}
+		 
+		function alertAndUpdateDefault_Global(currElem, confirmMsg, prevDefaultDataRowIdx,
+											  uniqueNameColAPI, defaultColAPI, activeColAPI,
+											  gridId, gridRecordName, currentRowIndex
+											 ){
+			var confirmUpdateDefault = function(gridDefaultConfirm){
+				var currRowCUid = $(currElem).closest("tr").attr('data-uid');
+				
+				var gridDataSource = $("#" + gridId).data("kendoGrid").dataSource;
+				if(currentRowIndex == -1){
+					currentRowIndex = gridDataSource.view().length - 1;
+				}
+				
+				if(gridDefaultConfirm){
+					var prevDefaultDataRow = gridDataSource.view()[prevDefaultDataRowIdx];
+					if(prevDefaultDataRow != null){
+						prevDefaultDataRow.set(defaultColAPI, false);
+						var currentDataRow = gridDataSource.getByUid(currRowCUid);
+						currentDataRow.set(defaultColAPI, true); 
+						currentDataRow.set(activeColAPI, true);   
+					}
+				}else{
+					$(currElem).attr('checked', false);
+					var currentDataRow = gridDataSource.getByUid(currRowCUid);
+					if(currentDataRow != null){
+						currentDataRow.set(defaultColAPI, false);
+					}
+				}
+			};
+			confirmAction("Confirm Update", confirmMsg, confirmUpdateDefault);
+		}
+	</script>
+	<!------------------------------------------------------------------------------------------------------------------------------>
+</apex:component>

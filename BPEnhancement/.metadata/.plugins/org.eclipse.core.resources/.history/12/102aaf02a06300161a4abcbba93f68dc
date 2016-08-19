@@ -1,0 +1,6 @@
+<apex:page controller="BlackPurlFooterCtrl" id="BlackPurlFooter"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+
+	<h3>Footer</h3>
+
+</apex:page>

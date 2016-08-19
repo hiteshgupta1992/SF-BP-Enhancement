@@ -1,0 +1,278 @@
+<apex:component >
+        <style>
+              .Customer-info-overlay{
+                  display: none;
+                  background: #fff;
+                  color: #000;
+                  width: 630px;
+                  min-height: 215px;
+                  position: absolute;
+                  top: 20px;
+                  left: 195px;
+                  text-align: left;
+                  z-index: 1000;
+                  border-radius: 10px;
+                  padding: 10px 20px;
+                  -moz-box-shadow: 0 0 20px #222;
+                  -webkit-box-shadow: 0 0 20px #222;
+                  box-shadow: 0 0 20px #222;
+              }
+              
+              .Customer-info-overlay:before{
+                  content: '';
+                  display: block;
+                  position: absolute;
+                  left: -120px;
+                  width: 120px;
+                  top: 52px;
+                  height: 170px;
+                  background: url('{!URLFOR($Resource.arrow)}') no-repeat !important;
+              }
+              .Customer-info-overlay .under-line-row{
+                  padding: 10px;
+                  border-bottom: 1px solid #939598;
+                  margin-left: 0px;
+              }
+              
+              
+              
+              .PopupPanel{
+                    position: absolute;
+                    top: 90px;
+                    left: 275px;
+                }
+                #preloader_1{
+                    position: absolute;
+                    top: 15px;
+                    left: 10px;
+                }
+                #preloader_1 span{
+                    display:block;
+                    bottom:0px;
+                    width: 9px;
+                    height: 5px;
+                    background:#9b59b6;
+                    position:absolute;
+                    -webkit-animation: preloader_1 1.5s  infinite ease-in-out;
+                    -moz-animation: preloader_1 1.5s     infinite ease-in-out;
+                    -ms-animation: preloader_1 1.5s  infinite ease-in-out;
+                    -o-animation: preloader_1 1.5s   infinite ease-in-out;
+                    animation: preloader_1 1.5s  infinite ease-in-out;
+                }
+                #preloader_1 span:nth-child(2){
+                    left:11px;
+                    -webkit-animation-delay: .2s;
+                    -moz-animation-delay: .2s;
+                    -ms-animation-delay: .2s;
+                    -o-animation-delay: .2s;
+                    animation-delay: .2s;
+                
+                }
+                #preloader_1 span:nth-child(3){
+                    left:22px;
+                    -webkit-animation-delay: .4s;
+                    -moz-animation-delay: .4s;
+                    -ms-animation-delay: .4s;
+                    -o-animation-delay: .4s;
+                    animation-delay: .4s;
+                }
+                #preloader_1 span:nth-child(4){
+                    left:33px;
+                    -webkit-animation-delay: .6s;
+                    -moz-animation-delay: .6s;
+                    -ms-animation-delay: .6s;
+                    -o-animation-delay: .6s;
+                    animation-delay: .6s;
+                }
+                #preloader_1 span:nth-child(5){
+                    left:44px;
+                    -webkit-animation-delay: .8s;
+                    -moz-animation-delay: .8s;
+                    -ms-animation-delay: .8s;
+                    -o-animation-delay: .8s;
+                    animation-delay: .8s;
+                }
+                @-webkit-keyframes preloader_1 {
+                    0% {height:5px;-webkit-transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;-webkit-transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;-webkit-transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;-webkit-transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                @-moz-keyframes preloader_1 {
+                    0% {height:5px;-moz-transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;-moz-transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;-moz-transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;-moz-transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                @-ms-keyframes preloader_1 {
+                    0% {height:5px;-ms-transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;-ms-transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;-ms-transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;-ms-transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                @keyframes preloader_1 {
+                    0% {height:5px;transform:translateY(0px);background:#9b59b6;}
+                    25% {height:30px;transform:translateY(15px);background:#3498db;}
+                    50% {height:5px;transform:translateY(0px);background:#9b59b6;}
+                    100% {height:5px;transform:translateY(0px);background:#9b59b6;}
+                }
+                
+                .loadingText{
+                    padding-top: 30px;
+                    text-align: center;
+                    font-size: 20px;
+                    color: #000;
+                    font-family: arial sans-serif;
+                 }
+    
+              
+      
+        </style>
+        <script>
+            $(document).ready(function () {
+                $('.Customer-info-overlay').mouseover(function() {
+                    $('.Customer-info-overlay').show(); 
+                })
+                $('.Customer-info-overlay').mouseout(function() {
+                    $('.Customer-info-overlay').hide(); 
+                })
+            });
+        </script>
+                <div class="Customer-info-overlay">
+                        <div id="loading" class="PopupPanel" ng-if="CustomerOrderModel.CustomerOverlay.length == 0">
+                            <table border="0" bordercolor="red" width="100%" height="100%">
+                                
+                                <tr>
+                                    <td valign="center" align="center">
+                                        <div id="preloader_1"> 
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                       </div> 
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="loadingText"><b>Loading...</b></td>
+                                </tr>
+                            </table>
+                        </div>
+                       <div ng-if="CustomerOrderModel.CustomerOverlay.length != 0">
+                            <div class="row overlay-header">
+                                <div class="col-lg-2 col-md-2">
+                                    <img src="{!URLFOR($Resource.UserImage, 'profile-pic.jpg')}" style="height:70px; width:70px;" />
+                                </div>
+                                <div class="col-lg-10 col-md-10">
+                                    <div class="row pull-right" style="margin-top: 10px;">
+                                        <div>
+                                            <button  class="square-btn bold white orange-back"  ng-click="CustomerOrder.EditCustomerOverLay()">Edit Customer</button>
+                                            <button class="square-btn bold white red-back">Remove from Invoice</button>
+                                        </div>
+                                    </div>
+                                    <div class="clear"></div>
+                                    <div class="row customer-name">
+                                            <Strong>{{CustomerOrderModel.CustomerOverlay[0].value}}</Strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="under-line-row row" ng-repeat="cust in CustomerOrderModel.CustomerOverlay"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>{{cust.label}}</strong>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6" ng-if="cust.value != ''">
+                                    <span>{{cust.value}}</span>
+                                </div>
+                                <div class="form-label italic col-lg-6 col-md-6" ng-if="cust.value == ''">
+                                    <span>(none)</span>
+                                </div>
+                            </div>
+                            <!-- 
+                            <div class="under-line-row row"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>PHONE PRIMARY</strong>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Phone != ''">
+                                    <span>{{CustomerOrder.customer.Cust_Phone}}</span>
+                                </div>
+                                <div class="form-label italic col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Phone == ''">
+                                    <span>(none)</span>
+                                </div>
+                            </div>
+                            <div class="under-line-row row"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>PHONE ALT</strong>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Mobile != ''">
+                                    <span>{{CustomerOrder.customer.Cust_Mobile}}</span>
+                                </div>
+                                <div class="form-label italic col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Mobile == ''">
+                                    <span>(none)</span>
+                                </div>
+                                <div class="pull-right"> 
+                                    <img src="{!URLFOR($Resource.UserImage, 'sage-badge.gif')}" style="height:25px; width:18px;" />
+                                </div>
+                            </div>
+                            <div class="under-line-row row"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>EMAIL</strong>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Email != ''">
+                                    <span>{{CustomerOrder.customer.Cust_Email}}</span>
+                                </div>
+                                <div class="form-label italic col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Email == ''">
+                                    <span>(none)</span>
+                                </div>
+                                <div class="pull-right"> 
+                                    <img src="{!URLFOR($Resource.UserImage, 'sage-badge.gif')}" style="height:25px; width:18px;" />
+                                </div>
+                            </div>
+                            <div class="under-line-row row"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>PHONE PRIMARY</strong>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Fax != ''">
+                                    <span>{{CustomerOrder.customer.Cust_Fax}}</span>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6" ng-if="CustomerOrder.customer.Cust_Fax == ''">
+                                    <span>(none)</span>
+                                </div>
+                            </div>
+                            <div class="under-line-row row"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>ADDRESS</strong>
+                                </div>
+                                <div class="form-label col-lg-6 col-md-6">
+                                    <span> {{CustomerOrder.customer.Cust_BillingStreet}}, {{CustomerOrder.customer.Cust_BillingCity}}</span>
+                                </div>
+                            </div>
+                             -->
+                            <div class="rewards-block row"> 
+                                <div class="col-lg-5 col-md-5 form-label">
+                                    <strong>REWARDS</strong>
+                                </div>
+                                <div class="rewards-info col-lg-7 col-md-7">
+                                    <div class="row">
+                                        <div class="col-lg-10 col-md-10">
+                                            50 Points
+                                        </div>
+                                        <div class="pull-right"> 
+                                            <img src="{!URLFOR($Resource.UserImage, 'sage-badge.gif')}" style="height:25px; width:18px;" />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-10 col-md-10">
+                                            50 Points
+                                        </div>
+                                        <div class="pull-right"> 
+                                            <img src="{!URLFOR($Resource.UserImage, 'sage-badge.gif')}" style="height:25px; width:18px;" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+</apex:component>

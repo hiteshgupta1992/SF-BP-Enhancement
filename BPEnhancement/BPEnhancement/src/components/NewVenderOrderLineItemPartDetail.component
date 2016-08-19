@@ -1,0 +1,219 @@
+<apex:component >
+        <style>
+              .Vendor-Order-Needpopup{
+                  display: none;
+					background: #fff;
+					color: #000;
+					width: 300px; /* 350px; */
+					min-height: 100px;
+					position: absolute;
+					text-align: left;
+					z-index: 1000;
+					border-radius: 10px;
+					padding: 10px 20px;
+					-moz-box-shadow: 0 0 20px #222;
+					-webkit-box-shadow: 0 0 20px #222;
+					box-shadow: 0 0 20px #222;
+					/********** new ***********/
+					top: 20px;
+                    left: 195px;
+                    /********** new ***********/
+					
+              }
+              /*************new*************/
+              .colorRed{
+              	color:red;
+              }
+              
+              .Vendor-Order-Needpopup-flyout:before{
+	         	border-color: #fff transparent;
+			    border-style: solid;
+			    border-width: 0 11px 13px;
+			    content: '';
+			    display: block;
+			    width: 0;
+			    height: 0;
+			    position: absolute;
+			    border-top: 13px solid transparent;
+			    border-bottom: 13px solid transparent;
+			    border-right: 13px solid #FFF;
+			    left: -22px;
+			    top: 50px;
+	         }
+	         .savecancle_btncntnr .closeBtn{
+		         	height: 32px;
+		         }
+		         
+		         .savecancle_btncntnr {
+                    margin-right: 15px;
+                 }
+                 .savecancle_btncntnr .grayBtn, .savecancle_btncntnr .grayBtn:hover, .savecancle_btncntnr.grayBtn:focus, .savecancle_btncntnr.grayBtn:active{
+                    background: #727983;
+                    color: #ffffff;
+                    border: none !important;
+                    font-weight: bold;
+                    border-radius: 1px;
+                    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-delay: 0.2s;
+                    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+                    
+                }
+                .savecancle_btncntnr .greenBtn, .savecancle_btncntnr .greenBtn:hover, .savecancle_btncntnr .greenBtn:focus,.savecancle_btncntnr .greenBtn:active {
+                    background: #71BF3E;
+                    color: #ffffff;
+                    border: none !important;
+                    font-weight: bold;
+                    border-radius: 1px;
+                    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition-delay: 0.2s;
+                    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+                } 
+                .Vendor-Order-Needpopup strong{
+                	text-transform:uppercase;
+                }
+	         /*********************new*******************/
+	         
+              /* .Vendor-Order-Needpopup:before{
+                  content: '';
+					display: block;
+					position: absolute;
+					z-index: -1;
+					top: 13px;
+					left:335px;
+					height: 30px;
+					width: 30px;
+					-moz-box-shadow: 5px 0px 5px -3px #7a7a7a;
+					-webkit-box-shadow: 5px 0px 5px -3px #7a7a7a;
+					-o-box-shadow: 5px 0px 5px -3px #7a7a7a;
+					box-shadow: 5px 0px 5px -3px #7a7a7a;
+					transform: rotate(45deg);
+					-ms-transform: rotate(45deg);
+					-webkit-transform: rotate(45deg);
+					background-color: #fff;
+              } */
+              .Vendor-Order-Needpopup .under-line-row{
+                  padding: 10px;
+				  border-bottom: 1px solid #939598;
+				  margin-left: 0px;
+              }
+        </style>
+        <script>
+            $(document).ready(function () {
+                $('.Vendor-Order-Needpopup').mouseover(function() {
+                    $('.Vendor-Order-Needpopup').show(); 
+                })
+                $('.Vendor-Order-Needpopup').mouseout(function() {
+                    $('.Vendor-Order-Needpopup').hide(); 
+                })
+                $('.Vendor-Order-Needpopup-flyout .closeBtn').bind("click", function(){
+            	  $('.Vendor-Order-Needpopup').hide(); 
+            	 })
+            });
+        </script>
+        
+      	<div class="Vendor-Order-Needpopup Vendor-Order-Needpopup-flyout" id="Vendor-Order-Needpopup-flyout">
+        	<div>
+        		<div class="row overlay-header">
+                	<div class="savecancle_btncntnr pull-right">
+	                	<button class="btn btn-default grayBtn closeBtn C6" type="button"><i class="fa fa-times"></i></button>
+                    </div>
+                </div>  
+            	<div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<strong class="T3">{!$label.Part_Object_Quantity_Available} </strong>	
+                   	</div>
+                    <div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		{{VendorOrderModel.voliPartDetails.QtyAvailable}}
+                   	</div>
+                </div>   	
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<strong class="T3"> {!$label.Part_Object_Quantity_Incoming} </strong>	
+                   	</div>
+                    <div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		{{VendorOrderModel.voliPartDetails.Incoming}}
+                   	</div>
+                </div>
+                
+                <div style="border-bottom :1px solid black"/>   	
+                
+                <div class="row overlay-header" style="margin-top:10px;">
+                	<div class="col-lg-2 col-md-2 pull-right">
+                   		<strong class="T3"> {{VendorOrderModel.voliPartDetails.NetAvailable}}  </strong>
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                	<div class="col-lg-8 col-md-8 ">
+                    	<strong class="T3">{!$label.Part_Object_Quantity_Net_Available} </strong>	
+                   	</div>
+                    
+                   	
+                </div> 
+                
+                <div class="row clearfix" style="height:20px;">
+                	
+                </div> 	
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<strong class="T3"> {!$label.Label_Auto_reorder_at} : </strong>	
+                   	</div>
+	                   	<div class="col-lg-2 col-md-2">
+	                   	
+	                   	</div>
+	                   	<div class="col-lg-2 col-md-2">
+	                   		<strong class="T3"> {{VendorOrderModel.voliPartDetails.AutoReprderAt}}   </strong>
+	                  </div>
+                </div> 
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<strong class="T3"> {!$label.Label_Auto_reorder_to} : </strong>	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		<b class="T3"> {{VendorOrderModel.voliPartDetails.AutoReprderTo}}  </b>
+                   	</div>
+                </div> 
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8"  style="color:red">
+                    	<strong class="T3" ng-if="VendorOrderModel.voliPartDetails.PackageUnit  !=null || VendorOrderModel.voliPartDetails.PackageUnit !='NULL'">{!$label.Label_Ordered} {!$label.Label_As}  {{ VendorOrderModel.voliPartDetails.PackageQty}} / {{VendorOrderModel.voliPartDetails.PackageUnit }}</strong>	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		<strong class="T3">  </strong>
+                   	</div>
+                </div> 
+                
+                <div style="border-bottom:1px solid black; margin-top : 10px;"/> 
+                  
+                <div class="row overlay-header" style="margin-top:10px;">
+                	<div class="col-lg-2 col-md-2 pull-right">
+                   		<strong class="T3"> {{VendorOrderModel.voliPartDetails.TotalNeed}} </strong>
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                	<div class="col-lg-8 col-md-8 pull-right">
+                    	<strong class="T3"> {!$Label.Label_Need} </strong>	
+                   	</div>
+                </div> 
+                
+          	</div> 
+      	</div>
+      	
+      	
+</apex:component>

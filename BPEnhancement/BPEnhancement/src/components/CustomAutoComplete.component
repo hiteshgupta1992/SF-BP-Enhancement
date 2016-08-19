@@ -1,0 +1,174 @@
+<apex:component id="CustomAutoComplete" controller="CustomAutoCompleteCtrl" >
+    <!-- Component Attributes -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for component here."/>
+    <apex:attribute name="objName" required="true" type="String" description="Object API name for which to create auto complete."/>
+    <apex:attribute name="resultElemId" required="true" type="String" description="Html element id where result for selected item will be stored."/>
+    <apex:attribute name="required" required="false" type="boolean" description="If the field value is required."/>
+    <apex:attribute name="defaultClass" required="false" type="String" description="HTML class for autocomplete element."/>
+    <apex:attribute name="defaultDisplayValue" required="false" type="String" description="Display value for autocomplete element by which to initialize."/>
+    <apex:attribute name="defaultIdValue" required="false" type="String" description="Id value for autocomplete element by which to initialize."/>
+    
+    <!-- Auto Complete text field -->
+    <input id="{!uniqueId}Autocomplete" width="200px" class="{!defaultClass} {!IF(required == true, 'requiredField', '')}"/>
+    
+    <script>
+    	var {!uniqueId}StartSugest = 0;
+    	var minCharLengthToSearch = {!$Setup.Configurations__c.SearchMinCharLength__c};
+    	var {!uniqueId}OriginalResultId = "{!JSENCODE(defaultIdValue)}";
+    	// Delay method
+    	var {!uniqueId}delayName= (function(){
+			var timer = 0;
+			return function(callback, ms){
+				clearTimeout(timer);
+				timer = setTimeout(callback, ms);
+			};
+
+		})();
+		
+		$("#{!uniqueId}Autocomplete").val("{!defaultDisplayValue}");
+		$("#{!resultElemId}").val("{!defaultIdValue}");
+		
+    	// Vendors AutoComplete Data Source
+		var {!uniqueId}bindAutocompleteDataSource = function(){
+				var filterKey = $("#{!uniqueId}Autocomplete").val();
+				
+				// make AJAX request to the remote service
+				Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.CustomAutoCompleteCtrl.getAutoCompleteJSONForObj}',
+					encodeString('{!objName}'), encodeString(filterKey),
+					function (result, event) {
+						if (event.type == 'exception') {
+							showPopupNotification(event.message, "error");
+						} else {
+							componentDataArray = $.parseJSON(decodeString(result));
+							
+							$('#{!uniqueId}Autocomplete').data("kendoAutoComplete").setDataSource(componentDataArray);
+							var searchKey = $('#{!uniqueId}Autocomplete').val();
+							
+							if({!uniqueId}StartSugest == 0) {
+								$('#{!uniqueId}Autocomplete').data("kendoAutoComplete").search(searchKey);
+								{!uniqueId}StartSugest = 1;
+							}
+						}
+				},
+				{ escape : true }
+			);
+		}
+		
+		var {!uniqueId}autocomplete = $("#{!uniqueId}Autocomplete").kendoAutoComplete({
+				//dataSource : {!uniqueId}autocompleteDataSource,
+				dataTextField : "Name",
+				filter : "contains",
+				placeholder : "Type "+minCharLengthToSearch+" characters to search",
+				minLength: minCharLengthToSearch,
+				select : function (e) {
+					var DataItem = this.dataItem(e.item.index());
+					$("#{!resultElemId}").val(DataItem.Value);
+				}
+			}).data('kendoAutoComplete');
+		
+		$("#{!uniqueId}Autocomplete").keyup(function (e) {
+			debug(e.which);
+			if( $(this).val().length >= minCharLengthToSearch ) {
+				{!uniqueId}RemoveErrorFromAutoComplete("{!uniqueId}Autocomplete");
+				if (e.which == kendo.keys.DOWN || e.which == kendo.keys.LEFT || e.which == kendo.keys.RIGHT || e.which == kendo.keys.UP || e.which == kendo.keys.TAB) {
+					// Do nothing
+				} else if (e.which == kendo.keys.ENTER){
+					if( !{!uniqueId}processSearch() ){
+						{!uniqueId}StartSugest = 0;
+						{!uniqueId}bindAutocompleteDataSource();
+					}
+				} else {
+					{!uniqueId}delayName(function(){
+						{!uniqueId}StartSugest = 0;
+						{!uniqueId}bindAutocompleteDataSource();
+					}, 300 );
+				}
+			} else {
+				{!uniqueId}StartSugest = 0;
+			}
+		});
+		
+		$("#{!uniqueId}Autocomplete").focusout(function (e) {
+			debug("Focusout:   " + e.which);
+			var isRequired = {!required};
+			if(isRequired && $(this).val().length == 0){
+				// Display Error
+				{!uniqueId}RemoveErrorFromAutoComplete("{!uniqueId}Autocomplete");
+				{!uniqueId}AddErrorToAutoComplete("{!uniqueId}Autocomplete", "Required.");
+			}else if($(this).val().length >= minCharLengthToSearch){
+				{!uniqueId}RemoveErrorFromAutoComplete("{!uniqueId}Autocomplete");
+				debug($("#{!uniqueId}Autocomplete").hasClass("Errormsg"));
+				{!uniqueId}ProcessDataScourceForTab();
+			}else{
+				// Display Error
+				{!uniqueId}AddErrorToAutoComplete("{!uniqueId}Autocomplete", "Please type more letters to search.");
+			}
+		});
+		
+		function {!uniqueId}findItem(text) {
+			return {!uniqueId}autocomplete.dataSource.data().find(function (item) {
+				return item.Name.toLowerCase() == text.toLowerCase();
+			});
+		}
+		
+		function {!uniqueId}processSearch() {
+			var searchDataItem = null,
+			value = {!uniqueId}autocomplete.value();
+			if (value != "" && value.length >= 1) {
+				searchDataItem = {!uniqueId}findItem(value);
+			}
+		
+			if (searchDataItem != null) {
+				$("#{!resultElemId}").val(searchDataItem.Value);
+			}
+			
+			if(searchDataItem == null){
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
+		// Method handles TAB key processing for autocomplete
+		// 1. If there is only 1 element in dropdown, then first element will be selected
+		// 2. If user typed whole word that is present in dropdown, then select the dropdown value (TO DO: check for duplicate values)
+		// 3. If no matching value found in dropdown list, then display an error message
+		function {!uniqueId}ProcessDataScourceForTab(){
+			debug("PROCESSS:     " + $("#{!uniqueId}Autocomplete").hasClass("Errormsg"));
+			if( {!uniqueId}autocomplete.dataSource.data().length == 1 ){
+				var searchDataItem = {!uniqueId}autocomplete.dataSource.data()[0];
+				$("#{!resultElemId}").val(searchDataItem.Value);
+				$("#{!uniqueId}Autocomplete").val(searchDataItem.Name);
+			}else {
+				var succesfullSearch = {!uniqueId}processSearch();
+				if( !succesfullSearch ){
+					// Display Error
+					{!uniqueId}AddErrorToAutoComplete("{!uniqueId}Autocomplete", "Selected value not found.");
+				}
+			}
+		}
+		
+		// Method adds error message to element Id 
+		function {!uniqueId}AddErrorToAutoComplete(elementId, errMsg){
+			if( !{!uniqueId}IfSameAsPreviousValue() ){
+				$('#' + elementId).addClass("Errormsg");
+				$("<font>", {id: elementId +'acValidate', class: "errDiv", text: errMsg})
+						.insertAfter('#' + elementId);
+			}
+		}
+		
+		// Method removes error message from element Id 
+		function {!uniqueId}RemoveErrorFromAutoComplete(elementId){
+			$('#'+elementId).removeClass("Errormsg");
+			$('#' + elementId + 'acValidate').remove();
+		}
+		
+		debug($("#{!resultElemId}").val());
+		// Method to check if previous value is equal to new selected value
+		function {!uniqueId}IfSameAsPreviousValue(){
+			return $("#{!resultElemId}").val() == {!uniqueId}OriginalResultId;
+		}
+		
+		$("#{!uniqueId}Autocomplete").closest("span").removeAttr("class");
+    </script>
+</apex:component>

@@ -1,0 +1,558 @@
+<apex:component controller="ViewPartCtrl">
+	<c:NewPopupStyle />
+	<style>
+.modal-content .kit_popup_container .popupinside .min_overflow {
+	height: 270px;
+	overflow: auto;
+	float: left;
+}
+
+.modal-content .kit_popup_container .popupinside .max_overflow {
+	height: 900px;
+	overflow: auto;
+	float: left;
+}
+
+.modify_Cost_summary_gid_container .table tbody>tr>td.highlightremaining {
+	background-color: #BCE2F1;
+	padding: 12px 2px;
+	float: left;
+	margin-right: 15px;
+	width: 80%;
+}
+.grayhighlightremaining{
+	background: #B7BEC6;
+	padding: 2px;
+}
+
+.modal-content .kit_popup_container .popupright {
+	min-height: 370px;
+}
+
+.modal-content .kit_popup_container .popupleft .goldbox .rightgoldbox {
+	width: 160px;
+}
+
+.modal-content .kit_popup_container .popupleft .popupleft_container#topsection
+	{
+	min-height: 0;
+}
+
+.kit_popup_container .popupright .tabconainer form .controls1 {
+	top: -45px;
+}
+
+.kit_popup_container .popupright .tabconainer form .form-group .txtbox:focus
+	{
+	border: none;
+}
+
+.kit_popup_container .popupright .tabconainer form .form-group .smschkbox .chk_tick
+	{
+	margin-left: 0;
+}
+
+.popup_container .modifyCostSummary {
+	border-left: none !important;
+}
+
+.popup_container .modifyCostSummary .tabconainer form .lable_fields {
+	width: 15% !important;
+}
+
+.popup_container .modifyCostSummary .tabconainer form .form_fields {
+	width: 18% !important;
+	float: left;
+}
+
+.popup_container .modifyCostSummary .tabconainer form .form-group.MB {
+	width: 100%;
+}
+
+.popup_container .modifyCostSummary .tabconainer .option_field {
+	width: 100%;
+	float: left;
+}
+
+.popup_container .modifyCostSummary .tabconainer .increaseOptionField {
+	margin-left: 7.5%;
+	width: 100%;
+}
+
+.MR5 {
+	margin-right: 5px;
+}
+
+/* .increaseQty {
+	background: yellow;
+	color: #00AEEF;
+	padding: 2px;
+} */
+
+.MT10 {
+	margin-top: 10px;
+}
+
+.popup_container .modifyCostSummary .tabconainer {
+	width: 90%;
+	margin-left: 5%;
+	border-bottom: none !important; 
+	margin-top: 30px;
+	float: left;
+}
+
+.PartAdjustHeadding {
+	color: #00AEEF;
+	font-weight: bold;
+	text-transform: capitalize;
+	margin-top: 10px;
+}
+.modifyCostSummary .main_container_partAdjust{
+	border-bottom: 1px solid #000;
+}
+.gid_container_Customer .table {
+	border: 0;
+}
+
+.gid_container_Customer .table th {
+	border: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.gid_container_Customer .table tbody {
+	border: none;
+}
+
+.modify_Cost_summary_gid_container .table tbody>tr>td {
+	border: none;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	vertical-align: middle;
+	padding-left: 0px;
+}
+
+.gid_container_Customer .table tbody .tddropdown td {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	vertical-align: middle;
+}
+
+.gid_container_Customer .tableHeader {
+	margin-left: -15px;
+	margin-right: -15px;
+}
+
+.modify_Cost_summary_gid_container .table th:hover {
+	background: #F6F7F9;
+	cursor: inherit;
+}
+.gid_container_Customer .table th.PLR0{
+	padding-left: 0;
+	padding-right: 0px;
+}
+.fontB{
+	font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    margin: 0.01em;
+    color: #414449;
+}
+.modify_Cost_summary_gid_container .table thead tr th{
+	font-family: 'Open Sans', sans-serif;
+}
+</style>
+	<script type="text/javascript">
+        var modifyCostSummaryModel = angular.module("modifyCostSummaryModel",[]);
+        
+        
+        modifyCostSummaryModel.controller("modifyCostSummaryCtrl", function($scope,modifyCostSummryService) {
+             if($scope.modifyCostSummaryModel == undefined){
+                $scope.modifyCostSummaryModel = {};
+            }
+         	
+		
+			$scope.modifyCostSummaryModel.previewBucketList = [];
+			$scope.modifyCostSummaryModel.activePreviewButton = false;
+          // $scope.modifyCostSummaryModel.showPreview = true;
+           $scope.modifyCostSummaryModel.showPreview = false;
+            $scope.$on('ModifyCostSummaryEvent', function (event, args) {
+            	 $scope.modifyCostSummaryModel.bucketList = args;
+            	 $scope.modifyCostSummaryModel.remainingQty = 0
+	           	 $scope.modifyCostSummaryModel.total = 0
+				 $scope.modifyCostSummaryModel.avgCost = 0
+            	 debug($scope.modifyCostSummaryModel.bucketList);
+            	 for(var i=0; i<$scope.modifyCostSummaryModel.bucketList.length;i++){
+                      /*   $scope.modifyCostSummaryModel.bucketList[i].isEdit = false;  */
+						$scope.modifyCostSummaryModel.remainingQty += $scope.modifyCostSummaryModel.bucketList[i].RemainingQty
+						$scope.modifyCostSummaryModel.total += $scope.modifyCostSummaryModel.bucketList[i].Total;
+						$scope.modifyCostSummaryModel.avgCost = $scope.modifyCostSummaryModel.total/$scope.modifyCostSummaryModel.remainingQty   
+             	 }  
+             	 $scope.modifyCostSummaryModel.openmodifyCostSummaryModelPopup(	);
+
+            });
+            
+          /*   $scope.modifyCostSummaryModel.showApplyBtn = function(){
+            	$scope.modifyCostSummaryModel.showPreview = false;
+            } */
+            $scope.modifyCostSummaryModel.openmodifyCostSummaryModelPopup = function () {
+                //$scope.partAdjustModal.clearAllData();
+                
+                $scope.modifyCostSummaryModel.openPopup();
+                setTimeout(function(){ 
+                    angular.element('#feeCodeInput').focus();
+                }, 1000);
+            }
+            
+            
+            // Open popup box
+            $scope.modifyCostSummaryModel.openPopup = function() {
+                angular.element('.controls').hide(); 
+                angular.element('#modifyCostSummary').modal({
+                    backdrop : 'static',
+                    keyboard : false
+                });
+            }
+            
+            // Close popup box
+            $scope.modifyCostSummaryModel.closePopup = function() {
+            	$scope.modifyCostSummaryModel.showPreview = false;
+            	$scope.modifyCostSummaryModel.cost = '';
+            	$scope.modifyCostSummaryModel.activePreviewButton = false;
+                angular.element('#modifyCostSummary').modal('hide');
+            }
+            
+            $scope.modifyCostSummaryModel.PreviewActive = function(newCost){
+				if(newCost != undefined  && newCost != "" && newCost >= 0){ 
+					$scope.modifyCostSummaryModel.activePreviewButton = true;
+				} 
+				else{
+					$scope.modifyCostSummaryModel.activePreviewButton = false;
+				}          
+            }
+            $scope.modifyCostSummaryModel.showModifyCostSummaryPreviewGrid = function (){
+					$scope.modifyCostSummaryModel.showPreview = true;	
+					var monthNames = [
+					  "Jan", "Feb", "Mar",
+					  "Apr", "May", "Jun", "Jul",
+					  "Aug", "Sep", "Oct",
+					  "Nov", "Dec"
+					];
+					
+					var date = new Date();
+					var day = date.getDate();
+					day = day <= 9 ? '0'+day : day;
+					var monthIndex = date.getMonth();
+					var year = date.getFullYear();
+					
+					var gropuItem = {};
+					var lineItem = {};
+					$scope.modifyCostSummaryModel.previewBucketList = angular.copy($scope.modifyCostSummaryModel.bucketList);
+					for(var i=0; i<$scope.modifyCostSummaryModel.previewBucketList.length;i++){
+						//var qtyOut = $scope.modifyCostSummaryModel.previewBucketList[i].QtyOut;
+					/* 	$scope.modifyCostSummaryModel.previewBucketList[i].isEdit = false;  */
+						$scope.modifyCostSummaryModel.previewBucketList[i].PartFIFOActivityLineItemList.isCostAdjustment = false;
+						var lineItem = {};
+						gropuItem.CreatedDate = monthNames[monthIndex] + ' ' + day + ', ' + year;
+						lineItem.UniqueId = "TBD";
+						lineItem.Reference = "Cost Adjustment";
+						lineItem.isCostAdjustment = true
+						lineItem.QtyOut = $scope.modifyCostSummaryModel.previewBucketList[i].RemainingQty;
+						debug(lineItem.QtyOut);
+						$scope.modifyCostSummaryModel.previewBucketList[i].PartFIFOActivityLineItemList.push(lineItem);
+						
+						$scope.modifyCostSummaryModel.previewBucketList[i].QtyOut = $scope.modifyCostSummaryModel.previewBucketList[i].QtyOut + $scope.modifyCostSummaryModel.previewBucketList[i].RemainingQty;
+					 	$scope.modifyCostSummaryModel.previewBucketList[i].RemainingQty = 0;
+					 	$scope.modifyCostSummaryModel.previewBucketList[i].isCostAdjustment = false;
+					 	
+					}
+					debug($scope.modifyCostSummaryModel.previewBucketList);
+					gropuItem.SourceName = "cost Adjust"
+					gropuItem.CreatedDate =  monthNames[monthIndex] + ' ' + day + ', ' + year;
+					gropuItem.UniqueId = "TBD";
+					gropuItem.Reference = "Cost Adjustment";
+					gropuItem.QtyIn = $scope.modifyCostSummaryModel.remainingQty;
+					gropuItem.QtyOut = 0;
+					gropuItem.RemainingQty = $scope.modifyCostSummaryModel.remainingQty;
+					gropuItem.Cost = $scope.modifyCostSummaryModel.cost;
+					gropuItem.isCostAdjustment = true
+					if( $scope.modifyCostSummaryModel.cost!= 'undefined' && $scope.modifyCostSummaryModel.cost!= '' &&  $scope.modifyCostSummaryModel.cost >=0){
+						gropuItem.Total = $scope.modifyCostSummaryModel.cost * $scope.modifyCostSummaryModel.remainingQty;
+					}
+					$scope.modifyCostSummaryModel.previewBucketList.push(gropuItem);
+					
+					debug($scope.modifyCostSummaryModel.previewBucketList);
+                			
+				}
+				
+				$scope.modifyCostSummaryModel.saveModifyCostSummary = function(){
+					debug("Hiii");
+		     		debug($scope.modifyCostSummaryModel.bucketList);
+		     		
+		      		modifyCostSummryService.modifyCostSummary(JSON.stringify($scope.modifyCostSummaryModel.bucketList),$scope.modifyCostSummaryModel.cost).then(function (successfulSearchResult) {
+	                debug(successfulSearchResult);
+	                $scope.modifyCostSummaryModel.closePopup();
+	                $scope.$emit('modifyCostUpdate', successfulSearchResult);
+	                
+		                         
+	                 },
+	                 function (errorSearchResult) {
+	                     responseData = errorSearchResult;  
+	                 });  
+				
+				
+				}
+				
+			  /* $scope.modifyCostSummaryModel.updateFifoBucketLineItem = function(FifoBucketHeaderIndex){
+	                debug("fifo bucket");
+	                debug(FifoBucketHeaderIndex)
+	               	 for(var i=0;i<$scope.modifyCostSummaryModel.bucketList.length;i++){
+	                       	$scope.modifyCostSummaryModel.bucketList[i].isEdit = false; 
+	                 }
+	                $scope.modifyCostSummaryModel.bucketList[FifoBucketHeaderIndex].isEdit = true;
+             }	
+             
+             
+             $scope.modifyCostSummaryModel.updatePreviewFifoBucketLineItem = function(FifoBucketHeaderIndex){
+             	 for(var i=0;i<$scope.modifyCostSummaryModel.previewBucketList.length;i++){
+	                       	$scope.modifyCostSummaryModel.previewBucketList[i].isEdit = false; 
+	                 }
+	                $scope.modifyCostSummaryModel.previewBucketList[FifoBucketHeaderIndex].isEdit = true;
+             } */
+           })
+           
+               modifyCostSummaryModel.service("modifyCostSummryService", function ($q) {
+            	this.modifyCostSummary = function(modifycostJSON , newCost)
+                {
+                	modifycostJSON = encodeString(modifycostJSON);
+                	var deferred = $q.defer();
+                      Visualforce.remoting.Manager.invokeAction(
+                          '{!$RemoteAction.ViewPartCtrl.modifyCostSummary}',
+                              modifycostJSON,newCost,
+                          function (result, event) {
+                             if (event.type == 'exception') {
+                                  deferred.reject(event.message);
+                              } else {
+                                  var partInfo = decodeString(result);
+                                  var find = '\'';
+                                  var re = new RegExp(find, 'g');
+                                  partInfo = partInfo.replace(re, '');
+                                  deferred.resolve(JSON.parse(partInfo));
+                              }
+                          }, {
+                              escape : true
+                      });
+                      return deferred.promise;
+                }
+           	 });
+    </script>
+	<div id="modifyCostSummary" class="modal fade" role="dialog"
+		ng-controller="modifyCostSummaryCtrl">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content col-md-12">
+				<div class="modal-body popup_container kit_popup_container">
+					<div class="popupinside col-md-12 popupright modifyCostSummary ">
+						<div class="right_heading_container col-md-12">
+							<h1 class="right_panel_heading">Modify Cost Summary</h1>
+							<div class="savecancle_btncntnr">
+								<button type="button" id="closemodal"
+									class="btn btn-default grayBtn"
+									ng-click="modifyCostSummaryModel.closePopup()">Cancel</button>
+								<button type="button" class="btn btn-default greenBtn"
+									ng-click="modifyCostSummaryModel.showModifyCostSummaryPreviewGrid()" ng-disabled = "!modifyCostSummaryModel.activePreviewButton">
+									Preview</button>
+								<button type="button" class="btn btn-default greenBtn" ng-if = "modifyCostSummaryModel.showPreview" ng-click = "modifyCostSummaryModel.saveModifyCostSummary()">Apply</button>
+							</div>
+						</div>
+						<div class="col-md-12 P0 main_container_partAdjust">
+							<p class="PartAdjustHeadding">Cost Details</p>
+							<div class="gid_container_Customer modify_Cost_summary_gid_container"
+								id="modify_Cost_summary_gid_container">
+								<table class="table pull-left" id="part_Adjust_ItemGrid">
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<thead>
+										<tr class="tableHeader T3 C2 ">
+											<th class="text-uppercase  T3 PLR0">SOURCE</th>
+											<th class=" T3 text-uppercase PLR0">DATE</th>
+											<th class=" T3 text-uppercase PLR0">ID#</th>
+											<th class=" T3 text-uppercase PLR0">REFERENCE</th>
+											<th class=" T3 text-uppercase PLR0 text-center">QTY IN</th>
+											<th class="T3 text-uppercase PLR0 text-center">QTY OUT</th>
+											<th class=" T3 text-uppercase PLR0 text-center">REMAINING</th>
+											<th class=" T3 text-uppercase PLR0 text-center">COST</th>
+											<th class=" T3 text-uppercase PLR0 text-center">TOTAL</th>
+										</tr>
+									</thead>
+									<tbody class="parentBody printChild" ng-repeat = " FifoBucket in modifyCostSummaryModel.bucketList"  ng-init="FifoBucketHeaderIndex = $index">
+										<tr   ng-class-even="'C2'">
+											 <td class ="T7">{{FifoBucket.SourceName}}</td>
+                                                <td class ="T7">{{FifoBucket.CreatedDate}}</td>
+                                                <td class ="T7"><a href="javascript:void(0)">{{FifoBucket.UniqueId}}</a></td>
+                                                <td class ="T7">{{FifoBucket.Reference}}</td>
+                                                <td class ="T7 text-center">{{FifoBucket.QtyIn}}</td>
+                                                <td class ="T7 text-center">{{FifoBucket.QtyOut}}</td>
+                                                <td class ="T7 text-center">{{FifoBucket.RemainingQty}}</td>
+                                                <td class ="T7 text-center">{{FifoBucket.Cost | currency}}</td>
+                                                <td class ="T7 text-center">{{FifoBucket.Total | currency}}</td>  
+
+										</tr>
+										
+										 <tr ng-repeat-start="FifoBucketLineItem in FifoBucket.PartFIFOActivityLineItemList" >
+                                                <td class ="T7"></td>
+                                                <td class ="T7">{{FifoBucketLineItem.CreatedDate}}</td>
+                                                <td class ="T7"><a href="javascript:void(0)">{{FifoBucketLineItem.UniqueId}}</a></td>
+                                                <td class ="T7">{{FifoBucketLineItem.Reference}}</td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7 text-center">{{FifoBucketLineItem.QtyOut}}</td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7"></td>
+                                                <td class ="T7 text-left"></td>
+                                                     
+                                                </tr>
+                                                <tr ng-repeat-end="ng-repeat-end" ></tr>
+									</tbody>
+									<tbody  class="parentBody printChild">
+									<tr>
+										 <td class ="T7"></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T7"><a href="#"></a></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T3 text-center">{{modifyCostSummaryModel.remainingQty}}</td>
+                                         <td class ="T3 text-center highlightremaining">{{modifyCostSummaryModel.avgCost | currency}}</td>
+                                         <td class ="T3 text-center grayhighlightremaining">{{modifyCostSummaryModel.total | currency}}</td>  
+
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="tabconainer">
+							<form>
+								<div class="option_field">
+									<div class="increaseOptionField">
+										<span class="pull-left MR5 MT10 fontB">I want to adjust
+											the Cost per Item from </span> <span
+											class="pull-left  MR5 highlightremaining MT10 fontB">{{modifyCostSummaryModel.avgCost | currency}}</span> <span
+											class="pull-left MR5 MT10 fontB">to $</span> 
+										<div class="form_fields">
+											<div class="form-group large MB">
+												<input type="text" class="form-control" id="txtdescription"
+													ng-model="modifyCostSummaryModel.cost" placeholder="Enter Cost"
+													ng-attr-tabindex="{{modifyCostSummaryModel.tabIndexValue + 2}}"
+													maxlength="10" ng-change = "modifyCostSummaryModel.PreviewActive(modifyCostSummaryModel.cost)" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="option_field">
+									<div class="increaseOptionField">
+										<span class=" pull-left MR5 MT10">Which will change
+											the Valuation of the part from </span> <span
+											class="pull-left  MR5 highlightremaining MT10">{{modifyCostSummaryModel.total | currency}}</span> <span
+											class=" pull-left MR5 MT10">to</span>
+											 <span class=" pull-left MR5 MT10" ng-if = " modifyCostSummaryModel.cost == 'undefined' || modifyCostSummaryModel.cost == ''">??</span>
+											<span class=" pull-left MR5 MT10" ng-if = " modifyCostSummaryModel.cost!= 'undefined' && modifyCostSummaryModel.cost!= '' &&  modifyCostSummaryModel.cost >=0">{{(modifyCostSummaryModel.cost * modifyCostSummaryModel.remainingQty) | currency}}</span>
+									</div>
+								</div>
+								<div class="clearfix"></div>
+							</form>
+						</div> 
+							<div class="col-md-12 P0 main_container_partAdjust"  ng-if = "modifyCostSummaryModel.showPreview">
+								<p class="PartAdjustHeadding">Adjusted Cost Details</p>
+								<div class="gid_container_Customer modify_Cost_summary_gid_container"
+									id="modify_Cost_summary_gid_container">
+									<table class="table pull-left" id="part_Adjust_ItemGrid">
+										<col width="15%" />
+										<col width="10%" />
+										<col width="10%" />
+										<col width="15%" />
+										<col width="10%" />
+										<col width="10%" />
+										<col width="10%" />
+										<col width="10%" />
+										<col width="10%" />
+										<thead>
+											<tr class="tableHeader T3 C2 ">
+												<th class="text-uppercase PLR0 T3">SOURCE</th>
+												<th class=" T3 text-uppercase PLR0">DATE</th>
+												<th class=" T3 text-uppercase PLR0">ID#</th>
+												<th class=" T3 text-uppercase PLR0 ">REFERENCE</th>
+												<th class=" T3 text-uppercase PLR0 text-center">QTY IN</th>
+												<th class="T3 text-uppercase PLR0 text-center">QTY OUT</th>
+												<th class=" T3 text-uppercase PLR0 text-center">REMAINING</th>
+												<th class=" T3 text-uppercase PLR0 text-center">COST</th>
+												<th class=" T3 text-uppercase PLR0 text-center">TOTAL</th>
+											</tr>
+										</thead>
+										<tbody class="parentBody printChild"  ng-repeat = " FifoBucket in modifyCostSummaryModel.previewBucketList" ng-init="FifoBucketHeaderIndex = $index">
+											<tr ng-class-even="'C2'">
+												 <td  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment}">{{FifoBucket.SourceName}}</td>
+                                                <td  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment}">{{FifoBucket.CreatedDate}}</td>
+                                                <td  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment }"><a href="javascript:void(0)">{{FifoBucket.UniqueId}}</a></td>
+                                                <td  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment}">{{FifoBucket.Reference}}</td>
+                                                <td class =" text-center"  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment}">{{FifoBucket.QtyIn}}</td>
+                                                <td class =" text-center"  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment}">{{FifoBucket.QtyOut}}</td>
+                                                <td class =" text-center"  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment }">{{FifoBucket.RemainingQty}}</td>
+                                                <td class =" text-center"  ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment }">{{FifoBucket.Cost | currency}}</td>
+                                                <td class =" text-center" ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucket.isCostAdjustment}">{{FifoBucket.Total | currency}}</td>  
+											</tr>
+											<tr ng-repeat-start="FifoBucketLineItem in FifoBucket.PartFIFOActivityLineItemList"  >
+	                                        <td class ="T7"></td>
+	                                        <td ng-class="{'T3': FifoBucketLineItem.isCostAdjustment, 'T7' : !FifoBucketLineItem.isCostAdjustment}">{{FifoBucketLineItem.CreatedDate}}</td>
+	                                        <td ng-class="{'T3': FifoBucket.isCostAdjustment, 'T7' : !FifoBucketLineItem.isCostAdjustment}"><a href="#">{{FifoBucketLineItem.UniqueId}}</a></td>
+	                                        <td ng-class="{'T3': FifoBucketLineItem.isCostAdjustment, 'T7' : !FifoBucketLineItem.isCostAdjustment}">{{FifoBucketLineItem.Reference}}</td>
+	                                        <td class ="T7 "></td>
+	                                        <td ng-class="{'T3': FifoBucketLineItem.isCostAdjustment, 'T7' : !FifoBucketLineItem.isCostAdjustment}" class =" text-center" >{{FifoBucketLineItem.QtyOut}}</td>
+	                                        <td class ="T7 "></td>
+	                                        <td class ="T7 "></td>
+	                                        <td class ="T7 "></td> 
+	                                             
+	                                        </tr>
+	                                        <tr ng-repeat-end="ng-repeat-end" ></tr>
+										</tbody>
+										<tbody  class="parentBody printChild">
+										<tr>
+										 <td class ="T7"></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T7"><a href="#"></a></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T7"></td>
+                                         <td class ="T3 text-center">{{modifyCostSummaryModel.remainingQty}}</td>
+                                         <td class ="T3 text-center highlightremaining">{{modifyCostSummaryModel.cost | currency}}</td>
+                                         <td class ="T3 text-center grayhighlightremaining">{{modifyCostSummaryModel.cost * modifyCostSummaryModel.remainingQty | currency}}</td>  
+
+										</tr>
+									</tbody>
+									</table>
+								</div>
+							</div>
+						<div class="right_heading_container col-md-12">
+                                <div class="savecancle_btncntnr">
+                                 <button type="button" id="closemodal"
+									class="btn btn-default grayBtn"
+									ng-click="modifyCostSummaryModel.closePopup()">Cancel</button>
+								<button type="button" class="btn btn-default greenBtn"
+									ng-click="modifyCostSummaryModel.showModifyCostSummaryPreviewGrid()" ng-disabled = "!modifyCostSummaryModel.activePreviewButton">
+									Preview</button>
+								<button type="button" class="btn btn-default greenBtn" ng-if = "modifyCostSummaryModel.showPreview" ng-click = "modifyCostSummaryModel.saveModifyCostSummary()">Apply</button>
+                                </div>
+                            </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</apex:component>

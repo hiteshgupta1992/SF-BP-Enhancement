@@ -1,0 +1,20 @@
+<apex:component >
+	<!-- Component Attributes -->
+	<apex:attribute name="compId" required="true" type="String" description="Component Id."/>
+	
+	<body>
+		<div class="waitingSearchDiv" id="{!compId}"> 
+			<img class="waitingImage" src="{!URLFOR($Resource.Images, '/loading.gif')}" title="Please Wait..." />
+		</div>
+	</body>
+	
+	<script>
+		function startLoading(compId){
+			$("#"+compId).show();
+		}
+		
+		function stopLoading(compId){
+			$("#"+compId).hide();
+		}
+	</script>
+</apex:component>

@@ -1,0 +1,1109 @@
+<apex:component id="PartsComp" controller="BlackPurlContentCtrl" allowDML="true">
+    <!-- Component Attributes -->
+    <apex:attribute name="uniqueId" required="true" type="String" description="unique Id for components here."/>
+    
+    <body>
+    	<span id="{!uniqueId}Notification"></span>
+
+        <div id="dropDownDiv">
+			<span id="{!uniqueId}NumberOfFilterRecords" style="color: #1abc9c;"> </span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		  	<span> <b> Include Inactive </b> </span>
+		  	<input type="checkbox" id="{!uniqueId}IncludeInactiveCheckBox" onClick="{!uniqueId}BindGridData();"/> &nbsp;&nbsp;&nbsp;
+		  	<span> <b> Records Size : </b> </span>
+		  	<select id="{!uniqueId}dropDownList" onchange="{!uniqueId}setCustomSettingAndReloadGrid();">
+				  <option value="20">20</option>
+				  <option value="50">50</option>
+				  <option value="100">100</option>
+			</select>
+		</div>
+        <div id="partTabPanel" style="border:0px; margin-top: 5px;">
+            <ul>
+                <li class="k-state-active">Parts</li>
+            </ul>
+            <div>
+                <div id="{!uniqueId}grid" style="width:100%"></div>
+                <apex:outputPanel id="NavigationPanel"> 
+		         	<span id="NavigationDiv">
+		          	<span> Show </span>
+		          	<a href="" onclick="{!uniqueId}moreLinkClickAction();" id="{!uniqueId}MoreLink" > More </a>
+		          	<sapn> / </sapn>
+		          	<a href="" onclick="{!uniqueId}fewerLinkClickAction();" id="{!uniqueId}FewerLink" class="linkDisable"> Fewer </a>
+		          	<span> Records </span>
+		         	</span>
+		         </apex:outputPanel>
+            </div>
+        </div>
+
+
+        <div class="{!uniqueId}waitingSearchDiv"   > 
+            <img class="waitingImage" src="{!URLFOR($Resource.Images, '/loading.gif')}" title="Please Wait..." />
+        </div>
+		<div class="scroll-to-top">
+		</div>
+		
+		<div class="scroll-to-add">  
+        </div>
+		
+		<div style="display: none;">
+        	<div id="{!uniqueId}HoverIconsDivToAdd">
+	        	<img class="bpGridAddButton" id="Update_Parts_Trans" src="{!URLFOR($Resource.Images, '/support.png')}" title="Create/Update Parts Sales Transactions" />
+			    <img class="bpGridAddButton" id="Update_Service_Trans" src="{!URLFOR($Resource.Images, '/settings.png')}" title="Create/Update Service Transactions" />
+			    <img class="bpGridAddButton" id="Update_Purchase_Order_Trans" src="{!URLFOR($Resource.Images, '/phone.png')}" title="Create/Update Parts Purchase Order Transactions" />
+		    </div>
+        </div>
+        
+
+    </body>
+    <apex:form >
+	     <apex:actionFunction name="createRecentPartRecord" action="{!createRecentPartRecord}" rerender="dummy">
+	    	<apex:param name="selectedPartId" assignTo="{!selectedPartId}" value="" />
+	    </apex:actionFunction> 
+		<apex:actionFunction name="{!uniqueId}setPartCustomSetting" action="{!setCustomerCustomSetting}" rerender="dummy">
+			<apex:param name="dropDownSelectedNumber" assignTo="{!dropDownSelectedNumber}" value=""/>
+		</apex:actionFunction>
+	</apex:form> 
+	
+
+	<style>
+        .bpGridAddButton {
+            float:left;
+         	position:relative;
+        }
+       .GridRowSelected {
+        	background-color: #c4f7ed !important;
+        }
+        .ob-center {	
+        	text-align:center;
+        }
+        .ob-right {
+        	text-align:center;
+        }
+        #NavigationDiv a {
+        	text-decoration : none;
+        	color : blue;
+        	cursor : pointer;
+        }
+        .linkDisable {
+			color: #a0a0a0 !important;
+		    pointer-events: none;
+  			cursor: default;
+        }
+        #NavigationDiv {
+        	margin-left:40%;
+        	position: absolute;
+			z-index: 1;
+			margin-top: -1.7%;
+        }
+        .recentRows {
+        	 border-left:3px solid #1abc9c !important;
+        }
+		.scroll-to-top {
+			position: fixed; 
+			background : url("{!URLFOR($Resource.Images,'/scrollToTop.png')}");
+			cursor: pointer; 
+			width:12px; 
+			height: 33px; 
+			bottom: 3.5em; 
+			padding-right: 1em; 
+			display: none; 
+			z-index: 999; 
+			margin-left: 77.7%;
+			border-radius: 13px !important;
+		}
+		.scroll-to-add {
+            position: fixed; 
+            background : url("{!URLFOR($Resource.Images,'/scrollAdd.png')}");
+            cursor: pointer; 
+            width:23px; 
+            height: 30px; 
+            bottom: 1em; 
+            display: block;
+            padding-right: 1em; 
+
+            z-index: 999; 
+            margin-left: 77.77%;
+            border-radius: 13px !important;
+        }
+		#dropDownDiv {
+			margin-top: 5px;
+		}
+		.k-header .k-grid-toolbar {
+            border-bottom:0px;
+        }
+    </style>
+    
+    <script>
+		if(document.getElementById('{!uniqueId}dropDownList') != null && '{!dropDownSelectedNumber}' != "") {
+   			document.getElementById('{!uniqueId}dropDownList').value = '{!dropDownSelectedNumber}';
+   		}
+
+		// Method to bind window unload event if any customer tab is open
+		var binWindowUnLoadEvent = function(){
+			$(window).bind('beforeunload', function(e) { 
+				var isToProcessWindowUnloadPopup = partsGridTabPanel != null && partsGridTabPanel.tabGroup[0].children.length != 1;
+				var message = "Please make sure all edited part records have been saved.";
+				
+				if(isToProcessWindowUnloadPopup){
+					e.returnValue = message;	
+					return message;
+				}
+			});
+		}
+	
+		$(window).unbind('beforeunload');
+		
+		// Boolean variable to keep track if any changes in whole customer page
+    	var IsAnyChangesInCustomerPage = false;;
+
+		// variable to show popup notification. 
+    	var {!uniqueId}popupNotification;
+		
+
+		// Varibale to store the number selected by drop down 
+		var dropDownNumber;
+		
+		// Variable to store Include Inactive check box status
+		var isInactiveIncluded;
+		
+		// Variable related to filters
+		var KeyColumn='';
+    	var Keyvalue='';
+    	var FilterKeys = [];
+
+
+
+    	var FilterJsonData = '';
+	   	var startSugest = 0;
+		var PartssGridTabPanel;
+		var PartIdToTabIndexMap = {};
+		var pagePartId='';
+		var partdetailJson='';
+
+		// Varibale used in opening customer. It is always a unique number.
+        var tabCounter=0;
+        
+		function {!uniqueId}setCustomSettingAndReloadGrid() {
+        	var numberOfPartsToBeShown = document.getElementById('{!uniqueId}dropDownList');
+    		{!uniqueId}setPartCustomSetting(numberOfPartsToBeShown.value); 
+    		{!uniqueId}BindGridData();
+        }
+		
+        /**
+		 * Name: Document Ready Function
+		 * Desc: Method executes as soon as the page load
+		 * @param: 
+		 * @return: 
+		**/
+        $(document).ready(function () {
+        	// Notification Popup
+            {!uniqueId}popupNotification = $("#{!uniqueId}Notification").kendoNotification({
+				// hide automatically after 2 seconds
+				autoHideAfter: 5000,
+
+				// prevent accidental hiding for 100 mili-second
+				allowHideAfter: 100,
+
+				// prevent to show a hide button
+				button: false,
+				
+				// allow hiding by clicking on the notification content
+				hideOnClick: true,
+				
+				// Set animation to false
+				animation: false
+            }).data("kendoNotification");
+              
+            // Load grid here
+            {!uniqueId}loadPartGrid();
+
+            if({!uniqueId}partGrid == null){
+                {!uniqueId}partGrid = $("#{!uniqueId}grid").data("kendoGrid");
+            }
+            
+            $("#{!uniqueId}grid").data().kendoGrid.dataSource.bind('requestStart', {!uniqueId}start);
+            $("#{!uniqueId}grid").data().kendoGrid.dataSource.bind('requestEnd', {!uniqueId}end );
+            
+            function {!uniqueId}start(){
+                $(".{!uniqueId}waitingSearchDiv").show();//i.e. make your loading gif visible
+            }
+            
+            function {!uniqueId}end(){
+                $(".{!uniqueId}waitingSearchDiv").hide();//i.e. make your loading gif visible
+            }
+            
+            $("#{!uniqueId}Part_Add_Button", {!uniqueId}partGrid.element).on("click", function (event) {
+                {!uniqueId}partGridAddButtonClickEvent();
+                event.stopPropagation();
+            });
+			
+			$('#{!uniqueId}grid').data('kendoGrid').tbody.on('mousedown', 'img', function (e) {
+		        e.stopImmediatePropagation();
+		    });
+		    
+		    $('#{!uniqueId}grid').data('kendoGrid').tbody.on('mousedown', '.HoverIconsDiv', function (e) {
+		        e.stopImmediatePropagation();
+		    });
+		    
+
+            // Initialize customers tab panel
+			initPartsTabPanel();
+
+			var offset = 200;
+			var duration = 500;
+			jQuery('#center-pane').scroll(function() {
+				if (jQuery(this).scrollTop() > offset) {
+					jQuery('.scroll-to-top').fadeIn(duration);
+				} else {
+					jQuery('.scroll-to-top').fadeOut(duration);
+				}
+
+			});
+			
+			jQuery('.scroll-to-top').click(function(event) {
+				event.preventDefault();
+				jQuery('#center-pane').animate({scrollTop: 0}, duration);
+				return false;
+			})
+			
+			jQuery('.scroll-to-add').click(function(event) {
+                {!uniqueId}partGridAddButtonClickEvent();
+                event.preventDefault();
+                return false;
+            })
+
+		});
+		
+		/**
+		 * Name: {!uniqueId}loadCustomerGrid
+		 * Desc: Method to load the customer Grid when the component is loaded.
+		 * @param: 
+		 * @return: 
+		**/
+        function {!uniqueId}loadPartGrid(){
+
+			dropDownNumber = document.getElementById('{!uniqueId}dropDownList').value;
+            isInactiveIncluded = document.getElementById('{!uniqueId}IncludeInactiveCheckBox').checked;
+
+			// Grid Data Source
+            var partGridDataSource = new kendo.data.DataSource({
+                transport: {
+                    read: function (options) {
+						
+						// make AJAX request to the remote service
+                        Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.BlackPurlContentCtrl.getJSONForParts}', 
+
+																		 +dropDownNumber, 20, isInactiveIncluded,encodeString('[]'),
+                            function(result, event){
+                                if (event.type == 'exception') {
+                                    {!uniqueId}showPopupNotification(event.message, "error");
+                                } else {
+                                    var part = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    part = part.replace(re,'');
+									debug(part);
+
+                                    part = JSON.parse(part);
+									if(part.length ==  +dropDownNumber) {
+										$("#{!uniqueId}MoreLink").removeClass("linkDisable");
+									} else if(part.length <  +dropDownNumber) {
+										$("#{!uniqueId}MoreLink").addClass("linkDisable");
+									}
+									$("#{!uniqueId}FewerLink").addClass("linkDisable");
+                                    if(part.length==0) {
+										{!uniqueId}showPopupNotification('No records found ','info');
+                                    }
+                                    options.success(part);
+                                }
+
+							},
+
+							{escape: true}
+						);
+
+                    },
+                    create:function(e) {
+                         return false;
+                    },
+                    update:function(e) {
+                        return false;
+                    },
+                },
+                schema: {
+                    model: {
+                        Id: "Part_Id",
+                        fields: {
+                            Part_Part_ID: { type: "string" },
+                            Part_Description: { type: "string" },
+                            Part_Active: {  type: "boolean" },
+                            Part_Qty_On_Order: { type: "number" },
+                            Part_Retail_Price : { type: "number"},
+                            Part_Location: { type: "string" },
+                            Part_Category: { type: "string"},
+                            Is_recent: {type: "boolean"},
+                            Part_AvailableParts: {type: "number"}
+                        }
+                    }
+                },
+                sortable: {
+                    mode: "single",
+                    allowUnsort: false
+                }
+            });
+            
+            // Method: Load Data Grid here
+            $("#{!uniqueId}grid").kendoGrid({
+                toolbar: [
+                    {
+                        name: "Add",
+                        template: '<img src="{!URLFOR($Resource.Images, '/add.jpg')}" class="bpGridAddButton" id="{!uniqueId}Part_Add_Button">',
+                        text: "Add New Part",
+                        click: function(e){
+							return false;
+						}
+
+                    }
+                ],
+				filterable: {
+                            extra: false,
+                            operators: {
+                                string: {
+                                    startswith: "Starts with",
+                                    eq: "Is equal to",
+                                    neq: "Is not equal to",
+									gte:"greater than eqaul",
+									lte:"less than eqaul"
+
+
+                                }
+                            }
+                        },
+                columns: [
+                		{
+                            field:"Part_Part_ID",title:"Part Id", width: "20%", 
+                            filterable: {
+			                	ui:partIdFilter
+			                },
+                            template: '<div   #=Is_recent  ? "class=recentRows" : ""#  ><span  style="margin-left:3px" title=\'${Part_Part_ID}\'>${Part_Part_ID}</span><div>'
+                        },
+                        {
+                            field:"Part_Description",title:"Description", width: "20%", 
+							filterable: {
+			                	ui:partDescFilter
+			                },
+                            template: '<span title=\'${Part_Description}\'>${Part_Description}</span>'
+                        },
+                        {
+                            field:"Part_AvailableParts",title:"Available", width: "10%",
+                            filterable: {
+
+			                	ui:partAvailableFilter
+			                },
+
+                            template: '<span title=\'${Part_AvailableParts}\'>${Part_AvailableParts}</span>'
+                        },
+                        {
+                            field: "Part_Qty_On_Order", title: "On Order", width: "10%" ,
+                             filterable: {
+
+			                	ui:partOnOrderFilter
+			                },
+                            template: '<span title=\'${Part_Qty_On_Order}\'>${Part_Qty_On_Order}</span>'
+                        },
+                        {
+                            field:"Part_Retail_Price",title:"Retail", width: "10%" , 
+                            filterable: {
+
+			                	ui:partRetailPriceFilter
+			                },
+                            template: '<div> #=kendo.format("{0:c3}", Part_Retail_Price )#</div>'
+                        },
+                        {
+                            field: "Part_Location", title: "Location", width: "15%",
+							filterable: {
+			                	ui:partLocationFilter
+			                },
+                            template: '<span title=\'${Part_Location}\'>${Part_Location}</span>'
+                        },
+                        {
+                            field: "Part_Category", title: "Category", width: "15%",
+							filterable: {
+			                	ui:partCategoryFilter
+			                },
+							template:  "<div currentElemId=\'${Part_Id}\' id=\'dataDiv\' title=\'${Part_Category}\'>${Part_Category}</div>"
+                        }
+                    ],
+                    dataSource: partGridDataSource,
+                    scrollable:false,
+                    sortable : true,
+					serverFiltering: true,
+                    reorderable: false,
+                    dataBound: {!uniqueId}onPartDataBound,
+                    selectable: "single",
+                    change: function(e) {
+
+	                    openSelectedPartTab(e);
+	                }
+            	});
+
+	            // Called  to bind auto-complete to filter
+	            function partIdFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true ,
+			        	filter: "contains"
+			        });
+	                autoCompleteCall(element, 'auto', 'Part_Part_ID'); 
+			    }
+			    
+			    // Called  to bind auto-complete to filter
+	            function partDescFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true         
+			        });
+	                autoCompleteCall(element, 'autoPartDesc', 'Part_Description'); 
+			    }
+			    
+			    function partLocationFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true         
+			        });
+	            	autoCompleteCall(element, 'autoPartLocation', 'Part_Location');
+			    }
+			    
+
+			    function partCategoryFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true         
+			        });
+
+	            	autoCompleteCall(element, 'autoPartCategory', 'Part_Category');
+			    }
+			    
+			    function partRetailPriceFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true         
+			        });
+				    partEqualFilterCall(element, 'filterRetailPrice', 'Part_Retail_Price');
+			    }
+
+				function partOnOrderFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true         
+			        });
+				    partEqualFilterCall(element, 'filterOnOrder', 'Part_Qty_On_Order');
+			    }
+			    
+			    function partAvailableFilter(element) {
+			    	element.kendoAutoComplete({
+			        	ignoreCase: true         
+
+			        });
+
+				    partEqualFilterCall(element, 'filterAvailable', 'Part_AvailableParts');
+			    }
+        }
+        
+        
+
+        function setFilterKeys(fieldValue, operatorValue, keyValue) {		
+			debug('operatorValue  ' + operatorValue + '\n\nfieldValue' + fieldValue);
+			var newFilter;
+			if(fieldValue == 'Part_AvailableParts' || fieldValue == 'Part_Retail_Price' || fieldValue == 'Part_Qty_On_Order') {
+				newFilter = { field: fieldValue, operator: operatorValue, value: +keyValue};
+			} else {
+				newFilter = { field: fieldValue, operator: operatorValue, value: keyValue};
+			}
+
+
+			
+
+
+
+
+
+			var recordNo = 0;
+			if(FilterKeys.length == 0) {		
+				FilterKeys.push(newFilter);
+			} else {
+	            for (var i = 0 ; i < FilterKeys.length ; i++) {
+				    if(FilterKeys[i]["field"] == fieldValue) {
+				        FilterKeys.splice(i, 1, newFilter);
+				      	recordNo = 1;
+				    }
+				}
+				if(recordNo == 0) {
+					FilterKeys.push(newFilter);
+				}
+			}
+			FilterJsonData = JSON.stringify(FilterKeys);		
+		}
+		
+		
+		//Reset Filter Key To the Database
+        function removeFilterKeys(fieldValue) {
+        	if(FilterKeys.length > 0) {		
+				for (var i = 0 ; i < FilterKeys.length ; i++) {
+					if (FilterKeys[i]["field"] == fieldValue) {
+						FilterKeys.splice(i, 1);
+					}
+				}
+			}
+        	FilterJsonData=JSON.stringify(FilterKeys);	
+        }
+        
+        var asd;
+        function autoCompleteCall(element, elementId, columnName) {
+    		$(element).attr('id',elementId);
+        	var delayPartDescInput = (function(){
+				var timer = 0;
+				return function(callback, ms){
+					clearTimeout(timer);
+					timer = setTimeout(callback, ms);
+				};
+			})();
+			
+
+
+
+
+			$(element).parents("div").children("select").children('option[value!="startswith"]').remove();
+
+			$(element).parents("div").children("select").prop('disabled', true);
+
+
+			$(element).parent().closest("div").find("button[type='submit']").on('click',function() {							
+				var keyValue=$('#'+elementId).val();
+
+
+
+				setFilterKeys(columnName,'startswith', keyValue);
+
+				debug(FilterJsonData);
+				{!uniqueId}BindGridData();
+			});
+		
+
+
+
+			$(element).parent().closest("div").find("button[type='reset']").on('click',function() {							
+				removeFilterKeys(columnName);
+				{!uniqueId}BindGridData();
+			});
+
+        
+         	$("input[data-role='autocomplete']").keyup(function(event) {
+            	if($('#'+elementId).val().length >= 3) {
+				    if((event.keyCode == 13) || (event.keyCode == 40)) {
+				    	
+				    } else {
+				    	delayPartDescInput(function(){
+				    	    getAutoCompleteSugestion(elementId, columnName);
+				    	}, 400 );
+				    }
+				} else {
+					startSugest = 0;
+				}
+			});
+        } 
+        
+		function getAutoCompleteSugestion(elementId, columnName) {
+			var InputItem = $('#'+ elementId).val();  
+		    
+		    Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.BlackPurlContentCtrl.getJSONForFilteredParts}',
+		                                                 	encodeString(InputItem), encodeString(columnName),
+	    			function(result, event){
+	                	if (event.status) {
+                           	dataarray = $.parseJSON(decodeString(result));
+
+			    		 	$('#'+ elementId).data("kendoAutoComplete").setDataSource(dataarray);
+			    		 	if(startSugest == 0) {
+			      				var searchKey = $('#' + elementId).val();
+			     				$('#' + elementId).data("kendoAutoComplete").search(searchKey);
+			     				startSugest = 1;
+			     			}
+                         } else if (event.type === 'exception') {
+                             {!uniqueId}showPopupNotification(event.message, "error");
+                         } else {
+                         	{!uniqueId}showPopupNotification(event.message, "error");
+                         }
+	                },
+	                {escape: true}
+		    );
+		}
+        
+        function partEqualFilterCall(element, elementId, columnName) {
+    		$(element).attr('id', elementId);
+			$(element).parents("div").children("select").children('option[value!="eq"]').remove();
+			$(element).parents("div").children("select").append('<option value="gte"> Greater Than </option>');
+			$(element).parents("div").children("select").append('<option value="lte"> Less Than </option>');	
+			var selectList = $(element).parents("div").children("select");
+			
+			$(element).parent().closest("div").find("button[type='submit']").on('click',function() {							
+				debug(selectList.val());
+				var keyValue = $('#' + elementId).val();
+				setFilterKeys(columnName, selectList.val(), keyValue);
+				debug(FilterJsonData);
+				{!uniqueId}BindGridData();
+			});
+		
+			$(element).parent().closest("div").find("button[type='reset']").on('click',function() {							
+				removeFilterKeys(columnName);
+				{!uniqueId}BindGridData();
+			});
+        } 
+        
+        
+        /**
+		 * Name: {!uniqueId}moreLinkClickAction
+		 * Desc: Method executes when more link is clicked and it added 20 more records to the current Grid
+		 * @param: 
+		 * @return: 
+		**/
+        function {!uniqueId}moreLinkClickAction() {
+        	debug('Length   -  ' + {!uniqueId}partGrid.dataSource.view().length);
+            Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.BlackPurlContentCtrl.increaseParts}', 
+														{!uniqueId}partGrid.dataSource.view().length + 21 , 20, isInactiveIncluded, encodeString(FilterJsonData),
+                function(result, event){ 
+					if (event.type == 'exception') {
+						{!uniqueId}showPopupNotification(event.message, "error");
+					} else {
+						var part = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						part = part.replace(re,'');
+						debug('More  ' + part);
+						part = JSON.parse(part);
+						if(part.length < 21) {
+							$("#{!uniqueId}MoreLink").addClass("linkDisable");
+						}
+
+
+						if(part.length > 0) {
+							$("#{!uniqueId}FewerLink").removeClass("linkDisable");
+						}
+						debug('outside pushing for ' + {!uniqueId}partGrid.dataSource.view().length);
+						var Sorts= {!uniqueId}partGrid.dataSource.sort();
+						{!uniqueId}partGrid.dataSource.filter({});
+						{!uniqueId}partGrid.dataSource.sort({});
+
+						for(var i = 0; i < 20 ; i++){
+							if(part[i] != null) {
+								debug('Inside pushing for ' + {!uniqueId}partGrid.dataSource.view().length);
+								{!uniqueId}partGrid.dataSource.view().push(part[i]);
+							}
+						}
+
+						debug('1st pushing for ' + {!uniqueId}partGrid.dataSource.view().length);
+
+
+						{!uniqueId}partGrid.dataSource.filter(FilterKeys);
+
+						debug('Filter data pushing for ' + FilterKeys);
+						debug('2nd pushing for ' + {!uniqueId}partGrid.dataSource.view().length);
+						if(Sorts!= null) {
+							 {!uniqueId}partGrid.dataSource.sort(Sorts);
+						}
+						debug('bottom pushing for ' + {!uniqueId}partGrid.dataSource.view().length);
+					}
+                },
+                {escape: true}
+            );
+        }
+        
+        
+        /**
+		 * Name: {!uniqueId}fewerLinkClickAction
+		 * Desc: Method executes when fewer link is clicked and it removes last 20 records to the current Grid
+		 * @param: 
+		 * @return: 
+		**/
+		function {!uniqueId}fewerLinkClickAction() {
+			var gridLength = {!uniqueId}partGrid.dataSource.view().length;
+			$("#{!uniqueId}MoreLink").removeClass("linkDisable");
+			if(gridLength <= +dropDownNumber + 1) {
+				$("#{!uniqueId}FewerLink").addClass("linkDisable");
+				if(gridLength <= +dropDownNumber) {
+					return;
+				}
+			}
+
+
+
+			{!uniqueId}partGrid.dataSource.filter({});
+			var Sorts= {!uniqueId}partGrid.dataSource.sort();
+			{!uniqueId}partGrid.dataSource.sort({});
+
+			
+			for(var i = gridLength-1; i > gridLength - 20 - 1 ; i--){
+				if(i == +dropDownNumber - 1) {
+					$("#{!uniqueId}FewerLink").addClass("linkDisable");
+					return;
+				} else if(i == +dropDownNumber) {
+					$("#{!uniqueId}FewerLink").addClass("linkDisable");
+				}
+				{!uniqueId}partGrid.dataSource.view().pop(i);
+			}
+			if(Sorts!= null) {
+				{!uniqueId}partGrid.dataSource.sort(Sorts);
+			}
+			 {!uniqueId}partGrid.dataSource.filter(FilterKeys);
+		}
+        
+        
+        // variable to store the Customer Grid Instance
+        var {!uniqueId}partGrid = $("#{!uniqueId}grid").data("kendoGrid");
+        
+        /**
+		 * Name: {!uniqueId}getSelectedRowData
+		 * Desc: Method to get row data which is selected.
+		 * @param: 
+		 * @return: selected row data
+		**/
+        function {!uniqueId}getSelectedRowData(){
+            var rowIndex = {!uniqueId}partGrid.select().closest("tr");
+            if(rowIndex.length == 0){
+                return null;
+            }else{
+                var rowData = {!uniqueId}partGrid.dataItem(rowIndex);
+                if(rowData.Part_Id != ""){
+                    return rowData;
+                }else if( ({!uniqueId}partGrid.editable.validatable.validate()) == false ){
+                    return null;
+                }
+            }
+            return rowData;
+        }
+        
+        /**
+		 * Name: {!uniqueId}onCustDataBound
+		 * Desc: Method to Bound customer datasource to the Grid.
+		 * @param: 
+		 * @return: 
+		**/
+        function {!uniqueId}onPartDataBound(e) {
+
+			// Calculate current Grid length
+			var gridlen={!uniqueId}partGrid.dataSource.view().length;
+           	
+
+			// Variable to store selected row data
+			var selectedRowData ;
+
+			// Add toolbar to the bottom of the Grid
+			$("#{!uniqueId}grid").find(".k-grid-toolbar").insertAfter($("#{!uniqueId}grid").children()[1]);
+            $(".k-grid-toolbar").css("background-color", "#ffffff");
+           	$(".k-grid-toolbar").css("border-top", "none");
+           	$(".k-grid-toolbar").css("height", "25px");
+           	$(".k-grid-toolbar").css("vertical-align", "middle");
+           	$(".bpGridAddButton").prop('title', 'Add');
+           	$('#partTabPanel').children(':first').children(':first').css('height','30px');
+			
+			$(".k-grid table tr").hover(function(){
+				$(this).find('td').each (function() {
+					$(this).addClass("tr_hover");
+				});
+				
+				var lastTdElem = $(this).find('td:last');
+				lastColDivWidth = lastTdElem.width();
+				lastTdElem.find("#dataDiv").addClass("hoverColNoneDisplay").width(lastColDivWidth/4);
+				var newIconsDiv = $("<div id=\'HoverIconsDiv\' class=\'HoverIconsDiv\'></div>").width(3 * (lastColDivWidth/4));
+				newIconsDiv.html( $("#{!uniqueId}HoverIconsDivToAdd").html() );
+				
+				$(this).find('td:last').append(newIconsDiv);
+			}, function(){
+				$(this).find('td').each (function() {
+					$(this).removeClass("tr_hover");
+				});
+				$(this).find('td:last').find("#dataDiv").removeClass("hoverColNoneDisplay");
+				$(this).find('td:last').find("#HoverIconsDiv").remove();
+			});
+			
+
+			// Set the width of the filter input
+            $("#{!uniqueId}grid").find(".k-filter-row").children().find("span>input").css('width','130px');
+		    
+		    if(gridlen=={!currentNoOfCustomerByCustomSetting}) {     
+	            {!uniqueId}partGrid.element.on("click", "tbody>tr", "click", function (event) {
+					selectedRowData = {!uniqueId}getSelectedRowData();
+					$("#{!uniqueId}grid").find('tr>td.GridRowSelected').removeClass('GridRowSelected');
+					$("#{!uniqueId}grid").find('tr.k-state-selected>td').addClass('GridRowSelected');
+					debug(selectedRowData);
+					event.stopPropagation();
+	            });
+
+            }
+        }
+        
+		// part grid declarations
+        
+        	var {!uniqueId}partGrid = $("#{!uniqueId}grid").data("kendoGrid");
+        
+          function {!uniqueId}getPartsSelectedRowData(){
+            var rowIndex = {!uniqueId}partGrid.select().closest("tr");
+            if(rowIndex.length == 0){
+                return null;
+            }else{
+                var rowData = {!uniqueId}partGrid.dataItem(rowIndex);
+                if(rowData.Part_Id != ""){
+                    return rowData;
+                }else if( ({!uniqueId}partGrid.editable.validatable.validate()) == false ){
+                    return null;
+                }
+            }
+            return rowData;
+        }
+		
+        // Initialize customers tab panel
+		function initPartsTabPanel(){
+			partsGridTabPanel = $("#partTabPanel").kendoTabStrip().data("kendoTabStrip");
+            partsGridTabPanel.select(0);
+		}
+		
+		// Method opens a tab with customer details form as parameter values
+		function openNewPartFormDataTab(Part_ID, Part_Part_ID) {
+		
+			var navURL = "{!$Page.PartOverview}?partpageno=page" + tabCounter ;
+
+			if(Part_ID != null){
+				navURL += "&Part_ID=" + Part_ID;
+			}
+			debug(navURL);
+			
+            partsGridTabPanel.insertAfter(
+                {
+                    text: "<div id='page"+ tabCounter +"TabNameDiv' style='width:100px; overflow: hidden; white-space: nowrap; float:left' title='"+ Part_Part_ID +"'> " + Part_Part_ID +" </div> <div style='float:right'> <img src='" + '{!URLFOR($Resource.Images, "x-mark.png")}' + "' onclick='page"+tabCounter+"preRemoveSelecedTab(this, \""+Part_ID+"\");'> </diV>",
+                    encoded: false,
+                    contentUrl: navURL
+                },
+                partsGridTabPanel.tabGroup.children("li:last")
+           
+            );
+
+            partsGridTabPanel.select(partsGridTabPanel.tabGroup.children().length - 1);
+            tabCounter = tabCounter + 1;
+		}
+		
+		
+		// open tab Of Parts When clicked in row of grid
+		 function openSelectedPartTab(e)
+		 {
+					var selectedRowData = {!uniqueId}getPartsSelectedRowData();// get the data from row selected
+					
+		            if(PartIdToTabIndexMap.hasOwnProperty(selectedRowData.Part_Id)) {
+		                createRecentPartRecord(selectedRowData.Part_Id);
+		                partsGridTabPanel.select(PartIdToTabIndexMap[selectedRowData.Part_Id]);
+		                return;
+		            }
+		          
+		
+		        
+		            if(partsGridTabPanel.tabGroup[0].children.length == 4){
+						  {!uniqueId}showPopupNotification("Please close a tab first in order to see the customer detail.", "error");
+		                return;
+		            }
+		           
+		
+					if(selectedRowData != null && !PartIdToTabIndexMap.hasOwnProperty(selectedRowData.Part_Id)){
+		                createRecentPartRecord(selectedRowData.Part_Id);
+		                PartIdToTabIndexMap[selectedRowData.Part_Id] = partsGridTabPanel.tabGroup[0].children.length;
+		                openNewPartFormDataTab(selectedRowData.Part_Id, selectedRowData.Part_Part_ID);
+		                
+		            }else{
+		                {!uniqueId}showPopupNotification("Some error occurred. Please reload the page.", "error");
+		
+		            }
+					
+					binWindowUnLoadEvent();
+        
+		 
+		 }
+		 
+		 
+		 
+		 // close tabs
+		 
+		var ImgObjG;
+		var part_IdG;
+		var anyChangesInCustomerClosingTab;
+        // Method to remove the tab from view
+        function removeSelecedTab(ImgObj, part_Id, IsselectedTabModified) {
+        	ImgObjG = ImgObj;
+        	part_IdG = part_Id;
+        	debug(IsselectedTabModified);
+        	if(IsselectedTabModified){
+	        	var actionConfirmMsg = "There are some changes not saved in the form. Do you want to continue?";
+	            confirmActionCustomized("Confirm Action", actionConfirmMsg, removeSelectedTabCallBack, "{!JSENCODE($Label.Tab_Leave_Confirm_box_Yes_text)}", "{!JSENCODE($Label.Tab_Leave_Confirm_box_No_text)}");
+	        }else{
+	        	removeSelectedTabCallBack(true);
+	        }
+	        
+	        if(partsGridTabPanel.tabGroup[0].children.length == 1){
+	        	//$(window).unbind('beforeunload');
+	        }
+		}
+		
+		function removeSelectedTabCallBack(isConfirmed){
+			if(isConfirmed == false){
+				return;
+			}
+			
+			partsGridTabPanel.remove($(ImgObjG).closest("li"));
+            var removedTab;
+            if(part_IdG == 'null'){
+            	removedTab = PartIdToTabIndexMap['New'];
+            	delete PartIdToTabIndexMap['New'];
+            } else {
+            	removedTab = PartIdToTabIndexMap[part_IdG];
+            	delete PartIdToTabIndexMap[part_IdG];
+            }
+            for(var key in PartIdToTabIndexMap) {
+            	if(PartIdToTabIndexMap[key] > removedTab) {
+            		var tabIndex = PartIdToTabIndexMap[key];
+            		PartIdToTabIndexMap[key] = tabIndex - 1;
+            	}
+            }
+            partsGridTabPanel.select(0);
+		}
+		
+		
+		// Add New Records 
+		 
+		 function {!uniqueId}partGridAddButtonClickEvent(){
+
+            if(PartIdToTabIndexMap.hasOwnProperty('New')) {
+                partsGridTabPanel.select(PartIdToTabIndexMap['New']);
+                return;
+            }
+            if(partsGridTabPanel.tabGroup[0].children.length >= 4){
+                {!uniqueId}showPopupNotification("Please close a tab first in order to see the customer detail.", "error");
+                return;
+            }
+            if(!PartIdToTabIndexMap.hasOwnProperty('New')){
+                PartIdToTabIndexMap['New'] = partsGridTabPanel.tabGroup[0].children.length;
+                openNewPartFormDataTab(null, "New Part");
+
+            }else{
+                {!uniqueId}showPopupNotification("Some error occurred. Please reload the page.", "error");
+            }
+        }
+        
+
+
+
+		function {!uniqueId}BindGridData() {	
+		    isInactiveIncluded = document.getElementById('{!uniqueId}IncludeInactiveCheckBox').checked;
+		    dropDownNumber = document.getElementById('{!uniqueId}dropDownList').value;
+		    Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.BlackPurlContentCtrl.getJSONForParts}',
+
+		                                                  +dropDownNumber , 20, isInactiveIncluded, encodeString(FilterJsonData),
+		                function(result, event){
+
+
+
+
+		                	if (event.status) {
+								var dataArray = decodeString(result);
+                                var find = '\'';
+                                var re = new RegExp(find, 'g');
+
+
+
+
+
+                                dataArray = dataArray.replace(re,'');
+                                debug(dataArray);
+                                dataArray = JSON.parse(dataArray);
+                                
+								$("#{!uniqueId}grid").data("kendoGrid").dataSource.data(dataArray);
+								if(dataArray.length ==  +dropDownNumber) {
+									$("#{!uniqueId}MoreLink").removeClass("linkDisable");
+								} else if(dataArray.length <  +dropDownNumber) {
+									$("#{!uniqueId}MoreLink").addClass("linkDisable");
+								}
+								if(FilterJsonData != '[]' && FilterJsonData != '') {
+									if(dataArray.length == 0) {
+										$("#{!uniqueId}NumberOfFilterRecords").html('<i> No records found </i>');
+									} else {
+										$("#{!uniqueId}NumberOfFilterRecords").html('<b>'+ dataArray[0].TotalFilteredRecords + '</b><i> records retrieved </i>');
+									}
+								} else {
+									$("#{!uniqueId}NumberOfFilterRecords").html('');		
+								}
+								
+								$("#{!uniqueId}FewerLink").addClass("linkDisable");
+		                    } else if (event.type === 'exception') {
+		                        {!uniqueId}showPopupNotification(event.message, "error");
+		                    } else {
+
+		                        {!uniqueId}showPopupNotification(event.message, "error");
+		                    }
+		                },
+
+		                {escape: true}
+		    );
+
+
+		}
+		
+		function populatePartdetails(pagePartTabId,uniqueIdDetail) {
+    			Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.BlackPurlContentCtrl.getJSONForPartByPartId}', 
+																		encodeString(pagePartTabId),
+
+							function(result, event){
+                                if (event.type == 'exception') {
+                                    
+                                } else {
+                                    partdetailJson = decodeString(result);
+                                    var find = '\'';
+                                    var re = new RegExp(find, 'g');
+                                    partdetailJson = partdetailJson.replace(re,'');
+                                    partdetailJson = JSON.parse(partdetailJson);
+                                    uniqueIdDetail(partdetailJson);
+                                }
+							},
+							{escape: true}
+				);
+				return partdetailJson;
+		}
+		
+		 /**
+		 * Name: {!uniqueId}showPopupNotification
+		 * Desc: Method to show popup Notification.
+		 * @param: (1) message - Message that is to be displayed
+		 *		   (2) msgType - Type of message - info, warning, error etc.
+		 * @return: 
+		**/
+        function {!uniqueId}showPopupNotification(message, msgType){
+        	{!uniqueId}popupNotification.hide();
+        	{!uniqueId}popupNotification.show(kendo.toString(message), msgType);
+        }
+		
+		function savePartRecordData(uniqueIdpagePartTabId, uniqueIdDetailDataJson, uniqueIdPartSaveCallBack) {
+			var pId = '';
+			Visualforce.remoting.Manager.invokeAction( '{!$RemoteAction.BlackPurlContentCtrl.savePartJSON}', 
+																		encodeString(JSON.stringify(uniqueIdDetailDataJson)),
+                            function(result, event){
+                                if (event.type == 'exception') {
+                                	{!uniqueId}showPopupNotification(event.message, "error");
+                            	} else {
+
+                                   var grid = $("#{!uniqueId}grid").data("kendoGrid");
+                                    pId = decodeString(result);
+                                   grid.dataSource.read();
+                                    // debug(pId);
+                                    uniqueIdPartSaveCallBack(pId);
+
+
+                                  	{!uniqueId}showPopupNotification("Saved successfully", "success");
+                                }
+                            },
+							{escape: true}
+				);
+		}
+
+
+
+
+        </script>
+    
+</apex:component>

@@ -1,0 +1,686 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" controller="NewHomePageCtrl" docType="html-5.0">
+    <html ng-app="homePage" doctype="html5">
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.0-beta.6/angular-animate.js"></script>
+      
+    <head>
+        <title>Home Page</title>
+         <!-- Styles -->
+         <c:NewVendorOrderStyle />
+         <c:Css_and_Js ></c:Css_and_Js>
+         <c:NewAddEditCustomer />
+         <c:NewAddEditVendor />
+         <c:NewAddEditparts />
+        <apex:includeScript value="{!$Resource.niceScroll}"/>
+        <apex:includeScript value="{!$Resource.JqueryUI}"/>
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.newjqueryUICss)}" media="all" />
+        <style type="text/css">
+        .section3 {
+            background-image: url('{!URLFOR($Resource.Home_Page_Images, 'blue_area_image.jpg')}') ;
+            /* background-repeat: no-repeat; */
+            background-size: cover;
+        }
+        .section2 {
+            margin: 2% 6%;
+        }
+        .section2 .T1{
+            text-transform: none;
+        }
+        .section3 button {
+            margin:2%;
+        }
+        .moreinfoBtn2, .moreinfoBtn2:hover, .moreinfoBtn2:focus, .moreinfoBtn2:active,
+        .moreinfoBtn1, .moreinfoBtn1:hover, .moreinfoBtn1:focus, .moreinfoBtn1:active {
+            border: none;
+            font-weight: bold;
+            transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition-delay: 0.2s;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+            outline: none;
+            width: initial;
+            border: 1px solid transparent;
+            border-radius: 2px;
+        }
+        .moreinfoBtn2, .moreinfoBtn2:hover, .moreinfoBtn2:focus, .moreinfoBtn2:active {
+            color: #00AEEF;
+            background: #ffffff;
+        }
+        .moreinfoBtn1, .moreinfoBtn1:hover, .moreinfoBtn1:focus, .moreinfoBtn1:active {
+            background: #949ca9;
+            color: #ffffff;
+        }
+        .bigIcon {
+            font-size:45px;
+        }
+        .mainSection div{
+            display:block; 
+        }
+        .section3 {
+            color: white;
+        }
+        /* Added by richa for footer */
+        .section4 {
+            color: #acb4b6;
+        }
+        /* Added by richa for footer */
+        .section3 p, .section4 p {
+            margin: 0;
+        }
+        .section3 h2 {
+            text-transform:capitalize;
+            margin-bottom: 5%;
+        }
+        .section4 h2 {
+            margin: 8px 0;
+        }
+        /* Added by richa for footer */
+        .section4 p {
+            font-size: 15px;
+        }
+        .section4 a {
+        	color: #acb4b6;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .section4 a:hover {
+            color: white;
+        }
+        /* Added by richa for footer */
+        .section2 i {
+            margin: 2% 1%;
+        }
+        .section3, .section4{
+            margin-right: 0;
+            margin-left: 0;
+        }
+        .btnContainer1 button, .btnContainer1 a {
+            margin-top:3%;
+        }
+        .btnContainer a {
+             margin-top: 7%;
+        }
+        /* .btnContainer1 button, .btnContainer1 a {
+            margin-bottom:5%;
+        } */
+        .midPanel {
+            padding: 3% 0 2% 0;
+        }
+        .section4 {
+            background-color: #383d43;
+        }
+        .wrapperClass {
+            margin-bottom: 4%;
+            margin-top: 5%;
+        }
+        .wrapperClass1 {
+            margin-bottom: 3%;
+            margin-top: 3%;
+        }
+        .navbar-brand1 > img {
+            display: inline;
+            margin-bottom: 2%;
+            /* margin-top: 5%; */
+        }
+        .navbar-brand1 {
+            float: none;
+        }
+        .lp {
+            border:1px solid #ccc;
+            padding: 0 5%;
+            margin-top: 2%;
+        }
+        .lp row{
+            margin-bottom: 15%;
+        }
+        .mainSection {
+            margin: 34px 0 0 0;
+        }
+        .divider {
+            float: right;
+            margin-top: -2px;
+            color: #eee;
+        }
+        .midPanel, .leftPanel {
+            height: 395px;
+        }
+        .rightPanel {
+            height: 364px;
+        }
+        .sectionBody {
+            padding: 0;
+            margin-top: 5%;
+        }
+        .panelNumber {
+            color: #00AEEF;
+        }
+        /* style added for nice scroll */
+        ::-webkit-scrollbar{
+            width: 11px;
+            height: 20px;
+        }
+        ::-webkit-scrollbar-button{
+            background: #ECF0F1;
+        }
+        ::-webkit-scrollbar-track-piece{
+            background: #ECF0F1;
+        }
+        ::-webkit-scrollbar-thumb{
+            background: #B7BEC6;
+            border-radius : 3px;
+            border: 1px solid #fff;
+        } 
+        /* end style for nice scroll */
+        .panelHeader {
+            padding :0;
+        }
+        .panelHeader span{
+            font-family: 'Open Sans', sans-serif;
+            font-weight: lighter;
+            font-size: 22px;
+            margin: 0.01em;
+            color: #414449;
+        }
+        .numberBlock {
+            font-size: 45px;
+            width: 20%;
+            font-family: 'Open Sans', sans-serif;
+            font-weight: lighter;
+            margin-top: 3%;
+            padding: 0 12px;
+        }
+       
+        @media screen and (min-width: 1200px) and (max-width: 1410px) {
+            .numberBlock {
+                padding: 0 2%;
+            }
+        }@media screen and (max-width: 1400px) {
+            .btnContainer a {
+                margin-top: 3%;
+            }
+            .section3 h2 {
+                margin-bottom: 4%;
+            }
+            .panelHeader span{
+                font-size: 20px;
+            }
+        }
+        .vCenter {
+            margin-top: 6%;
+        }
+        .ask_a_ques_div {
+            margin-top: 3%;
+        }
+        /* style added for carousal */
+        .carouselContainer {
+                margin-top: 34px;
+            }
+            .carousel .item,
+            .carousel .item.active,
+            .carousel .carousel-inner {
+                height: 100%;
+            }
+            .carousel-indicators {
+                bottom: 10px;
+            }
+            .carousel .fill {  
+                width: 100%;
+                height: 100%;
+                background-position: center;
+                background-size: cover;
+            }
+            .header-text {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 1.8%;
+                right: auto;
+                width: 96.66666666666666%;
+                color: #fff;
+            }
+            .header-text p {
+                font-size: 30px;
+                margin: 0;
+            }
+            .header-text .sub-text, .section4 .sub-text {
+                font-size: 15px;
+            }
+            .header-text .subTextFirst, .section4 .subTextFirst {
+                margin-top: 18px;
+            }
+            .bannerGrayBtn,
+            .bannerGrayBtn:hover,
+            .bannerGrayBtn:focus,
+            .bannerGrayBtn:active {
+                background: #727983;
+                color: #ffffff;
+                border: none !important;
+                font-weight: bold;
+                border-radius : 1px;
+                transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                transition-delay: 0.2s;
+                box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+                margin-top: 30px;
+            }
+            .arrowBackground {
+                /* top: 50%;
+                transform: matrix(1, 0, 0, 1, 20, -20);
+                left: 31px; */
+                top: 50%;
+                cursor: pointer;
+                background: rgba(0,0,0,0.5);
+                width: 40px;
+                height: 40px;
+                position: absolute;
+                display: block;
+                z-index: 100;
+                border-radius: 50%;
+            }
+            .arrowBackground:hover {
+                background: rgba(0, 0, 0, 1);
+            }
+            .arrowBackground.arrowLeft {
+                transform: matrix(1, 0, 0, 1, 35, -20);
+            }
+            .arrowBackground.arrowRight {
+                transform: matrix(1, 0, 0, 1, -35, -20);
+            }
+            .arrowBackground .fa-chevron-left {
+                margin-top: 10px;
+                margin-right: 5px;
+            }
+            .arrowBackground .fa-chevron-right {
+                margin-top: 10px;
+                margin-left: 5px;
+            }
+            
+            @media screen and (min-width: 1200px) and (max-width: 1400px) {
+              .bannerGrayBtn, .moreinfoBtn1, .moreinfoBtn2 {
+                padding:4px 7px;
+                font-size:90%;
+              }
+              .header-text p, .section3 h2, .section4 h2 {
+                    font-size: 25px;
+                }
+                
+                .header-text .sub-text, .section4 .sub-text, .section2 p , .section3 p {
+                    font-size: 13px;
+                }
+                .numberBlock{
+                    font-size: 37px;
+                }
+                .midPanel, .leftPanel {
+                    height: 326px;
+                }
+                .rightPanel {
+                    height: 295px;
+                }
+            }
+            @media screen and (max-width: 1200px) {
+              .bannerbannerGrayBtn, .moreinfoBtn1 , .moreinfoBtn2   {
+                padding:2px 4px;
+                font-size:80%;
+              }
+              .header-text p, .section4 h2, .section3 h2 {
+                    font-size: 22px;
+                }
+                
+                .header-text .sub-text, .section2 p, .section3 p, .section4 .sub-text {
+                    font-size: 12px;
+                }
+                .numberBlock{
+                    font-size: 37px;
+                }
+                .midPanel, .leftPanel {
+                    height: 326px;
+                }
+                .rightPanel {
+                    height: 295px;
+                }
+            }
+             .chk_tick {
+			    width: 20px !important;
+			    height: 20px !important;
+			    border-radius: 4px;
+			    margin: 3px 15px;
+			    border: 1px solid #cccccc;
+			    display: block;
+			    float: left;
+			    cursor: pointer;
+			}
+			.chk_tick .chksqure {
+			    font-size: 0px;
+			    height: 12px;
+			    width: 12px;
+			    margin: 3px;
+			    border-radius: 2px;
+			    display: block;
+			    background: #D8D8D8;
+			}
+        /* style added for carousal */
+        </style>
+        <script>
+        var homePage = angular.module('homePage', 
+                                            ['BPGlobalHeader','ngAnimate', 'ui-notification', 'ui.date', 'addEditCustomerModule', 'addEditVendorModule', 'addEditPartModule']
+                                        );
+            
+            // Angular controller for home page
+            homePage.controller('homePageController', function ($scope, $timeout, $rootScope, Notification,$location) {
+            
+            $scope.homePageModel = {};
+            $scope.homePageModel.count = 1;
+            $scope.homePageModel.IsTrialOrg = {!IsTrialOrg};
+            $scope.homePageModel.communityURL = '{!JSENCODE(communityURL)}';
+            $scope.homePageModel.IsSystemSettingVisited = {!IsSystemSettingVisited};
+            $scope.homePageModel.IsSampleDataAvailable = {!IsSampleDataAvailable};
+            
+            $scope.homePageModel.NewCustomer = function () {
+               $rootScope.$broadcast('AddCustomerEvent');
+            } 
+            
+            $scope.homePageModel.NewVendor = function () {
+               $rootScope.$broadcast('AddVendorEvent');
+            } 
+            
+            $scope.homePageModel.NewPart = function () {
+               $rootScope.$broadcast('AddPartEvent');
+            }   
+        });
+        
+        </script> 
+        
+     </head>
+     
+    <body>
+        <c:BPGlobalHeader />
+        
+        <div ng-cloak="ng-cloak" ng-controller="homePageController">  <!-- ng-init="initFunction()" -->
+            <div class="mainSection">
+                <!-- <div class="section1_banner1 row text-center"> 
+                    <div class="col-md-offset-4 col-md-4 col-lg-4 "> class="midPanel"
+                        <h2>Welcome to BlackPurl, you're currently using a free trial</h2> 
+                        <h2>account with our sample data. Import your data now.</h2>
+                        <div class="btnContainer">
+                            <button class="bannerGrayBtn btn btn-default">IMPORT DATA</button>
+                        </div>
+                    </div>
+                    <div class="header-text">
+                        <div class="col-md-12 text-center">
+                                <p>Welcome to BlackPurl, you're currently using a free trial</p> 
+                                <p>account with our sample data. Import your data now.</p>
+                            <br/>
+                            <button class="bannerGrayBtn btn btn-default">IMPORT DATA</button>
+                        </div>
+                    </div> --><!-- /header-text
+                </div> -->
+                <div class="section1">
+                    <div class="carouselContainer">
+                      <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                    
+                        <!-- Wrapper for slides -->  
+                        <div class="carousel-inner" role="listbox">
+                          <div ng-if="homePageModel.IsTrialOrg && !homePageModel.IsSampleDataAvailable" class="item active">
+                            <img class="fill" src="{!URLFOR($Resource.Home_Page_Images, 'banner_image_1.jpg')}" alt="Import Data"/>
+                            <div class="header-text">
+                                <div class="col-md-12 text-center">
+                                        <p>Welcome to BlackPurl, you're currently using a free trial</p> 
+                                        <p>account with our sample data. Import your data now.</p>
+                                    <button class="bannerGrayBtn btn btn-default text-uppercase">Import Data</button>
+                                </div>
+                            </div><!-- /header-text -->
+                          </div>
+                          <div ng-if="homePageModel.IsTrialOrg && homePageModel.IsSampleDataAvailable && !homePageModel.IsSystemSettingVisited" class="item active">
+                            <img class="fill" src="{!URLFOR($Resource.Home_Page_Images, 'banner_image_2.jpg')}" alt="Settings"/>
+                            <div class="header-text">
+                                <div class="col-md-12 text-center">
+                                    <p>Welcome to BlackPurl, you're currently using</p> 
+                                    <p>a free trial account with your data.</p>
+                                    <p class="sub-text subTextFirst">We've chosen the system settings that are best suited for your</p>
+                                    <p class="sub-text">business, you can change these at any time</p>
+                                    <a href="{!$Page.UserSettings}" class="bannerGrayBtn btn btn-default text-uppercase">Settings</a>
+                                </div>
+                            </div><!-- /header-text -->
+                          </div>
+                        
+                          <div ng-if="!homePageModel.IsTrialOrg && !homePageModel.IsSystemSettingVisited" class="item active">
+                            <img class="fill" src="{!URLFOR($Resource.Home_Page_Images, 'banner_image_3.jpg')}" alt="Settings"/>
+                            <div class="header-text">
+                                <div class="col-md-12 text-center">
+                                        <p>Thanks for joining BlackPurl, we've chosen the system</p> 
+                                        <p>settings that are best suited for your business, you can</p> 
+                                        <p>change these at any time</p>
+                                    <a href="{!$Page.UserSettings}" class="bannerGrayBtn btn btn-default text-uppercase">Settings</a>
+                                </div>
+                            </div><!-- /header-text -->
+                          </div>
+                    
+                          <div ng-if="(homePageModel.IsTrialOrg && homePageModel.IsSampleDataAvailable && homePageModel.IsSystemSettingVisited) || (!homePageModel.IsTrialOrg && homePageModel.IsSystemSettingVisited)" class="item active">  
+                            <img class="fill" src="{!URLFOR($Resource.Home_Page_Images, 'banner_image_4.jpg')}" alt="Welcome"/>
+                            <div class="header-text">
+                                <div class="col-md-12 text-center">
+                                       <p ng-if="!homePageModel.IsTrialOrg">Welcome to BlackPurl</p>
+                                </div> 
+                            </div><!-- /header-text -->
+                          </div>
+                        </div>
+                     </div>
+                </div>
+        
+                </div>
+                <div class="section2 row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="T1 row">
+                            <div class="col-lg-1 col-md-1 text-center panelHeader">
+                                <i class="fa fa-male"></i>
+                            </div>
+                            <div class="col-lg-11 col-md-11 panelHeader">
+                                <span>Sell a part to a customer</span>
+                            </div>
+                        </div>
+                        <div class="lp leftPanel">
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">1</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p>To sell a part, merchandise or to create a service, first start by 
+                                    creating a new customer. If you're selling to an existing customer you can jump to step 2.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <button class="btn text-uppercase moreinfoBtn1" ng-click="homePageModel.NewCustomer()">Create customer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">2</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p class="vCenter">Then create the order.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <a href="{!$Page.NewCustomerOrder}" class="btn text-uppercase moreinfoBtn1">Create customer order
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="T1 row">
+                            <div class="col-lg-1 col-md-1 text-center panelHeader">
+                                <i class="fa fa-shopping-cart "></i>
+                            </div>
+                            <div class="col-lg-11 col-md-11 panelHeader">
+                                <span>Order more inventory</span>
+                            </div>
+                        </div>
+                        <div class="lp midPanel">
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">1</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p>To order a new part or merchandise, first start by 
+                                    creating a new vendor. If you're buying an existing part from a known vendor you can jump to step 3.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <button class="btn text-uppercase moreinfoBtn1" ng-click="homePageModel.NewVendor()">Create vendor
+                                      </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">2</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p class="vCenter">Then add the part to your inventory.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <button class="btn text-uppercase moreinfoBtn1" ng-click="homePageModel.NewPart()">Create part
+                                      </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">3</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p class="vCenter">And finally create the order.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <a href="{!$Page.NewVendorOrder}" class="btn text-uppercase moreinfoBtn1">Create vendor order
+                                      </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="T1 row">
+                            <div class="col-lg-1 col-md-1 text-center panelHeader">
+                                <i class="fa fa-refresh"></i>
+                            </div>
+                            <div class="col-lg-11 col-md-11 panelHeader">
+                                <span>Receive your inventory</span>
+                            </div>
+                        </div>
+                        <div class="lp rightPanel">
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">1</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p>To update your inventory when parts and merchandise have been delivered, create a new vendor receipt.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <a href="{!$Page.NewVendorOrderReceiving}" class="btn text-uppercase moreinfoBtn1">Create vendor receipt
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 col-md-2 numberBlock">
+                                    <span class="panelNumber">2</span>
+                                    <span class="divider">|</span>
+                                </div>
+                                <div class="col-lg-9 col-md-9 sectionBody">
+                                    <p>To reconcile the costs on your vendor's invoice with your vendor order received, create a new vendor invoice.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-offset-2 col-lg-9 col-md-9 btnContainer2">
+                                    <a href="{!$Page.NewVendorOrderInvoicing}" class="btn text-uppercase moreinfoBtn1" >Create vendor invoice
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section3 row text-center"> 
+                    <div class="col-md-offset-4 col-md-4 col-lg-4 wrapperClass">
+                        <!-- <img src="{!URLFOR($Resource.Home_Page_Images, 'blue_area_image.jpg')}" alt="" /> -->
+                        <i class="fa fa-life-ring bigIcon"></i>
+                        <h2>Get help &amp; support</h2>
+                        <p>We're available to help you 24/7. If you need support you</p>
+                        <p>can visit our community, or ask us a question</p>
+                        <div class="btnContainer">
+                            <a class="btn text-uppercase moreinfoBtn2" id="go_to_community_btn" href="{{homePageModel.communityURL}}" target="_blank">Go to the Community
+                            </a>
+                        </div>
+                        <!-- 
+                        <div class="ask_a_ques_div">
+                            <a class="btn text-uppercase moreinfoBtn2" id="ask_a_ques_btn" href="{{homePageModel.communityURL}}" target="_blank">Ask a question
+                            </a>
+                        </div> -->
+                    </div>
+                </div>
+                
+                <div class="section4 row text-center">
+                    <div class="col-md-12 col-lg-12 wrapperClass1"><!-- col-md-offset-2 col-md-8 col-lg-8 -->
+                                       <p>BlackPurl &copy; 2016 All Rights Reserved 
+	                                       <a href="http://www.blackpurl.com/terms-of-use/" target="_blank">
+	                                       Terms of Use
+	                                       </a> and <a href="http://www.blackpurl.com/privacy-policy/" target="_blank">
+	                                       Privacy Policy
+	                                       </a>
+                                       </p>
+                        <!-- <div class="row">
+                        	<img width="50%" height="40%" src="{!URLFOR($Resource.Home_Page_Images, 'blackpurl_high.png')}" alt="Blackpurl"/>
+                        </div>
+                        <div ng-if="homePageModel.IsTrialOrg && !homePageModel.IsSampleDataAvailable">
+                            <h2>You're currently using a free trial account with our</h2>
+                            <h2>sample data. Import your data now.</h2>
+                            <div class="btnContainer1">
+                                <a href="{!$Page.UserSettings}#/Import_And_Export" class="btn text-uppercase moreinfoBtn2">Import data</a>
+                            </div> 
+                        </div>
+                        <div ng-if="homePageModel.IsTrialOrg && homePageModel.IsSampleDataAvailable && !homePageModel.IsSystemSettingVisited">
+                            <h2>Welcome to BlackPurl, you're currently using</h2>
+                            <h2>a free trial account with your data.</h2>
+                            <p class="sub-text subTextFirst">We've chosen the system settings that are best suited for your</p>
+                            <p class="sub-text">business, you can change these at any time</p>
+                            <div class="btnContainer1">
+                                <a href="{!$Page.UserSettings}" class="btn text-uppercase moreinfoBtn2  text-uppercase">Settings</a>
+                            </div>
+                        </div>
+                        <div ng-if="!homePageModel.IsTrialOrg && !homePageModel.IsSystemSettingVisited">
+                            <h2>Thanks for joining BlackPurl, we've chosen the system</h2> 
+                            <h2>settings that are best suited for your business, you can</h2> 
+                            <h2>change these at any time</h2>
+                            <div class="btnContainer1">
+                                <a href="{!$Page.UserSettings}" class="btn text-uppercase moreinfoBtn2 text-uppercase">Settings
+                                </a>
+                            </div>
+                        </div>
+                        <div ng-if="(homePageModel.IsTrialOrg && homePageModel.IsSampleDataAvailable && homePageModel.IsSystemSettingVisited) || (!homePageModel.IsTrialOrg && homePageModel.IsSystemSettingVisited)">
+                            <h2 ng-if="!homePageModel.IsTrialOrg">Welcome to BlackPurl</h2>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>       
+</apex:page>

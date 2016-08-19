@@ -1,0 +1,156 @@
+<apex:component >
+        <style>
+              .Vendor-Order-Needpopup{
+                  display: none;
+					background: #fff;
+					color: #000;
+					width: 350px;
+					min-height: 100px;
+					position: absolute;
+					text-align: left;
+					z-index: 1000;
+					border-radius: 10px;
+					padding: 10px 20px;
+					-moz-box-shadow: 0 0 20px #222;
+					-webkit-box-shadow: 0 0 20px #222;
+					box-shadow: 0 0 20px #222;
+					
+					
+              }
+              
+              .Vendor-Order-Needpopup:before{
+                  content: '';
+					display: block;
+					position: absolute;
+					z-index: -1;
+					top: 13px;
+					left:335px;
+					height: 30px;
+					width: 30px;
+					-moz-box-shadow: 5px 0px 5px -3px #7a7a7a;
+					-webkit-box-shadow: 5px 0px 5px -3px #7a7a7a;
+					-o-box-shadow: 5px 0px 5px -3px #7a7a7a;
+					box-shadow: 5px 0px 5px -3px #7a7a7a;
+					transform: rotate(45deg);
+					-ms-transform: rotate(45deg);
+					-webkit-transform: rotate(45deg);
+					background-color: #fff;
+              }
+              .Vendor-Order-popup .under-line-row{
+                  padding: 10px;
+				  border-bottom: 1px solid #939598;
+				  margin-left: 0px;
+              }
+        </style>
+        <script>
+            $(document).ready(function () {
+                $('.Vendor-Order-Needpopup').mouseover(function() {
+                    $('.Vendor-Order-Needpopup').show(); 
+                })
+                $('.Vendor-Order-popup').mouseout(function() {
+                    $('.Vendor-Order-popup').hide(); 
+                })
+            });
+        </script>
+        
+      	<div class="Vendor-Order-Needpopup">
+        	<div>
+            	<div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<b> AVAILABLE ON HAND </b>	
+                   	</div>
+                    <div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		<p> {{VendorOrderModel.voliPartDetails.QtyAvailable}} </p>
+                   	</div>
+                </div>   	
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<b> INCOMING </b>	
+                   	</div>
+                    <div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		<p>  {{VendorOrderModel.voliPartDetails.Incoming}}</p>
+                   	</div>
+                </div>
+                
+                <div style="border-bottom :1px solid black"/>   	
+                
+                <div class="row overlay-header" style="margin-top:10px;">
+                	<div class="col-lg-2 col-md-2 pull-right">
+                   		<b> {{VendorOrderModel.voliPartDetails.NetAvailable}}  </b>
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                	<div class="col-lg-8 col-md-8 ">
+                    	<b> NET AVAILABLE </b>	
+                   	</div>
+                    
+                   	
+                </div> 
+                
+                <div class="row clearfix" style="height:20px;">
+                	
+                </div> 	
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<b > AUTO REORDER AT : </b>	
+                   	</div>
+	                   	<div class="col-lg-2 col-md-2">
+	                   	
+	                   	</div>
+	                   	<div class="col-lg-2 col-md-2">
+	                   		<b> {{VendorOrderModel.voliPartDetails.AutoReprderAt}}   </b>
+	                  </div>
+                </div> 
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8">
+                    	<b> AUTO REORDER TO : </b>	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		<b> {{VendorOrderModel.voliPartDetails.AutoReprderTo}}  </b>
+                   	</div>
+                </div> 
+                
+                <div class="row overlay-header">
+                	<div class="col-lg-8 col-md-8"  style="color:red">
+                    	<b ng-if="VendorOrderModel.voliPartDetails.PackageUnit  !=null || VendorOrderModel.voliPartDetails.PackageUnit !='NULL'">Ordered as  {{ VendorOrderModel.voliPartDetails.PackageQty}} / {{VendorOrderModel.voliPartDetails.PackageUnit }}</b>	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   		<b>  </b>
+                   	</div>
+                </div> 
+                
+                <div style="border-bottom:1px solid black; margin-top : 10px;"/> 
+                  
+                <div class="row overlay-header" style="margin-top:10px;">
+                	<div class="col-lg-2 col-md-2 pull-right">
+                   		<b> {{VendorOrderModel.voliPartDetails.TotalNeed}} </b>
+                   	</div>
+                   	<div class="col-lg-2 col-md-2">
+                   	
+                   	</div>
+                	<div class="col-lg-8 col-md-8 pull-right">
+                    	<b> NEED </b>	
+                   	</div>
+                </div> 
+                
+          	</div> 
+      	</div>
+      	
+      	
+</apex:component>

@@ -1,0 +1,1540 @@
+<apex:component >
+<c:NewViewCustomerStyle />
+<c:NewPopupStyle />
+<style>
+	.selectDropdown{
+		width: 68%;
+		float: left;
+	}
+	
+	.selectDropdown .btn{
+	    width: 98%;   
+    	border-radius: 0;
+    	padding: 4px 12px;
+	}
+	
+	.selectDropdown .dropdown-menu {
+        border-radius: 0;
+   		margin-top: 0;
+   		width: 267px;
+	}
+	.chk_tick {
+	    width: 20px !important;
+	    height: 20px !important;
+	    border-radius: 4px;
+	    margin: 3px 15px;
+	    border: 1px solid #cccccc;
+	    display: block;
+	    float: left;
+	    
+	    
+	    cursor: pointer;
+	}
+	.chk_tick .chksqure {
+	    font-size: 0px;
+	    height: 12px;
+	    width: 12px;
+	    margin: 3px; 
+	    border-radius: 2px;
+	    background: #D8D8D8;
+	}
+	.chked .chksqure {
+	    font-size: 0px !important;
+	    height: 12px;
+	    width: 12px;
+	    margin: 3px;
+	    border-radius: 2px;
+	    background: #71BF3E;
+	}
+	 .dropdown-menu > li:hover{
+	    background: #f5f5f5;
+    	color: #FFFFFF;
+    	cursor: pointer;
+    }
+    
+    .dropdown-menu > li > a:hover {
+	    color: #000;
+	    text-decoration: none;
+	    background-color: transparent;
+	} 
+	.dropdown-menu > li > a:focus{
+		color: #000;
+	    text-decoration: none;
+	    background-color: transparent;
+	}
+	
+	
+	.inner-addon { 
+	    position: relative; 
+	}
+	
+	/* style icon */
+	.inner-addon .glyphicon {
+	  position: absolute;
+	  padding: 10px;
+	  pointer-events: none;
+	}
+	
+	/* align icon */
+	.left-addon .glyphicon  { left:  0px;}
+	.right-addon .glyphicon { 
+		right: 8px;
+	    z-index: 1;
+	    font-size: 17px;
+	    top: -3px;
+	}
+	
+	/* add padding  */
+	.left-addon input  { padding-left:  30px; }
+	.right-addon input { padding-right: 30px; }
+	.controlBtn{
+		margin-top: 5px;
+	}
+	.controlBtn .fa{
+		color: #B7BEC6;
+	}
+	.homePagecontrols{
+		display: none;
+	}
+</style>
+
+<script>
+$(document).ready(function(){
+	  $(".homeform-control").focus(function(){
+	  debug(  $('#'+ $(this).attr('rel')));
+            $('.homePagecontrols').hide();  
+            $('#'+ $(this).attr('rel')).show();
+            
+        })
+        
+        
+})
+  
+
+</script>
+
+  <div class="homeSearchFilterWrapper pull-left" id="homeSearchFilterWrapper">
+  	<div class="row">
+  		<div class="P30">
+	  		<label class="text-uppercase T3 pull-left">Search</label>
+	  		<div class="savecancle_btncntnr pull-right">
+				<button type="button" class="btn btn-default grayBtn" ng-click="HomeSearchGrid.clearFilterForm()">Clear</button>
+				<button type="button" class="btn btn-default grayBtn hourlogMR" ng-click="HomeSearchGrid.closeFilterForm()">&#10006;</button>
+			</div>
+  		</div>
+  	</div>
+ 	
+ 	<div class="fixedHeight">
+ 	
+ 	
+	 	<!-- type Div Start  -->
+	 	<div class="row P10">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Type</label>
+	 			<div class="dropdown selectDropdown checkboxDropdown">
+				  <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
+				  	ng-click="HomeSearchGrid.TypeFilterSearch = ''">{{HomeSearchGrid.getObjectFilterText()}}
+				  <span class="caret"></span></button>
+				  <ul class="dropdown-menu keep_open" style="overflow: visible;">
+				  	<div class="right-inner-addon" style="margin: 10px;">
+                        <i class="glyphicon glyphicon-search"></i> 
+                        <input type="search" class="form-control" placeholder="Search"
+                            ng-model="HomeSearchGrid.TypeFilterSearch" />
+                    </div>
+                    <div class="column_fixHeight" id="TypeFixedHeight">
+				    <li ng-repeat="object in HomeSearchGrid.objectsList | filter:HomeSearchGrid.TypeFilterSearch"
+				    	ng-click="HomeSearchGrid.selectFilterObject(object);"
+				    	ng-if="object != 'Any'">
+					     <span class="chk_tick " ng-attr-tabindex="100" ng-class="{'chked' : HomeSearchGrid.isFilterObjectSelected(object)}">
+		                    <i class="fa fa-check-square chksqure"></i>
+		                 </span>
+				    	<a>{{object}}</a> 
+				    </li> 
+				   </div>
+				  </ul>
+				</div>
+	 		</div>
+	 	</div> 
+	 	<!-- type Div End  -->
+	 	
+	 	
+	 	<!-- contains Div Start  -->
+	 	<div class="row P10">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >	
+		 			<label class="T3 labelWidth pull-left">contains</label>
+		 			<input type="text" class="col-md-8  homeSearchFilterTextbox homeform-control" id="SearchText"
+		 				ng-model="HomeSearchGrid.filterFormJson.SearchText" rel="homePageContains"  />
+	 			</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageContains">
+	                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Add a contains Value"></i> 
+	                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('SearchText');"></i>
+	             </div>
+            </div> 
+	 	</div>
+	 	<!-- contains Div End  -->
+	 	
+	 	<!-- owner Div Start  -->
+	 	<div class="row P10">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">owner</label>
+	 				<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="Owner"
+	 				ng-model="HomeSearchGrid.filterFormJson.Owner.SelectedOption" rel="homePageSpecificPerson" >
+		 				<option value="0">Any</option>
+		 				<option value="1">Owned by me</option>
+		 				<option value="2">Not owned by me</option>
+		 				<option value="3">Specific person</option>
+		 			</select>
+	 		</div>
+	 		
+	 		<div class="col-md-5" ng-show="HomeSearchGrid.filterFormJson.Owner.SelectedOption == '3'">
+	 					<usersearch id ="Owner_Search" typesearchmodal="HomeSearchGrid.OwnerNameStr"  titleField="Name" placeholder ="Enter a Name"
+	 			  			Addclass="col-md-7 homeSearchFilterTextbox " class="homeform-control" tabIndex = "110" rel="homePageSpecificPerson"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageSpecificPerson">
+		                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Specific person"></i> 
+		                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Owner');"></i>
+           </div>
+	 	</div>
+	 	<!-- owner Div End  -->
+	 	
+	 	<!-- status Div Start  -->
+		<div class="row P10">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">status</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="Status"
+	 				ng-model="HomeSearchGrid.filterFormJson.Status" rel="homePageStatus">
+	 				<option value="0">Any</option>
+	 				<option ng-repeat="Status in HomeSearchGrid.formMaterData.StatusValues" value="{{Status}}">{{Status}}</option> 
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageStatus">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Status"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Status');"></i>
+           </div>
+	 	</div>
+	 	
+	 	<!-- status Div End  -->	
+	 	
+	 	<!-- modified Div Start  -->
+		 <div class="row P10">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">modified</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="ModifiedDate" rel="homePageModified"
+	 				ng-model="HomeSearchGrid.filterFormJson.ModifiedDate.SelectedOption">
+ 	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.dateFilterOptions" value="{{item.optionValue}}">{{item.label}}</option> 
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageModified">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Modified Date"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('ModifiedDate');"></i>
+           </div>
+	 	</div>
+	 	<!-- modified Div End  -->
+	 	
+	 	
+	 	
+		<!-- Between Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.filterFormJson.ModifiedDate.SelectedOption == '5'">
+	 			<div class="col-md-7 modifiedField">
+	 			<label class="T3 col-md-12">Between:</label>
+	 			<div class="col-md-6 inner-addon right-addon" style="padding-left: 0;">
+				    <i class="glyphicon glyphicon-calendar"></i>
+				    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy" 
+				    	ng-model="HomeSearchGrid.filterFormJson.ModifiedDate.Value1" rel="homePageModified"/>
+				</div>
+	 			<div class="col-md-6 inner-addon right-addon">
+				    <i class="glyphicon glyphicon-calendar"></i>
+				    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+				    	ng-model="HomeSearchGrid.filterFormJson.ModifiedDate.Value2" rel="homePageModified"/>
+				</div>
+	 			
+	 		</div>
+	 		
+	 	</div>
+		<!-- Between Div End  -->
+	 	
+	 	
+	 	<!-- created Div Start  -->
+		<div class="row P10">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">created</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="CreatedDate" 
+	 				ng-model="HomeSearchGrid.filterFormJson.CreatedDate.SelectedOption" rel="homePageCreated">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.dateFilterOptions" value="{{item.optionValue}}">{{item.label}}</option> 
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageCreated">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Created Date"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('CreatedDate');"></i>
+           </div>
+	 	</div>
+	 	<!-- created Div End  -->
+	 	
+	 	<!-- Between Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.filterFormJson.CreatedDate.SelectedOption == '5'">
+	 			<div class="col-md-7 modifiedField">
+	 			<label class="T3 col-md-12">Between:</label>
+	 			<div class="col-md-6 inner-addon right-addon" style="padding-left: 0;">
+				    <i class="glyphicon glyphicon-calendar"></i>
+				    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+				    	ng-model="HomeSearchGrid.filterFormJson.CreatedDate.Value1"  rel="homePageCreated"/>
+				</div>
+	 			<div class="col-md-6 inner-addon right-addon">
+				    <i class="glyphicon glyphicon-calendar"></i>
+				    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+				    	ng-model="HomeSearchGrid.filterFormJson.CreatedDate.Value2"  rel="homePageCreated"/>
+				</div>
+	 			
+	 		</div>
+	 	</div>
+		<!-- Between Div End  -->
+		
+		
+		<!-- People HTML Start here -->
+		<!-- Id Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_Id');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">ID</label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_Id"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_Id" rel="homePageId"/>
+	 			</div>
+	 		
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageId">
+	                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Id"></i> 
+	                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_Id');"></i>
+	           </div>
+           </div>
+	 	</div>
+	 	<!-- Id Div End  -->
+	 	
+	 	<!-- Name Div Start  -->
+	 	<div class="row P10 " ng-show="HomeSearchGrid.showField('People_Name');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Name</label>
+		 			<input type="text" value="Anything" class="col-md-8 homeSearchFilterTextbox P0 homeform-control" id="People_Name"
+	 				ng-model="HomeSearchGrid.filterFormJson.People_Name" rel="homePageName"/>
+	 			</div>
+	 			
+	 			<div class="col-md-2 controlBtn homePagecontrols" id="homePageName">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Add a Name"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_Name', 'text');"></i>
+                </div>
+	 		</div>
+	 	</div>
+	 	<!-- Name Div End  -->
+	 	
+	 	<!-- Phone Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_Phone');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >	
+		 			<label class="T3 labelWidth pull-left">Phone</label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_Phone"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_Phone" rel="homePagePhone"/>
+		 		</div>
+		 		
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePhone">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Phone Number"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_Phone');"></i>
+                </div>
+	 		</div>
+	 	</div>
+	 	<!-- Phone Div End  -->
+	 	
+	 	<!-- Email Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_Email');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Email </label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_Email"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_Email" rel="homePageEmail"/>
+		 		</div>
+		 			<div class="col-md-2 controlBtn homePagecontrols" id="homePageEmail">
+		                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Email Address"></i> 
+		                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_Email');"></i>
+               	 	</div>
+	 		</div>
+	 	</div>
+	 	<!-- Email Div End  -->
+	 	
+	 	<!-- Address   Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_BillingAddress');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Address  </label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_BillingAddress"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_BillingAddress" rel="homePageBillingAddress"/>
+		 		</div>
+		 		
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageBillingAddress">
+		                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Billing Address"></i> 
+		                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_BillingAddress');"></i>
+               	</div>
+	 		</div>
+	 	</div>
+	 	<!-- Address  Div End  -->
+	 	
+	 	<!-- City Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_BillingCity');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">City  </label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_BillingCity"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_BillingCity" rel="homePageBillingCity"/ >
+		 		</div>
+		 			<div class="col-md-2 controlBtn homePagecontrols" id="homePageBillingCity">
+		                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Billing City"></i> 
+		                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_BillingCity');"></i>
+               		</div>
+		 		
+	 		</div>
+	 	</div>
+	 	<!-- City Div End  -->
+	 	
+	 	<!-- State/Prov  Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_StateProv');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">State/Prov </label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_StateProv"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_StateProv" rel="homePageState"/ >
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageState">
+		                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Billing State"></i> 
+		                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_StateProv');"></i>
+               	</div>
+	 		</div>
+	 	</div>
+	 	<!-- State/Prov Div End  -->
+	 	
+	 	<!-- Country   Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('People_Country');">
+	 		<div class="col-md-11">
+		 		<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Country  </label>
+		 			<input type="text" value="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="People_Country"
+		 				ng-model="HomeSearchGrid.filterFormJson.People_Country" rel="homePageCountry"/>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageCountry">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People Billing Country"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_Country');"></i>
+               	</div>
+	 		</div>
+	 	</div>
+	 	<!-- Country Div End  -->
+	 	
+	 	<!-- Sales Tax Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('People_SalesTax');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Sales Tax</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="People_SalesTax"
+	 				ng-model="HomeSearchGrid.filterFormJson.People_SalesTax" rel="homePageSalesTaxList">
+	 				<option value="0">Any</option>
+	 				<option ng-repeat="SalesTaxItem in HomeSearchGrid.formMaterData.SalesTaxList" value="{{SalesTaxItem.Id}}">{{SalesTaxItem.Value}}</option> 
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageSalesTaxList">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Sales Tax List"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_SalesTax');"></i>
+             </div>
+	 	</div>
+	 	<!-- Sales Tax Div End  -->
+	 	
+	 	
+	 	<!-- Price Level Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('People_PriceLevel');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Price Level </label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="People_PriceLevel"
+	 				ng-model="HomeSearchGrid.filterFormJson.People_PriceLevel" rel="homePagePeoplePriceLevel">
+	 				<option value="0">Any</option>
+	 				<option ng-repeat="PriceLevelItem in HomeSearchGrid.formMaterData.PriceLevelList" value="{{PriceLevelItem.Id}}">{{PriceLevelItem.Value}}</option> 
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePeoplePriceLevel">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="People PriceLevel"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('People_PriceLevel');"></i>
+             </div>
+	 	</div>
+	 	<!-- Price Level Div End  -->
+	 	
+	 	
+	 	<!-- Purchase Sales Tax Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_PurchaseSalesTax');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Purchase Sales Tax</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="Vendor_PurchaseSalesTax"
+	 				ng-model="HomeSearchGrid.filterFormJson.Vendor_PurchaseSalesTax" rel="homePageVendorPurchaseSalesTax">
+	 				<option value="0">Any</option>
+	 				<option ng-repeat="PurchaseTaxItem in HomeSearchGrid.formMaterData.PurchaseTaxList" value="{{PurchaseTaxItem.Id}}">{{PurchaseTaxItem.Value}}</option> 
+	 			</select>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageVendorPurchaseSalesTax">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Purchase SalesTax"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_PurchaseSalesTax');"></i>
+             </div>
+	 	</div>
+	 	<!-- Purchase Sales Tax Div End  -->
+ 	<!-- People HTML END here -->
+ 	
+ 		<!-- Product  HTML Start here -->
+ 		
+ 		
+ 		
+ 		<!-- Item Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Product_Item');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Item</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Product_Item"
+		 				ng-model="HomeSearchGrid.filterFormJson.Product_Item" rel="homePageProductItem"/>
+	 			</div>
+	 			<div class="col-md-2 controlBtn homePagecontrols" id="homePageProductItem">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Product Item"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Product_Item');"></i>
+             </div>
+	 		</div>
+	 	</div>
+	 	<!-- Item Div End  -->
+	 	
+	 	
+ 		<!-- Description Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Product_Description');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Description</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Product_Description"
+		 				ng-model="HomeSearchGrid.filterFormJson.Product_Description" rel="homePageProductDescription"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageProductDescription">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Product Description"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Product_Description');"></i>
+             </div>
+          </div>
+	 	</div>
+	 	<!-- Description Div End  -->
+ 		
+ 		
+ 		<!-- Category  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Product_Category');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Category</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageProductCategory" ng-model="HomeSearchGrid.filterFormJson.Product_Category" id="Product_Category">
+	 				<option value="0">Any</option>
+	 				<option ng-repeat="categoryItem in HomeSearchGrid.formMaterData.CategoryList" value="{{categoryItem.Id}}">{{categoryItem.Value}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageProductCategory">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Product Category"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Product_Category');"></i>
+             </div>
+	 	</div>
+	 	<!-- Category  Div End  -->
+	 	
+	 	<!-- Price  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Product_Price');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Price</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageProductPrice" ng-model="HomeSearchGrid.filterFormJson.Product_Price.SelectedOption"
+	 				id="Product_Price">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Product_Price.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Product_Price.SelectedOption != '0'" rel="homePageProductPrice"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Product_Price.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Product_Price.SelectedOption == '5'" rel="homePageProductPrice"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageProductPrice">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Product Price"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Product_Price');"></i>
+             </div>
+	 	</div>
+	 	<!-- Price  Div End  -->
+	 	
+	 	
+	 	
+	 	<!-- Qty Available  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Product_QtyAvailable');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Qty Available</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageProductQtyAvailable" ng-model="HomeSearchGrid.filterFormJson.Product_QtyAvailable.SelectedOption"
+	 				id="Product_QtyAvailable">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Product_QtyAvailable.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Product_QtyAvailable.SelectedOption != '0'" rel="homePageProductQtyAvailable"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Product_QtyAvailable.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Product_QtyAvailable.SelectedOption == '5'" rel="homePageProductQtyAvailable"/ >
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageProductQtyAvailable">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Product QtyAvailable"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Product_QtyAvailable');"></i>
+             </div>
+	 	</div>
+	 	<!-- Oty Available  Div End  -->
+	 	
+	 	<!-- Product  HTML End here -->
+	 	
+	 	
+	 	<!-- Parts Additional  HTML Start here -->
+	 	
+	 	<!-- Vendor Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Part_Vendor');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Vendor</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Part_Vendor"
+		 				ng-model="HomeSearchGrid.filterFormJson.Part_Vendor" rel="homePagePartVendor"/>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartVendor">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Vendor"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_Vendor');"></i>
+             </div>
+	 		</div>
+	 	</div>
+	 	<!-- Vendor Div End  -->
+	 	
+	 	
+	 <!-- Cost  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_Cost');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Cost</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartCost" ng-model="HomeSearchGrid.filterFormJson.Part_Cost.SelectedOption"
+	 				id="Part_Cost">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_Cost.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_Cost.SelectedOption != '0'" rel="homePagePartCost"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_Cost.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_Cost.SelectedOption == '5'" rel="homePagePartCost"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartCost">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Cost"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_Cost');"></i>
+             </div>
+	 	</div>
+	<!-- Cost  Div End  -->
+	 	
+	 	
+	 	
+	 	 <!-- Avg Cost  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_AverageCost');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Avg Cost</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartAverageCost" ng-model="HomeSearchGrid.filterFormJson.Part_AverageCost.SelectedOption"
+	 				id="Part_AverageCost">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_AverageCost.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_AverageCost.SelectedOption != '0'" rel="homePagePartAverageCost"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_AverageCost.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_AverageCost.SelectedOption == '5'" rel="homePagePartAverageCost"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartAverageCost">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Average Cost"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_AverageCost');"></i>
+             </div>
+	 	</div>
+	<!-- Avg Cost  Div End  -->
+	 	
+	 	
+	 	
+	 <!-- Location Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Part_Location');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Location</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Part_Location"
+		 				ng-model="HomeSearchGrid.filterFormJson.Part_Location" rel="homePagePartLocation"/>
+	 			</div>
+	 			<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartLocation">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Location"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_Location');"></i>
+             </div>
+	 		</div>
+	 	</div>
+	 <!-- Location Div End  -->
+	 
+	 
+	 
+	 
+	 <!-- In Stock  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_InStock');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">In Stock</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartInStock" ng-model="HomeSearchGrid.filterFormJson.Part_InStock.SelectedOption"
+	 				id="Part_InStock">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_InStock.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_InStock.SelectedOption != '0'" rel="homePagePartInStock"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_InStock.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_InStock.SelectedOption =='5'" rel="homePagePartInStock"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartInStock">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part In Stock"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_InStock');"></i>
+             </div>
+	 	</div>
+	<!-- In Stock  Div End  -->
+	
+	
+	
+	 <!-- Committed  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_Committed');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Committed</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartCommitted" ng-model="HomeSearchGrid.filterFormJson.Part_Committed.SelectedOption"
+	 				id="Part_Committed">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_Committed.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_Committed.SelectedOption != '0'" rel="homePagePartCommitted"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_Committed.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_Committed.SelectedOption == '5'" rel="homePagePartCommitted"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartCommitted">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Committed"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_Committed');"></i>
+             </div>
+	 	</div>
+	<!-- Committed  Div End  -->
+	
+	
+	
+	
+	 <!-- In Order  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_OnOrder');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">On Order</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartOnOrder" ng-model="HomeSearchGrid.filterFormJson.Part_OnOrder.SelectedOption"
+	 				id="Part_OnOrder">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_OnOrder.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_OnOrder.SelectedOption != '0'" rel="homePagePartOnOrder"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_OnOrder.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_OnOrder.SelectedOption == '5'" rel="homePagePartOnOrder"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartOnOrder">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part On Order"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_OnOrder');"></i>
+             </div>
+	 	</div>
+	<!-- In Order  Div End  -->
+	
+	
+	
+	<!-- Category  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_PackagedPart');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Packaged Part</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartPackagedPart" ng-model="HomeSearchGrid.filterFormJson.Part_PackagedPart"
+	 				id="Part_PackagedPart">
+	 				<option value="0">Any</option>
+	 				<option value="1">Yes</option>
+	 				<option value="2">No</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartPackagedPart">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Packaged Part"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_PackagedPart');"></i>
+             </div>
+	 	</div>
+	 	<!-- Category  Div End  -->
+	
+	
+	 	
+	 	<!-- Last Counted Div Start  -->
+	 	<div ng-show="HomeSearchGrid.showField('Part_LastCounted');">
+			 <div class="row P10" >
+		 		<div class="col-md-5">
+		 			<label class="T3 labelWidth pull-left">Last Counted</label>
+		 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartLastCounted" ng-model="HomeSearchGrid.filterFormJson.Part_LastCounted.SelectedOption"
+		 				id="Part_LastCounted">
+		 				<option ng-repeat="item in HomeSearchGrid.formMaterData.dateFilterOptions" value="{{item.optionValue}}">{{item.label}}</option> 
+		 			</select>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartLastCounted">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Last Counted"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_LastCounted');"></i>
+             </div>
+		 	</div>
+		 	<!-- Last Counted Div End  -->
+	 	
+	 	
+	 	
+			<!-- Between Div Start  -->
+			<div class="row P10" ng-show="HomeSearchGrid.filterFormJson.Part_LastCounted.SelectedOption == '5'">
+		 			<div class="col-md-7 modifiedField">
+		 			<div class="col-md-6 inner-addon right-addon" style="padding-left: 0;">
+					    <i class="glyphicon glyphicon-calendar"></i>
+					    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" rel="homePagePartLastCounted" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+					    	ng-model="HomeSearchGrid.filterFormJson.Part_LastCounted.Value1"/>
+					</div>
+		 			<div class="col-md-6 inner-addon right-addon">
+					    <i class="glyphicon glyphicon-calendar"></i>
+					    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" rel="homePagePartLastCounted" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+					    	ng-model="HomeSearchGrid.filterFormJson.Part_LastCounted.Value2"/>
+					</div>
+		 			
+		 		</div>
+		 	</div>
+		 	<!-- Between Div End  -->
+		</div>
+		
+	 	
+	 	<!-- Last Counted Div End  -->
+	 	
+	 	
+	 	<!-- Last Sold Div Start  -->
+	 	<div ng-show="HomeSearchGrid.showField('Part_LastSold');">
+			 <div class="row P10">
+		 		<div class="col-md-5">
+		 			<label class="T3 labelWidth pull-left">Last Sold</label>
+		 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartLastSold" ng-model="HomeSearchGrid.filterFormJson.Part_LastSold.SelectedOption"
+		 				id="Part_LastSold">
+		 				<option ng-repeat="item in HomeSearchGrid.formMaterData.dateFilterOptions" value="{{item.optionValue}}">{{item.label}}</option> 
+		 			</select>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartLastSold">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Last Sold"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_LastSold');"></i>
+             </div>
+		 	</div>
+		 	<!-- Last Counted Div End  -->
+	 	
+	 	
+	 	
+			<!-- Between Div Start  -->
+			<div class="row P10" ng-show="HomeSearchGrid.filterFormJson.Part_LastSold.SelectedOption == '5'">
+		 			<div class="col-md-7 modifiedField">
+		 			<div class="col-md-6 inner-addon right-addon" style="padding-left: 0;">
+					    <i class="glyphicon glyphicon-calendar"></i>
+					    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+					    	ng-model="HomeSearchGrid.filterFormJson.Part_LastSold.Value1" rel="homePagePartLastSold"/>
+					</div>
+		 			<div class="col-md-6 inner-addon right-addon">
+					    <i class="glyphicon glyphicon-calendar"></i>
+					    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+					    	ng-model="HomeSearchGrid.filterFormJson.Part_LastSold.Value2" rel="homePagePartLastSold"/>
+					</div>
+		 			
+		 		</div>
+		 	</div>
+		 	<!-- Between Div End  -->
+	 	</div>
+		
+	 	
+	 	<!-- Last Sold Div End  -->
+	 	
+	 	
+	 	
+	 	<!-- Last Stocked Div Start  -->
+	 	<div ng-show="HomeSearchGrid.showField('Part_LastStocked');">
+			 <div class="row P10">
+		 		<div class="col-md-5">
+		 			<label class="T3 labelWidth pull-left">Last Stocked</label>
+		 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartLastStocked" ng-model="HomeSearchGrid.filterFormJson.Part_LastStocked.SelectedOption"
+		 				id="Part_LastStocked">
+		 				<option ng-repeat="item in HomeSearchGrid.formMaterData.dateFilterOptions" value="{{item.optionValue}}">{{item.label}}</option> 
+		 			</select>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartLastStocked">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Last Stocked"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_LastStocked');"></i>
+            	 </div>
+		 	</div>
+		 	<!-- Last Counted Div End  -->
+	 	
+	 	
+	 	
+			<!-- Between Div Start  -->
+			<div class="row P10" ng-show="HomeSearchGrid.filterFormJson.Part_LastStocked.SelectedOption == '5'">
+		 			<div class="col-md-7 modifiedField">
+		 			<div class="col-md-6 inner-addon right-addon" style="padding-left: 0;">
+					    <i class="glyphicon glyphicon-calendar"></i>
+					    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+					    	ng-model="HomeSearchGrid.filterFormJson.Part_LastStocked.Value1" rel="homePagePartLastStocked"/>
+					</div>
+		 			<div class="col-md-6 inner-addon right-addon">
+					    <i class="glyphicon glyphicon-calendar"></i>
+					    <input type="text" class="col-md-12 homeSearchFilterTextbox homeform-control" ui-date="dateOptions" ui-date-format="mm/dd/yy"
+					    	ng-model="HomeSearchGrid.filterFormJson.Part_LastStocked.Value2" rel="homePagePartLastStocked"/>
+					</div>
+		 			
+		 		</div>
+		 	</div>
+			<!-- Between Div End  -->
+	 	</div>
+	 	<!-- Last Stocked Div End  -->
+	 	
+	 	
+	 	
+	 	 
+	 <!-- Reorder At  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_ReorderAt');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Reorder At</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartReorderAt" ng-model="HomeSearchGrid.filterFormJson.Part_ReorderAt.SelectedOption"
+	 				id="Part_ReorderAt">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_ReorderAt.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_ReorderAt.SelectedOption != '0'" rel="homePagePartReorderAt"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_ReorderAt.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_ReorderAt.SelectedOption == '5'" rel="homePagePartReorderAt"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartReorderAt">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Reorder At"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_ReorderAt');"></i>
+           	</div>
+	 	</div>
+	<!-- Reorder At  Div End  -->
+	 	
+	 	
+	 	
+	 	
+	 	 <!-- Reorder To  Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_ReorderTo');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Reorder To</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartReorderTo" ng-model="HomeSearchGrid.filterFormJson.Part_ReorderTo.SelectedOption"
+	 				id="Part_ReorderTo">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_ReorderTo.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_ReorderTo.SelectedOption != '0'" rel="homePagePartReorderTo"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Part_ReorderTo.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Part_ReorderTo.SelectedOption =='5'" rel="homePagePartReorderTo"/>
+	 		</div>
+	 		
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartReorderTo">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Reorder To"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_ReorderTo');"></i>
+           	</div>
+	 	</div>
+	<!-- Reorder To  Div End  -->
+	 	
+	 	
+	 	<!-- status Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Part_Status');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">status</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePartStatus" ng-model="HomeSearchGrid.filterFormJson.Part_Status"
+	 				id="Part_Status">
+	 				<option value="0">Any</option>
+	 				<option>Active</option>
+	 				<option>Inactive</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePagePartStatus">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Part Status"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Part_Status');"></i>
+           	</div>
+	 	</div>
+	 	
+	 	<!-- status Div End  -->
+	 	
+ 		<!-- Parts Additional HTML END here -->
+ 	
+ 	
+ 	
+ 	<!--  Kit Additional HTML  Start Here -->
+ 	
+ 		 <!-- Kit Price Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Kit_KitPrice');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Kit Price</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageKitPrice" ng-model="HomeSearchGrid.filterFormJson.Kit_KitPrice.SelectedOption"
+	 				id="Kit_KitPrice">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Kit_KitPrice.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Kit_KitPrice.SelectedOption != '0'" rel="homePageKitPrice" />
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Kit_KitPrice.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Kit_KitPrice.SelectedOption == '5'" rel="homePageKitPrice" />
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols" id="homePageKitPrice">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="KitPrice"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Kit_KitPrice');"></i>
+           	</div>
+	 	</div>
+	<!-- Kit Price  Div End  -->
+	 	
+	 	
+	 <!-- Fixed Price Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Kit_FixedPrice');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Fixed Price</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageKitFixedPrice" ng-model="HomeSearchGrid.filterFormJson.Kit_FixedPrice"
+	 				id="Kit_FixedPrice">
+	 				<option value="0">Any</option>
+	 				<option value="1">Yes</option>
+	 				<option value="2">No</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageKitFixedPrice">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Kit Fixed Price"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Kit_FixedPrice');"></i>
+           	</div>
+	 	</div>
+	 	
+	 	<!-- Fixed Price Div End  -->
+ 	
+ 	
+ 	
+ 	<!-- Service Kit Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Kit_ServiceKit');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Service Kit</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageKitServiceKit" ng-model="HomeSearchGrid.filterFormJson.Kit_ServiceKit"
+	 				id="Kit_ServiceKit">
+	 				<option value="0">Any</option>
+	 				<option value="1">Yes</option>
+	 				<option value="2">No</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageKitServiceKit">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Kit Service Kit"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Kit_ServiceKit');"></i>
+           	</div>
+	 	</div>
+	 	
+	<!-- Service Kit Div End  -->
+ 	
+ 	<!--  Kit Additional HTML  End Here -->
+ 	
+ 	
+ 	<!--  Fee Additional HTML  Start Here -->
+ 	
+ 	
+ 	<!-- Fee Type Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Fee_FeeType');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Fee Type</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageFeeFeeType" ng-model="HomeSearchGrid.filterFormJson.Fee_FeeType"
+	 				id="Fee_FeeType">
+	 				<option value="0">Any</option>
+	 				<option value="1">Yes</option>
+	 				<option value="2">No</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageFeeFeeType">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Fee Fee Type"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Fee_FeeType');"></i>
+           	</div>
+	 	</div>
+	 	
+	<!-- Fee Type Div End  -->
+ 	
+ 	
+ 	
+ 	<!--  Fee Additional HTML  End Here -->
+ 	
+ 	
+ 	
+ 	<!--  Customer Sales HTML  Start Here -->
+ 	
+ 		<!-- Id Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Sales_Id');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">ID</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Customer_Sales_Id"
+		 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Id" rel="homePageCustomerSalesId"/>
+	 			</div>
+	 			<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerSalesId">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Sales Id"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Sales_Id');"></i>
+           	  </div>
+	 		</div>
+	 	</div>
+	 	<!-- Id Div End  -->
+	 	
+	 	
+	 	
+	 	<!-- Customer Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Sales_Customer');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0 " >
+		 			<label class="T3 labelWidth pull-left">Customer</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" 
+		 				id="Customer_Sales_Customer"
+		 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Customer" rel="homePageCustomerSalesCustomer"/>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerSalesCustomer">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Sales Customer"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Sales_Customer');"></i>
+           	  </div>
+	 		</div>
+	 	</div>
+	 	<!-- Customer Div End  -->
+	 	
+ 	
+ 	 <!-- Total Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Sales_Total');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Total</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageCustomerSalesTotal" ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Total.SelectedOption"
+	 				id="Customer_Sales_Total">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Total.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Sales_Total.SelectedOption != '0'" rel="homePageCustomerSalesTotal"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Total.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Sales_Total.SelectedOption == '5'" rel="homePageCustomerSalesTotal"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerSalesTotal">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Sales Total"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Sales_Total');"></i>
+           	  </div>
+	 	</div>
+	<!-- Total  Div End  -->
+ 	
+ 	
+ 	 <!-- Balance Due Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Sales_Balance_Due');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Balance Due</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" id="Customer_Sales_Balance_Due" rel="homePageCustomerSalesBalanceDue"
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Balance_Due.SelectedOption">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Balance_Due.Value1" rel="homePageCustomerSalesBalanceDue"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Sales_Balance_Due.SelectedOption != '0'"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Sales_Balance_Due.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Sales_Balance_Due.SelectedOption == '5'" rel="homePageCustomerSalesBalanceDue"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerSalesBalanceDue">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Sales Balance Due"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Sales_Balance_Due');"></i>
+           	  </div>
+	 	</div>
+	<!-- Balance Due  Div End  -->
+ 	
+ 	
+ 	<!--  Customer Sales HTML  End Here -->
+ 	
+ 	
+ 	
+ 	<!-- Customer Order Additional HTML Start Here -->
+ 	
+ 	
+ 		 <!-- Deposits Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Order_Deposits');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Deposits</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageCustomerOrderDeposits" ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Deposits.SelectedOption"
+	 				id="Customer_Order_Deposits">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Deposits.Value1" rel="homePageCustomerOrderDeposits"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Order_Deposits.SelectedOption != '0'"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Deposits.Value2" rel="homePageCustomerOrderDeposits"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Order_Deposits.SelectedOption == '5'"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerOrderDeposits">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Order Deposits"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Order_Deposits');"></i>
+           	  </div>
+	 	</div>
+	<!-- Deposits  Div End  -->
+ 	
+ 	
+ 	 <!-- Payments Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Order_Payments');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Payments</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageCustomerOrderPayments" ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Payments.SelectedOption"
+	 				id="Customer_Order_Payments">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Payments.Value1" rel="homePageCustomerOrderPayments"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Order_Payments.SelectedOption != '0'"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Payments.Value1"
+	 				ng-show="HomeSearchGrid.filterFormJson.Customer_Order_Payments.SelectedOption == '5'" rel="homePageCustomerOrderPayments"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerOrderPayments">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Order Payments"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Order_Payments');"></i>
+           	  </div>
+	 	</div>
+	<!-- Payments  Div End  -->
+ 	
+ 	
+ 		<!-- status Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Customer_Order_Status');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">status</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageCustomerOrderStatus" ng-model="HomeSearchGrid.filterFormJson.Customer_Order_Status"
+	 				id="Customer_Order_Status">
+	 				<option value="0">Any</option>
+	 				<option>Active</option>
+	 				<option>Inactive</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCustomerOrderStatus">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Customer Order Status"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Customer_Order_Status');"></i>
+           	  </div>
+	 	</div>
+	 	
+	 	<!-- status Div End  -->
+ 	
+ 	
+ 	
+ 	<!-- Customer Order Additional HTML End Here -->
+ 	
+
+
+ 	<!-- Customer Invoice Additional HTML Start Here -->
+ 	
+ 		<!-- Customer Order Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('CO_Invoice_Header_Customer_Order');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0">
+	 			<label class="T3 labelWidth pull-left">Customer Order</label>
+	 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="CO_Invoice_Header_Customer_Order" 
+	 				ng-model="HomeSearchGrid.filterFormJson.CO_Invoice_Header_Customer_Order" rel="homePageCOInvoiceHeaderCustomerOrder"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageCOInvoiceHeaderCustomerOrder">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="COInvoice Header Customer Order"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('CO_Invoice_Header_Customer_Order');"></i>
+           	  </div>
+	 	</div>
+	 	</div>
+	 	<!-- Customer Order Div End  -->
+ 	
+ 	
+ 	<!-- Customer Invoice Additional HTML End Here -->
+ 	
+ 	<!-- Customer Payment Additional HTML Start Here -->
+ 	
+ 		<!-- Customer Order Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('CO_Payment_Payment_Method');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0">
+		 			<label class="T3 labelWidth pull-left">Payment Method</label>
+		 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePagePaymentMethod" 
+		 				ng-model="HomeSearchGrid.filterFormJson.CO_Payment_Payment_Method.SelectedOption"
+		 				id="CO_Payment_Payment_Method">
+		 				<option value="0">Any</option>
+		 				<option value="1">Cash</option>
+		 				<option value="2">Debit</option>
+		 				<option value="3">Cheque</option>
+		 				<option value="4">Visa</option>
+		 				<option value="5">Mastercard</option>
+		 				<option value="6">Amex</option>
+		 				<option value="7">Gift Card</option>
+		 				<option value="8">Charge Account</option>
+		 				<option value="9">Use Deposit</option> 
+		 			</select>
+	 			</div>
+	 			<div class="col-md-2 controlBtn homePagecontrols " id="homePagePaymentMethod">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="COInvoice Payment Method"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('CO_Payment_Payment_Method');"></i>
+           	  	</div>
+	 		</div>
+	 	</div>
+	 	
+	 	
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('CO_Payment_Customer_Order');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0">
+		 			<label class="T3 labelWidth pull-left">Customer Order</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" 
+		 				id="CO_Payment_Customer_Order" 
+		 				ng-model="HomeSearchGrid.filterFormJson.CO_Payment_Customer_Order" 
+		 				rel="homePagePaymentCustomerOrder"/>
+	 			</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols " id="homePagePaymentCustomerOrder">
+		            <i class="fa fa-question-circle" data-toggle="tooltip" title="COInvoice Header Customer Order"></i> 
+		            <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('CO_Payment_Customer_Order');"></i>
+	        	</div>
+		 	</div>
+	 	</div>
+	 	<!-- Customer Order Div End  -->
+ 	
+ 	
+ 	<!-- Customer Payment Additional HTML End Here -->
+ 	
+ 	<!-- Vendor Ordering  HTML End Here -->
+ 	
+ 		<!-- Id Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Ordering_Id');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0">
+		 			<label class="T3 labelWidth pull-left">ID</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Vendor_Ordering_Id" 
+		 				ng-model="HomeSearchGrid.filterFormJson.Vendor_Ordering_Id" rel="homePageVendorOrderingId"/>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorOrderingId">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Ordering Id"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Ordering_Id');"></i>
+           	  </div>
+	 		</div>
+	 	</div>
+	 	<!-- Id Div End  -->
+	 	
+	 	
+	 	
+	 	<!-- Vendor Div Start  -->
+	 	<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Ordering_Vendor');">
+	 		<div class="col-md-11">
+	 			<div class="col-md-9 P0">
+		 			<label class="T3 labelWidth pull-left">Vendor</label>
+		 			<input type="text" placeholder="Anything" class="col-md-8  homeSearchFilterTextbox homeform-control" id="Vendor_Ordering_Vendor"
+		 				ng-model="HomeSearchGrid.filterFormJson.Vendor_Ordering_Vendor" rel="homePageVendorOrderingVendor"/>
+		 		</div>
+		 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorOrderingVendor">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Ordering Vendor"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Ordering_Vendor');"></i>
+           	  </div>
+		 		
+	 		</div>
+	 	</div>
+	 	<!-- Vendor Div End  -->
+	 	
+ 	
+ 	 <!-- Total Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Ordering_Total');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Total</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageVendorOrderingTotal" ng-model="HomeSearchGrid.filterFormJson.Vendor_Ordering_Total.SelectedOption"
+	 				id="Vendor_Ordering_Total">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Vendor_Ordering_Total.Value1" rel="homePageVendorOrderingTotal"
+	 				ng-show="HomeSearchGrid.filterFormJson.Vendor_Ordering_Total.SelectedOption != '0'"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Vendor_Ordering_Total.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Vendor_Ordering_Total.SelectedOption == '5'" rel="homePageVendorOrderingTotal"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorOrderingTotal">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Ordering Total"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Ordering_Total');"></i>
+           	  </div>
+	 	</div>
+	<!-- Total  Div End  -->
+ 	
+ 	
+ 	<!--  Vendor Ordering HTML End Here -->
+ 	
+ 	
+ 	<!--  Vendor Order Additional HTML Start Here -->
+ 	
+ 	<!-- Purchase Order Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Order_Purchase_Order');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Purchase Order Type</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageVendorOrderPurchaseOrder" ng-model="HomeSearchGrid.filterFormJson.Vendor_Order_Purchase_Order"
+	 				id="Vendor_Order_Purchase_Order">
+	 				<option value="0">Any</option>
+	 				<option ng-repeat="POTypeItem in HomeSearchGrid.formMaterData.POTypeList" value="{{POTypeItem.Id}}">{{POTypeItem.Value}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorOrderPurchaseOrder">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Order Purchase Order"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Order_Purchase_Order');"></i>
+           	  </div>
+	 	</div>
+	 	
+	 	<!-- Purchase Order Div End  -->
+ 	
+ 	
+ 	
+ 	 <!-- Total Received Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Order_Total_Recieved');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Total Received</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageVendorOrderTotalRecieved" ng-model="HomeSearchGrid.filterFormJson.Vendor_Order_Total_Recieved.SelectedOption"
+	 				id="Vendor_Order_Total_Recieved">
+	 				<option ng-repeat="item in HomeSearchGrid.formMaterData.rangeFilterOptions" value="{{item.optionValue}}">{{item.label}}</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-5">
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Vendor_Order_Total_Recieved.Value1" rel="homePageVendorOrderTotalRecieved"
+	 				ng-show="HomeSearchGrid.filterFormJson.Vendor_Order_Total_Recieved.SelectedOption != '0'"/>
+	 			<input type="text" placeholder="Anything" class="col-md-5 homeSearchFilterTextbox col-md-offset-1 homeform-control" 
+	 				ng-model="HomeSearchGrid.filterFormJson.Vendor_Order_Total_Recieved.Value2"
+	 				ng-show="HomeSearchGrid.filterFormJson.Vendor_Order_Total_Recieved.SelectedOption == '5'" rel="homePageVendorOrderTotalRecieved"/>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorOrderTotalRecieved">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Order Total Recieved"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Order_Total_Recieved');"></i>
+           	  </div>
+	 	</div>
+	<!-- Total Received  Div End  -->
+ 	
+ 	
+ 	
+ 	<!-- Status Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Order_Status');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Status</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageVendorOrderStatus" ng-model="HomeSearchGrid.filterFormJson.Vendor_Order_Status"
+	 				id="Vendor_Order_Status">
+	 				<option value="0">Any</option>
+	 				<option>Active</option>
+	 				<option>Inactive</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorOrderStatus">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Order Status"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Order_Status');"></i>
+           	  </div>
+	 	</div>
+	 	
+	 	<!-- Status Div End  -->
+ 	
+ 	<!--  Vendor Order Additional HTML End Here -->
+ 	
+ 	<!--  Vendor Receivings Additional HTML End Here -->
+ 	
+ 	<!-- Status Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Receiving_Header_Status');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Status</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageVendorReceivingHeaderStatus" ng-model="HomeSearchGrid.filterFormJson.Vendor_Receiving_Header_Status"
+	 				id="Vendor_Receiving_Header_Status">
+	 				<option value="0">Any</option>
+	 				<option>Active</option>
+	 				<option>Inactive</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorReceivingHeaderStatus">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Receiving Header Status"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Receiving_Header_Status');"></i>
+           	  </div>
+	 	</div>
+	 	
+	 	<!-- Status Div End  -->
+ 	
+ 	<!--  Vendor Receivings Additional HTML End Here -->
+ 	
+ 	
+ 	<!--  Vendor Invoices Additional HTML End Here -->
+ 	
+ 	<!-- Status Div Start  -->
+		<div class="row P10" ng-show="HomeSearchGrid.showField('Vendor_Invoicing_Header_Status');">
+	 		<div class="col-md-5">
+	 			<label class="T3 labelWidth pull-left">Status</label>
+	 			<select class="col-md-8 homeSearchFilterDropdown homeform-control" rel="homePageVendorInvoicingHeaderStatus" ng-model="HomeSearchGrid.filterFormJson.Vendor_Invoicing_Header_Status"
+	 				id="Vendor_Invoicing_Header_Status">
+	 				<option value="0">Any</option>
+	 				<option>Active</option>
+	 				<option>Inactive</option>
+	 			</select>
+	 		</div>
+	 		<div class="col-md-2 controlBtn homePagecontrols " id="homePageVendorInvoicingHeaderStatus">
+                     <i class="fa fa-question-circle" data-toggle="tooltip" title="Vendor Invoicing Header Status"></i> 
+                     <i class="fa fa-times" ng-click="HomeSearchGrid.removeAdditionalField('Vendor_Invoicing_Header_Status');"></i>
+           	  </div>
+	 	</div>
+	 	
+	 	<!-- Status Div End  -->
+ 	
+ 	<!--  Vendor Invoices Additional HTML End Here -->
+ 	
+ 	
+ 	</div>
+ 	      
+ 	<!-- select other fields Div Start  -->
+	<div class="row selectOtherField">
+		<div class="selectOtherFieldBtnWrapper">
+			<div class="col-md-6  selectOtherFieldBtn">
+				<div class="dropdown selectDropdown selectBoxDropdown dropup">
+				  <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
+				  ng-disabled = "HomeSearchGrid.formMaterData.AdditionalFields == null || HomeSearchGrid.formMaterData.AdditionalFields.length == 0">Select Other Fields
+				  <span class="caret"></span></button>
+				  <ul class="dropdown-menu keep_open">
+				    <li ng-repeat="Field in HomeSearchGrid.formMaterData.AdditionalFields | filter:{IsDisplayed:false}"
+				    	ng-click="HomeSearchGrid.addAdditionalField(Field.UIFieldKey)">
+				    	<a>{{Field.Label}}</a>  
+				    </li> 
+				  </ul>
+				</div>
+			</div>
+			<div class="selectOtherFieldBtn">
+				<button class="btn btn-default greenBtn pull-right" ng-click="HomeSearchGrid.applyFilter()">apply</button>
+			</div>
+		</div>
+		
+ 	</div>
+ 	<!-- select other fields Div End  -->
+ 	
+  </div>
+  
+
+</apex:component>

@@ -1,0 +1,6 @@
+<apex:page controller="BlackPurlSidePanelCtrl" id="BlackPurlSidePage"
+			showHeader="false" sidebar="false" standardStylesheets="false">
+			
+	<h3>Side Panel</h3>
+			
+</apex:page>

@@ -1,0 +1,629 @@
+<apex:component >
+    <!-- Component Parameters -->
+    <apex:attribute name="UID" type="String" required="true" description="Unique Id field value for all styles" />
+    
+    <style>
+        #{!UID} {
+            font-family: arial;
+            font-size: 12px;
+        }
+        .modal-dialog {
+            width: 1400px;
+            -moz-box-shadow: 10px 10px 5px #6F6868;
+            -webkit-box-shadow: 10px 10px 5px #6F6868;
+            box-shadow: 10px 10px 5px #6F6868;
+        }
+        
+        .modal-backdrop.in{
+            height: 1200px !important;
+        }
+    
+        .bg_container {
+            min-height: 650px;
+        }
+        .popup_container {
+            border: 1px solid #cccccc;
+            min-height: 400px;
+            position: absolute;
+            left: 20%;
+            right: 20%;
+            top: 0;
+            font-family: Arial;
+            background: #fff none repeat scroll 0 0;
+        }
+        .popup_container .popupleft {
+            /*border-right: 1px solid #cccccc;*/
+            
+            min-height: 618px;
+        }
+        .popup_container .popupleft .popupleft_container {
+            overflow: hidden;
+            /*border-bottom: 1px solid #cccccc;*/
+            
+            padding-bottom: 40px;
+            transition: all 0.5s ease;
+        }
+        .popup_container .popupleft .popupleft_container#topsection {
+            min-height: 618px;
+        }
+        .popup_container .popupright {
+            padding-bottom: 5px;
+            border-left: 1px solid #cccccc;
+        }
+        .popup_container .popupleft h1.letpanel_heading {
+            font-size: 18px;
+            font-weight: bold;
+            color: #f89420;
+            position: relative;
+            max-width: 86%;
+        }
+        .popup_container .popupleft h1.letpanel_heading .helptip {
+            position: absolute;
+            right: 49px;
+            top: -5px;
+            font-size: 24px;
+        }
+        .popup_container .popupleft .goldbox {
+            min-height: 85px;
+            border: 2px solid #666666;
+            padding: 0;
+            margin-top: 3px;
+            max-width: 271px
+        }
+        .popupright .right_panel_heading {
+            font-weight: bold;
+            font-size: 25px;
+            float: left;
+        }
+        .popupright .right_heading_container {
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .popupright .tabconainer {
+            clear: left;
+            /*border-bottom: 1px solid #cccccc;*/
+            
+            overflow: hidden;
+            padding-bottom: 10px;
+        }
+        .popupright .tabconainer .addmoreinfo {
+            background: #f79420;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .popupright .tabconainer.noborder {
+            border-bottom: 0px solid #cccccc;
+        }
+        .popupright .tabconainer .option_field {
+            clear: both;
+        }
+    /*  .popupright .tabconainer .option_field.hideit {
+            display: none;
+        } */
+        .popupright .tabconainer .form-group {
+            width: 43%;
+            float: left;
+            margin: 2px;
+            position: relative;
+        }
+        .popupright .tabconainer .form-group.small {
+            width: 10%;
+        }
+        .popupright .tabconainer .form-group.small2 {
+            width: 23%;
+            color: #D2D2D2;
+            font-size: 15px;
+            padding-top: 8px;
+        }
+        .popupright .tabconainer .form-group.half {
+            width: 47%;
+        }
+        .popupright .tabconainer .form-group.onehalf {
+            width: 25%;
+        }
+        .popupright .tabconainer .form-group.threehalf {
+            width: 66%;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom {
+            overflow: hidden;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom.disabled .leftchked.checked {
+            background: url(../images/chkpngleft_trimmed_disabled.png) no-repeat;
+            color: #FFFFFF;
+            background-size: 100% 100%;
+            font-size: 12px;
+/*          font-weight: bold; */
+            text-align: center;
+            padding-top: 9px;
+            padding-right: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom.disabled .leftchked {
+            background: none;
+            color: #FFFFFF;
+            background-size: 100% 100%;
+            font-size: 12px;
+/*          font-weight: bold; */
+            text-align: center;
+            padding-top: 9px;
+            padding-right: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom.disabled .rightchked.checked {
+            background: url(../images/chkpngright_trimmed_disabled.png) no-repeat;
+            color: #FFFFFF;
+            background-size: 100% 100%;
+            font-size: 12px;
+/*          font-weight: bold; */
+            text-align: center;
+            padding-top: 10px;
+            padding-left: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom.disabled .rightchked {
+            background: none;
+            color: #FFFFFF;
+            background-size: 100% 100%;
+            font-size: 12px;
+/*          font-weight: bold; */
+            text-align: center;
+            padding-top: 10px;
+            padding-left: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom .leftchked {
+            width: 48%;
+            float: left;
+            height: 34px;
+            color: #ffffff;
+            cursor: pointer;
+            text-align: center;
+            padding-top: 9px;
+            padding-right: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom .rightchked {
+            width: 48%;
+            float: left;
+            height: 34px;
+            color: #ffffff;
+            cursor: pointer;
+            margin-left: -10px;
+            margin-top: -1px;
+            text-align: center;
+            padding-top: 10px;
+            padding-left: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom .leftchked.checked {
+            background: url(../images/chkpngleft_trimmed.png) no-repeat;
+            color: #FFFFFF;
+            background-size: 100% 100%;
+            font-size: 12px;
+/*          font-weight: bold; */
+            text-align: center;
+            padding-top: 9px;
+            padding-right: 5px;
+        }
+        .popupright .tabconainer .form-group .chkbox_custom .rightchked.checked {
+            background: url(../images/chkpngright_trimmed.png) no-repeat;
+            color: #FFFFFF;
+            background-size: 100% 100%;
+            font-size: 12px;
+/*          font-weight: bold; */
+            text-align: center;
+            padding-top: 10px;
+            padding-left: 5px;
+        }
+        .popupright .tabconainer .form-group.large {
+            width: 90%;
+        }
+        .popupright .tabconainer .form-group.medium {
+            width: 60%;
+        }
+        .popupright .tabconainer .form-group input[type="text"],
+        .popupright .tabconainer .form-group select {
+            border-radius: 0;
+        }
+        .popupright .tabconainer .form-group select {
+            padding-left: 5px;
+        }
+        .popupright .tabconainer .form-group .checkbox {
+            display: block;
+        }
+        /*.popupright .tabconainer .form-group .checkbox .chksqure {
+            font-size: 0px;
+            height: 12px;
+            width: 12px;
+            margin: 3px;
+            border-radius: 2px;
+            background: #D8D8D8;
+        }
+        .popupright .tabconainer .form-group .checkbox .chk_tick {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin: 6px 15px;
+        }
+        .popupright .tabconainer .form-group .checkbox .chk_tick.chked .chksqure {
+            font-size: 0px !important;
+            height: 12px;
+            width: 12px;
+            margin: 3px;
+            border-radius: 2px;
+            background: #71BF3E;
+        }
+        .popupright .tabconainer .form-group .checkbox .chk_tick .chksqure {
+            display: none;
+        }*/
+        .popupright .tabconainer .form-group .checkbox .chk_txt {
+            display: block;
+            float: left;
+            padding-top: 5px;
+            padding-left: 8px;
+        }
+        .popupright .tabconainer .lable_fields.chkbox p {
+            padding-top: 10px;
+        }
+        .popupright .tabconainer .lable_fields {
+            float: left;
+            width: 34%;
+            margin-top: 5px;
+            position: relative;
+        }
+        .popupright .tabconainer .lable_fields .form_lable_icons {
+            display: block;
+            float: left;
+            width: 30px;
+            height: 30px;
+            background: url("../images/circlefornumber.png") no-repeat;
+        }
+        .popupright .tabconainer .lable_fields .form_lable_icons.text {
+            font-size: 10px;
+            padding-top: 9px;
+        }
+        .popupright .tabconainer .lable_fields .form_lable_icons {
+            color: #f89420;
+            text-align: center;
+            padding-top: 5px;
+            font-size: 16px;
+        }
+        .popupright .tabconainer .lable_fields p {
+            padding: 5px 5px 5px 5px;
+/*          font-weight: bold; */
+            float: left;
+        }
+        .popupright .tabconainer .form_fields {
+            float: right;
+            width: 66%;
+            position: relative;
+        }
+        
+        .popupright .tabconainer .form_fields {
+            position: relative;
+        }
+        .popupright .tabconainer .form_fields a.bookmarklink {
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            font-size: 19px;
+            color: #f1f1f1;
+        }
+        .popupright .tabconainer .form-group .form-control:focus {
+            border-color: #f89420;
+            outline: 1;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px #f89420;
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px #f89420;
+            border: 2px solid #f89420;
+        }
+        .themebtn_gray {
+            background: #D5D5D5;
+            color: #ffffff;
+            border: none;
+        }
+        .themebtn_gray:hover {
+            background: #D5D5D5;
+            color: #ffffff;
+            border: none;
+        }
+        .themebtn_orange {
+            background: #f89420;
+            color: #ffffff;
+            border: none;
+        }
+        .themebtn_orange:hover {
+            background: #f89420;
+            color: #ffffff;
+            border: none;
+        }
+        .popupright .savecancle_btncntnr {
+            float: right;
+            margin-top: 17px;
+        }
+        .popupright .tabbtn_container {
+            clear: both;
+            text-align: left;
+            padding: 0;
+        }
+        .popupright .tabbtn_container .btn {
+            width: 49%;
+        }
+        .popup_container .popupleft .goldbox .leftgoldbox {
+            width: 80px;
+            height: 76px;
+            background: #f79420;
+            padding: 4px;
+            float: left;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox {
+            float: left;
+            color: #000;
+            position: relative;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox.type2 {
+            width: 60%;
+        }
+        .popup_container .popupleft .goldbox .leftgoldbox .star_container {
+            text-align: center;
+            font-size: 25px;
+            color: #fff;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox p {
+            padding: 2px;
+            margin: 0;
+            font-size: 13px;
+            color: #54a8dd;
+        }
+        .popup_container .popupleft .goldbox.exists .leftgoldbox {
+            padding: 0px;
+            background: none;
+            width: 79px;
+            height: 76px;
+        }
+        .popup_container .popupleft .goldbox.exists .leftgoldbox img {
+            width: 100%;
+            height: 100%;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox p.cust_name {
+            font-size: 18px;
+            color: #333333;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox p.cust_name.address {
+            font-size: 10px;
+            color: #333333;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox p.cust_name.address .titletxt {
+            font-size: 20px;
+            text-decoration: underline;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox .boxedit {
+            position: absolute;
+            right: -24px;
+            top: 5px;
+            display: block;
+            width: 21px;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox .boxedit img {
+            max-width: 100%;
+        }
+        .popup_container .popupleft .goldbox .rightgoldbox .boxenum {
+            position: absolute;
+            right: -26px;
+            top: 39px;
+            display: block;
+            width: 30px;
+            height: 30px;
+            background: url("../images/circlefornumber.png") no-repeat;
+            background-size: 100%;
+            color: #f79420;
+/*          font-weight: bold; */
+            font-size: 12px;
+            text-align: center;
+            text-decoration: none;
+            padding-top: 8px;
+        }
+        .popup_container .popupleft .goldbox .bottomgoldbox {
+            width: 100%;
+            height: 15px;
+            background: #666666;
+            clear: both;
+            color: #fff;
+            font-size: 11px;
+            text-align: right;
+        }
+        /* 15.06.2015 */
+        
+        .sub_content {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        .gen_heading {
+            font-size: 18px;
+            font-weight: bold;
+            position: relative;
+            margin: 0;
+            border-bottom: 1px solid #cccccc;
+            margin-bottom: 14px;
+            padding-bottom: 6px;
+        }
+        .gen_heading .helplink {
+            position: absolute;
+            right: 0;
+            color: #f89420;
+        }
+        .popupright .tabconainer .lable_fields {
+            width: 20%;
+        }
+        .popupright .tabconainer .form_fields.left {
+            float: left;
+        }
+        .popupright .tabconainer .form-group.midnew {
+            width: 75%;
+        }
+        .popupright .tabconainer .form-group.midnew2 {
+            width: 50%;
+        }
+        .popupright .tabconainer .form-group.midnew1 {
+            width: 100%;
+        }
+        .popupright .tabconainer .form-group .helplink {
+            position: absolute;
+            right: 0;
+            font-size: 25px;
+        }
+        
+        .popupright .tabconainer .form-group.midnewlocation {
+		    width: 94%;
+        }
+        .popupright .tabconainer .form-group .currency {
+            position: absolute;
+            background: #fff;
+            color: #AEAEAE;
+            width: 32px;
+            height: 32px;
+            left: 1px;
+            top: 1px;
+            text-align: center;
+            padding-top: 6px;
+        }
+        a.ckhclick {
+            display: block;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #cccccc;
+            float: left;
+        }
+        a.ckhclick.checked {
+            background: #f89420;
+            color: #fff;
+            text-align: center;
+            padding-top: 5px;
+            font-size: 16px;
+        }
+        .rightside_label {
+            float: left;
+            padding: 5px 0 0 25px;
+/*          font-weight: bold; */
+        }
+        .popupright .tabconainer .form-group .form-control.small {
+            float: left;
+            width: 14%;
+            margin: 0 0 0 10px;
+            font-size: 12px;
+        }
+        .popupright .tabconainer .form-group .form-control.medium {
+            float: left;
+            width: 25%;
+            margin: 0;
+            font-size: 12px;
+        }
+        .mandatory_sign {
+            color: #ff0000;
+            font-size: 16px;
+        }
+        .popupright .tabconainer .form_fields .addlink {
+            position: absolute;
+            right: 0;
+            top: 7px;
+            color: #fff;
+            font-size: 16px;
+            width: 20px;
+            height: 20px;
+            background-color: #f89420;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .popupright .tabconainer .form-group .helplink.second {
+            right: -52px;
+            font-size: 21px;
+            top: 1px;
+        }
+        .popupright .tabconainer .form-group.pricefiled input {
+            padding-left: 34px;
+        }
+        .popupright .tabconainer .form-group.orderfiled input {
+            padding-left: 10px;
+        }
+        .popupright .tabconainer .form_fields .closelink {
+            position: absolute;
+            right: 0;
+            top: 1px;
+            color: #C5C5C5;
+            font-size: 21px;
+            width: 20px;
+            height: 20px;
+            /* background-color: #f89420; */
+            
+            text-align: center;
+            border-radius: 4px;
+        }
+        .strong_label {
+            font-weight: bold;
+        }
+        .hiddenlabel {
+            font-size: 25px;
+            color: #cccccc;
+        }
+        a .fa-plus {
+            margin-top: 2px !important;
+        }
+        a .fa {
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        .required .req-label:after {
+            content:" *";
+            color:red;
+        }
+        #{!UID} .checkbox {
+            margin-top: 0px;
+        }
+        .redborder{
+            border : 2px solid red;
+        }
+        .red {
+            color : red;
+        }
+        .green {
+            color : green;
+        }
+        i.fa.fa-question-circle.helplink {
+          color: #f89420;
+          font-size: 20px;
+          margin-top: 6px;
+          cursor: pointer;
+        }
+        .controls{
+            position: absolute;
+            right: -146px;
+            height: 33px;
+            width: 200px;
+            margin-top: 2px;
+            font-size: 18px;
+            padding: 4px 0;
+            display:none;
+        }
+        .chk_tick {
+		    width: 20px !important;
+		    height: 20px !important;
+		    border-radius: 4px;
+		    margin: 3px 15px;
+		    border: 1px solid #cccccc;
+		    display: block;
+		    float: left;
+		    
+		    
+		    cursor: pointer;
+		}
+		.chk_tick .chksqure {
+		    font-size: 0px;
+		    height: 12px;
+		    width: 12px;
+		    margin: 3px; 
+		    border-radius: 2px;
+		    background: #D8D8D8;
+		}
+		.chked .chksqure {
+		    font-size: 0px !important;
+		    height: 12px;
+		    width: 12px;
+		    margin: 3px;
+		    border-radius: 2px;
+		    background: #71BF3E;
+		}
+    </style>
+</apex:component>

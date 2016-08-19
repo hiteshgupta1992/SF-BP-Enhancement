@@ -1,0 +1,631 @@
+<apex:component >
+    <style type="text/css">
+        body {
+            font-family: arial;
+            font-size: 16px;
+        }
+        .table thead tr th {
+            font-family: arial sans-serif;
+            color: #707070;
+            border-bottom: solid 1px #939598;
+        }
+        .table thead tr th:hover {
+            background: #E9E9E9;
+            cursor: pointer;
+        }
+        .table tr td {
+            border-top: 0px !important;
+        }
+        .status {
+            border: 1px solid #E7E7E7;
+            padding: 2px 5px;
+            border-radius: 5px;
+        }
+        .color-blue {
+            color: #6B8FBD;
+        }
+        .color-orange {
+            color: #F7941E;
+        }
+        .Orange {
+		    color: orange;
+		}
+        .color-gray {
+            color: #5D5E5E;
+        }
+        .row {
+            margin-right: 0px;
+        }
+        .nav li ul {
+            margin-left: 10%;
+        }
+        .drop-hover {
+            border: 3px dashed gray !important;
+        }
+        .insideDroppable {
+            border: 3px dashed transparent;
+        }
+        .outsideDroppable {
+            border: 3px dashed transparent;
+        }
+        .rewards-bedge {
+            height: 30px;
+            width: 20px;
+            position: absolute;
+            top: 30px;
+            left: 20px;
+        }
+        .navbar {
+            min-height: 30px;
+            margin-bottom: 0px;
+        }
+        .header-btn-div {
+            margin-top: 10px;
+            width: 200px;
+        }
+        
+        .navbar-right > li > a:focus {
+            background: transparent !important;
+        }
+        .sidebar-filter {
+            margin: 2px 0 10px 0;
+            border-bottom: 1px solid #e7e7e7;
+            color: #707070;
+            font-weight: bold;
+            font-family: arial sans-serif;
+        }
+        .sidebar-filter div {
+            margin: 10px 0;
+            padding: 0 10px;
+        }
+        .find-filter-btn {
+            margin-left: 10%;
+            border-radius: 2px;
+        }
+        .nav h4 {
+            color: #707070;
+            font-size: 16px;
+            margin: 10% 0% 2% 1%;
+            font-family: arial sans-serif;
+        }
+        .place_holder {
+            display: none;
+        }
+        .nav >li > a {
+            padding: 2px;
+        }
+        .outsideDroppable {
+            background: #e74c3c;
+            position: fixed;
+            top: 70px;
+            left: 80%;
+            width: 60px;
+            height: 60px;
+            color: #FFF;
+            z-index: 999;
+            margin: 40px;
+            box-shadow: 1px 5px 8px gray, 5px 5px 8px gray;
+        }
+        .outsideDroppable h3 {
+            margin-top: 10px;
+            text-align: center;
+        }
+        .top_row {
+            font-family: Arial, sans-serif;
+            padding: 20px 20px 10px;
+            background: #F7F9F9;
+            border-bottom: 1px solid #EEEFF0;
+        }
+        .top_row h1 {
+            float: left;
+            margin-top: 0px;
+            font-weight: normal;
+            margin-right: 12px;
+            max-width: 18em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 24px;
+            line-height: 1.25;
+        }
+        .Filter_row {
+            padding: 10px 10px 0px 0px;
+            background: #F7F9F9;
+            border-bottom: 1px solid #EEEFF0;
+        }
+        .top_row p {
+            font-size: 30px;
+        }
+        .saveas_btn {} .filter_row {
+            background: none repeat scroll 0 0 #f7f9f9;
+            border-bottom: 1px solid #eeeff0;
+            margin-bottom: 30px;
+            padding: 5px 20px;
+        }
+        .selectdropdown {
+            padding: 5px;
+            margin: 0 10px;
+            border: none;
+            background: #F7F9F9;
+            font-weight: bold;
+            color: #6E6D6E;
+            cursor: pointer;
+            font-size: 16px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            -o-appearance: none;
+            appearance: none;
+        }
+        select::-ms-expand {
+            display: none;
+        }
+        .selectdropdown:focus {
+            outline: none;
+            border: none;
+        }
+        .round {
+            border-radius: 100px;
+        }
+        .selectedField {
+            background-color: #333;
+        }
+        .outsideOuter {
+            background: rgba(160, 160, 160, 0.5);
+            position: fixed;
+            top: 65px;
+            left: 79.5%;
+            width: 150px;
+            height: 150px;
+            box-shadow: 1px 5px 8px gray, 5px 5px 8px gray;
+            color: #FFF;
+            z-index: 999;
+            border-radius: 100px;
+            visibility: hidden;
+        }
+        .highlighted {
+            background: yellow;
+        }
+        .SortIcon {
+            float: left;
+            position: relative;
+            top: 2.5px;
+        }
+        .Down-arrow {
+            vertical-align: bottom;
+        }
+        .Up-arrow {
+            top: 0;
+            left: 0;
+            position: absolute;
+        }
+        .ngdialog-content {
+            background: #FFFFF !important;
+            color: #939598 !important;
+        }
+        .ngdialog-content hr {
+            border-top: 1px solid #939598;
+        }
+        .my-dropdown {
+            font: normal normal normal 13.3333330154419px/normal Arial;
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+        .btn-default:focus,
+        .btn-default:active,
+        .btn-default.active {
+            border: 1px solid #adadad;
+            background-color: #ffffff !important;
+        }
+        .btn-default:hover {
+            border: 1px solid #adadad;
+            background-color: #ffffff;
+        }
+        .dropdown-menu {
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            left: auto;
+            top: 75%;
+        }
+        .filter-btn {
+            float: left;
+            margin: 0 5px;
+        }
+        .filterLabel {
+            color: #666;
+        }
+        .filter-wrap {
+            max-width: 120px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .my-dropdown {
+            font: normal normal normal 13.3333330154419px/normal Arial;
+            font-size: 14px;
+            border: 1px solid transparent;
+            background: #F7F9F9;
+            min-width: 90px;
+        }
+        .btn-default:focus,
+        .btn-default:active,
+        .btn-default.active {
+            border: 1px solid #adadad;
+            background-color: #ffffff !important;
+        }
+        .btn-default:hover {
+            border: 1px solid #adadad;
+            background-color: #E9E9E9;
+        }
+        .find-filter-btn {
+            margin-left: 10%;
+            border-radius: 2px;
+        }
+        .link_dropdown {
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            left: auto;
+            top: 83%;
+            min-width: 180px;
+        }
+        .link_dropdown li a:hover {
+            background: #3B73AF;
+            color: #FFFFFF;
+        }
+        .link_dropdown hr {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .icon-share,
+        .icon-share:focus,
+        .icon-share:active {
+            background: url('{!URLFOR($Resource.icons, 'share.png')}') no-repeat !important;
+            background-position: 6px 6px !important;
+        }
+        .icon-Export,
+        .icon-Export:focus,
+        .icon-Export:active {
+            background: url('{!URLFOR($Resource.icons, 'export.png')}') no-repeat !important;
+            background-position: 6px 6px !important;
+        }
+        .icon-Tools,
+        .icon-Tools:focus,
+        .icon-Tools:active {
+            background: url('{!URLFOR($Resource.icons, 'tools.png')}') no-repeat !important;
+            background-position: 6px 6px !important;
+        }
+        .chkbox_dropdown li {
+            cursor: pointer;
+            padding: 2px 10px;
+        }
+        .chkbox_dropdown li:hover {
+            background: #3B73AF;
+            color: #FFFFFF;
+        }
+        .chkbox_dropdown li a:hover {
+            background: #3B73AF;
+            color: #FFFFFF;
+        }
+        .chkbox_dropdown p {
+            padding: 2px 10px;
+            font-weight: bold;
+        }
+        .chkbox_dropdown label {
+            font-size: 14px;
+            display: block;
+            line-height: 1.4;
+            overflow: hidden;
+            white-space: nowrap;
+            width: auto;
+            //color: #86898C;
+            font-weight: normal;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+        .chkbox_dropdown hr {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .chkbox_dropdown li span {
+            margin: 5px;
+            vertical-align: middle;
+        }
+        .chkbox_dropdown input[type="checkbox"] {
+            margin: 3px 10px;
+            vertical-align: middle;
+        }
+        /* tell the container's children to float left: */
+        
+        .container > * {
+            float: left;
+            margin-right: 10px;
+        }
+        /* this is called a clearfix. it makes sure that the container's children floats are cleared, without using extra markup */
+        
+        .container {
+            *zoom: 1
+            /* for IE */
+            
+            ;
+        }
+        .container:before,
+        .container:after {
+            content: " ";
+            display: table;
+        }
+        .container:after {
+            clear: both;
+        }
+        .thhead {
+            font-family: arial;
+            font-size: 14px;
+        }
+        .removeOverflow {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap !important;
+            font-size: 14px;
+        }
+        #dropArrowIcon {
+            display: none;
+            position: absolute;
+        }
+        .right-inner-addon {
+            position: relative;
+        }
+        .right-inner-addon input {
+            padding-right: 30px;
+        }
+        .right-inner-addon i {
+            position: absolute;
+            right: 0px;
+            padding: 8px 12px;
+            pointer-events: none;
+        }
+        .chkbox_dropdown {
+            color: #707070;
+            top: 37px;
+        }
+        .chkbox_dropdown:before {
+            border-color: #ccc transparent;
+            border-style: solid;
+            border-width: 0 8px 8px;
+            content: "";
+            left: 20px;
+            position: absolute;
+            top: -9px;
+        }
+        .chkbox_dropdown:after {
+            border-bottom-color: #fff;
+            top: -7px;
+            border-color: #fff transparent;
+            border-style: solid;
+            border-width: 0 8px 8px;
+            content: "";
+            left: 20px;
+            position: absolute;
+        }
+        .column_dropdown {
+            font-family: arial;
+            right: 0px;
+            min-width: 250px;
+            top: 130%;
+        }
+        .column_dropdown label {
+            margin-bottom: 2px;
+        }
+        .column_dropdown>li span {
+            margin: 5px;
+            vertical-align: middle;
+        }
+        .column_dropdown:before {
+            border-color: #ccc transparent;
+            border-style: solid;
+            border-width: 0 8px 8px;
+            content: "";
+            left: 80%;
+            position: absolute;
+            top: -9px;
+        }
+        .column_dropdown:after {
+            border-bottom-color: #fff;
+            top: -8px;
+            border-color: #fff transparent;
+            border-style: solid;
+            border-width: 0 8px 8px;
+            content: "";
+            left: 80%;
+            position: absolute;
+        }
+        input[type=checkbox].css-checkbox {
+            position: absolute;
+            z-index: -1000;
+            left: -1000px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            width: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+        }
+        input[type=checkbox].css-checkbox + label.css-label {
+            padding-left: 16px;
+            height: 16px;
+            display: inline-block;
+            line-height: 20px;
+            background-repeat: no-repeat;
+            background-position: 0 0;
+            font-size: 14px;
+            vertical-align: middle;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        input[type=checkbox].css-checkbox:checked + label.css-label {
+            background-position: 0 -16px;
+        }
+        label.css-label {
+            background-image:url('{!URLFOR($Resource.chkbox_image)}');
+            border-radius: 5px;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .radio_dropdown {
+            font-family: arial;
+        }
+        .radio_dropdown li:hover {
+            background: #FFFFFF;
+            color: #333;
+        }
+        .ui-datepicker {
+            font-size: 12px;
+        }
+        .ui-datepicker-header {
+            background: #3F98FE;
+            color: #fff;
+        }
+        .dropdown-height {
+            max-height: 200px;
+            overflow-y: auto;
+            max-width: 300px;
+            text-overflow: ellipsis;
+        }
+        .fonts {
+            position: relative;
+            float: left;
+            top: 20px;
+            font-family: sans-serif;
+            font-size: 12px;
+            fill: white;             
+            font-weight:bold;
+        }
+        .fonts_red {
+            position: relative;
+            float: left;
+            top: 20px;
+            font-family: sans-serif;
+            font-size: 12px;
+            fill: #000;
+            font-weight:bold;
+            font-weight:bold;
+        }
+        .rects {
+            color: #fff
+        }
+        .divMiddleText {
+            line-height: 30px;
+            vertical-align: middle;
+        }
+        .pagination_container {
+            color: #01a9db;
+        }
+        .ui-tooltip, .arrow:after {
+          background: black;
+        }
+        .ui-tooltip {
+          padding: 2px 5px;
+          color: white;
+          border-radius: 5px;
+          font: bold 14px "Helvetica Neue", Sans-Serif;
+          border: none;
+          margin-top: -10px;
+        }
+        .ui-tooltip:before{
+          content: "";
+          position: absolute;
+          left: 20px;
+          top: -25px;
+          width: 25px;
+          height: 25px;
+          border-color: black transparent;
+          border-style: solid;
+          border-width: 0 12px 12px;
+        }
+        .stcoking_detail{
+            margin-top:20px
+        }
+        
+        .form-group .checkbox {
+            display: block;
+        }
+        .form-group .checkbox .chksqure {
+            font-size: 43px;
+            margin-top: -7px;
+            margin-left: -3px;
+            color: #f79420;
+        }
+        .form-group .checkbox .chk_tick {
+            display: block;
+            float: left;
+            width: 33px;
+            height: 33px;
+            overflow: hidden;
+            border: 1px solid #cccccc;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .form-group .checkbox .disabled_chk_tick {
+            background: #e6e6e6 none repeat scroll 0 0;
+            border: 1px solid black;
+            cursor: not-allowed;
+        }
+        .form-group .checkbox .chk_tick.chked .chksqure {
+            display: block;
+        }
+        .form-group .checkbox .chk_tick .chksqure {
+            display: none;
+        }
+        .form-group .checkbox .chk_txt {
+            display: block;
+            float: left;   
+            padding-top: 5px;
+            padding-left: 8px;
+        }
+        .lable_fields.chkbox p {
+            padding-top: 10px;
+        }
+        .required .req-label:after {
+            content:" *";
+            color:red;
+        }
+        .ConfirmBox-overlay {
+            display: none;
+            width: 400px;
+            position: absolute;
+            z-index: 1000;
+            left: 40%;
+        }
+        
+        .Customtool{
+       	    font-size: 22px;
+       	    margin-top: 10px;
+        }
+        .content{
+        	margin-top: 120px !important;
+        }
+        .savecancle_btncntnr .greenBtn, .savecancle_btncntnr .greenBtn:hover, .savecancle_btncntnr .greenBtn:focus, .savecancle_btncntnr .greenBtn:active
+		 {
+		    background: #71BF3E !important;
+		    color: #ffffff;
+		    border: none !important;
+		    font-weight: bold;
+		    border-radius: 1px;
+		    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		    transition-delay: 0.2s;
+		    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+		}
+		.savecancle_btncntnr .grayBtn, .savecancle_btncntnr .grayBtn:hover, .savecancle_btncntnr.grayBtn:focus, .savecancle_btncntnr.grayBtn:active{
+		    background: #727983 !important;
+		    color: #ffffff;
+		    border: none !important;
+		    font-weight: bold;
+		    border-radius: 1px;
+		    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		    transition-delay: 0.2s;
+		    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+		}
+    </style>
+</apex:component>

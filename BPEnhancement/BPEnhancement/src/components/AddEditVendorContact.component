@@ -1,0 +1,562 @@
+<apex:component controller="ViewVendorRelatedListCtrl">
+	<script>
+		$(document).ready(function () {
+			setTimeout(function () {
+				$('[data-toggle="tooltip"]').tooltip({
+					placement : 'bottom'
+				});
+			}, 1000);
+		});
+		
+		var addNewVendorContactModule = angular.module('addNewVendorContactModule', ['dir.priceInput']);
+		
+		addNewVendorContactModule.controller('newContactCtrl', function ($scope, VendorVendorService) {
+			$scope.VendorContactModal.ContactInfo = {};
+			$scope.VendorContactModal.ContactInfo.PreferredEmail = false;
+			$scope.VendorContactModal.ContactInfo.PreferredPhone = false;
+			$scope.VendorContactModal.ContactInfo.PreferredSMS = false;
+			$scope.VendorContactModal.ContactInfo.IsSMS = false;
+			$scope.VendorContactModal.ContactInfo.ParentVendor;
+			
+			// START: Popup related methods
+            // Method to open self popup.
+            $scope.VendorContactModal.openAddVendorContactPopup = function (vendorId) {
+                $scope.VendorContactModal.clearAllData();
+				$scope.VendorContactModal.ContactInfo.ParentVendor = vendorId;
+				$scope.VendorContactModal.openPopup();
+            }
+            
+            // Method to open self popup.
+            $scope.VendorContactModal.openEditVendorContactPopup = function (contactId, vendorId) {
+                // Set default values
+                $scope.VendorContactModal.clearAllData();
+				$scope.VendorContactModal.ContactInfo.ParentVendor = vendorId;
+				$scope.VendorContactModal.getVendorContact(contactId);
+            }
+            
+            // Open popup box
+            $scope.VendorContactModal.openPopup = function(){
+                angular.element('#ContactPopup').modal({
+                    backdrop : 'static',
+                    keyboard : false
+                });
+                
+                setTimeout(function () {
+	            	angular.element(document.getElementById("ContactPopup").querySelector('[tabindex="1"]')).focus();
+	            }, 1000);
+            }
+            
+            // Close popup box
+            $scope.VendorContactModal.closePopup = function(){
+                angular.element('#ContactPopup').modal('hide');
+            }
+            // END: Popup related methods
+			
+			$scope.VendorContactModal.textChangeAction = function (key) {
+				if (key == 'Phone' && ($scope.VendorContactModal.ContactInfo.Phone == null || $scope.VendorContactModal.ContactInfo.Phone.length == 0)) {
+					$scope.VendorContactModal.ContactInfo.PreferredPhone = false;
+					$scope.VendorContactModal.ContactInfo.PreferredSMS = false;
+					$scope.VendorContactModal.ContactInfo.IsSMS = false;
+				} else if (key == 'Email' && ($scope.VendorContactModal.ContactInfo.Email == null || $scope.VendorContactModal.ContactInfo.Email.length == 0)) {
+					$scope.VendorContactModal.ContactInfo.PreferredEmail = false;
+				}
+			}
+			
+			$scope.VendorContactModal.markFavourite = function (key) {
+				if (key == 'PreferredPhone' && $scope.VendorContactModal.ContactInfo.Phone != null && $scope.VendorContactModal.ContactInfo.Phone.length != 0) {
+					$scope.VendorContactModal.validateFieldWithKey('Phone');
+					if($scope.VendorContactModal.VendorContactFormValidationModal.Email.isError == false){
+						if ($scope.VendorContactModal.ContactInfo.PreferredPhone == true) {
+							$scope.VendorContactModal.ContactInfo.PreferredPhone = false;
+						} else {
+							$scope.VendorContactModal.ContactInfo.PreferredPhone = true;
+						}
+					}
+				} else if (key == 'PreferredEmail' && $scope.VendorContactModal.ContactInfo.Email != null && $scope.VendorContactModal.ContactInfo.Email.length != 0) {
+					$scope.VendorContactModal.validateFieldWithKey('Email');
+					if($scope.VendorContactModal.VendorContactFormValidationModal.Phone.isError == false){
+						if ($scope.VendorContactModal.ContactInfo.PreferredEmail == true) {
+							$scope.VendorContactModal.ContactInfo.PreferredEmail = false;
+						} else {
+							$scope.VendorContactModal.ContactInfo.PreferredEmail = true;
+						}
+					}
+				} else if (key == 'PreferredSMS' && $scope.VendorContactModal.ContactInfo.Phone != null && $scope.VendorContactModal.ContactInfo.Phone.length != 0) {
+					$scope.VendorContactModal.validateFieldWithKey('Phone');
+					if($scope.VendorContactModal.VendorContactFormValidationModal.Phone.isError == false){
+						if ($scope.VendorContactModal.ContactInfo.PreferredSMS == true) {
+							$scope.VendorContactModal.ContactInfo.PreferredSMS = false;
+						} else {
+							$scope.VendorContactModal.ContactInfo.IsSMS = true;
+							$scope.VendorContactModal.ContactInfo.PreferredSMS = true;
+						}
+					}
+				} else if (key == 'IsSMS' && $scope.VendorContactModal.ContactInfo.Phone != null && $scope.VendorContactModal.ContactInfo.Phone.length != 0) {
+					$scope.VendorContactModal.validateFieldWithKey('Phone');
+					if($scope.VendorContactModal.VendorContactFormValidationModal.Phone.isError == false){
+						if ($scope.VendorContactModal.ContactInfo.IsSMS == true) {
+							$scope.VendorContactModal.ContactInfo.IsSMS = false;
+						} else {
+							$scope.VendorContactModal.ContactInfo.IsSMS = true;
+						}
+					}
+				}
+			}
+		
+			// Method to set default values for validation model
+			$scope.VendorContactModal.setDefaultValidationModel = function () {
+				$scope.VendorContactModal.VendorContactFormValidationModal = {
+					FirstName : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Required',
+						Maxlength : 80
+					},
+					LastName : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Required',
+						Maxlength : 80
+					},
+					Email : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Email'
+					},
+					Phone : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'phone',
+						Minlength : 10,
+						Maxlength : 10
+					}
+				};
+			}
+			
+			// Method to validate form
+            $scope.VendorContactModal.validateForm = function () {
+                angular.forEach($scope.VendorContactModal.VendorContactFormValidationModal, function(value, key) {
+                    $scope.VendorContactModal.validateFieldWithKey(key);
+                    if($scope.VendorContactModal.VendorContactFormValidationModal[key].isError){
+                        $scope.VendorContactModal.isValidForm = false;
+                    }
+                });
+            }
+            
+			$scope.VendorContactModal.validateFieldWithKey = function (modelKey) {
+				var validationObj = $scope.VendorContactModal.VendorContactFormValidationModal[modelKey];
+				var isError = false;
+				var ErrorMessage = '';
+				var phoneRegEx = /^([0-9\(\)\/\+ \-]*)$/;
+				var emailRegEx = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+		
+				var validateType = validationObj.Type;
+				if (validateType.indexOf('Minlength') > -1) {
+					if ($scope.VendorContactModal.ContactInfo[modelKey] != undefined && $scope.VendorContactModal.ContactInfo[modelKey] != '' && $scope.VendorContactModal.ContactInfo[modelKey].length < validationObj.Minlength) {
+						isError = true;
+						ErrorMessage = 'Min length should be ' + validationObj.Minlength;
+					}
+				}
+		
+				if (validateType.indexOf('Maxlength') > -1) {
+					if ($scope.VendorContactModal.ContactInfo[modelKey] != undefined && $scope.VendorContactModal.ContactInfo[modelKey] != '' && $scope.VendorContactModal.ContactInfo[modelKey].length > validationObj.Maxlength) {
+						isError = true;
+						ErrorMessage = 'Max length should be ' + validationObj.Maxlength;
+					}
+				}
+		
+				if (validateType.indexOf('phone') > -1) {
+					if ($scope.VendorContactModal.ContactInfo[modelKey] != undefined && $scope.VendorContactModal.ContactInfo[modelKey] != '' && !phoneRegEx.test($scope.VendorContactModal.ContactInfo[modelKey])) {
+						isError = true;
+						ErrorMessage = 'Invalid Phone Number';
+					}
+				}
+		
+				if (validateType.indexOf('Email') > -1) {
+					if ($scope.VendorContactModal.ContactInfo[modelKey] != undefined && $scope.VendorContactModal.ContactInfo[modelKey] != '' && !emailRegEx.test($scope.VendorContactModal.ContactInfo[modelKey])) {
+						isError = true;
+						ErrorMessage = 'Invalid Email Id';
+					}
+				}
+		
+				if (validateType.indexOf('Required') > -1) {
+					if ($scope.VendorContactModal.ContactInfo[modelKey] == undefined || $scope.VendorContactModal.ContactInfo[modelKey] == '') {
+						isError = true;
+						ErrorMessage = 'Field is Required';
+					}
+				}
+				$scope.VendorContactModal.VendorContactFormValidationModal[modelKey]['isError'] = isError;
+				$scope.VendorContactModal.VendorContactFormValidationModal[modelKey]['ErrorMessage'] = ErrorMessage;
+			}
+		
+			// Clear and Set Default Values and validations for popup
+			$scope.VendorContactModal.clearAllData = function () {
+				$scope.VendorContactModal.ContactInfo = {};
+				$scope.VendorContactModal.ContactInfo.PreferredEmail = false;
+				$scope.VendorContactModal.ContactInfo.PreferredPhone = false;
+				$scope.VendorContactModal.ContactInfo.PreferredSMS = false;
+				$scope.VendorContactModal.ContactInfo.IsSMS = false;
+				$scope.VendorContactModal.setDefaultValidationModel();
+			}
+		
+			// Method to perform CANCEL action for popup
+			$scope.VendorContactModal.CancelContactForm = function () {
+				angular.element('#ContactPopup').modal('hide');
+			}
+		
+			// Method to perform SAVE operation in database
+			$scope.VendorContactModal.saveVendorContactRecord = function () {
+				// By default set valid flag to true before starting validation
+                $scope.VendorContactModal.isValidForm = true;
+                
+				// Validate form
+                $scope.VendorContactModal.validateForm();
+                
+                if($scope.VendorContactModal.isValidForm == false){
+                	angular.element(".redborder")[0].focus();
+                	return;
+                }
+				var vendorContactArray = [];
+				vendorContactArray.push($scope.VendorContactModal.ContactInfo);
+				VendorVendorService.saveVendorContact(angular.toJson(vendorContactArray)).then(function (relatedVendorContactList) {
+					// Vendor page callback
+					if($scope.$parent.ViewVendor != undefined && $scope.$parent.ViewVendor.UpdateVendorContactsLists != undefined){
+						angular.element('#ContactPopup').modal('hide');
+						$scope.$parent.ViewVendor.UpdateVendorContactsLists(relatedVendorContactList);
+					}
+					
+					// View vendor page related list callbacks
+					if($scope.$parent.ViewVendor != undefined && $scope.$parent.ViewVendor.RelatedLists_recordSaveCallback != undefined){
+						$scope.$parent.ViewVendor.RelatedLists_recordSaveCallback("{!JSENCODE($ObjectType.Contact.label)}", relatedVendorContactList);
+					}
+				}, function (errorSearchResult) {
+					//$scope.ViewVendor.VendorInfo = errorSearchResult;
+				});
+			}
+		
+			// Method to perform Delete operation in database
+			$scope.VendorContactModal.removeVendorContactRecord = function (vendorContactId) {
+				VendorVendorService.removeVendorContact(vendorId, vendorContactId).then(function (relatedVendorContactList) {
+					
+				}, function (errorSearchResult) {
+					$scope.ViewVendor.VendorInfo = errorSearchResult;
+				});
+			}
+		
+			// Method to get Vendor Contact Record
+			$scope.VendorContactModal.getVendorContact = function (vendorContactId) {
+				VendorVendorService.getVendorContactById(vendorContactId).then(function (vendorContactRec) {
+					// Set all the data models
+					$scope.VendorContactModal.ContactInfo = vendorContactRec[0];
+		
+					$scope.VendorContactModal.openPopup();
+				}, function (errorSearchResult) {
+					$scope.ViewVendor.VendorInfo = errorSearchResult;
+				});
+			}
+		
+		});
+		
+		// Service related to Vendor Owned Unit record
+		addNewVendorContactModule.service("VendorVendorService", function ($q) {
+		
+			// Get method for retrival of all field values of a COU
+			this.getVendorContactById = function (vendorContactId) {
+				vendorContactId = encodeString(vendorContactId);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.getVendorContactById}', vendorContactId,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var vendorContactRec = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						vendorContactRec = vendorContactRec.replace(re, '');
+						deferred.resolve(JSON.parse(vendorContactRec));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		
+			// Get method for retrival of all field values of a COU
+			this.saveVendorContact = function (vendorContactRec) {
+				vendorContactRec = encodeString(vendorContactRec);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction(
+					'{!$RemoteAction.ViewVendorRelatedListCtrl.saveVendorContact}', vendorContactRec,
+					function (result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var vendorContactRec = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						vendorContactRec = vendorContactRec.replace(re, '');
+						deferred.resolve(JSON.parse(vendorContactRec));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		});
+    </script>
+    
+    <div class="modal fade" ng-controller="newContactCtrl" id="ContactPopup">
+	    <div class="modal-dialog custom_modal">
+	        <div class="modal-content">
+	            <div class="modal-body popup_container">
+	                <div class="popupinside">
+	                    <div class="row">
+	                        <div class="popupright col-lg-12 col-lg-12">
+	                            <div class="right_heading_container col-lg-12 col-md-12">
+	                                <h1 class="right_panel_heading" ng-show="true">Add New Contact</h1>
+	                                <h1 class="right_panel_heading" ng-show="false">Edit Contact</h1>
+	                                <div class="savecancle_btncntnr">
+	                                    <button type="button" id="closemodal" class="btn btn-default themebtn_gray" 
+	                                    		ng-click="VendorContactModal.CancelContactForm()"
+	                                    		ng-enter="VendorContactModal.CancelContactForm()" 
+	                                    		ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 204}}">Cancel</button>
+	                                    <button type="button" class="btn btn-default themebtn_orange" 
+	                                    		ng-click="VendorContactModal.saveVendorContactRecord()"
+	                                    		ng-enter="VendorContactModal.saveVendorContactRecord()" 
+	                                    		ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 202}}">Save</button>
+	                                </div>
+	                            </div>
+	                            <div class="tabconainer" style="min-height: 375px;">
+	                                <form>
+	                                    <div class="clearfix"></div>
+	                                    <div class="option_field">
+	                                        <div class="lable_fields name_class">
+	                                            <p>Name</p>
+	                                        </div>
+	                                        <div class="form_fields" style="margin:4px 0 8px 0;">
+	                                            <div class="form-group " >
+	                                                <label for="labelFirstName">First Name </label>
+	                                                <input type="text" class="form-control " id="txtFirstName" rel="NameId" ng-model="VendorContactModal.ContactInfo.FirstName"
+	                                                    ng-blur="VendorContactModal.validateFieldWithKey('FirstName');" placeholder="First Name" ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 1}}"
+	                                                    data-toggle="tooltip" title="{{VendorContactModal.VendorContactFormValidationModal['FirstName']['ErrorMessage'] }}"
+	                                                    ng-class="{'redborder' : VendorContactModal.VendorContactFormValidationModal['FirstName']['isError'] == true}"/>
+	                                            </div>
+	                                            <div class="form-group">
+	                                                <label for="labelLastName">Last Name</label>
+	                                                <input type="text" class="form-control " id="txtLastName" rel="NameId" ng-model="VendorContactModal.ContactInfo.LastName"
+	                                                    ng-blur="VendorContactModal.validateFieldWithKey('LastName');" placeholder="Last Name" ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 2}}"
+	                                                    data-toggle="tooltip" title="{{VendorContactModal.VendorContactFormValidationModal['LastName']['ErrorMessage'] }}"
+	                                                    ng-class="{'redborder' : VendorContactModal.VendorContactFormValidationModal['LastName']['isError'] == true}"/>
+	                                            </div>
+	                                            <div class="controls1 controls" id="NameId" >
+	                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="Provide First and Last Name of Contact"></i>
+	                                            </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div>
+	                                    <div class="option_field" ng-show="true">
+	                                        <div class="lable_fields">
+	                                            <p>Email </p>
+	                                        </div>
+	                                        <div class="form_fields" style="margin:4px 0 8px 0;">
+	                                            <div class="form-group large" >
+	                                                <input type="text" class="form-control " id="businessName" rel="emailId" ng-model="VendorContactModal.ContactInfo.Email"
+	                                                    ng-blur="VendorContactModal.validateFieldWithKey('Email');" placeholder="Email" ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 3}}"
+	                                                    data-toggle="tooltip" title="{{VendorContactModal.VendorContactFormValidationModal['Email']['ErrorMessage'] }}"
+	                                                    ng-class="{'redborder' : VendorContactModal.VendorContactFormValidationModal['Email']['isError'] == true}"
+	                                                    ng-change="VendorContactModal.textChangeAction('Email');"/>
+	                                                <a href="#" class="bookmarklink">
+	                                                <i class="fa fa-star" ng-class="{' orange' : VendorContactModal.ContactInfo.PreferredEmail == true}" 
+	                                                	ng-click="VendorContactModal.markFavourite('PreferredEmail');"></i>
+	                                                </a>
+	                                            </div>
+	                                            <div class="controls1 controls" id="emailId"  >
+	                                                <i class="fa fa-question-circle" data-toggle="tooltip" title="Provide a Email of the Contact"></i>
+	                                            </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div>
+	                                    <div class="option_field" ng-show="true">
+	                                        <div class="lable_fields">
+	                                            <p>Phone</p>
+	                                        </div>
+	                                        <div class="form_fields">
+	                                            <div class="form-group large" style="width: 55%;">
+	                                                <input type="text" class="form-control" rel="phoneId" ng-model="VendorContactModal.ContactInfo.Phone"
+	                                                    ng-blur="VendorContactModal.validateFieldWithKey('Phone');" placeholder="Phone" ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 4}}"
+	                                                    data-toggle="tooltip" title="{{VendorContactModal.VendorContactFormValidationModal['Phone']['ErrorMessage'] }}"
+	                                                    ng-class="{'redborder' : VendorContactModal.VendorContactFormValidationModal['Phone']['isError'] == true}"
+	                                                    ng-change="VendorContactModal.textChangeAction('Phone');"/>
+	                                                <a href="#" class="bookmarklink phoneBookmark">
+	                                                <i class="fa fa-star" ng-class="{' orange' : VendorContactModal.ContactInfo.PreferredPhone == true}" 
+	                                                    ng-click="VendorContactModal.markFavourite('PreferredPhone');"></i>
+	                                                </a>
+	                                            </div>
+	                                            <div class="form-group small">
+	                                                <label class="checkbox smschkbox">
+	                                                <span class="chk_tick" ng-class="{'chked' : VendorContactModal.ContactInfo.IsSMS == true}" 
+	                                                    ng-click="VendorContactModal.markFavourite('IsSMS');">
+	                                                <i class="fa fa-check-square chksqure" ></i>
+	                                                </span>
+	                                                </label>
+	                                            </div>
+	                                            <div class="form-group small2" style="padding-top: 9px;">
+	                                                <label>SMS ?</label>
+	                                                <a href="#" class="bookmarklink smsBookmark">
+	                                                <i class="fa fa-star" ng-class="{' orange' : VendorContactModal.ContactInfo.PreferredSMS == true}"
+	                                                    ng-click="VendorContactModal.markFavourite('PreferredSMS');"></i>
+	                                                </a>
+	                                            </div>
+	                                        </div>
+	                                        <div class="controls" id="phoneId">
+	                                            <i class="fa fa-question-circle"  data-toggle="tooltip" title="Add a personal Phone number"></i>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div>
+	                                    
+	                                    <div class="option_field" >
+	                                        <div class="lable_fields">
+	                                            <p>Extension #</p>
+	                                        </div>
+	                                        <div class="form_fields">
+	                                            <div class="form-group large">
+	                                            	<price-only-input id-value = "Extension"
+                                                              class-value = "form-control"
+                                                              place-holder-value = "{!JSENCODE($ObjectType.Contact.fields.Extension__c.label)}"
+                                                              max-length = "6" 
+                                                              precision-length = "-1" 
+                                                              tab-index = "{{VendorContactModal.tabIndexValue + 4}}"
+                                                              input-value = "VendorContactModal.ContactInfo.Extension"
+                                                              validation-modal = "VendorContactModal.VendorContactFormValidationModal"
+                                                              validation-modal-key = "Extension"
+                                                              input-model = "VendorContactModal" 
+                                                              rel-value = "extensionHelpId"/>
+	                                            </div>
+	                                        </div>
+	                                        <div class="controls" id="extensionHelpId">
+	                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="Add a job title"></i>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div>
+	                                    
+	                                    <div class="option_field" >
+	                                        <div class="lable_fields">
+	                                            <p>Job Tilte</p>
+	                                        </div>
+	                                        <div class="form_fields">
+	                                            <div class="form-group large">
+	                                                <input type="text" class="form-control" rel="jobTitleId" ng-model="VendorContactModal.ContactInfo.JobTitle"
+	                                                    ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 6}}"/>
+	                                            </div>
+	                                        </div>
+	                                        <div class="controls" id="jobTitleId">
+	                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="Add a job title"></i>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div>
+	                                    
+	                                    <div class="option_field" >
+	                                        <div class="lable_fields">
+	                                            <p>Relation</p>
+	                                        </div>
+	                                        <div class="form-group half">
+	                                            <select class="form-control" rel="RelationHelp" id="relationId" 
+	                                            		ng-change="VendorContactModal.ChangeMonth()" ng-model="VendorContactModal.ContactInfo.Relation" 
+	                                            		ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 7}}">
+	                                                <option value="Friend">Friend</option>
+	                                                <option  value="Family">Family</option>
+	                                                <option value="Employee">Employee</option>
+	                                                <option value="Co-Worker">Co-Worker</option>
+	                                                <option value="Employer">Employer</option>
+	                                            </select>
+	                                        </div>
+	                                        <div class="controls" id="RelationHelp">
+	                                            <i class="fa fa-question-circle" data-toggle="tooltip" title="Select a Relation"></i>
+	                                        </div>
+	                                    </div>
+	                                    <div class="right_heading_container col-lg-12 col-md-12">
+		                                    <div class="savecancle_btncntnr">
+		                                    <button type="button" id="closemodal" class="btn btn-default themebtn_gray" 
+		                                    		ng-click="VendorContactModal.CancelContactForm()"
+		                                    		ng-enter="VendorContactModal.CancelContactForm()" 
+		                                    		ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 204}}">Cancel</button>
+		                                    <button type="button" class="btn btn-default themebtn_orange" 
+		                                    		ng-click="VendorContactModal.saveVendorContactRecord()"
+		                                    		ng-enter="VendorContactModal.saveVendorContactRecord()" 
+		                                    		ng-attr-tabindex="{{VendorContactModal.tabIndexValue + 202}}">Save</button>
+		                                </div>
+		                              </div>
+	                                </form>
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+	
+	<style>
+	    .modal-dialog {
+	        width: 1100px;
+	        -moz-box-shadow: 10px 10px 5px #6F6868;
+	        -webkit-box-shadow: 10px 10px 5px #6F6868;
+	        box-shadow: 10px 10px 5px #6F6868;
+	    }
+	    .modal-backdrop.in {
+	        height: 2000px !important;
+	    }
+	    .custom_modal {
+	        width: 700px;
+	    }
+	    .lable_fields.name_class {
+	        padding-top: 3%;
+	    }
+	    .popupright .tabconainer form .form_fields {
+	        width: 78%;
+	    }
+	    .popupright .tabconainer form .lable_fields {
+	        width: 20%;
+	    }
+	    #ContactPopup .popup_container {
+	        left: 20%;
+	        width: 700px;
+	    }
+	    #ContactPopup .bookmarklink a .fa {
+	        margin-top: 4px;
+	    }
+	    #ContactPopup .smschkbox {
+	        margin-top: 0;
+	        margin-bottom: 0;
+	    }
+	    #ContactPopup .half {
+	        width: 30%;
+	    }
+	    .smsBookmark {
+ 	        right: 0 !important;
+ 	        left: 50px !important;
+	    }
+	    .phoneBookmark {
+	    	 right: 19px !important;
+	    }
+	    .popupright .tabconainer form .form_fields a.bookmarklink {
+	        position: absolute;
+	        right: 28px;
+	        top: 2px;
+	        font-size: 19px;
+	        color: #f1f1f1;
+	    }
+	    .popupright .tabconainer form .controls1 {
+	        position: relative;
+	        right: -91%;
+	        top: -31px;
+	    }
+	    .popupright .tabconainer form .controls .fa-question-circle {
+	        color: orange;
+	    }
+	    .popupright .tabconainer form .controls .fa-times {
+	        color: #9E9E9E;
+	    }
+	</style>
+</apex:component>

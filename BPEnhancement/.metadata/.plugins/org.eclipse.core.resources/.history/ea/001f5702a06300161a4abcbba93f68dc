@@ -1,0 +1,23 @@
+<apex:page SideBar="false" tabstyle="Accounting_Data_Migration__c" title="Accounting Data Migration" >
+	<apex:outputpanel >
+        <apex:actionstatus id="status">
+            <apex:facet name="start">
+                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;height: 100%;opacity:0.65;width:100%;"> 
+                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                        <img class="waitingImage" src="/img/loading.gif" title="Please Wait..." />
+                        <span class="waitingDescription">Loading...</span>
+                    </div>
+                </div>
+            </apex:facet>
+        </apex:actionstatus>
+    </apex:outputpanel>
+    
+    <apex:tabPanel switchType="client" selectedTab="DataExport_Tab" id="ACDTabPanel">
+    	<apex:tab label="Data Export" name="DataExport_Tab" id="DataExport_Tab">
+    		<apex:include pageName="DataExport_MYOB" />
+    	</apex:tab>
+    	<apex:tab label="GL Accounts" name="GLAccounts_Tab" id="GLAccounts_Tab">
+    		<apex:include pageName="GLAccountsSetup" />
+    	</apex:tab>
+    </apex:tabPanel>
+</apex:page>

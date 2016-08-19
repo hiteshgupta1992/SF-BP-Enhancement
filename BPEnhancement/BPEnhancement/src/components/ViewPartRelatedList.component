@@ -1,0 +1,412 @@
+<apex:component >
+	<style>
+		tr th {
+			text-transform: uppercase;
+		}
+	</style>
+	
+	<!-- View part for component -->
+	<div ng-controller="viewPartRelatedListController" >
+		<!-- START: related section -->
+		<div id="Related">
+	        <!-- START: Heading and toggle section -->
+	        <div class="heading_panel row">
+	            <div class="left_heading col-lg-12 col-md-12">
+	                <h1>
+	                    <span class="heading_icon handCursor" ng-click="ViewPartRelatedListModal.hidePanel($event, 'relatedSection')">
+	                        <i class="fa fa-chevron-right"></i>
+	                    </span>
+	                    C {!$Label.Page_Section_Related}
+	                    
+	                    <i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Active_Orders_Help']}}" style="font-size: 26px"></i>
+	                    <i class="fa fa-cog" style="float: right; margin-right: 7px;" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Active_Orders_Settings_Help']}}"> </i>
+	                </h1>
+	            </div>
+	        </div>
+			<!-- END: Heading and toggle section -->
+			
+			<div id="relatedSection" >
+				
+				<!-- START: ACTIVE ORDERS section -->
+				<div class="heading_panel_sub row" id="VP_Active_Orders_block_heading_panel" style="width: 99.6%;margin-left: -3px;">
+				    <div class="left_sub col-lg-5 col-md-5" id="VP_Active_Orders_block_heading_panel_left_sub">
+				        <h1 id="VP_Active_Orders_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VP_Active_Orders_block_heading_panel_left_sub_h1_text">{!$Label.Active_Orders}</span> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VP_Active_Orders_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Active_Orders_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Active_Orders_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+				    
+				    <div class="gid_container" id="View_Part_Active_Orders_Empty_Div" 
+				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.ActiveOrders.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    
+				    <div ng-show="ViewPartRelatedListModal.PartRelatedInfo.ActiveOrders.length != 0">
+					    <div class="gid_container" id="View_Part_Active_Orders" >
+						    <table class="table" id="VP_Active_OrdersGrid">
+						        <col width="4%"  />
+						        <col width="20%" />
+						        <col width="15%"  />
+						        <col width="15%" />
+						        <col width="46%"  />
+						        <tr class="tableHeader">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewPartRelatedListModal.Active_Orders_sortControlsAction($event)">
+						            	<i class="fa fa-sort-asc" ng-show="ViewPartRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewPartRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewPartRelatedListModal.ActiveOrders_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.PO_Object_Short_Display_Label}
+						            </th>
+						            <th>{!$Label.Label_Quantity}</th>
+						            <th>{!$Label.Label_Status}</th>
+						            <th>{!$Label.Projected_Delivery}</th>
+						        </tr>
+						        <tbody ng-repeat="activeOrder in ViewPartRelatedListModal.PartRelatedInfo.ActiveOrders" >
+						            <tr class="clickable_row" id="row1" >
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_1_{{$index}}">	*	</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_2_{{$index}}">  <u>{{activeOrder.PONumber}}</u>	</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_3_{{$index}}">  {{activeOrder.Qty}}   			</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_4_{{$index}}"
+						                	ng-class="{'red': activeOrder.Status == 'On Order'}">
+						                	{{activeOrder.Status}}
+						                </td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_5_{{$index}}">
+						                	{{activeOrder.ProjectedDelivery | date : 'medium'}}
+						                </td>
+						            </tr>
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Part_Active_Orders_Pagination" ng-if="ViewPartRelatedListModal.PartRelatedInfo.TotalActiveOrders != undefined" >
+	<!--  				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.TotalActiveOrders > ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize" > -->
+					    	<list-pagination id-value = "View_Part_Active_Orders_Pagination_" 
+				    						 total-records-length = "ViewPartRelatedListModal.PartRelatedInfo.TotalActiveOrders"
+				    						 page-size = "ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize"
+				    						 current-page = "ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersCurrentPage"
+				    						 changes-count = "ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersChangesCount"
+				    						 pagination-control-method = "ViewPartRelatedListModal.Active_Orders_paginationControlsAction" />
+					    </div>
+				    </div>
+				</div>
+				<!-- END: ACTIVE ORDERS section -->
+				
+				<!-- START: ACTIVE SALES ORDERS section -->
+				<div class="heading_panel_sub row" id="VP_Active_Sales_Orders_block_heading_panel" style="width: 99.6%;margin-left: -3px;">
+				    <div class="left_sub col-lg-5 col-md-5" id="VP_Active_Orders_block_heading_panel_left_sub">
+				        <h1 id="VP_Active_Orders_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VP_Active_Sales_Orders_block_heading_panel_left_sub_h1_text">{!$Label.Active_Sales_Orders}</span> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VP_Active_Orders_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Active_Sales_Orders_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Active_Sales_Orders_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+				    
+				    <div class="gid_container" id="View_Part_Active_Orders_Empty_Div" 
+				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.ActiveSalesOrders.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    
+				    <div ng-show="ViewPartRelatedListModal.PartRelatedInfo.ActiveSalesOrders.length != 0">
+					    <div class="gid_container" id="View_Part_Active_Sales_Orders" >
+						    <table class="table" id="VP_Active_Sales_OrdersGrid">
+						        <col width="4%"  />
+						        <col width="20%" />
+						        <col width="15%"  />
+						        <col width="15%" />
+						        <col width="15%" />
+						        <col width="15%" />
+						        <col width="16%"  />
+						        <tr class="tableHeader">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewPartRelatedListModal.Active_Sales_Orders_sortControlsAction($event)">
+						            	<i class="fa fa-sort-asc" ng-show="ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.CO_Object_Short_Display_Label}
+						            </th>
+						            <th>{!$Label.Label_Status}</th>
+						            <th>{!$Label.Label_Quantity}</th>
+						            <th>{!$Label.Label_Committed_Quantity}</th>
+						            <th>{!$Label.Label_Outstanding_Quantity}</th>
+						            <th>{!$Label.Label_Total}</th>
+						        </tr>
+						        <tbody ng-repeat="activeSalesOrder in ViewPartRelatedListModal.PartRelatedInfo.ActiveSalesOrders" >
+						            <tr class="clickable_row" id="row1" >
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_1_{{$index}}">	*	</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_2_{{$index}}">  <u>{{activeSalesOrder.CONumber}}</u>	</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_4_{{$index}}">{{activeSalesOrder.Status}}</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_3_{{$index}}">{{activeSalesOrder.Qty}}</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_3_{{$index}}">{{activeSalesOrder.CommittedQty}}</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_3_{{$index}}">{{activeSalesOrder.OutstandingQty}}</td>
+						                <td id="VP_Active_Orders_block_grid_container_tbody_tr_td_3_{{$index}}">{{activeSalesOrder.TotalSalesOrder | currency}}</td>
+						            </tr>
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Part_Active_Sales_Orders_Pagination" ng-if="ViewPartRelatedListModal.PartRelatedInfo.TotalActiveSalesOrders != undefined" >
+	<!--  				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.TotalActiveOrders > ViewPartRelatedListModal.ActiveOrders_sectionModel.activeOrdersPageSize" > -->
+					    	<list-pagination id-value = "View_Part_Active_Sales_Orders_Pagination_" 
+				    						 total-records-length = "ViewPartRelatedListModal.PartRelatedInfo.TotalActiveSalesOrders"
+				    						 page-size = "ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.activeSalesOrdersPageSize"
+				    						 current-page = "ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.activeSalesOrdersCurrentPage"
+				    						 changes-count = "ViewPartRelatedListModal.ActiveSalesOrders_sectionModel.activeSalesOrdersChangesCount"
+				    						 pagination-control-method = "ViewPartRelatedListModal.Active_Sales_Orders_paginationControlsAction" />
+					    </div>
+				    </div>
+				</div>
+				<!-- END: ACTIVE ORDERS section -->
+				
+				<!-- START: ALTERNATE PARTS section -->
+				<div class="heading_panel_sub row" id="VP_Alternate_Parts_block_heading_panel" style="width: 99.6%;margin-left: -3px;">
+				    <div class="left_sub col-lg-5 col-md-5" id="VP_Alternate_Parts_block_heading_panel_left_sub">
+				        <h1 id="VP_Alternate_Parts_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VP_Alternate_Parts_block_heading_panel_left_sub_h1_text">{!$Label.Page_Section_AlternateParts}</span> 
+				            
+				            <i class="fa fa-plus-square plush_sign handCursor" id="VP_Alternate_Parts_block_heading_panel_left_sub_h1_text_plus_icon" 
+				            	ng-click="ViewPartRelatedListModal.AlternateParts_addAction($event)"></i> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7">
+					    <div class="right_sub pull-right" id="VP_Alternate_Parts_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Alternate_Parts_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Alternate_Parts_Help']}}"></i>
+					    </div>
+				    </div>
+				    <div class="horizontal_line"></div>
+				    
+				    <div class="gid_container" id="View_Part_Alternate_Parts_Empty_Div" 
+				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    <div ng-show="ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length != 0">
+					    <div class="gid_container" id="View_Part_Alternate_Parts" 
+					    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.AlternateParts.length != 0" >
+						    <table class="table" id="VP_Alternate_PartsGrid">
+						        <col width="4%"  />
+								<col width="25%" />
+	                            <col width="20%" />
+	                            <col width="17%" />
+	                            <col width="19%" />
+	                            <col width="13%" />
+						        <tr class="tableHeader" ng-click="ViewPartRelatedListModal.AlternateParts_closeEditRows($event)">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewPartRelatedListModal.AlternateParts_sortControlsAction();">
+						            	<i class="fa fa-sort-asc" ng-show="ViewPartRelatedListModal.AlternateParts_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewPartRelatedListModal.AlternateParts_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewPartRelatedListModal.AlternateParts_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.Part_Object_Item_Description}
+						            </th>
+						            <th>{!$Label.Label_Status}</th>
+						            <th>{!$Label.Label_Quantity} {!$Label.Part_Object_Status_Available}</th>
+						            <th>{!$Label.Label_Retail} {!$Label.Label_Price}</th>
+						            <th>{!$Label.Relation}</th>
+						        </tr>
+						        <tbody ng-repeat="alternateOrder in ViewPartRelatedListModal.PartRelatedInfo.AlternateParts track by $index" >
+						        	<!-- START: Data Display Row -->
+						            <tr class="clickable_row" id="Alternate_Parts_row{{$index}}" rel="rel_Alternate_Part_row{{$index}}_edit" 
+						            	ng-click="ViewPartRelatedListModal.AlternateParts_openRowAsEdit($event, $index)">
+						                <td id="VP_Alternate_Parts_block_grid_container_tbody_tr_td_1_{{$index}}" ng-click="ViewPartRelatedListModal.AlternateParts_makeDefault($event, $index)">
+						                	<i class="fa fa-star orange" ng-show="alternateOrder.IsPreferred" ></i>
+		                                    <i class="fa fa-star-o" ng-show="!alternateOrder.IsPreferred" ></i>
+						                </td>
+						                <td id="VP_Alternate_Parts_block_grid_container_tbody_tr_td_2_{{$index}}">
+						                	<a style="color: #000;" ng-mouseover="ViewPart.openpartpopup($event, alternateOrder.AlternatePartId);" ng-mouseleave="ViewPart.hidePartPopUp();">
+						                		{{alternateOrder.PartNumber}} - {{alternateOrder.Description}}
+						                	</a>
+						                </td>
+						                <td id="VP_Alternate_Parts_block_grid_container_tbody_tr_td_3_{{$index}}"
+						                	ng-class="{'red': alternateOrder.Status == 'On Order' || alternateOrder.Status == 'Required' || alternateOrder.Status == 'Out of Stock', 'green': alternateOrder.Status == 'In Stock', 'blue': alternateOrder.Status == 'Committed'}">
+						                	{{alternateOrder.Status}}
+						                </td>
+						                <td id="VP_Alternate_Parts_block_grid_container_tbody_tr_td_4_{{$index}}">  {{alternateOrder.Qty}}   		</td>
+						                <td id="VP_Alternate_Parts_block_grid_container_tbody_tr_td_5_{{$index}}">  ${{alternateOrder.Retail}}  		</td>
+						                <td id="VP_Alternate_Parts_block_grid_container_tbody_tr_td_6_{{$index}}">
+						                	<select class="form-control" ng-model="alternateOrder.Relation" 
+		                                            ng-click="$event.stopPropagation();"
+		                                            ng-change="ViewPartRelatedListModal.AlternateParts_updateRelation(alternateOrder.Id, alternateOrder.Relation, $index)">
+		                                             <option value="Alternate">{!$Label.Label_Alternate}</option>
+		                                             <option value="Replaces">{!$Label.Label_Replace}</option>
+		                                    </select>
+						                </td>
+						            </tr>
+						            <!-- END: Data Display Row -->
+						            
+						            <!-- START: Actions row in case editable row -->
+	                                <tr ng-show="ViewPartRelatedListModal.AlternateParts_editRow[$index].isEdit" class="edit_panel sample-show-hide" id="rel_Alternate_Part_row{{$index}}_edit">
+									    <td colspan="9" id="VP_Alternate_Parts_block_grid_container_tbody_expandtr_td_1_{{$index}}">
+									        <div id="VP_Alternate_Parts_block_grid_container_tbody_expandtr_edit_box_{{$index}}" 
+									            class="edit_box col-lg-9 col-md-9" 
+									            ng-show="ViewPartRelatedListModal.AlternateParts_editRow[$index].isEdit">
+									            <div class="its-heading" id="VP_Alternate_Parts_block_grid_container_tbody_expandtr_edit_box_its-heading_{{$index}}">
+									                <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+									                <span>{!$Label.Label_Actions} (1 {!$Label.Part_Object_Status_Available})</span>
+									            </div>
+									            <div id="VP_Alternate_Parts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}" class="edit-body">
+									                <form>
+									                    <!-- Remove link as action -->
+									                    <div class="radio" id="VP_Alternate_Parts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_2">
+									                        <label>
+										                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="1"
+										                            ng-model= "ViewPartRelatedListModal.AlternateParts_editRow[$index].radioValue"/>
+										                        <span>
+											                        <i class="fa fa-times"></i>
+											                        {!$Label.Label_Remove} {!$Label.Label_Link}
+										                        </span>
+									                        </label>
+									                    </div>
+									                    <!-- Action button (Go) -->
+									                    <a href="" id="VP_Alternate_Parts_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_go_btn" class="btn btn-default editform_btn" role="button"
+									                        ng-click="ViewPartRelatedListModal.AlternateParts_GoAction($index)">   {!$Label.Label_Go}  </a>                                
+									                </form>
+									            </div>
+									            <a href="" class="faq_link">
+									            	<i class="fa fa-question-circle qmark"></i>
+									            </a>
+									        </div>
+									    </td>
+									</tr>
+	                                <!-- END: Actions row in case editable row -->
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Part_Alternate_Parts_Pagination" ng-if="ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts != undefined" >
+	<!--  				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts > ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsPageSize" > -->
+					    	<list-pagination id-value = "View_Part_Alternate_Parts_Pagination_" 
+				    						 total-records-length = "ViewPartRelatedListModal.PartRelatedInfo.TotalAlternateParts"
+				    						 page-size = "ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsPageSize"
+				    						 current-page = "ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsCurrentPage"
+				    						 changes-count = "ViewPartRelatedListModal.AlternateParts_sectionModel.alternatePartsChangesCount"
+				    						 pagination-control-method = "ViewPartRelatedListModal.AlternateParts_paginationControlsAction" />
+					    </div>
+					</div>
+				</div>
+				<!-- END: ALTERNATE PARTS section -->
+				
+				<!-- START: TAX EXEMPTIONS section -->
+				<div class="heading_panel_sub row" id="VP_Tax_Exemptions_block_heading_panel" ng-show="ViewPartRelatedListModal.PartIsTaxable" style="width: 99.6%;margin-left: -3px;">
+				    <div class="left_sub col-lg-5 col-md-5" id="VP_Tax_Exemptions_block_heading_panel_left_sub">
+				        <h1 id="VP_Tax_Exemptions_block_heading_panel_left_sub_h1">
+				            <span class="subheading_text" id="VP_Tax_Exemptions_block_heading_panel_left_sub_h1_text">{!$Label.Page_Section_TaxExemptions}</span> 
+				            
+				            <i class="fa fa-plus-square plush_sign handCursor" id="VP_Tax_Exemptions_block_heading_panel_left_sub_h1_text_plus_icon" 
+				            	ng-click="ViewPartRelatedListModal.TaxExemptions_addAction($event)"></i> 
+				        </h1>
+				    </div>
+				    <div class="col-lg-7 col-md-7" >
+					    <div class="right_sub pull-right" id="VP_Tax_Exemptions_block_heading_panel_right_sub">
+					        <i class="fa fa-cog" style="margin-right: 7px;" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Tax_Exemptions_Settings_Help']}}"> </i>
+							<i class="fa fa-question-circle question_mark" data-toggle="tooltip" title="{{ViewPartRelatedListModal.helpText['Tax_Exemptions_Help']}}"></i>
+					    </div>
+					</div>
+				    <div class="horizontal_line"></div>
+				    
+				    <div class="gid_container" id="View_Part_Tax_Exemptions_Empty_Div" 
+				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions.length == 0">
+				    	{!$Label.Label_No_Records_Found}
+				    </div>
+				    <div ng-show="ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions.length != 0">
+					    <div class="gid_container" id="View_Part_Tax_Exemptions" 
+					    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions.length != 0">
+						    <table class="table" id="VP_Tax_ExemptionsGrid">
+	                            <col width="4%" />
+	                            <col width="35%"/>
+								<col width="41%"/>
+								<col width="20%"/>
+						        <tr class="tableHeader" ng-click="ViewPartRelatedListModal.TaxExemptions_closeEditRows($event)">
+						            <th></th>
+						            <th style="cursor: pointer;" ng-click="ViewPartRelatedListModal.TaxExemptions_sortControlsAction();">
+						            	<i class="fa fa-sort-asc" ng-show="ViewPartRelatedListModal.TaxExemptions_sectionModel.sorting[0].sortDirection == 'ASC'"/>
+						            	<i class="fa fa-sort-desc" ng-show="ViewPartRelatedListModal.TaxExemptions_sectionModel.sorting[0].sortDirection == 'DESC'"/>
+						            	<i class="fa fa-sort" ng-show="ViewPartRelatedListModal.TaxExemptions_sectionModel.sorting[0].sortDirection == ''"/>
+						            	{!$Label.Sales_Tax_Object_Display_Label}
+						            </th>
+						            <th>{!$Label.Label_Description}</th>
+						            <th>{!$Label.SalesTaxGridItem_Rate}</th>
+						        </tr>
+						        <tbody ng-repeat="taxExemption in ViewPartRelatedListModal.PartRelatedInfo.TaxExemptions track by $index" >
+						        	<!-- START: Data Display Row -->
+						            <tr class="clickable_row" id="Alternate_Parts_row{{$index}}" rel="rel_Tax_Exemption_row{{$index}}_edit" 
+						            	ng-click="ViewPartRelatedListModal.TaxExemptions_openRowAsEdit($event, $index)">
+						            	<td id="VP_Tax_Exemptions_block_grid_container_tbody_tr_td_0_{{$index}}"></td>
+						                <td id="VP_Tax_Exemptions_block_grid_container_tbody_tr_td_1_{{$index}}">	{{taxExemption.SalesTaxName}}	</td>
+						                <td id="VP_Tax_Exemptions_block_grid_container_tbody_tr_td_2_{{$index}}">	{{taxExemption.Description}}		</td>
+						                <td id="VP_Tax_Exemptions_block_grid_container_tbody_tr_td_3_{{$index}}">
+						                	{{taxExemption.Rate}}
+						                	<span ng-show="taxExemption.Rate != null && taxExemption.Rate != ''">%</span>
+						                </td>
+						            </tr>
+						            <!-- END: Data Display Row -->
+						            
+						            <!-- START: Actions row in case editable row -->
+	                                <tr ng-show="ViewPartRelatedListModal.TaxExemptions_editRow[$index].isEdit" class="edit_panel sample-show-hide" id="rel_Tax_Exemption_row{{$index}}_edit">
+									    <td colspan="9" id="VP_Tax_Exemptions_block_grid_container_tbody_expandtr_td_1_{{$index}}">
+									        <div id="VP_Tax_Exemptions_block_grid_container_tbody_expandtr_edit_box_{{$index}}" 
+									            class="edit_box col-lg-9 col-md-9" 
+									            ng-show="ViewPartRelatedListModal.TaxExemptions_editRow[$index].isEdit">
+									            <div class="its-heading" id="VP_Tax_Exemptions_block_grid_container_tbody_expandtr_edit_box_its-heading_{{$index}}">
+									                <img src="{!URLFOR($Resource.icon_images, 'images/edit_icon.png')}" styleClass="img_action"/>
+									                <span>{!$Label.Label_Actions} (1 {!$Label.Part_Object_Status_Available})</span>
+									            </div>
+									            <div id="VP_Tax_Exemptions_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}" class="edit-body">
+									                <form>
+									                    <!-- Remove link as action -->
+									                    <div class="radio" id="VP_Tax_Exemptions_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_radio_2">
+									                        <label>
+										                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="1"
+										                            ng-model= "ViewPartRelatedListModal.TaxExemptions_editRow[$index].radioValue"/>
+										                        <span>
+											                        <i class="fa fa-times"></i>
+											                        {!$Label.Label_Remove} {!$Label.Label_Link}
+										                        </span>
+									                        </label>
+									                    </div>
+									                    <!-- Action button (Go) -->
+									                    <a href="" id="VP_Tax_Exemptions_block_grid_container_tbody_expandtr_edit_box_its-heading_edit-body_{{$index}}_go_btn" class="btn btn-default editform_btn" role="button"
+									                        ng-click="ViewPartRelatedListModal.TaxExemptions_GoAction($index)">   {!$Label.Label_Go}  </a>                                
+									                </form>
+									            </div>
+									            <a href="" class="faq_link">
+									            	<i class="fa fa-question-circle qmark"></i>
+									            </a>
+									        </div>
+									    </td>
+									</tr>
+	                                <!-- END: Actions row in case editable row -->
+						        </tbody>
+						    </table>
+						</div>
+					    
+					    <!-- Pagination container -->
+					    <div class="pagination_container" id="View_Part_Tax_Exemptions_Pagination" ng-if="ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions != undefined" >
+	<!--  				    	ng-show="ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions > ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsPageSize" > -->
+					    	<list-pagination id-value = "View_Part_Tax_Exemptions_Pagination_" 
+				    						 total-records-length = "ViewPartRelatedListModal.PartRelatedInfo.TotalTaxExemptions"
+				    						 page-size = "ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsPageSize"
+				    						 current-page = "ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsCurrentPage"
+				    						 changes-count = "ViewPartRelatedListModal.TaxExemptions_sectionModel.taxExemptionsChangesCount"
+				    						 pagination-control-method = "ViewPartRelatedListModal.TaxExemptions_paginationControlsAction" />
+					    </div>
+					</div>
+				</div>
+				<!-- END: TAX EXEMPTIONS section -->
+			</div>
+		</div>
+		<!-- END: related section -->
+	</div>
+</apex:component>

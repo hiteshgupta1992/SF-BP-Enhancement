@@ -1,0 +1,23 @@
+<apex:component >
+	<script>
+		/**
+		 *	Documentation:
+		 *
+		 *	1. Include directive: angular.module('myApp', ['dir.ngEnter'])
+		 *
+		 **/
+		angular.module('dir.ngEnter', []).directive('ngEnter', function () {
+			return function (scope, element, attrs) {
+				element.bind("keydown keypress", function (event) {
+					if (event.which === 13) {
+						scope.$apply(function () {
+							scope.$eval(attrs.ngEnter);
+						});
+		
+						event.preventDefault();
+					}
+				});
+			};
+		});
+	</script>
+</apex:component>

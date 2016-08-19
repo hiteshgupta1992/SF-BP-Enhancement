@@ -1,0 +1,255 @@
+<apex:page standardStylesheets="false" showChat="false" showHeader="false" sidebar="false" controller="MasterDataUploadCtrl">
+    <html ng-app="app">
+        <title> Master Data Upload</title>
+        <c:Css_and_Js />
+        <style>
+            .addmoreinfoBtn,
+            .addmoreinfoBtn:hover,
+            .addmoreinfoBtn:focus,
+            .addmoreinfoBtn:active{
+                border: none;
+                color: #ffffff;
+                font-weight: bold;
+                border-radius: 1px;
+                transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                transition-delay: 0.2s;
+                box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+                outline: none;
+                width: 205px;
+                background: #00AEEF;
+            }
+            .grayBtn, 
+            .grayBtn:hover, 
+            .grayBtn:focus, 
+            .grayBtn:active {
+                background: #727983;
+                color: #ffffff;
+                border: none !important;
+                font-weight: bold;
+                border-radius: 1px;
+                transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                transition-delay: 0.2s;
+                width: 205px;
+                box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+            }
+        </style>
+        <script type="text/javascript">
+            var app = angular.module('app', ['ui-notification']);
+            
+            app.controller('CsvUploadController', function($scope, $q, Notification, CsvUploadService) {
+                $scope.MasterData = {};
+                $scope.MasterData.MasterDataTypes = [{id : 'Category Template', value : 'Category'},
+                                                    {id : 'Country State Template', value : 'Country State'},
+                                                    {id : 'Sales Tax Template', value : 'Sales Tax'},
+                                                    {id : 'Sales Tax Item Template', value : 'Sales Tax Item'},
+                                                    {id : 'Price Level Template', value : 'Price Level'},
+                                                    {id : 'Make Model Template', value : 'Make Model'}]
+                $scope.MasterData.LoadTemplateUrl = function (){
+                    
+                    CsvUploadService.getTemplateUrl().then(function (successfulSearchResult) {
+                        debug(successfulSearchResult);
+                        $scope.MasterData.templatesList = successfulSearchResult;
+                    },function (errorSearchResult) {
+                        //responseData = errorSearchResult;
+                        Notification.error("Some error occurred, please refresh the page");
+                    });
+                };
+                
+                
+                $scope.MasterData.InsertCSV = function (){
+                    debug($scope.MasterData.TableObject.TableData);
+                    $scope.MasterData.isDisabledButton = true; 
+                    CsvUploadService.insertCSVRecord(JSON.stringify($scope.MasterData.TableObject.TableData), $scope.MasterData.selectedMasterData).then(function (successfulSearchResult) {
+                        debug(successfulSearchResult);
+                        Notification.success("Data Uploaded Successfully");
+                    },function (errorSearchResult) {
+                         //responseData = errorSearchResult;
+                         debug(errorSearchResult);
+                         Notification.error(errorSearchResult);
+                    });
+                };
+                
+                $scope.MasterData.hideGrid =  function(){
+                    debug('changed');
+                    $scope.MasterData.isDisabled = false ;
+                    $scope.MasterData.TableObject.TableData = [] ; 
+                    $scope.MasterData.TableObject.TableHeader = []; 
+                    if (!$scope.$$phase) {
+                        debug('apply');
+                        $scope.$apply();
+                    }
+                }
+                
+                $scope.MasterData.TableObject = {};
+                $scope.MasterData.TableObject.TableData = [];
+                $scope.MasterData.TableObject.TableHeader = [];
+                $scope.MasterData.validateCSV = function() {
+                    $scope.MasterData.isDisabledButton = false; 
+                    $scope.MasterData.isDisabled = false ;  
+                    var fileUpload = document.getElementById("fileUpload");
+                    var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.csv|.txt)$/;
+                    if (regex.test(fileUpload.value.toLowerCase())) {
+                        if (typeof (FileReader) != "undefined") {
+                            
+                            
+                            $scope.MasterData.isDisabled = true ;   
+                            var reader = new FileReader();
+                            reader.onload = function (e) {
+                                //var table = document.createElement("table");
+                                var rows = e.target.result.split("\r\n");
+                                for (var i = 0; i < rows.length - 1; i++) {
+                                    var row = {}; 
+                                    var cells = rows[i].split(";");
+                                    debug(cells);
+                                    for (var j = 0; j < cells.length; j++) {
+                                        if(i == 0){
+                                            debug(cells[cells.length - 1]);
+                                            $scope.MasterData.TableObject.TableHeader.push(cells[j]);
+                                        }else{
+                                            row[$scope.MasterData.TableObject.TableHeader[j]] = cells[j];
+                                        }
+                                        //debugger;
+                                        
+                                    }
+                                    if(i != 0){
+                                        $scope.MasterData.TableObject.TableData.push(row);
+                                    }
+                                    
+                                }
+                                debug($scope.MasterData.TableObject);
+                                if (!$scope.$$phase) {
+                                    debug('apply');
+                                    $scope.$apply();
+                                }
+                            }
+                            reader.readAsText(fileUpload.files[0]);
+                        } else {
+                             Notification.error("This browser does not support HTML5.");
+                        }
+                    } else {
+                        Notification.error("Please upload a valid CSV file.");
+                        //alert("Please upload a valid CSV file.");
+                    }
+                  } 
+            
+            });
+            
+        
+            app.service("CsvUploadService", function ($q){
+                this.getTemplateUrl = function() {
+                        var deferred = $q.defer();
+        
+                        // make AJAX request to the remote service
+                        Visualforce.remoting.Manager.invokeAction(
+                            '{!$RemoteAction.MasterDataUploadCtrl.getTemplateUrl}',
+                            function (result, event) {
+                            if (event.type == 'exception') {
+                                deferred.reject(event.message);
+                            } else {
+                                var MasterData = decodeString(result);
+                                var find = '_';
+                                var re = new RegExp(find, 'g');
+                                MasterData = MasterData.replace(re, ' ');
+                                deferred.resolve(JSON.parse(MasterData));
+                            }
+                        }, {
+                            escape : true
+                        });
+                        return deferred.promise;
+                    }
+                    
+                 this.insertCSVRecord = function(strList , csvType) {
+                 	strList = encodeString(strList);
+                 	csvType = encodeString(csvType);
+                     var deferred = $q.defer();
+     
+                     // make AJAX request to the remote service
+                     Visualforce.remoting.Manager.invokeAction(
+                         '{!$RemoteAction.MasterDataUploadCtrl.insertCSVRecord}', strList , csvType,
+                         function (result, event) {
+                         if (event.type == 'exception') {
+                             deferred.reject(event.message);
+                         } else {
+                            deferred.resolve(decodeString(result));
+                         }
+                     }, {
+                         escape : true
+                     });
+                     return deferred.promise;
+                 }
+                });
+        
+            
+            
+        </script>
+        
+        <body ng-controller="CsvUploadController" ng-init="MasterData.LoadTemplateUrl()">
+            
+            <div class="container" style=" margin-top:20px; ">
+                <div class="row">
+                    <div class="col-lg-3  col-md-2 col-sm-2 col-xs-2" ></div>
+                    <div class="col-lg-3  col-md-6 col-sm-6 col-xs-6" >
+                        <h3 style="margin-bottom: 30px; color: #00AEEF;">Upload Master Data</h3>
+                    </div>
+                </div>
+                <div class = "col-lg-12 col-md-12 col-sm-12 col-xs-12" >
+                    <form name="myForm">
+                    <div class="row">
+                        <div class = "col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>
+                        <div class ="col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                            <label for="repeatSelect"> Master Data Type : </label>
+                        </div>
+                        <div class="  col-lg-2 col-md-2 col-sm-3 col-xs-3">
+                            <select class=" form-control " name="repeatSelect" id="repeatSelect" ng-model="MasterData.selectedMasterData" 
+                                 ng-change = "MasterData.hideGrid()">
+                                <option ng-repeat="option in MasterData.MasterDataTypes" value="{{option.id}}" > {{option.value}} </option>
+                            </select>
+                        </div>
+                        <span  ng-repeat="template in MasterData.templatesList" ng-if="template.DocumentUniqueName == MasterData.selectedMasterData"  style = " margin-left:20px;">
+                            <a href="{{template.Url}}" target="_blank"> Download {{template.DocumentUniqueName}}</a>
+                        </span>
+                        </div>
+                    </form>
+                </div>
+                <div class ="row" ng-repeat="template in MasterData.templatesList" ng-if="template.DocumentUniqueName == MasterData.selectedMasterData"  style=" margin-top:60px; ">
+                    <div class = "col-lg-1 col-md-1 col-sm-1 "></div>
+                    <div class=" col-lg-2  col-md-3 col-sm-3 col-xs-4" style=" margin-left:15px; "> <label for="repeatSelect"> Upload CSV : </label></div>
+                    <div class="col-lg-3  col-md-3 col-sm-4 col-xs-4" style=" margin-left: -8px;">
+                        <input type="file"  id="fileUpload" file-model="myFile" ng-model="MasterData.templatesFile" 
+                            onchange="angular.element(this).scope().MasterData.hideGrid()"/>
+                    </div>
+                   <button class="btn" style="margin-left: 15px;" 
+                            ng-class="{'grayBtn': MasterData.isDisabled, 'addmoreinfoBtn' : !MasterData.isDisabled} " 
+                            ng-disabled="MasterData.isDisabled" ng-click="MasterData.validateCSV();">Upload CSV</button>
+                    <div class="row" style=" margin-top:60px; position: relative;">
+                    
+                        <div class=" col-lg-offset-3 col-lg-3 col-lg-offset-5 col-md-6 col-sm-6 col-xs-6" >
+                        
+                        </div>
+                    </div>
+                </div>
+                <div class=" col-lg-offset-3 col-lg-3 col-lg-offset-5 col-md-6 col-sm-6 col-xs-6" style="margin-bottom: 15px;" ng-if="MasterData.TableObject.TableData.length != 0" >
+                    <button class="btn " ng-class="{'grayBtn': MasterData.isDisabledButton, 'addmoreinfoBtn' : !MasterData.isDisabledButton} " 
+                            ng-disabled="MasterData.isDisabledButton" ng-click="MasterData.InsertCSV()">Insert CSV</button>
+                </div>
+                <div class ="row" style = "margin-top:20px;" ng-if="MasterData.TableObject.TableHeader.length != 0">
+                    <div id="dvCSV" class ="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <table class="table table-hover">
+                            <tbody>
+                                <tr>
+                                    <th ng-repeat = "header in MasterData.TableObject.TableHeader">{{header}}</th>
+                                </tr>
+                                <tr ng-repeat = "row in MasterData.TableObject.TableData">
+                                    <td ng-repeat = "header in MasterData.TableObject.TableHeader">{{row[header]}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                   
+                </div>
+                
+                    
+            </div>
+        </body>
+    </html>
+</apex:page>

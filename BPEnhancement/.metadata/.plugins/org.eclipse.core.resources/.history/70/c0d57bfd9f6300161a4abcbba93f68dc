@@ -1,0 +1,601 @@
+<apex:component controller="ViewPartCtrl">
+	<c:NewPopupStyle />
+	<c:dirNumberInput />
+	<style>
+.modal-content .kit_popup_container .popupinside .min_overflow {
+	height: 270px;
+	overflow: auto;
+	float: left;
+}
+.fontbold{
+	font-weight : bold;
+}
+.grayshade{
+background-color : #BEBEBE; 
+}
+span.T3.pull-left.MR5.MT10.italictext{
+	text-transform: none;
+	font-weight: 400;
+	padding-top: 3px;
+}
+.popup_container .modifyCostSourcePopup .tabconainer form .form_fields_new.checkboxadjustment{
+    width: 7%;
+    margin-top: -7px;
+    margin-left: 7px;
+    padding-left: 0px;
+
+}
+.modal-content .kit_popup_container .popupinside .max_overflow {
+	height: 900px;
+	overflow: auto;
+	float: left;
+}
+.highlightremaining{
+	background-color : #BCE2F1;
+}
+.modal-content .kit_popup_container .popupright {
+	min-height: 370px;
+}
+
+.modal-content .kit_popup_container .popupleft .goldbox .rightgoldbox {
+	width: 160px;
+}
+
+.modal-content .kit_popup_container .popupleft .popupleft_container#topsection
+	{
+	min-height: 0;
+}
+
+.kit_popup_container .popupright .tabconainer form .controls1 {
+	top: -45px;
+}
+.additionalwidth{
+	width : 18%;
+}
+.kit_popup_container .popupright .tabconainer form .form-group .txtbox:focus
+	{
+	border: none;
+}
+
+.kit_popup_container .popupright .tabconainer form .form-group .smschkbox .chk_tick
+	{
+	margin-left: 0;
+}
+
+.popup_container .modifyCostSourcePopup {
+	border-left: none !important;
+}
+
+.popup_container .modifyCostSourcePopup .tabconainer form .lable_fields {
+	width: 15% !important;
+}
+
+.popup_container .modifyCostSourcePopup .tabconainer form .form_fields_new {
+	width: 18% ;
+	float: left;
+}
+
+.popup_container .modifyCostSourcePopup .tabconainer form .form-group.MB {
+	width: 100%;
+}
+
+.popup_container .modifyCostSourcePopup .tabconainer .option_field {
+	width: 100%;
+	float: left;
+}
+
+.popup_container .modifyCostSourcePopup .tabconainer .increaseOptionField {
+	margin-left: 7.5%;
+	width: 100%;
+}
+
+.MR5 {
+	margin-right: 5px;
+}
+
+.increaseQty {
+	background: yellow;
+	color: #00AEEF;
+	padding: 2px;
+}
+
+.MT10 {
+	margin-top: 10px;
+}
+
+.popup_container .modifyCostSourcePopup .tabconainer .noborder {
+	width: 90%;
+	margin-left: 5%;
+}
+.borderline{
+	border-bottom: 1px solid #000;
+}
+.borderlinetop{
+	border-top: 1px solid #000;
+}
+.PartAdjustHeadding {
+	color: #00AEEF;
+	font-weight: bold;
+	text-transform: capitalize;
+	margin-top: 10px;
+}
+
+.gid_container_Customer .table {
+	border: 0;
+}
+
+.gid_container_Customer .table th {
+	border: none;
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.gid_container_Customer .table tbody {
+	border: none;
+}
+.fontremoveuppercase{
+	text-transform : none;
+}
+.part_Adjust_gid_container .table tbody>tr>td {
+	border: none;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	vertical-align: middle;
+}
+
+.gid_container_Customer .table tbody .tddropdown td {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	vertical-align: middle;
+}
+
+.gid_container_Customer .tableHeader {
+	margin-left: -15px;
+	margin-right: -15px;
+}
+
+.part_Adjust_gid_container .table th:hover {
+	background: #F6F7F9;
+	cursor: inherit;
+}
+</style>
+	<script type="text/javascript">
+        var modifyCostSourceModel = angular.module("modifyCostSourceModel",[]);
+        
+       
+        modifyCostSourceModel.controller("modifyCostSourceCtrl", function($scope,modifyCostSourceService) {
+             if($scope.modifyCostSourceModel == undefined){
+                $scope.modifyCostSourceModel = {};
+            }
+           $scope.modifyCostSourceModel.isAdjustmentRemaining = true;
+           $scope.modifyCostSourceModel.showPreview = false;
+            $scope.$on('ModifyCostSourceEvent', function (event,selectedbucket) {  
+	            $scope.modifyCostSourceModel.previewBucketList = [];
+	             $scope.modifyCostSourceModel.showPreview = false;
+	             $scope.modifyCostSourceModel.adjustedCost = 0;
+	             $scope.modifyCostSourceModel.isAdjustmentRemaining = true;
+            	$scope.modifyCostSourceModel.openModifyCostSourceModelPopup(selectedbucket);
+             	$scope.selectedbucketmodel = selectedbucket;
+            });
+            $scope.selectedbucketmodel = {};
+            
+            $scope.$on('PreviewEvent', function (event,flag) {   
+                $scope.modifyCostSourceModel.showPreview = flag;
+
+            });
+                 $scope.modifyCostSourceModel.showModifyCostSourcePreviewGrid = function (){
+					$scope.modifyCostSourceModel.showPreview = true;
+           			$scope.modifyCostSourceModel.previewBucketList = [];
+					var monthNames = [
+					  "Jan", "Feb", "Mar",
+					  "Apr", "May", "Jun", "Jul",
+					  "Aug", "Sep", "Oct",
+					  "Nov", "Dec"
+					];
+					
+					var date = new Date();
+					var day = date.getDate();
+					if(day < 10){
+						day= '0' + day; 
+					}
+					var monthIndex = date.getMonth();
+					var year = date.getFullYear();
+					var gropuItem = {};
+					$scope.modifyCostSourceModel.previewBucketList = [];
+					$scope.selectedbucketmodeltemp = angular.copy($scope.selectedbucketmodel.selectedbucket);
+					$scope.modifyCostSourceModel.previewBucketList.push($scope.selectedbucketmodeltemp);
+					
+					for(var i=0; i < $scope.modifyCostSourceModel.previewBucketList.length; i++){
+						$scope.extraActivityLineItem = {}
+						$scope.extraActivityLineItem.CreatedDate=  monthNames[monthIndex] + ' ' + day + ', ' + year;
+						$scope.extraActivityLineItem.UniqueId = 'TBD';
+						$scope.extraActivityLineItem.Reference = 'Cost Adjustment';
+						$scope.extraActivityLineItem.QtyOut = $scope.selectedbucketmodel.selectedbucket.RemainingQty;
+						$scope.modifyCostSourceModel.previewBucketList[i].QtyOut = $scope.selectedbucketmodel.selectedbucket.QtyIn;
+						$scope.modifyCostSourceModel.previewBucketList[i].RemainingQty = 0;
+						$scope.modifyCostSourceModel.previewBucketList[i].Total = 0.0;
+						$scope.modifyCostSourceModel.previewBucketList[i].PartFIFOActivityLineItemList.push($scope.extraActivityLineItem);
+					}
+					gropuItem.SourceName = "Cost Adjust"
+					gropuItem.CreatedDate = monthNames[monthIndex] + ' ' + day + ', ' + year;
+					gropuItem.UniqueId = "TBD";
+					gropuItem.Reference = 're :' + $scope.selectedbucketmodel.selectedbucket.UniqueId;
+					if($scope.modifyCostSourceModel.isAdjustmentRemaining){
+						gropuItem.QtyIn = $scope.selectedbucketmodel.selectedbucket.RemainingQty;
+						gropuItem.QtyOut = 0;
+					}
+					else{
+					gropuItem.QtyIn = $scope.selectedbucketmodel.selectedbucket.QtyIn;
+					gropuItem.QtyOut = $scope.selectedbucketmodel.selectedbucket.QtyOut;
+					}
+					
+					gropuItem.RemainingQty = $scope.selectedbucketmodel.selectedbucket.RemainingQty;
+					gropuItem.Cost = $scope.modifyCostSourceModel.adjustedCost;
+					gropuItem.PartFIFOActivityLineItemList=[];
+					gropuItem.isCostAdjustment = true
+					gropuItem.Total = gropuItem.Cost * gropuItem.RemainingQty;
+					if($scope.modifyCostSourceModel.isAdjustmentRemaining == false){
+						$scope.presoldActivityLineItem = {}
+						$scope.presoldActivityLineItem.CreatedDate=  monthNames[monthIndex] + ' ' + day + ' ' + year;
+						$scope.presoldActivityLineItem.UniqueId = 'TBD';
+						$scope.presoldActivityLineItem.Reference ='Presold on:' + $scope.selectedbucketmodel.selectedbucket.UniqueId;
+						$scope.presoldActivityLineItem.QtyOut = $scope.selectedbucketmodel.selectedbucket.QtyOut;
+						gropuItem.PartFIFOActivityLineItemList.push($scope.presoldActivityLineItem);
+					}
+					$scope.modifyCostSourceModel.previewBucketList.push(gropuItem);
+					debug($scope.modifyCostSourceModel.previewBucketList);
+                			
+				}
+            
+            $scope.modifyCostSourceModel.updateCost = function(){
+            	$scope.modifyCostSourceModel.showPreview = false;
+            	debug('function call');
+             }
+            $scope.modifyCostSourceModel.onClickCostSource = function(event){
+        		$scope.modifyCostSourceModel.isAdjustmentRemaining = !$scope.modifyCostSourceModel.isAdjustmentRemaining;
+        		if($scope.modifyCostSourceModel.showPreview){
+		        	$scope.modifyCostSourceModel.showPreview =! $scope.modifyCostSourceModel.showPreview;
+			  	}
+            }
+            $scope.modifyCostSourceModel.showApplyBtn = function(){
+            	$scope.modifyCostSourceModel.showPreview = false;
+            }
+            $scope.modifyCostSourceModel.openModifyCostSourceModelPopup = function (selectedbucket) {
+                //$scope.partAdjustModal.clearAllData();
+                $scope.bucket =  selectedbucket;
+                debug($scope.bucket);
+                $scope.modifyCostSourceModel.openPopup();
+                setTimeout(function(){ 
+                    angular.element('#feeCodeInput').focus();
+                }, 1000);
+            }
+            
+            
+            // Open popup box
+            $scope.modifyCostSourceModel.openPopup = function() {
+                angular.element('.controls').hide(); 
+                angular.element('#modifyCostSource').modal({
+                    backdrop : 'static',
+                    keyboard : false
+                });
+            }
+            
+            // Close popup box
+            $scope.modifyCostSourceModel.closePopup = function() {
+            	$scope.modifyCostSourceModel.showPreview = true;
+                angular.element('#modifyCostSource').modal('hide');
+            }
+            $scope.modifyCostSourceModel.modifyCostSourcValidationModal = {
+                    adjustedCost : {
+                        isError : false,
+                        ErrorMessage : '',
+                        Type : 'Required'
+                    }
+            }        
+            $scope.saveAdjustedCostSource = function(){
+            	modifyCostSourceService.saveAdjustedCostDetails(angular.toJson($scope.selectedbucketmodel.selectedbucket),$scope.modifyCostSourceModel.adjustedCost,$scope.modifyCostSourceModel.isAdjustmentRemaining).then(function (successfulSearchResult) {
+	                debug(successfulSearchResult);
+	                $scope.modifyCostSourceModel.closePopup();
+	                $scope.$emit('modifyCostSourceAdjustment',successfulSearchResult);
+		            $scope.$emit('ModifyCostSourceUpdateBucketEvent',{updatedbucket : {}}); 
+                    $scope.selectedbucketmodel.selectedbucket = {};  
+	                 },
+	                 function (errorSearchResult) {
+	                     responseData = errorSearchResult;  
+	                 });  
+            }
+            
+           })
+           modifyCostSourceModel.service("modifyCostSourceService", function ($q) {
+            	this.saveAdjustedCostDetails = function(modifycostJSON , newCost, isAdjustmentRemaining)
+                {
+                	modifycostJSON = encodeString(modifycostJSON);
+                	var deferred = $q.defer();
+                      Visualforce.remoting.Manager.invokeAction(
+                          '{!$RemoteAction.ViewPartCtrl.saveAdjustedCostDetails}',
+                              modifycostJSON,newCost,isAdjustmentRemaining,
+                          function (result, event) {
+                             if (event.type == 'exception') {
+                                  deferred.reject(event.message);
+                              } else {
+                                  var partInfo = decodeString(result);
+                                  var find = '\'';
+                                  var re = new RegExp(find, 'g');
+                                  partInfo = partInfo.replace(re, '');
+                                  deferred.resolve(JSON.parse(partInfo));
+                              }
+                          }, {
+                              escape : true
+                      });
+                      return deferred.promise;
+                }
+           	 });
+           
+    </script>
+
+	<div id="modifyCostSource" class="modal fade" role="dialog"
+		ng-controller="modifyCostSourceCtrl">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content col-md-12">
+				<div class="modal-body popup_container kit_popup_container">
+					<div class="popupinside col-md-12 popupright modifyCostSourcePopup ">
+						<div class="right_heading_container col-md-12">
+							<h1 class="right_panel_heading">Modify Cost Source</h1>
+							<div class="savecancle_btncntnr">
+								<button type="button" id="closemodal"
+									class="btn btn-default grayBtn"
+									ng-click="modifyCostSourceModel.closePopup()">Cancel</button>
+								<button type="button" class="btn btn-default greenBtn"
+									ng-disabled="modifyCostSourceModel.showPreview"
+									ng-click="modifyCostSourceModel.showModifyCostSourcePreviewGrid();">
+									Preview</button>
+								<button type="button" class="btn btn-default greenBtn"
+									ng-if="modifyCostSourceModel.showPreview" ng-click="saveAdjustedCostSource();">Apply</button>
+							</div>
+						</div>
+						<div class="col-md-12 P0 main_container_partAdjust borderline">
+							<p class="PartAdjustHeadding">Cost Details</p>
+							<div class="gid_container_Customer part_Adjust_gid_container"
+								id="part_Adjust_gid_container">
+								<table class="table pull-left" id="part_Adjust_ItemGrid">
+									<col width="11%" />
+									<col width="9%" />
+									<col width="12%" />
+									<col width="16%" />
+									<col width="9%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="13%" />
+									<col width="13%" />
+									<thead>
+										<tr class="tableHeader T3 C2 ">
+											<th class="text-uppercase  T3 PLR0">SOURCE</th>
+											<th class=" T3 text-uppercase PLR0">DATE</th>
+											<th class=" T3 text-uppercase PLR0">ID#</th>
+											<th class=" T3 text-uppercase PLR0">REFERENCE</th>
+											<th class=" T3 text-uppercase text-center PLR0">QTY IN</th>
+											<th class="T3 text-uppercase text-center PLR0">QTY OUT</th>
+											<th class=" T3 text-uppercase text-center PLR0">REMAINING</th>
+											<th class=" T3 text-uppercase text-center PLR0">COST</th>
+											<th class=" T3 text-uppercase text-center PLR0">TOTAL</th>
+										</tr>
+									</thead>
+									<tbody class="parentBody printChild">
+										<tr>
+											<td class="T7">{{bucket.selectedbucket.SourceName}}</td>
+											<td class="T7">{{bucket.selectedbucket.CreatedDate}}</td>
+											<td class="T7"><a href="#">{{bucket.selectedbucket.UniqueId}}</a></td>
+											<td class="T7">{{bucket.selectedbucket.Reference}}</td>
+											<td class="T7 text-center"> <span ng-class="{'grayshade' :modifyCostSourceModel.isAdjustmentRemaining && bucket.selectedbucket.PartFIFOActivityLineItemList.length != 0 ,'highlightremaining' :!modifyCostSourceModel.isAdjustmentRemaining && bucket.selectedbucket.PartFIFOActivityLineItemList.length != 0}">{{bucket.selectedbucket.QtyIn}}</span> </td>
+											<td class="T7 text-center"> <span  ng-class="{'grayshade' :modifyCostSourceModel.isAdjustmentRemaining && bucket.selectedbucket.PartFIFOActivityLineItemList.length != 0,'highlightremaining' :!modifyCostSourceModel.isAdjustmentRemaining && bucket.selectedbucket.PartFIFOActivityLineItemList.length != 0}">{{bucket.selectedbucket.QtyOut}}</span></td>
+											<td class="T7 text-center"><span ng-class="{'grayshade' :!modifyCostSourceModel.isAdjustmentRemaining ,'highlightremaining' :modifyCostSourceModel.isAdjustmentRemaining}">{{bucket.selectedbucket.RemainingQty}}</span></td>
+											<td class="T7 text-center"><span  class="highlightremaining">{{bucket.selectedbucket.Cost | currency }}</span></td>
+											<td class="T7 text-center">{{bucket.selectedbucket.Total | currency}}</td>
+
+										</tr>
+
+										<tr ng-repeat="activitylineitem in bucket.selectedbucket.PartFIFOActivityLineItemList">
+											<td class="T7"></td>
+											<td class="T7">{{activitylineitem.CreatedDate}}</td>
+											<td class="T7"><a href="#">{{activitylineitem.UniqueId}}</a></td>
+											<td class="T7">{{activitylineitem.Reference}}</td>
+											<td class="T7 text-center"></td>
+											<td class="T7 text-center">{{activitylineitem.QtyOut}}</td>
+											<td class="T7 text-center"><span class=""></span></td>
+											<td class="T7 text-center"><span class=""></span></td>
+											<td class="T7 text-center"></td>
+
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="tabconainer noborder">
+						<form>
+						<div class="option_field" ng-show="bucket.selectedbucket.PartFIFOActivityLineItemList.length == 0">
+                                        <div class="increaseOptionField">
+                                 			<span class="T3 pull-left MR5 MT10 fontremoveuppercase">Adjusting the cost for the  </span> 
+                                 			<span class="pull-left T3 MR5  MT10 fontremoveuppercase highlightremaining">{{bucket.selectedbucket.QtyIn}}</span>
+											<span class="T3 pull-left MR5 MT10">Remaining</span>
+											<span class="T3 pull-left MR5 MT10 fontremoveuppercase">In Stock</span>
+                                        </div>
+                         </div>
+                         <div class="clearfix"></div>            
+						<div class="option_field " ng-show="bucket.selectedbucket.PartFIFOActivityLineItemList.length == 0">
+                           <div class="increaseOptionField">
+	                       		<span class="T3 pull-left MR5 MT10 fontremoveuppercase">Change cost per item from </span> <span class="pull-left T3 MR5 highlightremaining MT10">{{bucket.selectedbucket.Cost | currency}}</span>
+								<span class="T3 pull-left MR5 MT10 fontremoveuppercase">to $</span>
+								<div class="form_fields_new">
+	                                            <div class="form-group large MB">
+	                                            <price-only-input id-value = "modifyCostSourceModel.adjustedCost"
+                                                                  class-Value = "form-control"
+                                                                  place-holder-value = ""
+                                                                  max-length = "10"
+                                                                  precision-length = "2"
+                                                                  rel-value="modifyCostSourceModel.adjustedCostID"
+                                                                  input-value = "modifyCostSourceModel.adjustedCost"
+                                                                  input-model = "modifyCostSourceModel.adjustedCost"
+                                                                  validation-modal = "modifyCostSourceModel.modifyCostSourcValidationModal"
+                                                              	  validation-modal-key = "adjustedCost"
+                                                                  ng-keydown="modifyCostSourceModel.updateCost();"
+                                                                  packaged="true" />
+<!-- 	                                            	<input type="number" class="form-control" min="1" ng-model="modifyCostSourceModel.adjustedCost"   placeholder="enter Qty" maxlength="10" ng-change="modifyCostSourceModel.updateCost();"/>  -->
+	                                            </div>
+                               	</div>
+							</div>
+						</div>
+						<div class="option_field " ng-hide="bucket.selectedbucket.PartFIFOActivityLineItemList.length == 0">
+                           <div class="increaseOptionField">
+	                       		<span class="T3 pull-left MR5 MT10 fontremoveuppercase">Are you adjusting the cost for the  </span>
+	                       		<span class="pull-left T3 MR5  MT10" ng-class="{'highlightremaining' :modifyCostSourceModel.isAdjustmentRemaining, 'grayshade' :!modifyCostSourceModel.isAdjustmentRemaining}">{{bucket.selectedbucket.RemainingQty}}</span>
+								<span class="T3 pull-left MR5 MT10 fontremoveuppercase">REMAINING parts in Stock or ALL</span>
+								<span class="pull-left T3 MR5  MT10" ng-class="{'highlightremaining' :!modifyCostSourceModel.isAdjustmentRemaining, 'grayshade' :modifyCostSourceModel.isAdjustmentRemaining}">{{bucket.selectedbucket.QtyIn}}</span>
+								<span class="T3 pull-left MR5 MT10 fontremoveuppercase">parts ?</span>
+
+							</div>
+						</div>
+						<div class="option_field" ng-hide="bucket.selectedbucket.PartFIFOActivityLineItemList.length == 0">
+                            <div class="increaseOptionField">
+		                       	<div class="form_fields_new checkboxadjustment">
+                                    <div class="form-group">
+                                        <div class="form-group small MR5 MT10" >
+				                       		<label class="checkbox">
+				                             	 <span class="chk_tick chked" ng-class="{'chked' : modifyCostSourceModel.isAdjustmentRemaining}" 
+                                                                                ng-click="modifyCostSourceModel.onClickCostSource($event);" style="margin-left: 8px;">
+				                                	 <i class="fa fa-check-square chksqure" ></i>
+				                                  </span>
+				                           	 </label>
+                       	 				</div>
+                                   	</div>
+	                            </div>
+	                       		<span class="T3 pull-left MR5 MT10 italictext">I want to adjust the cost on the </span> <span class="pull-left T3 MR5  MT10 italictext" ng-class="{'highlightremaining' : modifyCostSourceModel.isAdjustmentRemaining, 'grayshade' :!modifyCostSourceModel.isAdjustmentRemaining}">{{bucket.selectedbucket.RemainingQty}}</span>
+								<span class="T3 pull-left MR5 MT10 italictext">REMAINING parts in Stock</span>
+							</div>
+                         </div>
+						<div class="option_field" ng-hide="bucket.selectedbucket.PartFIFOActivityLineItemList.length == 0">
+                            <div class="increaseOptionField">
+		                       	<div class="form_fields_new checkboxadjustment">
+                                    <div class="form-group">
+                                        <div class="form-group small MR5 MT10" >
+				                       		<label class="checkbox">
+				                             	 <span class="chk_tick" ng-class="{'chked' : !modifyCostSourceModel.isAdjustmentRemaining}" 
+                                                                                ng-click="modifyCostSourceModel.onClickCostSource($event);" style="margin-left: 8px;">
+				                                	 <i class="fa fa-check-square chksqure" ></i>
+				                                  </span>
+				                           	 </label>
+                       	 				</div>
+                                   	</div>
+	                            </div>
+	                       		<span class="T3 pull-left MR5 MT10 italictext">I want to adjust the cost on all </span> <span class="pull-left T3 MR5 MT10 italictext" ng-class="{'highlightremaining' :!modifyCostSourceModel.isAdjustmentRemaining, 'grayshade' :modifyCostSourceModel.isAdjustmentRemaining}">{{bucket.selectedbucket.QtyIn}}</span>
+								<span class="T3 pull-left MR5 MT10 italictext">parts including</span>
+								<span class="pull-left T3 MR5  MT10 italictext" ng-class="{'highlightremaining' : !modifyCostSourceModel.isAdjustmentRemaining, 'grayshade' : modifyCostSourceModel.isAdjustmentRemaining}">{{bucket.selectedbucket.QtyOut}}</span>
+								<span class="pull-left T3 MR5  MT10 italictext">parts already sold</span>
+							</div>
+							<div class="option_field " ng-hide="bucket.selectedbucket.PartFIFOActivityLineItemList.length == 0">
+	                           <div class="increaseOptionField">
+		                       		<span class="T3 pull-left MR5 MT10 fontremoveuppercase">Change cost per item from </span> <span class="pull-left T3 MR5 highlightremaining MT10">{{bucket.selectedbucket.Cost | currency }}</span>
+									<span class="T3 pull-left MR5 MT10 fontremoveuppercase">to $</span>
+									<div class="form_fields_new">
+		                                            <div class="form-group large MB">
+		                                            <price-only-input id-value = "modifyCostSourceModel.adjustedCost"
+                                                                  class-Value = "form-control"
+                                                                  place-holder-value = ""
+                                                                  max-length = "10"
+                                                                  precision-length = "2"
+                                                                  rel-value="modifyCostSourceModel.adjustedCost"
+                                                                  input-value = "modifyCostSourceModel.adjustedCost"
+                                                                  input-model = "modifyCostSourceModel.adjustedCost"
+                                                                  validation-modal = "modifyCostSourceModel.modifyCostSourcValidationModal"
+                                                              	  validation-modal-key = "adjustedCost"
+                                                                  ng-keydown="modifyCostSourceModel.updateCost();"
+                                                                  packaged="true" />
+<!-- 		                                                <input type="number" min="1" class="form-control" id="txtdescription" ng-model="modifyCostSourceModel.adjustedCost" placeholder="enter cost"  maxlength="10" />  -->
+		                                            </div> 
+	                               	</div>
+								</div>
+							</div>
+						 </div>
+		
+						</form>
+						</div>
+						<div class="col-md-12 P0 main_container_partAdjust borderlinetop" ng-show="modifyCostSourceModel.showPreview">
+							<p class="PartAdjustHeadding">Adjusted Cost Details</p>
+							<div class="gid_container_Customer part_Adjust_gid_container"
+								id="part_Adjust_gid_container">
+								<table class="table pull-left" id="part_Adjust_ItemGrid">
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="15%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<col width="10%" />
+									<thead>
+										<tr class="tableHeader T3 C2 ">
+											<th class="text-uppercase  T3 PLR0">SOURCE</th>
+											<th class=" T3 text-uppercase PLR0">DATE</th>
+											<th class=" T3 text-uppercase PLR0">ID#</th>
+											<th class=" T3 text-uppercase PLR0">REFERENCE</th>
+											<th class=" T3 text-uppercase text-center PLR0">QTY IN</th>
+											<th class="T3 text-uppercase text-center PLR0">QTY OUT</th>
+											<th class=" T3 text-uppercase text-center PLR0">REMAINING</th>
+											<th class=" T3 text-uppercase text-center PLR0">COST</th>
+											<th class=" T3 text-uppercase text-center PLR0">TOTAL</th>
+										</tr>
+									</thead>
+									<tbody class="parentBody printChild" ng-repeat = "bucket in modifyCostSourceModel.previewBucketList">
+										<tr>
+											<td class="T7" ng-class="{'fontbold' : $index == 1}">{{bucket.SourceName}}</td>
+											<td class="T7" ng-class="{'fontbold' : $index == 1}">{{bucket.CreatedDate}}</td>
+											<td class="T7" ng-class="{'fontbold' : $index == 1}"><a href="#">{{bucket.UniqueId}}</a></td>
+											<td class="T7" ng-class="{'fontbold' : $index == 1}">{{bucket.Reference}}</td>
+											<td class="T7 text-center" ng-class="{'fontbold' : $index == 1}">{{bucket.QtyIn}}</td>
+											<td class="T7 text-center" ng-class="{'fontbold' : $index == 1}">{{bucket.QtyOut}}</td>
+											<td class="T7 text-center" ng-class="{'fontbold' : $index == 1}"><span class="">{{bucket.RemainingQty}}</span></td>
+											<td class="T7 text-center additionalwidth" ng-class="{'fontbold' : $index == 1}"><span class="">{{bucket.Cost | currency}}</span></td>
+											<td class="T7 text-center" ng-class="{'fontbold' : $index == 1}">{{bucket.Total | currency}}</td>
+
+										</tr>
+										<tr ng-repeat="activitylineitem in bucket.PartFIFOActivityLineItemList">
+											<td class="T7"></td>
+											<td class="T7" ng-class="{ 'fontbold' : $index == bucket.PartFIFOActivityLineItemList.length -1 }">{{activitylineitem.CreatedDate}}</td>
+											<td class="T7" ng-class="{ 'fontbold' : $index == bucket.PartFIFOActivityLineItemList.length -1 }"><a href="#">{{activitylineitem.UniqueId}}</a></td>
+											<td class="T7" ng-class="{ 'fontbold' : $index == bucket.PartFIFOActivityLineItemList.length -1 }">{{activitylineitem.Reference}}</td>
+											<td class="T7 text-center"></td>
+											<td class="T7 text-center" ng-class="{ 'fontbold' : $index == bucket.PartFIFOActivityLineItemList.length -1 }">{{activitylineitem.QtyOut}}</td>
+											<td class="T7 text-center"><span class=""></span></td>
+											<td class="T7 text-center"><span class=""></span></td>
+											<td class="T7 text-center"></td>
+										</tr>
+									</tbody>
+									
+									
+								</table>
+							</div>
+						</div>
+						<div class="right_heading_container col-md-12">
+							<div class="savecancle_btncntnr">
+								<button type="button" id="closemodal"
+									class="btn btn-default grayBtn"
+									ng-click="modifyCostSourceModel.closePopup()">Cancel</button>
+								<button type="button" class="btn btn-default greenBtn"
+									ng-disabled="modifyCostSourceModel.showPreview"
+									ng-click="modifyCostSourceModel.showModifyCostSourcePreviewGrid();">
+									Preview</button>
+								<button type="button" class="btn btn-default greenBtn"
+									ng-if="modifyCostSourceModel.showPreview" ng-click="saveAdjustedCostSource();">Apply</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+</apex:component>

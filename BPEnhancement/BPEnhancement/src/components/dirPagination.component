@@ -1,0 +1,216 @@
+<apex:component >
+	<script>
+		/**
+		 *	Documentation:
+		 *
+		 *	1. Include directive: angular.module('myApp', ['dir.listPagination'])
+		 *	2. Attributes:
+		 *		- idValue: required
+		 *		- totalRecordsLength: required
+		 *		- pageSize: required
+		 *		- paginationControlMethod : Method on parent page to handle pagination actions
+		 *		- changesCount : Model to watch if any changes to be done
+		 **/
+		angular.module('dir.listPagination', []).directive('listPagination', function () {
+			var numberRegex = /^\d+$/;
+			return {
+				restrict : 'EA',
+				template : '<div class="col-lg-5 col-md-5" id="{{idValue}}Total_Records" style="padding-left: 20px;" class="divMiddleText">'
+								+ '({{totalRecordsLength}} Records returned)'
+							+ '</div>'
+							+ '<div class="col-lg-7 col-md-7" id="{{idValue}}Page_Index" style="padding: 0px;">'
+								+ '<div align="right" style="padding: 0px" class=" col-lg-9 col-md-9" >'
+									+ '<ul class="pagination pagination-sm" style="margin: 0px" ng-show="totalRecordsLength > pageSize">'
+										+ '<li ng-class="{ disabled : currentPage == 1 }">'
+											+ '<a href="" ng-click="setCurrent(1)">&laquo;</a>'
+										+ '</li>'
+										
+										+ '<li class="ng-scope" ng-class="{ disabled : currentPage == 1 }">'
+											+ '<a ng-click="setCurrent(currentPage-1)" class="ng-binding"><</a>'
+										+ '</li>'
+										
+										+ '<li class="ng-scope" ng-repeat="pageNumber in pages track by $index" ng-class="{ active : currentPage == pageNumber, disabled : pageNumber == \'...\' }">'
+											+ '<a href="" ng-click="setCurrent(pageNumber)">{{ pageNumber }}</a>'
+										+ '</li>'
+										
+										+ '<li class="ng-scope" ng-class="{ disabled : currentPage == last }">'
+											+ '<a href="" ng-click="setCurrent(currentPage+1)" class="ng-binding">></a>'
+										+ '</li>'
+										+ '<li ng-class="{ disabled : currentPage == last }">'
+											+ '<a href="" ng-click="setCurrent(last)">&raquo;</a>'
+										+ '</li>'
+									+ '</ul>'
+								+ '</div>'
+								+ '<div align="left" style="padding: 0px;" class="divMiddleText col-lg-3 col-md-3">'
+									+ '<div class="col-lg-4 col-md-4" style="padding: 0px 0px 0px 10px;">'
+										+ 'SHOW &nbsp;'
+									+ '</div>'
+									+ '<div style="padding: 0px;" class="col-lg-2 col-md-2">'
+										+ '<select class="form-control small" rel="BirthdayIcon" id="inputPageSize" ng-change="onChangePageSize()" ng-model="pageSize" style="height: 28px; padding: 0px; -moz-appearance: none; -webkit-appearance: none; text-indent: 0.01px; text-overflow: \'\';">'
+											+ '<option value="10" >10</option>'
+											+ '<option value="25" >25</option>'
+											+ '<option value="50" >50</option>'
+										+ '</select>'
+									+ '</div>'
+									+ '<div style="padding: 0px 0px 0px 5px;" class="col-lg-6 col-md-6">'
+										+ 'PER PAGE'
+									+ '</div>'
+								+ '</div>'
+							+ '</div>',
+				scope : {
+					idValue : '@',
+					totalRecordsLength : '=',
+					pageSize : '=',
+					currentPage : '=',
+					paginationControlMethod : '=',
+					changesCount : '='
+				},
+				link : function (scope, el, attrs) {
+					if (!scope.maxSize) {
+						scope.maxSize = 9;
+					}
+					var paginationRange = Math.max(scope.maxSize, 5);
+					var oldPageSize = scope.pageSize;
+		
+					scope.pages = [];
+					scope.last = 1;
+					scope.paginationInProcess = false;
+		
+					// Generate intial page array
+					generatePagination();
+		
+					scope.$watch(function () {
+						return scope.changesCount;
+					}, function (newChangesCount, oldChangesCount) {
+						if (newChangesCount != oldChangesCount) {
+							generatePagination();
+						}
+					});
+		
+					scope.onChangePageSize = function () {
+						var arr = String(scope.pageSize).split("");
+						var pieces = String(scope.pageSize).split(".");
+						if (arr.length === 0) {
+							return;
+						}
+		
+						if (arr[0] == '-') {
+							scope.pageSize = oldPageSize;
+						} else if (isNaN(scope.pageSize)) {
+							scope.pageSize = oldPageSize;
+						} else if (String(scope.pageSize).indexOf(".") != -1) {
+							scope.pageSize = oldPageSize;
+						}
+		
+						if (scope.pageSize != oldPageSize && typeof oldPageSize != 'undefined') {
+							scope.currentPage = 1;
+							oldPageSize = scope.pageSize;
+							goToPage(scope.currentPage);
+						}
+					}
+		
+					scope.setCurrent = function (num) {
+						if (isValidPageNumber(num)) {
+							num = parseInt(num, 10);
+							scope.currentPage = num;
+							goToPage(scope.currentPage);
+						}
+					};
+		
+					function goToPage(num) {
+						if (isValidPageNumber(num) && !scope.paginationInProcess) {
+							scope.paginationInProcess = true;
+							scope.currentPage = num;
+							setTimeout(function () {
+								if (scope.paginationControlMethod != undefined) {
+									scope.paginationControlMethod();
+								}
+								scope.paginationInProcess = false;
+							}, 10);
+						}
+					}
+		
+					function generatePagination() {
+						var page = scope.currentPage;
+						scope.pages = generatePagesArray(page, scope.totalRecordsLength, scope.pageSize, paginationRange);
+						scope.last = scope.pages[scope.pages.length - 1];
+					}
+		
+					function isValidPageNumber(num) {
+						return (numberRegex.test(num) && (0 < num && num <= scope.last));
+					}
+		
+					/**
+					 * Generate an array of page numbers (or the '...' string) which is used in an ng-repeat to generate the
+					 * links used in pagination
+					 *
+					 * @param currentPage
+					 * @param rowsPerPage
+					 * @param paginationRange
+					 * @param collectionLength
+					 * @returns {Array}
+					 */
+					function generatePagesArray(currentPage, collectionLength, rowsPerPage, paginationRange) {
+						var pages = [];
+						var totalPages = Math.ceil(collectionLength / rowsPerPage);
+						var halfWay = Math.ceil(paginationRange / 2);
+						var position;
+		
+						if (currentPage <= halfWay) {
+							position = 'start';
+						} else if (totalPages - halfWay < currentPage) {
+							position = 'end';
+						} else {
+							position = 'middle';
+						}
+		
+						var ellipsesNeeded = paginationRange < totalPages;
+						var i = 1;
+						while (i <= totalPages && i <= paginationRange) {
+							var pageNumber = calculatePageNumber(i, currentPage, paginationRange, totalPages);
+		
+							var openingEllipsesNeeded = (i === 2 && (position === 'middle' || position === 'end'));
+							var closingEllipsesNeeded = (i === paginationRange - 1 && (position === 'middle' || position === 'start'));
+							if (ellipsesNeeded && (openingEllipsesNeeded || closingEllipsesNeeded)) {
+								pages.push('...');
+							} else {
+								pages.push(pageNumber);
+							}
+							i++;
+						}
+						return pages;
+					}
+		
+					/**
+					 * Given the position in the sequence of pagination links [i], figure out what page number corresponds to that position.
+					 *
+					 * @param i
+					 * @param currentPage
+					 * @param paginationRange
+					 * @param totalPages
+					 * @returns {*}
+					 */
+					function calculatePageNumber(i, currentPage, paginationRange, totalPages) {
+						var halfWay = Math.ceil(paginationRange / 2);
+						if (i === paginationRange) {
+							return totalPages;
+						} else if (i === 1) {
+							return i;
+						} else if (paginationRange < totalPages) {
+							if (totalPages - halfWay < currentPage) {
+								return totalPages - paginationRange + i;
+							} else if (halfWay < currentPage) {
+								return currentPage - halfWay + i;
+							} else {
+								return i;
+							}
+						} else {
+							return i;
+						}
+					}
+		
+				}
+			};
+		});
+	</script>
+</apex:component>

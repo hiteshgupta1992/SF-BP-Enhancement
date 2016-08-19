@@ -1,0 +1,711 @@
+<apex:component controller="ViewVendorRelatedListCtrl">
+	<!-- Include Styles for component here -->
+	<c:AddEditPartsStyles UID="AddNewProduct" />
+
+	<!-- Include required directives -->
+	<!-- Directive for price fields -->
+	<c:dirNumberInput />
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.controls').hide();
+			$(".form-control").focus(function() {
+				$('.controls').hide();
+				$('#' + $(this).attr('rel')).show();
+
+			});
+
+			$(".anguinput").focus(function() {
+				$('.controls').hide();
+				$('#' + $(this).attr('rel')).show();
+
+			})
+
+			$('[data-toggle="tooltip"]').tooltip({
+				placement : 'bottom'
+			});
+		})
+	</script>
+
+	<script>
+		var addEditProductModule = angular.module('addEditProductModule', [ 'dir.priceInput', 'autocomplete', 'ui-notification' ]);
+		addEditProductModule.controller('newEditProductCtrl',function($scope, AddEditProductService, Notification) {
+			// START: Modals declaration
+			$scope.ProductCompModal.ProductModal = {};
+			$scope.ProductCompModal.isValidForm = true;
+			$scope.ProductCompModal.tabIndexValue = 0;
+			$scope.ProductCompModal.CategoryNameStr = "";
+			//$scope.ProductCompModal.saveButtonClicked = false;
+	
+			$scope.ProductCompModal.helpText = {
+				Save : 'Save infomation',
+				Cancel : 'Cancel all changes',
+				Type : 'Product Type',
+				Code : 'Product Code',
+				Cost : 'Product Cost',
+				Price : 'Product Price',
+				Category : 'Product Category',
+				Term : 'Product Term',
+				Mileage : 'Product Mileage',
+				Deductible : 'Product Deductible',
+				Description : 'Product Description',
+			};
+
+			$scope.ProductCompModal.ProductFieldsFilter = {
+				SubletCategory : [ {
+					Field : "Type__c",
+					Value : "Sublet",
+                    FilterObject :"Category__c"
+				} ]
+			};
+
+			// Set default values for validation model
+			// Method to set default values for validation model
+			$scope.ProductCompModal.setDefaultValidationModal = function() {
+				$scope.ProductCompModal.productFormValidationModal = {
+					Type : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Required'
+					},
+					Code : {
+						isError : false,
+						ErrorMessage : '',
+						Type : 'Required'
+					},
+					/* Cost : {
+					     isError : false,
+					     ErrorMessage : '',
+					     Type : 'Required'
+					 },
+					 Price : {
+					     isError : false,
+					     ErrorMessage : '',
+					     Type : 'Required'
+					 }*/
+				};
+			}
+			// END: Modals declaration
+
+			// START: Popup related methods
+			// Method to open self popup.
+			$scope.ProductCompModal.openAddProductPopup = function(vendorId) {
+				$scope.ProductCompModal.clearAllData();
+				$scope.ProductCompModal.ProductModal.vendorId = vendorId;
+				$scope.ProductCompModal.getAndSetSystemDefaultCategory();
+				$scope.ProductCompModal.openPopup();
+			}
+
+			// Method to open self popup.
+			$scope.ProductCompModal.openEditProductPopup = function(productId, vendorId) {
+				// Get current Product id and fill the form with related information
+				$scope.ProductCompModal.currentProductId = productId;
+				$scope.ProductCompModal.ProductModal.Id = productId;
+				$scope.ProductCompModal.ProductModal.vendorId = vendorId;
+
+				// Set default values
+				$scope.ProductCompModal.setDataDefault();
+				//$scope.ProductCompModal.saveButtonClicked = false;
+				$scope.ProductCompModal.getCurrentProductData();
+			}
+
+			// Open popup box
+			$scope.ProductCompModal.openPopup = function() {
+				angular.element('#AddNewProduct').modal({
+					backdrop : 'static',
+					keyboard : false
+				});
+
+				setTimeout(function() {
+					angular.element(document.getElementById("AddNewProduct").querySelector('[tabindex="1"]')).focus();
+				}, 1000);
+			}
+
+			// Close popup box
+			$scope.ProductCompModal.closePopup = function() {
+				angular.element('#AddNewProduct').modal('hide');
+			}
+			// END: Popup related methods
+
+			// START: Reset and refresh form fields methods
+			// Method to get default category for form
+			$scope.ProductCompModal.getAndSetSystemDefaultCategory = function() {
+				AddEditProductService.getSystemDefaultCategory('').then(function(categoryRecord) {
+					$scope.ProductCompModal.UpdateCategoryInForm(categoryRecord);
+				}, function(errorSearchResult) {
+					//$scope.ViewCustomer.CustomerInfo = errorSearchResult;
+				});
+			}
+
+			// Set default category in form
+			$scope.ProductCompModal.UpdateCategoryInForm = function(categoryRecord) {
+				$scope.ProductCompModal.ProductModal.CategoryId = categoryRecord.DefaultCategoryId;
+				$scope.ProductCompModal.ProductModal.CategoryName = categoryRecord.DefaultCategoryName;
+				$scope.ProductCompModal.CategoryNameStr = categoryRecord.DefaultCategoryName;
+			}
+
+			// Method to clear all form fields and set default values
+			$scope.ProductCompModal.clearAllData = function() {
+				$scope.ProductCompModal.currentProductId = null;
+				$scope.ProductCompModal.ProductModal = {};
+				$scope.ProductCompModal.ProductModal.Cost = 0;
+				$scope.ProductCompModal.ProductModal.Price = 0;
+				//$scope.ProductCompModal.saveButtonClicked = false;
+
+				// Set default values
+				$scope.ProductCompModal.setDataDefault();
+			}
+
+			// Set default data for new
+			$scope.ProductCompModal.setDataDefault = function() {
+				$scope.ProductCompModal.setDefaultValidationModal();
+				$scope.ProductCompModal.CategoryNameStr = "";
+			}
+			// END: Reset and refresh form fields methods
+
+			// START: DOM event handler methods
+			// On click of cancel button, close the popup
+			$scope.ProductCompModal.CancelProductForm = function(event) {
+				$scope.ProductCompModal.closePopup();
+			}
+
+			// On click of Save button, save form data and close popup
+			$scope.ProductCompModal.SaveProductForm = function(event) {
+				// By default set valid flag to true before starting validation
+				$scope.ProductCompModal.isValidForm = true;
+				//$scope.ProductCompModal.saveButtonClicked = true;
+				//debug($scope.ProductCompModal.saveButtonClicked);
+				
+				//$scope.ProductCompModal.checkForSimilarProduct();
+				/* if($scope.ProductCompModal.isDuplicateProductCode) {
+					$scope.ProductCompModal.saveButtonClicked = false;
+					return;
+				} */
+								
+				// Validate form
+				$scope.ProductCompModal.validateForm();
+				
+				if ($scope.ProductCompModal.isValidForm) {
+					debug("valid");
+					var productRecords = [];
+					//debug($scope.ProductCompModal.saveButtonClicked);
+					debug($scope.ProductCompModal.ProductModal);
+					if($scope.ProductCompModal.ProductModal.Cost == "" || $scope.ProductCompModal.ProductModal.Cost == null) {
+	               		$scope.ProductCompModal.ProductModal.Cost = 0;
+	               	}
+	               	if($scope.ProductCompModal.ProductModal.Price == "" || $scope.ProductCompModal.ProductModal.Price == null) {
+	               		$scope.ProductCompModal.ProductModal.Price = 0;
+	               	}
+					productRecords.push($scope.ProductCompModal.ProductModal);
+					$scope.ProductCompModal.saveProductData(productRecords);
+				} else {
+					debug("Invalid");
+					//$scope.ProductCompModal.saveButtonClicked = false;
+					//debug($scope.ProductCompModal.saveButtonClicked);
+					//angular.element(".redborder")[0].focus();
+				}
+			}
+			// END: DOM event handler methods
+
+			// START: Form validation process
+			// Method to validate form
+			$scope.ProductCompModal.validateForm = function() {
+				
+				angular.forEach($scope.ProductCompModal.productFormValidationModal,function(value, key) {
+					$scope.ProductCompModal.validateFieldWithKey(key);
+					if ($scope.ProductCompModal.productFormValidationModal[key].isError) {
+						$scope.ProductCompModal.isValidForm = false;
+					}
+				});
+			}
+
+			// Validation method for a field with modelKey value
+			$scope.ProductCompModal.validateFieldWithKey = function(modelKey) {
+				var fieldValue = $scope.ProductCompModal.ProductModal[modelKey];
+				var numericRegex = /^[0-9]*$/;
+				var validateType = $scope.ProductCompModal.productFormValidationModal[modelKey].Type;
+
+				if (validateType.indexOf('Numeric') > -1) {
+					if (fieldValue != '' && fieldValue != undefined && !numericRegex.test(fieldValue)) {
+						$scope.ProductCompModal.productFormValidationModal[modelKey].isError = true;
+						$scope.ProductCompModal.productFormValidationModal[modelKey].ErrorMessage = 'Invalid field Value';
+					} else {
+						$scope.ProductCompModal.productFormValidationModal[modelKey].isError = false;
+						$scope.ProductCompModal.productFormValidationModal[modelKey].ErrorMessage = '';
+					}
+				}
+				if (validateType.indexOf('Required') > -1) {
+					if (fieldValue == undefined || fieldValue == null || $scope.ProductCompModal.ProductModal[modelKey] == '') {
+						$scope.ProductCompModal.productFormValidationModal[modelKey].isError = true;
+						$scope.ProductCompModal.productFormValidationModal[modelKey].ErrorMessage = 'Field is Required';
+					} else {
+						$scope.ProductCompModal.productFormValidationModal[modelKey].isError = false;
+						$scope.ProductCompModal.productFormValidationModal[modelKey].ErrorMessage = '';
+					}
+				}
+
+				// Set validation flag value
+				if ($scope.ProductCompModal.productFormValidationModal[modelKey].isError == true) {
+					$scope.ProductCompModal.isValidForm = false;
+				}
+			}
+			// END: Form validation process
+
+			// START: Service call methods
+			// Get Product data from server and fill form
+			$scope.ProductCompModal.getCurrentProductData = function() {
+				AddEditProductService.getProductInfoById($scope.ProductCompModal.currentProductId).then(function(productRecord) {
+					$scope.ProductCompModal.UpdateFormFieldsWithExistingProduct(productRecord);
+				},
+				function(errorSearchResult) {
+					Notification.error("Some error occurred while fetching the record. Please try again.");
+				});
+			}
+							
+			/* $scope.ProductCompModal.checkForSimilarProduct = function() {
+				var code = $scope.ProductCompModal.ProductModal.Code;
+				var vendorId = $scope.ProductCompModal.ProductModal.vendorId;
+				if(code == '' || typeof code == 'undefined' || code.length == 0) {
+					return;
+				}
+				debug(code + '  ' + vendorId);
+				
+				$scope.ProductCompModal.isDuplicateProductCode = false;
+				AddEditProductService.checkForSimilarProduct(code, vendorId).then(function(isSimilarProductPresent) {
+					if(isSimilarProductPresent == 'true') {
+						$scope.ProductCompModal.isDuplicateProductCode = true;
+						$scope.ProductCompModal.productFormValidationModal['Code'].isError = true;
+						$scope.ProductCompModal.productFormValidationModal['Code'].ErrorMessage = 'Product Code already present for vendor';
+					} else if(isSimilarProductPresent == 'false') {
+						$scope.ProductCompModal.productFormValidationModal['Code'].isError = false;
+						$scope.ProductCompModal.productFormValidationModal['Code'].ErrorMessage = '';
+					}
+				},
+				function(errorSearchResult) {
+					Notification.error("Some error occurred while searching similar Product. Please try again.");
+				});
+			} */
+
+			// Method to Save product record data
+			$scope.ProductCompModal.saveProductData = function(productJSON) {
+				AddEditProductService.saveProductInfo(productJSON).then(function(newProductDetails) {
+					debug("saving..");
+					if(newProductDetails.indexOf('Product Code already present for vendor') > -1) {
+						Notification.error(newProductDetails);
+					}
+					else{
+						if ($scope.$parent.ViewVendor.RelatedLists_recordSaveCallback != undefined) {
+							$scope.$parent.ViewVendor.RelatedLists_recordSaveCallback("{!$ObjectType.Product__c.label}",newProductDetails);
+						}
+					}
+					// If parent page has product save callback method, then perform the method and close popup
+					
+				},
+				function(errorSearchResult) {
+					debug(errorSearchResult);
+					Notification.error('Error while saving record.');
+					$scope.ProductCompModal.closePopup();
+				});
+			}
+
+			// Set all the form fields with existing Product record
+			$scope.ProductCompModal.UpdateFormFieldsWithExistingProduct = function(productRecord) {
+				$scope.ProductCompModal.ProductModal = productRecord[0];
+				if ($scope.ProductCompModal.ProductModal.CategoryName != null) {
+					$scope.ProductCompModal.CategoryNameStr = $scope.ProductCompModal.ProductModal.CategoryName;
+				}
+				$scope.ProductCompModal.openPopup();
+			}
+			// END: Service call methods
+		});
+
+		// START: Services definition for Product component
+		addEditProductModule.service("AddEditProductService",function($q) {
+			// Get method for retrival of all field values of a Product by Id
+			this.getProductInfoById = function(productId) {
+				productId = encodeString(productId);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ViewVendorRelatedListCtrl.getProductInfoById}',productId,function(result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var productRecord = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						productRecord = productRecord.replace(re, '');
+						deferred.resolve(JSON.parse(productRecord));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+
+			// Get method for default category record as per selected vendor
+			this.getSystemDefaultCategory = function(vendorId) {
+				vendorId = encodeString(vendorId);
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ViewVendorRelatedListCtrl.getSystemDefaultCategory}',vendorId,function(result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(event.message);
+					} else {
+						var categoryRecord = decodeString(result);
+						var find = '\'';
+						var re = new RegExp(find, 'g');
+						categoryRecord = categoryRecord.replace(re, '');
+						deferred.resolve(JSON.parse(categoryRecord));
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+							
+			/* this.checkForSimilarProduct = function(code, vendorId) {
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ViewVendorRelatedListCtrl.getSimilarProduct}',code, vendorId,function(result, event) {
+					if (event.type == 'exception') {
+						deferred.reject(JSON.parse('[]'));
+					} else {
+						var isSimilarPresent = result;
+						deferred.resolve(isSimilarPresent);
+					}
+				}, {
+					escape : false
+				});
+				return deferred.promise;
+			} */
+
+			// Save method for Product record
+			this.saveProductInfo = function(productRecordJSON) {
+				debug("inside saveProductInfo");
+				productRecordJSON = encodeString(angular.toJson(productRecordJSON));
+				var deferred = $q.defer();
+				Visualforce.remoting.Manager.invokeAction('{!$RemoteAction.ViewVendorRelatedListCtrl.addUpdateProductToVendor}',productRecordJSON,function(result, event) {
+					if (event.type == 'exception') {
+					 debug('called');
+						 deferred.reject(event.message);
+					} else {
+						if(result.indexOf('Product Code already present for vendor') > -1) {
+							deferred.resolve(decodeString(result));
+						} else {
+							var productRecord = decodeString(result);
+							var find = '\'';
+							var re = new RegExp(find, 'g');
+							productRecord = productRecord.replace(re, '');
+							deferred.resolve(JSON.parse(productRecord));
+						}
+					}
+				}, {
+					escape : true
+				});
+				return deferred.promise;
+			}
+		});
+		// END: Services definition for Product component
+	</script>
+
+	<!-- View product for Add/Edit Product component -->
+	<div id="AddNewProduct" class="modal fade"
+		ng-controller="newEditProductCtrl">
+		<div class="modal-dialog">
+			<!--   <div class="bg_container col-lg-12 col-md-12" /> -->
+			<div class="popup_container">
+				<div class="popupinside">
+					<div class="popupright col-lg-12 col-lg-12">
+
+						<!-- Heading section -->
+						<div class="right_heading_container col-lg-12 col-md-12">
+							<h1 class="right_panel_heading"
+								ng-show="ProductCompModal.currentProductId == null">{!$Label.New_Label}
+								{!$ObjectType.Product__c.label}</h1>
+							<h1 class="right_panel_heading"
+								ng-show="ProductCompModal.currentProductId != null">{!$Label.Edit_Label}
+								{!$ObjectType.Product__c.label}</h1>
+							<div class="savecancle_btncntnr">
+								<button type="button" id="productCancelBtn"
+									class="btn btn-default grayBtn"
+									ng-click="ProductCompModal.CancelProductForm($event);"
+									ng-enter="ProductCompModal.CancelProductForm($event);"
+									ng-blur="ProductCompModal.tabIndexValue = 0"
+									ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 13}}">
+									{!$Label.Cancel_Label}</button>
+								<button type="button" id="productSaveBtn"
+									class="btn btn-default greenBtn"
+									ng-click="ProductCompModal.SaveProductForm($event);"
+									ng-enter="ProductCompModal.SaveProductForm($event);"
+									ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 12}}">
+									<!-- ng-disabled="ProductCompModal.saveButtonClicked == true" -->
+									{!$Label.Save_Label}</button>
+							</div>
+						</div>
+						<div class="clearfix"></div>
+
+						<!-- Edit fields content -->
+						<div class="sub_content" style="margin-top: 25px;">
+							<div class="tabconainer">
+								<!-- <div class="form-group" style="float: right;padding-left: 88px;">
+	                                    <label for="required" class="FC9">* {!$Label.Indicates_Required_Fields}</label>
+	                            </div> -->
+								<!-- Type value -->
+								<div class="option_field">
+									<div class="lable_fields">
+										<p class="req-label">{!$ObjectType.Product__c.fields.Type__c.label}</p>
+									</div>
+									<div class="form_fields left">
+										<div class="form-group">
+											<select class="form-control" id="type" rel="typeHelp"
+												ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 1}}"
+												ng-model="ProductCompModal.ProductModal.Type"
+												ng-blur="ProductCompModal.validateFieldWithKey('Type')"
+												ng-class="{'redborder' : ProductCompModal.productFormValidationModal['Type']['isError'] == true}"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.productFormValidationModal['Type']['ErrorMessage']}}">
+												<!--                                                 <option value="Warranty">   Warranty    </option> -->
+												<option value="Sublet">Sublet</option>
+												<!--                                                 <option value="Third Party">Third Party </option> -->
+											</select>
+										</div>
+										<div class="controls1 controls" id="typeHelp">
+											<i class="fa fa-question-circle helplink"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.helpText['Type']}}"></i>
+										</div>
+									</div>
+								</div>
+
+								<!-- Code value -->
+								<div class="option_field">
+									<div class="lable_fields">
+										<p class="req-label">{!$ObjectType.Product__c.fields.Code__c.label}</p>
+									</div>
+									<div class="form_fields left">
+										<div class="form-group">
+											<input type="text" class="form-control" id="code"
+												placeholder="{!$ObjectType.Product__c.fields.Code__c.label}"
+												maxlength="80"
+												ng-blur="ProductCompModal.validateFieldWithKey('Code')"
+												ng-model="ProductCompModal.ProductModal.Code" rel="codeHelp1"
+												ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 2}}"
+												ng-class="{'redborder' : ProductCompModal.productFormValidationModal['Code']['isError'] == true}"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.productFormValidationModal['Code']['ErrorMessage']}}" />
+										</div>
+										<div class="controls1 controls" id="codeHelp1">
+											<i class="fa fa-question-circle helplink"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.helpText['Code']}}"></i>
+										</div>
+									</div>
+								</div>
+
+								<!-- Description value -->
+								<div class="option_field">
+									<div class="lable_fields">
+										<p>{!$ObjectType.Product__c.fields.Description__c.label}</p>
+									</div>
+									<div class="form_fields left">
+										<div class="form-group">
+											<input type="text" class="form-control" id="description"
+												placeholder="{!$ObjectType.Product__c.fields.Description__c.label}"
+												maxlength="255" rel="descriptionHelp"
+												ng-model="ProductCompModal.ProductModal.Description"
+												ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 3}}"
+												ng-class="{'redborder' : ProductCompModal.productFormValidationModal['Description']['isError'] == true}"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.productFormValidationModal['Description']['ErrorMessage']}}" />
+										</div>
+										<div class="controls1 controls" id="descriptionHelp">
+											<i class="fa fa-question-circle helplink"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.helpText['Description']}}"></i>
+										</div>
+									</div>
+								</div>
+
+								<!-- Cost -->
+								<div class="option_field">
+									<div class="lable_fields">
+										<p class="extraMargin">{!$ObjectType.Product__c.fields.Cost__c.label}</p>
+									</div>
+									<div class="form_fields left">
+										<div class="form-group " style="width:80px">
+											<price-only-input id-value="Cost" class-value="form-control"
+												place-holder-value="{!$ObjectType.Product__c.fields.Cost__c.label}"
+												max-length="9" precision-length="2"
+												tab-index="{{ProductCompModal.tabIndexValue + 4}}"
+												input-value="ProductCompModal.ProductModal.Cost"
+												validation-modal="ProductCompModal.productFormValidationModal"
+												validation-modal-key="Cost" input-model="ProductCompModal"
+												rel-value="CostHelp" />
+										</div>
+										<div class="controls1 controls" id="CostHelp">
+											<i class="fa fa-question-circle helplink"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.helpText['Cost']}}"></i>
+										</div>
+									</div>
+								</div>
+
+								<!-- Price -->
+								<div class="option_field">
+									<div class="lable_fields">
+										<p class="extraMargin">{!$ObjectType.Product__c.fields.Price__c.label}</p>
+									</div>
+									<div class="form_fields left">
+										<div class="form-group " style="width:80px">
+											<price-only-input id-value="Price" class-value="form-control"
+												place-holder-value="{!$ObjectType.Product__c.fields.Price__c.label}"
+												max-length="9" precision-length="2"
+												tab-index="{{ProductCompModal.tabIndexValue + 5}}"
+												input-value="ProductCompModal.ProductModal.Price"
+												validation-modal="ProductCompModal.productFormValidationModal"
+												validation-modal-key="Price" input-model="ProductCompModal"
+												rel-value="PriceHelp" />
+										</div>
+										<div class="controls1 controls" id="PriceHelp">
+											<i class="fa fa-question-circle helplink"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.helpText['Price']}}"></i>
+										</div>
+									</div>
+								</div>
+
+								<!-- Category autocomplete -->
+								<div class="option_field">
+									<div class="lable_fields">
+										<p>{!$ObjectType.Product__c.fields.Category__c.label}</p>
+									</div>
+									<div class="form_fields left" style="margin-bottom: 50px">
+										<div class="form-group">
+											<autocomplete id="Category"
+												tab-index="{{ProductCompModal.tabIndexValue + 6}}"
+												rel-value="CategoryHelp"
+												placeholder="{!$ObjectType.Product__c.fields.Category__c.label}"
+												type="{!$Label.Category_Object_Display_Label}"
+												titlefield="Name" validationkey="Category"
+												errorclass="ProductCompModal.productFormValidationModal"
+												typesearchmodal="ProductCompModal.CategoryNameStr"
+												filter-param="ProductCompModal.ProductFieldsFilter.SubletCategory" />
+										</div>
+										<div class="controls1 controls" id="CategoryHelp">
+											<i class="fa fa-question-circle helplink"
+												data-toggle="tooltip"
+												title="{{ProductCompModal.helpText['Category']}}"></i>
+										</div>
+									</div>
+								</div>
+
+								<!-- Term -->
+								<!-- <div class="option_field">
+                                    <div class="lable_fields">
+                                        <p class="extraMargin">{!$ObjectType.Product__c.fields.Term__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group small2">
+                                            <price-only-input id-value = "Term"
+                                                              class-value = "form-control"
+                                                              place-holder-value = "{!$ObjectType.Product__c.fields.Term__c.label}"
+                                                              max-length = "3" 
+                                                              precision-length = "-1" 
+                                                              tab-index = "{{ProductCompModal.tabIndexValue + 7}}"
+                                                              input-value = "ProductCompModal.ProductModal.Term"
+                                                              validation-modal = "ProductCompModal.productFormValidationModal"
+                                                              validation-modal-key = "Term"
+                                                              input-model = "ProductCompModal" 
+                                                              rel-value = "TermHelp"/>
+                                        </div>
+                                        <div class="divMiddleText" style="margin-top: 10px;">&#160; Months</div>
+                                        <div class="controls1 controls" id="TermHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{ProductCompModal.helpText['Term']}}"></i>
+                                        </div>
+                                    </div>
+                                </div> -->
+
+								<!-- Mileage -->
+								<!--       <div class="option_field">
+                                    <div class="lable_fields">
+                                        <p class="extraMargin">{!$ObjectType.Product__c.fields.Mileage__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group small2">
+                                            <price-only-input id-value = "Mileage"
+                                                              class-value = "form-control"
+                                                              place-holder-value = "{!$ObjectType.Product__c.fields.Mileage__c.label}"
+                                                              max-length = "5" 
+                                                              precision-length = "-1" 
+                                                              tab-index = "{{ProductCompModal.tabIndexValue + 8}}"
+                                                              input-value = "ProductCompModal.ProductModal.Mileage"
+                                                              validation-modal = "ProductCompModal.productFormValidationModal"
+                                                              validation-modal-key = "Mileage"
+                                                              input-model = "ProductCompModal" 
+                                                              rel-value = "MileageHelp"/>
+                                        </div>
+                                        <div class="controls1 controls" id="MileageHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{ProductCompModal.helpText['Mileage']}}"></i>
+                                        </div>
+                                    </div>
+                                </div> -->
+
+								<!-- Deductible -->
+								<!--            <div class="option_field">
+                                    <div class="lable_fields">
+                                        <p class="extraMargin">{!$ObjectType.Product__c.fields.Deductible__c.label}</p>
+                                    </div>
+                                    <div class="form_fields left">
+                                        <div class="form-group small2">
+                                            <price-only-input id-value = "Deductible"
+                                                              class-value = "form-control"
+                                                              place-holder-value = "{!$ObjectType.Product__c.fields.Deductible__c.label}"
+                                                              max-length = "9" 
+                                                              precision-length = "3" 
+                                                              tab-index = "{{ProductCompModal.tabIndexValue + 9}}"
+                                                              input-value = "ProductCompModal.ProductModal.Deductible"
+                                                              validation-modal = "ProductCompModal.productFormValidationModal"
+                                                              validation-modal-key = "Deductible"
+                                                              input-model = "ProductCompModal" 
+                                                              rel-value = "DeductibleHelp"/>
+                                        </div>
+                                        <div class="controls1 controls" id="DeductibleHelp" >
+                                            <i class="fa fa-question-circle helplink" data-toggle="tooltip" title="{{ProductCompModal.helpText['Deductible']}}"></i>
+                                        </div>
+                                    </div>
+                                </div> -->
+
+							</div>
+						</div>
+
+						<div class="right_heading_container col-lg-12 col-md-12">
+							<div class="savecancle_btncntnr">
+								<button type="button" id="productCancelBtn"
+									class="btn btn-default grayBtn"
+									ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 11}}"
+									ng-click="ProductCompModal.CancelProductForm($event);"
+									ng-enter="ProductCompModal.CancelProductForm($event);">
+									{!$Label.Cancel_Label}</button>
+								<button type="button" id="productSaveBtn"
+									class="btn btn-default greenBtn"
+									ng-attr-tabindex="{{ProductCompModal.tabIndexValue + 10}}"
+									ng-click="ProductCompModal.SaveProductForm($event);"
+									ng-enter="ProductCompModal.SaveProductForm($event);">
+									<!-- ng-disabled="ProductCompModal.saveButtonClicked == true" -->
+									{!$Label.Save_Label}</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+	</div>
+
+	<style>
+#AddNewProduct .small2 {
+	width: 30% !important;
+}
+
+#AddNewProduct .extraMargin {
+	margin-top: 4px;
+}
+</style>
+</apex:component>
