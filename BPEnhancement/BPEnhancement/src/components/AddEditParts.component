@@ -6,6 +6,7 @@
     <!-- Directive for price fields -->
    	<c:dirNumberInput />
 	<style>
+		// comment
 		.controls.visibletooltip{
 			display : block !important;
 		}
