@@ -10,6 +10,8 @@ public with sharing class SOInfoPrintPreviewPDFCtrl {
 			List<Account> customerList = new List<Account>();
 			List<Service_Order_Kit_Header__c> soKitHeaderList = new List<Service_Order_Kit_Header__c>();
 			List<Service_Order_Header__c> soHeaderRecList = SOQLUtil.getSODetailsByFieldName(new Map<String, String>{'Id' => string.escapesinglequotes(soHeaderId)});
+			
+			if(AccessControl.ifObjectFieldIsAccessible('Individual_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
 			List<Individual_Tax__c> individualTaxList = [select Sales_Tax_Item_Name__c, Tax_Rate__c, Service_Order_Line_Item__c, 		
     														Service_Order_Line_Item__r.Total__c, Service_Order_Line_Item__r.Tax_Percent__c	 		
     														from Individual_Tax__c		

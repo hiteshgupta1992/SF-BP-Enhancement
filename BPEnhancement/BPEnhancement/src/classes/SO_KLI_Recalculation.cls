@@ -98,8 +98,8 @@ public with sharing class SO_KLI_Recalculation {
                                             Labour_Rate__c = soHeaderList[0].Provider__r.Price_Level__r.Labour_Rate__c
                                         );
             
+            if(AccessControl.ifObjectFieldIsAccessible('Tax_Exemption__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
             taxExtemptionList = [select Id,Sales_Tax_Item__r.Rate__c,Sales_Tax_Item__c from Tax_Exemption__c where Customer__c =: soHeaderList[0].Provider__c];
-                            
                                         
         } else if(customer.Price_Level__r != null) {
             
@@ -107,8 +107,8 @@ public with sharing class SO_KLI_Recalculation {
                                                         Discount_Markup__c = customer.Price_Level__r.Discount_Markup__c,
                                                         Labour_Rate__c = customer.Price_Level__r.Labour_Rate__c
                                                     );
+			if(AccessControl.ifObjectFieldIsAccessible('Tax_Exemption__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }                                                    
             taxExtemptionList = [select Id,Sales_Tax_Item__r.Rate__c,Sales_Tax_Item__c from Tax_Exemption__c where Customer__c =: customerId];
-            
             
         } else {
             if(AccessControl.ifObjectFieldIsAccessible('Price_Level__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
@@ -117,9 +117,9 @@ public with sharing class SO_KLI_Recalculation {
                 return;
             }
             if(customerId !=null){
-            taxExtemptionList = [select Id,Sales_Tax_Item__r.Rate__c,Sales_Tax_Item__c from Tax_Exemption__c where Customer__c =: customerId];
+            	if(AccessControl.ifObjectFieldIsAccessible('Tax_Exemption__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+            	taxExtemptionList = [select Id,Sales_Tax_Item__r.Rate__c,Sales_Tax_Item__c from Tax_Exemption__c where Customer__c =: customerId];
             }
-            
             priceLevel = defaultPriceLevel[0];
         }
         
@@ -162,7 +162,6 @@ public with sharing class SO_KLI_Recalculation {
           if(AccessControl.ifObjectFieldIsAccessible('Part__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
           if(AccessControl.ifObjectFieldIsAccessible('Fee__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
           if(AccessControl.ifObjectFieldIsAccessible('Labour_Code__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
-          //if(AccessControl.ifObjectFieldIsAccessible('Applicable_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
           List<Part__c>  listPartSalesTax= new list<Part__c> ([Select Id,Applicable_Tax__r.Rate__c,Applicable_Tax__c From Part__c  where Id IN:partIdSet ]);
           List<Fee__c>  listFeeSalesTax= new list<Fee__c> ([Select Id,Applicable_Tax__r.Rate__c,Applicable_Tax__c From Fee__c  where Id IN:feeIdSet ]);
           List<Labour_Code__c>  listLaborPrices = new list<Labour_Code__c> ([Select Id,Fixed_Rate__c,Applicable_Tax__r.Rate__c,Applicable_Tax__c From Labour_Code__c  where Id IN:laborIdSet ]);
@@ -972,6 +971,7 @@ public with sharing class SO_KLI_Recalculation {
             databseSOKHRecoord.Tax_amount__c = TotalTaxAmount;
             ServiceOrderLineItemTriggerHelper.isTriggerExecuted =true;
             if(!(databseSOKHRecoord.Is_Fixed_Kit_Header_SO__c || databseSOKHRecoord.Fixed_Price_Flag__c )){
+                if(AccessControl.ifObjectFieldIsUpdateable('Service_Order_Kit_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
                 update databseSOKHRecoord;
             }
              

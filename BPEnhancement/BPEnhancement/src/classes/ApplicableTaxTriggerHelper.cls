@@ -38,6 +38,9 @@ public with sharing class ApplicableTaxTriggerHelper {
             }
         }
         
+        if(AccessControl.ifObjectFieldIsAccessible('Sales_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+        if(AccessControl.ifObjectFieldIsAccessible('Applicable_Taxes__r') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+        
         mapOfST = new Map<Id,Sales_Tax__c>([Select Rate__c, 
                                                   (select Id, Sales_Tax_Item__c,
                                                           Sales_Tax_Item__r.Rate__c,

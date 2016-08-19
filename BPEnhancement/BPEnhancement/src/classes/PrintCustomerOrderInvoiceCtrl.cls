@@ -573,6 +573,7 @@ global with sharing class PrintCustomerOrderInvoiceCtrl {
         List<Service_Order_Header__c> soHeadersList;
          if(AccessControl.ifObjectFieldIsAccessible('Service_Order_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
           if(AccessControl.ifObjectFieldIsAccessible('Service_Order_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+          if(AccessControl.ifObjectFieldIsAccessible('Customer_Owned_Unit__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         if(coIdsList != null && coIdsList.size() > 0) {
             soHeadersList = [SELECT Id, 
                                     Name__c,

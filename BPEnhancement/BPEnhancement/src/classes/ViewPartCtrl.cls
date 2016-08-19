@@ -48,7 +48,7 @@ global with sharing class ViewPartCtrl {
 	 		partId = BPUtility.escapeSingleQuotes(partId);
 	 		query += 'SELECT Qty__c, Price__c, CO_Invoice_Header__r.LastModifiedDate FROM CO_Invoice_Item__c WHERE CO_Line_Item__r.Part__c = \'' + partId + '\' AND CO_Invoice_Header__r.Invoice_Status__c = \'Closed\' ORDER BY CO_Invoice_Header__r.LastModifiedDate DESC';
 	 		if(AccessControl.ifObjectIsAccessible('CO_Invoice_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
-	 		if(AccessControl.ifObjectIsAccessible('CO_Invoice_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	 		//if(AccessControl.ifObjectIsAccessible('CO_Invoice_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
 	 		List<CO_Invoice_Item__c> coInvoiceItems = Database.query(query);
 	 		Decimal soldLifeTimeQty = 0; 
 	 		Decimal revenueLifetime = 0;
@@ -170,7 +170,7 @@ global with sharing class ViewPartCtrl {
 	 	  	}
 	 	  	
 	 	  	if(partFIFOBucketLineItemList.size() > 0) {
-	 	  		if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	 	  		//if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
 	 	  		if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	 	  		insert partFIFOBucketLineItemList;
 	 	  	}
@@ -230,10 +230,10 @@ global with sharing class ViewPartCtrl {
 	 	  	
 	 	  	//PartFifoObjList.add(new PartFifoBucket(partBucketRec));
 	 	  	if(partFIFOBucketLineItemList.size() > 0) {
-	 	  			if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
-	 	  			if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
+	 	  			//if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	 	  			//if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	 	  			
-	 	  			if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
+	 	  		if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	 	  		insert partFIFOBucketLineItemList;
 	 	  	}
 	 	  	FIFOTransaction.updatePartInStock(new List<String>{partId});
@@ -298,7 +298,7 @@ global with sharing class ViewPartCtrl {
 	 	  	PartFifoObjList.add(new PartFifoBucket(partBucketRec));
 	 	  	if(partFIFOBucketLineItemList.size()>0)
 	 	  	{
-	 	  		if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	 	  		//if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
 	 	  		if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	 	  		insert partFIFOBucketLineItemList;
 	 	  	}
@@ -356,7 +356,7 @@ global with sharing class ViewPartCtrl {
 	 	  	}
 	 	  	if(partFIFOBucketLineItemList.size()>0)
 	 	  	{
-	 	  		if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	 	  		//if(AccessControl.ifObjectIsAccessible('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
 	 	  		if(AccessControl.ifObjectIsCreateable('Part_FIFO_Bucket_Activity_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	 	  		insert partFIFOBucketLineItemList;
 	 	  	}

@@ -135,7 +135,6 @@ global with sharing class ViewPartRelatedListCtrl {
             }
             
             if(AccessControl.ifObjectIsAccessible('Part_Alternates__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE);}
-            if(AccessControl.ifObjectIsAccessible('Part__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
             
             // Check if any alternate part is already added for the part record
             List<Part_Alternates__c> partAlternateRecords = [SELECT Id, Part_ID__r.Part_Number__c, Alternate_Part_ID__r.Part_Number__c
@@ -199,7 +198,6 @@ global with sharing class ViewPartRelatedListCtrl {
 
             alternatePartstoUpdate.add(recToUpdate);
             if(AccessControl.ifObjectIsAccessible('Part_Alternates__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE);}
-            if(AccessControl.ifObjectIsAccessible('Part__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
 
             if(preferredValToUpdate){
                 List<Part_Alternates__c> prevDefaultPOTypes = [Select   Id, 
@@ -364,15 +362,13 @@ global with sharing class ViewPartRelatedListCtrl {
     **/
     @RemoteAction
     global static String removeAlternatePartRelation(String partId, String alternatePartJunctionId, String pageSortAttrsJSON) {
-    	if(AccessControl.ifObjectIsDeletable('Part_Alternates__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE); }
-    	
         partId = Id.valueOf(BPUtility.getDecodedString(partId));
         alternatePartJunctionId = Id.valueOf(BPUtility.getDecodedString(alternatePartJunctionId));
         pageSortAttrsJSON = BPUtility.getDecodedString(pageSortAttrsJSON);
         
         try{
             Part_Alternates__c recToDel = new Part_Alternates__c(Id = alternatePartJunctionId);
-            if(AccessControl.ifObjectIsDeletable('Product__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE);}
+            if(AccessControl.ifObjectIsDeletable('Part_Alternates__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE);}
             delete recToDel;
             return BPUtility.getEncodedString(System.JSON.serialize( new AllAlternatePartsWrapper(partId, pageSortAttrsJSON) ));
         }catch(exception ex){

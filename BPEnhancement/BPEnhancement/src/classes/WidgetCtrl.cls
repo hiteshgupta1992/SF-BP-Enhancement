@@ -44,6 +44,7 @@ global with sharing class WidgetCtrl {
 	            
 	        } else {
 	            if(AccessControl.ifObjectIsUpdateable('Widget_User_Junction__c') == false){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	            if(AccessControl.ifObjectFieldIsAccessible('Widget_User_Junction__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
 	            Integer counter = [SELECT COUNT() FROM Widget_User_Junction__c WHERE  WidgetOrder__c != NULL AND Is_Visible__c = true ];
 	            widgetUserJunctionObject = new Widget_User_Junction__c(Id = widgetJunctionId, Is_Visible__c = isVisible, WidgetOrder__c =  ++counter);
 	          	if(AccessControl.ifObjectIsUpdateable('Widget_User_Junction__c') == false){throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE);}

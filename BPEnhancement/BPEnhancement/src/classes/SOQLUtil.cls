@@ -4011,6 +4011,7 @@ public with sharing class SOQLUtil {
             query += 'WHERE ID IN : ttIds '; 
         } 
         query += ' order by Code__c';
+        if(AccessControl.ifObjectFieldIsAccessible('Account') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         if(AccessControl.ifObjectFieldIsAccessible('Transaction_Type__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         List<Transaction_Type__c> ttList = Database.query(query);
         return ttList;

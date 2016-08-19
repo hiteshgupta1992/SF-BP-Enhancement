@@ -47,6 +47,7 @@ public with sharing class CategoryTriggerHelper {
     public static void updateDefaultField() {
     	
     	if(AccessControl.ifObjectFieldIsUpdateable('Category__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
+    	if(AccessControl.ifObjectFieldIsAccessible('Category__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
     	for(Category__c categoryRec : categoryNewList) {
     		if(categoryRec.Default__c && !categoryRec.Active__c) {
     			categoryRec.addError('You can\'t make inactive category as default' );

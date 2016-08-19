@@ -40,6 +40,7 @@ public with sharing class COKH_Recalcualtion {
     public static String COKHPriceLevelCalculationByMerchandise( List<Id> listkitheaderId,string CustomerId ,string CoheaderId ){
         if(AccessControl.ifObjectFieldIsCreateable('Price_Level__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
         if(AccessControl.ifObjectFieldIsCreateable('Sales_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
+        if(AccessControl.ifObjectFieldIsAccessible('CO_Kit_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         
         Price_Level__c priceLevel = new Price_Level__c();
         Sales_Tax__c salesTax = new Sales_Tax__c();
@@ -67,7 +68,8 @@ public with sharing class COKH_Recalcualtion {
         else{
                 if(AccessControl.ifObjectFieldIsAccessible('CO_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
                 if(AccessControl.ifObjectFieldIsAccessible('Tax_Exemption__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
-                
+                if(AccessControl.ifObjectFieldIsAccessible('Sales_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+                                
                              CO_Header__c Coheader = [Select Part_Price_Base_From_Price_Level__c, Discount_Markup_From_Prive_Level__c,Customer__r.Sales_Tax__c,Customer__c 
                                         From CO_Header__c  where Id =: CoheaderId ];
                             
@@ -107,7 +109,9 @@ public with sharing class COKH_Recalcualtion {
             
             
             if(AccessControl.ifObjectFieldIsAccessible('CO_Kit_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+            if(AccessControl.ifObjectFieldIsUpdateable('CO_Kit_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
             if(AccessControl.ifObjectFieldIsUpdateable('CO_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+            if(AccessControl.ifObjectFieldIsAccessible('CO_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
             List<CO_Kit_Header__c> CoKitHeaderList = [Select Id,Price__c,Fixed_Price_Flag__c,(Select Price__c,Part__c,Fixed_Price__c,Qty__c,Tax__c,Part__r.Applicable_Tax__r.Rate__c,Fee__c,Fee__r.Applicable_Tax__r.Rate__c From CO_Line_Items__r)
                                                         From CO_Kit_Header__c where CO_Kit_Header__c.Id IN : listkitheaderId];
             
@@ -134,7 +138,8 @@ public with sharing class COKH_Recalcualtion {
            }
             
           if(AccessControl.ifObjectFieldIsAccessible('Part__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
-          //if(AccessControl.ifObjectFieldIsAccessible('Applicable_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+          if(AccessControl.ifObjectFieldIsAccessible('Fee__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+          if(AccessControl.ifObjectFieldIsAccessible('Applicable_Taxes__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
           List<Part__c>  listPartSalesTax= new list<Part__c> ([Select Id,Applicable_Tax__r.Rate__c,Applicable_Tax__c From Part__c  where Id IN:partIdSet ]);
            List<Fee__c>  listFeeSalesTax= new list<Fee__c> ([Select Id,Applicable_Tax__r.Rate__c,Applicable_Tax__c From Fee__c  where Id IN:feeIdSet ]);
          
@@ -180,7 +185,7 @@ public with sharing class COKH_Recalcualtion {
            }
            
           if(AccessControl.ifObjectFieldIsAccessible('Sales_Tax__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
-          
+          if(AccessControl.ifObjectFieldIsAccessible('Applicable_Taxe__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
           List<Sales_Tax__c>  salesTaxList   = new list<Sales_Tax__c>([Select Id,(Select Id, Name, Sales_Tax_Item__r.Tax_Parts__c,Sales_Tax_Item__r.Rate__c  From Applicable_Taxes__r) From Sales_Tax__c  where  Id =: salesTax.Id]);
           Decimal SalesTaxRate =0.00;
           for(Sales_Tax__c  saleTaxRec : salesTaxList){
@@ -445,9 +450,9 @@ public with sharing class COKH_Recalcualtion {
                         
                         }
                         
-                if(AccessControl.ifObjectFieldIsCreateable('CO_Kit_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
-                if(AccessControl.ifObjectFieldIsCreateable('CO_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
-                
+                if(AccessControl.ifObjectFieldIsUpdateable('CO_Kit_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
+                if(AccessControl.ifObjectFieldIsUpdateable('CO_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
+                             
                 CO_Kit_Header__c CoKitHeaderListToUpdate =new CO_Kit_Header__c();
                 List<CO_Line_Item__c> ColiToUpdate  =new List<CO_Line_Item__c>(); 
                 

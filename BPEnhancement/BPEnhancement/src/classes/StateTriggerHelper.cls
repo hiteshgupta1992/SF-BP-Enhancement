@@ -44,6 +44,7 @@ public with sharing class StateTriggerHelper {
 			
 			if(defaultFieldUpdated) {
 				if(AccessControl.ifObjectFieldIsUpdateable('State__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
+				if(AccessControl.ifObjectFieldIsAccessible('State__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
 				List<State__c> statesToBeUpdated = new List<State__c>();
 				List<State__c> allStates = [select Id, Default__c from State__c where Default__c = true];
 				

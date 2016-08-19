@@ -552,7 +552,7 @@ public with sharing class SystemSettingsService {
               individualCustomerRec.Is_Customer__c = true;
               update individualCustomerRec;
 
-              if(AccessControl.ifObjectFieldIsUpdateable('Contact') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
+              if(AccessControl.ifObjectFieldIsAccessible('Contact') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
               Contact customerContact = [Select Id from Contact where AccountId =: individualCustomer.Id];
               String fName = individualCustomer.Name.split(' ')[0];
               customerContact.FirstName = fName;
@@ -574,6 +574,7 @@ public with sharing class SystemSettingsService {
               customerContact.Email = individualCustomer.Email__c;
               customerContact.Price_Level__c = individualCustomer.Price_Level__c;
               customerContact.Sales_Tax__c = individualCustomer.Sales_Tax__c;
+              if(AccessControl.ifObjectFieldIsUpdateable('Contact') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
               update customerContact;
               return individualCustomer.Id;
          	}
@@ -623,6 +624,7 @@ public with sharing class SystemSettingsService {
 	        	throw e;
 	        } 
         }
+        if(AccessControl.ifObjectFieldIsAccessible('Part__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         List<Part__c> parts = [select Part_ID__c from Part__c where Id = :part.Id];
         return String.valueOf( part.Id)+'|'+ String.valueOf(parts[0].Part_ID__c);
     }

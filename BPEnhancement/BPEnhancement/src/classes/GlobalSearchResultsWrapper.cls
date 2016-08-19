@@ -24,6 +24,8 @@ public with sharing class GlobalSearchResultsWrapper {
 	    public String ObjectName;
 		public String AdditionalInfo1;
 		public String AdditionalInfo2;
+		public String AdditionalInfoLabel1;
+		public String AdditionalInfoLabel2;
 		public String ItemName;
 		
 		/**
@@ -41,139 +43,185 @@ public with sharing class GlobalSearchResultsWrapper {
 			
 			
 			if(objName == 'Account') {
-				if(String.valueOf(searchedObj.get('Is_Customer__c')) == 'true') {
+				if(((searchedObj.get(Constants.NAMESPACE +'Is_Customer__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Is_Customer__c')) : null) == 'true') {
 					this.Type = 1;
 					this.ObjectName = 'Customer';
-				} else if(String.valueOf(searchedObj.get('Is_Vendor__c')) == 'true') {
+				} else if(((searchedObj.get(Constants.NAMESPACE +'Is_Vendor__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Is_Vendor__c')) : null) == 'true') {
 					this.Type = 2;
 					this.ObjectName = 'Vendor';
 				}
 				
 				this.Id = String.valueOf(searchedObj.get('Id'));
-				this.ItemName = String.valueOf(searchedObj.get('Name'));
+				this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+				this.AdditionalInfoLabel1 = 'Email';
+				this.AdditionalInfoLabel2 = 'Phone';
 				
-				if(String.valueOf(searchedObj.get('Preferred_Email__c')) != '' && String.valueOf(searchedObj.get('Preferred_Email__c')) != null) {
-					this.AdditionalInfo1 = String.valueOf(searchedObj.get('Preferred_Email__c'));
-				} else if(String.valueOf(searchedObj.get('Work_Email__c')) != '' && String.valueOf(searchedObj.get('Work_Email__c')) != null) {
-					this.AdditionalInfo1 = String.valueOf(searchedObj.get('Work_Email__c'));
-				} else if(String.valueOf(searchedObj.get('Is_Customer__c')) == 'true') {
-					if(String.valueOf(searchedObj.get('Email__c')) != '' && String.valueOf(searchedObj.get('Email__c')) != null) {
-						this.AdditionalInfo1 = String.valueOf(searchedObj.get('Email__c'));
+				if(searchedObj.get(Constants.NAMESPACE +'Preferred_Email__c') != '' && searchedObj.get(Constants.NAMESPACE +'Preferred_Email__c') != null) {
+					this.AdditionalInfo1 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Preferred_Email__c'));
+				} else if(searchedObj.get(Constants.NAMESPACE +'Work_Email__c') != '' && searchedObj.get(Constants.NAMESPACE +'Work_Email__c') != null) {
+					this.AdditionalInfo1 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Work_Email__c'));
+				} else {
+					if(((searchedObj.get(Constants.NAMESPACE +'Is_Customer__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Is_Customer__c')) : null) == 'true') {
+						if(searchedObj.get(Constants.NAMESPACE +'Email__c') != '' && searchedObj.get(Constants.NAMESPACE +'Email__c') != null) {
+							this.AdditionalInfo1 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Email__c'));
+						} else if(searchedObj.get(Constants.NAMESPACE +'Other_Email__c') != '' && searchedObj.get(Constants.NAMESPACE +'Other_Email__c') != null) {
+							this.AdditionalInfo1 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Other_Email__c'));
+						}
+					} else if(((searchedObj.get(Constants.NAMESPACE +'Is_Vendor__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Is_Vendor__c')) : null) == 'true') {
+						if(searchedObj.get(Constants.NAMESPACE +'Other_Email__c') != '' && searchedObj.get(Constants.NAMESPACE +'Other_Email__c') != null) {
+							this.AdditionalInfo1 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Other_Email__c'));
+						}
 					}
-				} else if(String.valueOf(searchedObj.get('Other_Email__c')) != '' && String.valueOf(searchedObj.get('Other_Email__c')) != null) {
-					this.AdditionalInfo1 = String.valueOf(searchedObj.get('Other_Email__c'));
+				} 
+				
+				if(searchedObj.get(Constants.NAMESPACE +'Preferred_Phone__c') != '' && searchedObj.get(Constants.NAMESPACE +'Preferred_Phone__c') != null) {
+					this.AdditionalInfo2 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Preferred_Phone__c'));
+				} else if(searchedObj.get(Constants.NAMESPACE +'Work_Number__c') != '' && searchedObj.get(Constants.NAMESPACE +'Work_Number__c') != null) {
+					this.AdditionalInfo2 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Work_Number__c'));
+				} else {
+					if(((searchedObj.get(Constants.NAMESPACE +'Is_Customer__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Is_Customer__c')) : null) == 'true') { 
+						if(searchedObj.get(Constants.NAMESPACE +'Home_Number__c') != '' && searchedObj.get(Constants.NAMESPACE +'Home_Number__c') != null) {
+							this.AdditionalInfo2 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Home_Number__c'));
+						} else if(searchedObj.get(Constants.NAMESPACE +'Mobile__c') != '' && searchedObj.get(Constants.NAMESPACE +'Mobile__c') != null) {
+							this.AdditionalInfo2 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Mobile__c'));
+						}
+					} else if(((searchedObj.get(Constants.NAMESPACE +'Is_Vendor__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Is_Vendor__c')) : null) == 'true') {
+						if(searchedObj.get(Constants.NAMESPACE +'Mobile__c') != '' && searchedObj.get(Constants.NAMESPACE +'Mobile__c') != null) {
+							this.AdditionalInfo2 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Mobile__c'));
+						}
+					}
 				}
 				
-				if(String.valueOf(searchedObj.get('Preferred_Phone__c')) != '' && String.valueOf(searchedObj.get('Preferred_Phone__c')) != null) {
-					this.AdditionalInfo2 = String.valueOf(searchedObj.get('Preferred_Phone__c'));
-				} else if(String.valueOf(searchedObj.get('Work_Number__c')) != '' && String.valueOf(searchedObj.get('Work_Number__c')) != null) {
-					this.AdditionalInfo2 = String.valueOf(searchedObj.get('Work_Number__c'));
-				} else if(String.valueOf(searchedObj.get('Is_Customer__c')) == 'true') { 
-					if(String.valueOf(searchedObj.get('Home_Number__c')) != '' && String.valueOf(searchedObj.get('Home_Number__c')) != null) {
-						this.AdditionalInfo2 = String.valueOf(searchedObj.get('Home_Number__c'));
-					} 
-				}else if(String.valueOf(searchedObj.get('Mobile__c')) != '' && String.valueOf(searchedObj.get('Mobile__c')) != null) {
-					this.AdditionalInfo2 = String.valueOf(searchedObj.get('Mobile__c'));
-				}
-				
-	    	} else if(objName == 'Part__c') {
+	    	} else if(objName == Constants.NAMESPACE + 'Part__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 3;
 	    		this.ObjectName = 'Part';
-	    		this.ItemName = String.valueOf(searchedObj.get('Part_Number__c')) + ' - ' + String.valueOf(searchedObj.get('Description__c'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Qty_In_Stock__c'));
+	    		this.ItemName = ((searchedObj.get(Constants.NAMESPACE +'Part_Number__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Part_Number__c')) : null) + ' - ' + ((searchedObj.get(Constants.NAMESPACE +'Description__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Description__c')) : null);
+	    		//this.AdditionalInfo1 = String.valueOf(searchedObj.get(Constants.NAMESPACE +'Qty_In_Stock__c'));
+	    		this.AdditionalInfo1 = (searchedObj.get(Constants.NAMESPACE +'Qty_In_Stock__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Qty_In_Stock__c')) : null;
 	    		//this.AdditionalInfo2 = '';
-	    	} else if(objName == 'Kit_Header__c') {
+	    		this.AdditionalInfoLabel1 = 'Qty Available';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Kit_Header__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 4;
 	    		
-	    		this.ItemName = String.valueOf(searchedObj.get('Code__c')) + ' - ' + String.valueOf(searchedObj.get('Description__c'));
-	    		if(String.valueOf(searchedObj.get('Service_Kit__c')) == 'true') {
+	    		this.ItemName = ((searchedObj.get(Constants.NAMESPACE +'Code__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Code__c')) : null) + ' - ' + ((searchedObj.get(Constants.NAMESPACE +'Description__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Description__c')) : null);
+	    		if(((searchedObj.get(Constants.NAMESPACE +'Service_Kit__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Service_Kit__c')) : null) == 'true') {
 	    			this.AdditionalInfo1 = 'Service';
 	    			this.ObjectName = 'Service Kit';
 	    		} else {
 	    			this.AdditionalInfo1 = 'General';
 	    			this.ObjectName = 'Kit';
 	    		}
-	    	} else if(objName == 'Fee__c') {
+	    		this.AdditionalInfoLabel1 = 'Type';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Fee__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 5;
 	    		this.ObjectName = 'Fee';
-	    		this.ItemName = String.valueOf(searchedObj.get('Code__c')) + ' - ' + String.valueOf(searchedObj.get('Description__c'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Price__c'));
-	    	} else if(objName == 'Labour_Code__c') {
+	    		this.ItemName = ((searchedObj.get(Constants.NAMESPACE +'Code__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Code__c')) : null) + ' - ' + ((searchedObj.get(Constants.NAMESPACE +'Description__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Description__c')) : null);
+	    		this.AdditionalInfo1 = '$'+ ((searchedObj.get(Constants.NAMESPACE +'Price__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Price__c')) : null);
+	    		this.AdditionalInfoLabel1 = 'Price';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Labour_Code__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 6;
 	    		this.ObjectName = 'Labor Code';
-	    		this.ItemName = String.valueOf(searchedObj.get('Code__c')) + ' - ' + String.valueOf(searchedObj.get('Description__c'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Hours__c'));
+	    		this.ItemName = ((searchedObj.get(Constants.NAMESPACE +'Code__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Code__c')) : null) + ' - ' + ((searchedObj.get(Constants.NAMESPACE +'Description__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Description__c')) : null);
+	    		this.AdditionalInfo1 = (searchedObj.get(Constants.NAMESPACE +'Hours__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Hours__c')) : null;
+	    		this.AdditionalInfoLabel1 = 'Hours'; 
+	    		
 	    	} else if(objName == 'User') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 7;
 	    		this.ObjectName = 'User';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Email'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Phone'));
-	    	} else if(objName == 'CO_Header__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.get('Email') != null) ? String.valueOf(searchedObj.get('Email')) : null;
+	    		this.AdditionalInfo2 = (searchedObj.get('Phone') != null) ? String.valueOf(searchedObj.get('Phone')) : null;
+	    		this.AdditionalInfoLabel1 = 'Email';
+	    		this.AdditionalInfoLabel2 = 'Phone';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'CO_Header__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 8;
 	    		this.ObjectName = 'Customer Order';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('Customer__r').get('Name')); //
-	    	} else if(objName == 'CO_Invoice_Header__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'Customer__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Customer__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'Customer__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Customer Name';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'CO_Invoice_Header__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 9;
 	    		this.ObjectName = 'Customer Invoice';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('CO_Header__r').getSObject('Customer__r').get('Name')); //  
-	    	} else if(objName == 'Vendor_Order_Header__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'CO_Header__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Customer__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Customer__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'CO_Header__r').getSObject(Constants.NAMESPACE +'Customer__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Customer Name';
+	    		  
+	    	} else if(objName == Constants.NAMESPACE + 'Vendor_Order_Header__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 10;
 	    		this.ObjectName = 'Vendor Order';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('Vendor__r').get('Name')); //
-	    	} else if(objName == 'Vendor_Receiving_Header__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'Vendor__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Vendor Name';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Vendor_Receiving_Header__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 11;
 	    		this.ObjectName = 'Vendor Receiving';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('Vendor__r').get('Name')); //
-	    	} else if(objName == 'Vendor_Invoicing_Header__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'Vendor__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Vendor Name';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Vendor_Invoicing_Header__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 12;
 	    		this.ObjectName = 'Vendor Invoice';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('Vendor__r').get('Name')); //
-	    	} else if(objName == 'Category__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'Vendor__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Vendor Name';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Category__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 13;
 	    		this.ObjectName = 'Item Category';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name')) + ' - ' + String.valueOf(searchedObj.get('Description__c'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Type__c'));
-	    	} else if(objName == 'Price_Level__c') {
+	    		this.ItemName = ((searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null) + ' - ' + ((searchedObj.get(Constants.NAMESPACE +'Description__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Description__c')) : null);
+	    		this.AdditionalInfo1 = (searchedObj.get(Constants.NAMESPACE +'Type__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Type__c')) : null;
+	    		this.AdditionalInfoLabel1 = 'Category Type';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Price_Level__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 14;
 	    		this.ObjectName = 'Price Level';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Discount_Markup__c'));
-	    	} else if(objName == 'Sales_Tax__c') {
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = ((searchedObj.get(Constants.NAMESPACE +'Discount_Markup__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Discount_Markup__c')) : null)+ '%';
+	    		this.AdditionalInfoLabel1 = 'Discount Markup';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Sales_Tax__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 15;
 	    		this.ObjectName = 'Sales Tax';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name__c'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.get('Rate__c'));
-	    	} else if(objName == 'Product__c') {
+	    		this.ItemName = (searchedObj.get(Constants.NAMESPACE +'Name__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Name__c')) : null;
+	    		this.AdditionalInfo1 = ((searchedObj.get(Constants.NAMESPACE +'Rate__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Rate__c')) : null)+ '%';
+	    		this.AdditionalInfoLabel1 = 'Rate';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'Product__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 16;
 	    		this.ObjectName = 'Sublet';
-	    		this.ItemName = String.valueOf(searchedObj.get('Code__c')) + ' - ' + String.valueOf(searchedObj.get('Description__c'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('Vendor__r').get('Name')); //
-	    	} else if(objName == 'CO_Invoice_Payment__c') {
+	    		this.ItemName = ((searchedObj.get(Constants.NAMESPACE +'Code__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Code__c')) : null) + ' - ' + ((searchedObj.get(Constants.NAMESPACE +'Description__c') != null) ? String.valueOf(searchedObj.get(Constants.NAMESPACE +'Description__c')) : null);
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Vendor__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'Vendor__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Vendor Name';
+	    		
+	    	} else if(objName == Constants.NAMESPACE + 'CO_Invoice_Payment__c') {
 	    		this.Id = String.valueOf(searchedObj.get('Id'));
 	    		this.Type = 17;
 	    		this.ObjectName = 'Customer Payment';
-	    		this.ItemName = String.valueOf(searchedObj.get('Name'));
-	    		this.AdditionalInfo1 = String.valueOf(searchedObj.getSObject('CO_Invoice_Header__r').getSObject('CO_Header__r').getSObject('Customer__r').get('Name')); //
+	    		this.ItemName = (searchedObj.get('Name') != null) ? String.valueOf(searchedObj.get('Name')) : null;
+	    		this.AdditionalInfo1 = (searchedObj.getSobject(Constants.NAMESPACE +'CO_Invoice_Header__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'CO_Header__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Customer__r') != null && searchedObj.getSobject(Constants.NAMESPACE +'Customer__r').get('Name') != null) ? String.valueOf(searchedObj.getSObject(Constants.NAMESPACE +'CO_Invoice_Header__r').getSObject(Constants.NAMESPACE +'CO_Header__r').getSObject(Constants.NAMESPACE +'Customer__r').get('Name')) : null;
+	    		this.AdditionalInfoLabel1 = 'Customer Name';
+	    		
 	    	}
 			
 		}

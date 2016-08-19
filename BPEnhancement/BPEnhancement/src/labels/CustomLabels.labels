@@ -1,0 +1,4174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>ActiveOrders_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: ActiveOrders Help Text</shortDescription>
+        <value>Currently active orders on the Part</value>
+    </labels>
+    <labels>
+        <fullName>ActiveSalesOrders_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: ActiveSalesOrders Help Text</shortDescription>
+        <value>Currently active sales orders on the Part</value>
+    </labels>
+    <labels>
+        <fullName>Active_Orders</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Active Orders</shortDescription>
+        <value>Active Vendor Orders</value>
+    </labels>
+    <labels>
+        <fullName>Active_Sales_Orders</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Active Sales Orders</shortDescription>
+        <value>Active Sales Orders</value>
+    </labels>
+    <labels>
+        <fullName>Activity_Dates</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Activity Dates</shortDescription>
+        <value>Activity Dates</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_Applicable_Tax</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Applicable Tax</shortDescription>
+        <value>Applicable Tax</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_CostingInfo</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: CostingInfo</shortDescription>
+        <value>Costing info for the part</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_InStockQuantity</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part : Tooltip InStockQuantity</shortDescription>
+        <value>To modify this value go to the Cost Tracking section of the part</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_InStockQuantityForNewPart</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>AddPart : Tooltip InStockQuantityForNewPart</shortDescription>
+        <value>In Stock Quantity</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_Items_Per_Package</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Items Per Package</shortDescription>
+        <value>Items Per Package</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_Package_Cost</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Package Cost</shortDescription>
+        <value>Package Cost</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_PackagedCostForNewPart</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>AddPart : Tooltip PackagedCostForNewPart</shortDescription>
+        <value>Package Cost</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_Pkg_Unit_of_Measure</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Pkg Unit of Measure</shortDescription>
+        <value>Pkg Unit of Measure</value>
+    </labels>
+    <labels>
+        <fullName>Add_Part_Tooltip_Qty</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Qty</shortDescription>
+        <value>Quantity infomation for the Part</value>
+    </labels>
+    <labels>
+        <fullName>Adjust_In_Stock</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Adjust In-Stock</shortDescription>
+        <value>Adjust In-Stock</value>
+    </labels>
+    <labels>
+        <fullName>AlternateParts_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Alternative parts Help Text</shortDescription>
+        <value>Alternative parts</value>
+    </labels>
+    <labels>
+        <fullName>Average_Cost</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Average Cost</shortDescription>
+        <value>Average Cost</value>
+    </labels>
+    <labels>
+        <fullName>COPage_Log_Service_Work</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer Order Page - Logging Service Hours: Log Service Work</shortDescription>
+        <value>Log Service Work</value>
+    </labels>
+    <labels>
+        <fullName>COPage_Original_Estimate</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer Order Page - Logging Service Hours: Original Estimate</shortDescription>
+        <value>Original Estimate</value>
+    </labels>
+    <labels>
+        <fullName>COPage_Previously_Logged</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer Order Page - Logging Service Hours: Previously Logged</shortDescription>
+        <value>Previously Logged</value>
+    </labels>
+    <labels>
+        <fullName>COPage_Remaining_Estimate</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer Order Page - Logging Service Hours: Remaining Estimate</shortDescription>
+        <value>Remaining Estimate</value>
+    </labels>
+    <labels>
+        <fullName>COPage_Time_Spent</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer Order Page - Logging Service Hours: Time Spent</shortDescription>
+        <value>Time Spent</value>
+    </labels>
+    <labels>
+        <fullName>CO_Object_Short_Display_Label</fullName>
+        <categories>Customer Order Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer Order Object : Short Display Label</shortDescription>
+        <value>CO</value>
+    </labels>
+    <labels>
+        <fullName>Cancel_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cancel Label</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>Cannot_Be_less_than_Zero</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Cannot Be less than Zero</shortDescription>
+        <value>Cannot Be less Than Zero</value>
+    </labels>
+    <labels>
+        <fullName>Cannot_Mark_Inactive_Default</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Default record cannot be marked Inactive</shortDescription>
+        <value>Default record cannot be marked Inactive</value>
+    </labels>
+    <labels>
+        <fullName>Cannot_Replace_With_Same_Part_Select_Another_Part</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Cannot Replace With Same Part Select Another Part</shortDescription>
+        <value>Cannot Replace With Same Part Select Another Part</value>
+    </labels>
+    <labels>
+        <fullName>Category_Object_Display_Label</fullName>
+        <categories>Category Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Category : Object Display Label</shortDescription>
+        <value>Category</value>
+    </labels>
+    <labels>
+        <fullName>Claims_for_Service_Work</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Claims for Service Work</shortDescription>
+        <value>Claims for Service Work</value>
+    </labels>
+    <labels>
+        <fullName>Contact_Object_Display_Label</fullName>
+        <categories>Contact Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Contact : Object Display Label</shortDescription>
+        <value>Contact</value>
+    </labels>
+    <labels>
+        <fullName>Contact_Us_Heading</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Contact Us Heading</shortDescription>
+        <value>CONTACT US</value>
+    </labels>
+    <labels>
+        <fullName>Contact_Us_Text</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Contact Us New Case</shortDescription>
+        <value>New Case</value>
+    </labels>
+    <labels>
+        <fullName>Convert_To_Quote</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Convert to Quote</shortDescription>
+        <value>Convert to Quote</value>
+    </labels>
+    <labels>
+        <fullName>CostDetails_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: CostDetails Help Text</shortDescription>
+        <value>Cost Details</value>
+    </labels>
+    <labels>
+        <fullName>CostSummary_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: CostSummary Help Text</shortDescription>
+        <value>Cost Summary</value>
+    </labels>
+    <labels>
+        <fullName>Count_Confidence</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Count Confidence</shortDescription>
+        <value>Count Confidence</value>
+    </labels>
+    <labels>
+        <fullName>CountryGrid_Default</fullName>
+        <categories>Country Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>CountryGrid : Default</shortDescription>
+        <value>Default</value>
+    </labels>
+    <labels>
+        <fullName>CountryGrid_Name</fullName>
+        <categories>Country Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>CountryGrid : Name</shortDescription>
+        <value>Country Name</value>
+    </labels>
+    <labels>
+        <fullName>CountryGrid_Visible</fullName>
+        <categories>Country Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>CountryGrid : Visible</shortDescription>
+        <value>Visible</value>
+    </labels>
+    <labels>
+        <fullName>Currency_Symbol</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Currency Symbol</shortDescription>
+        <value>$</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Not_Found</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Customer Not Found</shortDescription>
+        <value>Customer Not Found.</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Object_Display_Label</fullName>
+        <categories>Customer Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Customer : Object Display Label</shortDescription>
+        <value>Customer</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Order</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: Customer Order</shortDescription>
+        <value>Customer Order</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Owned_Unit_Object_Display_Label</fullName>
+        <categories>Customer Owned Unit Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Customer Owned Unit</shortDescription>
+        <value>Customer Owned Unit</value>
+    </labels>
+    <labels>
+        <fullName>Customer_Owned_Units</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Customer Owned Units</shortDescription>
+        <value>Customer Owned Units</value>
+    </labels>
+    <labels>
+        <fullName>DeReference_Exception_Message</fullName>
+        <categories>Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Exception Messages: De-reference Exception</shortDescription>
+        <value>Attempt to de-reference a null object.</value>
+    </labels>
+    <labels>
+        <fullName>Default_Label</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Default Label</shortDescription>
+        <value>Default</value>
+    </labels>
+    <labels>
+        <fullName>Delete_Failed_Exception_Message</fullName>
+        <categories>Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Exception Messages: Delete Failed Exception</shortDescription>
+        <value>Delete Failed.</value>
+    </labels>
+    <labels>
+        <fullName>Delete_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Delete Label</shortDescription>
+        <value>Delete</value>
+    </labels>
+    <labels>
+        <fullName>Discount</fullName>
+        <categories>Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor : Discount</shortDescription>
+        <value>Discount</value>
+    </labels>
+    <labels>
+        <fullName>Duplicate_Exception_Message</fullName>
+        <categories>Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Exception Messages: Duplicate Exception</shortDescription>
+        <value>Review all error messages below to correct your data.Duplicate value on record :</value>
+    </labels>
+    <labels>
+        <fullName>Edit_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Edit Label</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>Export_All_Data_Alert_Message</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notification: Export All Data Alert Message</shortDescription>
+        <value>Batch to export all data has been initiated and once finished, user will be notified by mail.</value>
+    </labels>
+    <labels>
+        <fullName>Fee_Object_Display_Label</fullName>
+        <categories>Fee Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Fee : Object Display Label</shortDescription>
+        <value>Fee</value>
+    </labels>
+    <labels>
+        <fullName>Field_Is_Required</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Field is Required</shortDescription>
+        <value>Field is Required</value>
+    </labels>
+    <labels>
+        <fullName>Field_Value_Non_Numeric</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Field value is not in numeric forma</shortDescription>
+        <value>Field values should be Numeric</value>
+    </labels>
+    <labels>
+        <fullName>Finalize</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Finalize</shortDescription>
+        <value>Finalize</value>
+    </labels>
+    <labels>
+        <fullName>First_Fill_ReorderAt</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: First Fill ReorderAt</shortDescription>
+        <value>First Fill ReorderAt</value>
+    </labels>
+    <labels>
+        <fullName>Flooring_Company</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Flooring Company</shortDescription>
+        <value>Flooring Company</value>
+    </labels>
+    <labels>
+        <fullName>General_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: General Help Text</shortDescription>
+        <value>General Information</value>
+    </labels>
+    <labels>
+        <fullName>General_Information_Heading_Label</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part: General Information Heading Label</shortDescription>
+        <value>General Information</value>
+    </labels>
+    <labels>
+        <fullName>Generic_Object_Label</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Generic Object Label</shortDescription>
+        <value>Any</value>
+    </labels>
+    <labels>
+        <fullName>Indicates_Required_Fields</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Display: Indicates Required Fields</shortDescription>
+        <value>Indicates required fields</value>
+    </labels>
+    <labels>
+        <fullName>Insert_Customer_To_Customer_Order</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Insert Customer To Customer Order</shortDescription>
+        <value>Insert this customer into Customer Order?</value>
+    </labels>
+    <labels>
+        <fullName>Invalid_Field_Value</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Invalid Field Value</shortDescription>
+        <value>Invalid Field Value</value>
+    </labels>
+    <labels>
+        <fullName>Invoice_Object_Display_Label</fullName>
+        <categories>Invoice Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Invoice : Object Display Label</shortDescription>
+        <value>Invoice</value>
+    </labels>
+    <labels>
+        <fullName>Invoice_Page_Invoice_Date</fullName>
+        <categories>Invoice Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Invoice Mini Layout: Invoice Date</shortDescription>
+        <value>Invoice Date</value>
+    </labels>
+    <labels>
+        <fullName>Invoice_Page_Print_Date</fullName>
+        <categories>Invoice Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Invoice Mini Layout: Print Date</shortDescription>
+        <value>Print Date</value>
+    </labels>
+    <labels>
+        <fullName>Items</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Items</shortDescription>
+        <value>Items</value>
+    </labels>
+    <labels>
+        <fullName>Job_Title</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Job Title</shortDescription>
+        <value>Job Title</value>
+    </labels>
+    <labels>
+        <fullName>Kit_Header_Less_fixed_price_amount</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Less fixed price amount</shortDescription>
+        <value>Kit Header total price should be greater than or equal to Total of fixed price kit line items.</value>
+    </labels>
+    <labels>
+        <fullName>Kit_Header_No_unfixed_Line_Items</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: No unfixed Line Items</shortDescription>
+        <value>There must be at-least 1 Kit line item with unfixed price.</value>
+    </labels>
+    <labels>
+        <fullName>Kit_Line_Item_Exceeded_Total_Price</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: Exceeded Total Price</shortDescription>
+        <value>Line Item total price exceeded from Kit Header price</value>
+    </labels>
+    <labels>
+        <fullName>Kit_Line_Item_No_Unfixed_Line_Item</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: No Unfixed Line Item</shortDescription>
+        <value>No unfixed price line item present in kit header to adjust exceeded price</value>
+    </labels>
+    <labels>
+        <fullName>Kit_Object_Display_Label</fullName>
+        <categories>Kit Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Kit : Object Display Label</shortDescription>
+        <value>Kit</value>
+    </labels>
+    <labels>
+        <fullName>Label_Actions</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Actions</shortDescription>
+        <value>Actions</value>
+    </labels>
+    <labels>
+        <fullName>Label_Active</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Active</shortDescription>
+        <value>Active</value>
+    </labels>
+    <labels>
+        <fullName>Label_Add</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Add</shortDescription>
+        <value>Add</value>
+    </labels>
+    <labels>
+        <fullName>Label_Add_All_Item</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Add All Items</shortDescription>
+        <value>Add All Items</value>
+    </labels>
+    <labels>
+        <fullName>Label_Add_All_Required_For_This_Item</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Add All Required For This Item</shortDescription>
+        <value>Add All Required For This Item</value>
+    </labels>
+    <labels>
+        <fullName>Label_Add_More_Information</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Add More Information</shortDescription>
+        <value>Add More Information</value>
+    </labels>
+    <labels>
+        <fullName>Label_Add_This_Item_Only</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Add this item only</shortDescription>
+        <value>Add This Item Only</value>
+    </labels>
+    <labels>
+        <fullName>Label_Address</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Address</shortDescription>
+        <value>Address</value>
+    </labels>
+    <labels>
+        <fullName>Label_Advance</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Advance</shortDescription>
+        <value>Advance</value>
+    </labels>
+    <labels>
+        <fullName>Label_Advanced</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Advanced</shortDescription>
+        <value>Advanced</value>
+    </labels>
+    <labels>
+        <fullName>Label_Alternate</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Alternate</shortDescription>
+        <value>Alternate</value>
+    </labels>
+    <labels>
+        <fullName>Label_Amount</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Amount</shortDescription>
+        <value>Amount</value>
+    </labels>
+    <labels>
+        <fullName>Label_And</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: And</shortDescription>
+        <value>And</value>
+    </labels>
+    <labels>
+        <fullName>Label_Apply</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Apply</shortDescription>
+        <value>Apply</value>
+    </labels>
+    <labels>
+        <fullName>Label_April</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: April</shortDescription>
+        <value>April</value>
+    </labels>
+    <labels>
+        <fullName>Label_As</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: As (Like Ordered As)</shortDescription>
+        <value>As</value>
+    </labels>
+    <labels>
+        <fullName>Label_August</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: August</shortDescription>
+        <value>August</value>
+    </labels>
+    <labels>
+        <fullName>Label_Auto_reorder_at</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Auto reorder at</shortDescription>
+        <value>Auto reorder at</value>
+    </labels>
+    <labels>
+        <fullName>Label_Auto_reorder_to</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Auto reorder to</shortDescription>
+        <value>Auto reorder to</value>
+    </labels>
+    <labels>
+        <fullName>Label_Available</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Available</shortDescription>
+        <value>Available</value>
+    </labels>
+    <labels>
+        <fullName>Label_Billing</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Billing</shortDescription>
+        <value>Billing</value>
+    </labels>
+    <labels>
+        <fullName>Label_Birthday</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Birthday</shortDescription>
+        <value>Birthday</value>
+    </labels>
+    <labels>
+        <fullName>Label_Business</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Business</shortDescription>
+        <value>Business</value>
+    </labels>
+    <labels>
+        <fullName>Label_By</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: By</shortDescription>
+        <value>By</value>
+    </labels>
+    <labels>
+        <fullName>Label_Call</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Call</shortDescription>
+        <value>Call</value>
+    </labels>
+    <labels>
+        <fullName>Label_City</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: City</shortDescription>
+        <value>City</value>
+    </labels>
+    <labels>
+        <fullName>Label_Click_To_Add</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Click to add</shortDescription>
+        <value>Click to add</value>
+    </labels>
+    <labels>
+        <fullName>Label_Co_Worker</fullName>
+        <categories>Contact Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Contact: Relation</shortDescription>
+        <value>Co-Worker</value>
+    </labels>
+    <labels>
+        <fullName>Label_Code</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Code</shortDescription>
+        <value>Code</value>
+    </labels>
+    <labels>
+        <fullName>Label_Color</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Color</shortDescription>
+        <value>Color</value>
+    </labels>
+    <labels>
+        <fullName>Label_Commit</fullName>
+        <categories>Commit Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Commit</shortDescription>
+        <value>Commit</value>
+    </labels>
+    <labels>
+        <fullName>Label_Committed_Quantity</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Committed Quantity</shortDescription>
+        <value>Committed Qty</value>
+    </labels>
+    <labels>
+        <fullName>Label_Company</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Company</shortDescription>
+        <value>Company</value>
+    </labels>
+    <labels>
+        <fullName>Label_Confirm</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Confirm</shortDescription>
+        <value>Confirm</value>
+    </labels>
+    <labels>
+        <fullName>Label_Contacts</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Contacts</shortDescription>
+        <value>Contacts</value>
+    </labels>
+    <labels>
+        <fullName>Label_Cost</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Cost</shortDescription>
+        <value>Cost</value>
+    </labels>
+    <labels>
+        <fullName>Label_Country</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Country</shortDescription>
+        <value>Country</value>
+    </labels>
+    <labels>
+        <fullName>Label_Created</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Created</shortDescription>
+        <value>Created</value>
+    </labels>
+    <labels>
+        <fullName>Label_Current_Stock</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Current Stock</shortDescription>
+        <value>Current Stock</value>
+    </labels>
+    <labels>
+        <fullName>Label_Customer_Unit</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Customer Unit</shortDescription>
+        <value>Customer Unit</value>
+    </labels>
+    <labels>
+        <fullName>Label_Date</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Date</shortDescription>
+        <value>Date</value>
+    </labels>
+    <labels>
+        <fullName>Label_Dates</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Dates</shortDescription>
+        <value>Dates</value>
+    </labels>
+    <labels>
+        <fullName>Label_Day</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Day</shortDescription>
+        <value>Day</value>
+    </labels>
+    <labels>
+        <fullName>Label_Days</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Days</shortDescription>
+        <value>Days</value>
+    </labels>
+    <labels>
+        <fullName>Label_Deactive</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Deactive</shortDescription>
+        <value>Deactive</value>
+    </labels>
+    <labels>
+        <fullName>Label_December</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: December</shortDescription>
+        <value>December</value>
+    </labels>
+    <labels>
+        <fullName>Label_Description</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Description</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>Label_Email</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Email</shortDescription>
+        <value>Email</value>
+    </labels>
+    <labels>
+        <fullName>Label_Employee</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Employee</shortDescription>
+        <value>Employee</value>
+    </labels>
+    <labels>
+        <fullName>Label_Employer</fullName>
+        <categories>Contact Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Contact: Relation</shortDescription>
+        <value>Employer</value>
+    </labels>
+    <labels>
+        <fullName>Label_Excess</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Excess</shortDescription>
+        <value>Excess</value>
+    </labels>
+    <labels>
+        <fullName>Label_Existing</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Existing</shortDescription>
+        <value>Existing</value>
+    </labels>
+    <labels>
+        <fullName>Label_Expected_Date</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Expected Date</shortDescription>
+        <value>Expected Date</value>
+    </labels>
+    <labels>
+        <fullName>Label_Extension_Number</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Extension Number</shortDescription>
+        <value>Extension #</value>
+    </labels>
+    <labels>
+        <fullName>Label_Facebook</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Facebook</shortDescription>
+        <value>Facebook</value>
+    </labels>
+    <labels>
+        <fullName>Label_Family</fullName>
+        <categories>Contact Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Contact: Relation</shortDescription>
+        <value>Family</value>
+    </labels>
+    <labels>
+        <fullName>Label_Fax</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Fax</shortDescription>
+        <value>Fax</value>
+    </labels>
+    <labels>
+        <fullName>Label_February</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: February</shortDescription>
+        <value>February</value>
+    </labels>
+    <labels>
+        <fullName>Label_First</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: First</shortDescription>
+        <value>First</value>
+    </labels>
+    <labels>
+        <fullName>Label_For</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: For</shortDescription>
+        <value>For</value>
+    </labels>
+    <labels>
+        <fullName>Label_Friend</fullName>
+        <categories>Contact Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Contact: Relation</shortDescription>
+        <value>Friend</value>
+    </labels>
+    <labels>
+        <fullName>Label_From</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: From</shortDescription>
+        <value>From</value>
+    </labels>
+    <labels>
+        <fullName>Label_Gamification</fullName>
+        <categories>Gamification</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gamification Title: Gamification</shortDescription>
+        <value>Gamification</value>
+    </labels>
+    <labels>
+        <fullName>Label_General</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: General</shortDescription>
+        <value>General</value>
+    </labels>
+    <labels>
+        <fullName>Label_Go</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Go</shortDescription>
+        <value>Go</value>
+    </labels>
+    <labels>
+        <fullName>Label_Hide_History</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Hide History</shortDescription>
+        <value>Hide History</value>
+    </labels>
+    <labels>
+        <fullName>Label_Home</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Home</shortDescription>
+        <value>Home</value>
+    </labels>
+    <labels>
+        <fullName>Label_Hours</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Hours</shortDescription>
+        <value>Hours</value>
+    </labels>
+    <labels>
+        <fullName>Label_Id</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Id</shortDescription>
+        <value>Id</value>
+    </labels>
+    <labels>
+        <fullName>Label_Inactive</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Inactive</shortDescription>
+        <value>Inactive</value>
+    </labels>
+    <labels>
+        <fullName>Label_Individual</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Individual</shortDescription>
+        <value>Individual</value>
+    </labels>
+    <labels>
+        <fullName>Label_Invalid</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Invalid</shortDescription>
+        <value>Invalid</value>
+    </labels>
+    <labels>
+        <fullName>Label_Inventory</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Inventory</shortDescription>
+        <value>Inventory</value>
+    </labels>
+    <labels>
+        <fullName>Label_Invoice_History</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Invoice History</shortDescription>
+        <value>Invoice History</value>
+    </labels>
+    <labels>
+        <fullName>Label_Invoiced_By</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Invoiced By</shortDescription>
+        <value>Invoiced By</value>
+    </labels>
+    <labels>
+        <fullName>Label_Invoicing</fullName>
+        <categories>Invoicing Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Invoicing</shortDescription>
+        <value>Invoicing</value>
+    </labels>
+    <labels>
+        <fullName>Label_Item</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Item</shortDescription>
+        <value>Item</value>
+    </labels>
+    <labels>
+        <fullName>Label_January</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: January</shortDescription>
+        <value>January</value>
+    </labels>
+    <labels>
+        <fullName>Label_July</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: July</shortDescription>
+        <value>July</value>
+    </labels>
+    <labels>
+        <fullName>Label_June</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: June</shortDescription>
+        <value>June</value>
+    </labels>
+    <labels>
+        <fullName>Label_Last</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Last</shortDescription>
+        <value>Last</value>
+    </labels>
+    <labels>
+        <fullName>Label_Legends</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Legends</shortDescription>
+        <value>Legends</value>
+    </labels>
+    <labels>
+        <fullName>Label_License</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: License</shortDescription>
+        <value>License</value>
+    </labels>
+    <labels>
+        <fullName>Label_Like_This</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Like This</shortDescription>
+        <value>Like This</value>
+    </labels>
+    <labels>
+        <fullName>Label_Line</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Line</shortDescription>
+        <value>Line</value>
+    </labels>
+    <labels>
+        <fullName>Label_Link</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Link</shortDescription>
+        <value>Link</value>
+    </labels>
+    <labels>
+        <fullName>Label_LinkedIn</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: LinkedIn</shortDescription>
+        <value>LinkedIn</value>
+    </labels>
+    <labels>
+        <fullName>Label_Loading</fullName>
+        <categories>Loading Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Loading</shortDescription>
+        <value>Loading</value>
+    </labels>
+    <labels>
+        <fullName>Label_Location</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Location</shortDescription>
+        <value>Location</value>
+    </labels>
+    <labels>
+        <fullName>Label_Lock</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Lock</shortDescription>
+        <value>Lock</value>
+    </labels>
+    <labels>
+        <fullName>Label_Log</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Log</shortDescription>
+        <value>Log</value>
+    </labels>
+    <labels>
+        <fullName>Label_March</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: March</shortDescription>
+        <value>March</value>
+    </labels>
+    <labels>
+        <fullName>Label_May</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: May</shortDescription>
+        <value>May</value>
+    </labels>
+    <labels>
+        <fullName>Label_Milage</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Milage</shortDescription>
+        <value>Milage</value>
+    </labels>
+    <labels>
+        <fullName>Label_Mileage</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Mileage</shortDescription>
+        <value>Mileage</value>
+    </labels>
+    <labels>
+        <fullName>Label_Mileage_Measure</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Mileage Measure</shortDescription>
+        <value>Km</value>
+    </labels>
+    <labels>
+        <fullName>Label_Name</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Name</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>Label_Need</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Need</shortDescription>
+        <value>Need</value>
+    </labels>
+    <labels>
+        <fullName>Label_Needed_By</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Needed By</shortDescription>
+        <value>Needed By</value>
+    </labels>
+    <labels>
+        <fullName>Label_Needed_For</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Needed For</shortDescription>
+        <value>Needed For</value>
+    </labels>
+    <labels>
+        <fullName>Label_Nick</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Nick</shortDescription>
+        <value>Nick</value>
+    </labels>
+    <labels>
+        <fullName>Label_No</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: No</shortDescription>
+        <value>No</value>
+    </labels>
+    <labels>
+        <fullName>Label_No_Records_Found</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: No records found</shortDescription>
+        <value>No records found</value>
+    </labels>
+    <labels>
+        <fullName>Label_None</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: None</shortDescription>
+        <value>None</value>
+    </labels>
+    <labels>
+        <fullName>Label_Notes</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Notes</shortDescription>
+        <value>Notes</value>
+    </labels>
+    <labels>
+        <fullName>Label_November</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: November</shortDescription>
+        <value>November</value>
+    </labels>
+    <labels>
+        <fullName>Label_Number</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Number</shortDescription>
+        <value>Number</value>
+    </labels>
+    <labels>
+        <fullName>Label_October</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: October</shortDescription>
+        <value>October</value>
+    </labels>
+    <labels>
+        <fullName>Label_One</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: One</shortDescription>
+        <value>One</value>
+    </labels>
+    <labels>
+        <fullName>Label_Open</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Open</shortDescription>
+        <value>Open</value>
+    </labels>
+    <labels>
+        <fullName>Label_Order</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Order</shortDescription>
+        <value>Order</value>
+    </labels>
+    <labels>
+        <fullName>Label_Order_Lots</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Order Lots</shortDescription>
+        <value>Order Lots</value>
+    </labels>
+    <labels>
+        <fullName>Label_Order_Type</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Order Type</shortDescription>
+        <value>Order Type</value>
+    </labels>
+    <labels>
+        <fullName>Label_Ordered</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Ordered</shortDescription>
+        <value>Ordered</value>
+    </labels>
+    <labels>
+        <fullName>Label_Ordering</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Ordering</shortDescription>
+        <value>Ordering</value>
+    </labels>
+    <labels>
+        <fullName>Label_Other</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Other</shortDescription>
+        <value>Other</value>
+    </labels>
+    <labels>
+        <fullName>Label_Outstanding</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Outstanding</shortDescription>
+        <value>Outstanding</value>
+    </labels>
+    <labels>
+        <fullName>Label_Outstanding_Quantity</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Outstanding Quantity</shortDescription>
+        <value>Outstanding Qty</value>
+    </labels>
+    <labels>
+        <fullName>Label_Owner</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Owner</shortDescription>
+        <value>Owner</value>
+    </labels>
+    <labels>
+        <fullName>Label_Package</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Package</shortDescription>
+        <value>Package</value>
+    </labels>
+    <labels>
+        <fullName>Label_Packaged_Indicator</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Packaged Indicator</shortDescription>
+        <value>Packaged Indicator</value>
+    </labels>
+    <labels>
+        <fullName>Label_Packaging_Slip</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Packaging Slip</shortDescription>
+        <value>Packaging Slip</value>
+    </labels>
+    <labels>
+        <fullName>Label_Packing_Slip</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Packing Slip</shortDescription>
+        <value>Packing Slip</value>
+    </labels>
+    <labels>
+        <fullName>Label_Part</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Part</shortDescription>
+        <value>Part</value>
+    </labels>
+    <labels>
+        <fullName>Label_Pay</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Pay</shortDescription>
+        <value>Pay</value>
+    </labels>
+    <labels>
+        <fullName>Label_Per_Page</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Per Page</shortDescription>
+        <value>Per Page</value>
+    </labels>
+    <labels>
+        <fullName>Label_Phone</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Phone</shortDescription>
+        <value>Phone</value>
+    </labels>
+    <labels>
+        <fullName>Label_Phone_Alt</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Phone Alt</shortDescription>
+        <value>Phone Alt</value>
+    </labels>
+    <labels>
+        <fullName>Label_Phone_Number</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Phone Number</shortDescription>
+        <value>Phone Number</value>
+    </labels>
+    <labels>
+        <fullName>Label_Phone_Primary</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Phone Primary</shortDescription>
+        <value>Phone Primary</value>
+    </labels>
+    <labels>
+        <fullName>Label_Pkg_Qty</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Pkg Qty</shortDescription>
+        <value>Pkg Qty</value>
+    </labels>
+    <labels>
+        <fullName>Label_Plate</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Plate</shortDescription>
+        <value>Plate</value>
+    </labels>
+    <labels>
+        <fullName>Label_Points</fullName>
+        <categories>Gamification</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gamification Label: Points</shortDescription>
+        <value>Points</value>
+    </labels>
+    <labels>
+        <fullName>Label_Postal</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Postal</shortDescription>
+        <value>Postal/Zip Code</value>
+    </labels>
+    <labels>
+        <fullName>Label_Price</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Price</shortDescription>
+        <value>Price</value>
+    </labels>
+    <labels>
+        <fullName>Label_Price_Level</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Price Level</shortDescription>
+        <value>Price Level</value>
+    </labels>
+    <labels>
+        <fullName>Label_Products</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Products</shortDescription>
+        <value>Products</value>
+    </labels>
+    <labels>
+        <fullName>Label_Promised_By</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Promised By</shortDescription>
+        <value>Promised By</value>
+    </labels>
+    <labels>
+        <fullName>Label_Qty_In</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Qty In</shortDescription>
+        <value>Qty In</value>
+    </labels>
+    <labels>
+        <fullName>Label_Qty_Out</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Qty Out</shortDescription>
+        <value>Qty Out</value>
+    </labels>
+    <labels>
+        <fullName>Label_Qty_Unreceived</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Qty Unreceived</shortDescription>
+        <value>Qty Unreceived</value>
+    </labels>
+    <labels>
+        <fullName>Label_Quantity</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Quantity</shortDescription>
+        <value>Qty</value>
+    </labels>
+    <labels>
+        <fullName>Label_Received</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Received</shortDescription>
+        <value>Received</value>
+    </labels>
+    <labels>
+        <fullName>Label_Receiving</fullName>
+        <categories>Receiving Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Receiving</shortDescription>
+        <value>Receiving</value>
+    </labels>
+    <labels>
+        <fullName>Label_Receivings</fullName>
+        <categories>Receivings Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Receivings</shortDescription>
+        <value>Receivings</value>
+    </labels>
+    <labels>
+        <fullName>Label_Record</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Record</shortDescription>
+        <value>Record</value>
+    </labels>
+    <labels>
+        <fullName>Label_Records</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Records</shortDescription>
+        <value>Records</value>
+    </labels>
+    <labels>
+        <fullName>Label_Reference</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Reference</shortDescription>
+        <value>Reference</value>
+    </labels>
+    <labels>
+        <fullName>Label_Remaining</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Remaining</shortDescription>
+        <value>Remaining</value>
+    </labels>
+    <labels>
+        <fullName>Label_Remove</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Remove</shortDescription>
+        <value>Remove</value>
+    </labels>
+    <labels>
+        <fullName>Label_Remove_All_Item</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Remove All Item</shortDescription>
+        <value>Remove All Item</value>
+    </labels>
+    <labels>
+        <fullName>Label_Remove_From_Order</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Remove From Order</shortDescription>
+        <value>Remove From Order</value>
+    </labels>
+    <labels>
+        <fullName>Label_Remove_from_Invoice</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Remove from Invoice</shortDescription>
+        <value>Remove from Invoice</value>
+    </labels>
+    <labels>
+        <fullName>Label_Replace</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Replace</shortDescription>
+        <value>Replace</value>
+    </labels>
+    <labels>
+        <fullName>Label_Required</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Required</shortDescription>
+        <value>Required</value>
+    </labels>
+    <labels>
+        <fullName>Label_Result</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Result</shortDescription>
+        <value>Result</value>
+    </labels>
+    <labels>
+        <fullName>Label_Retail</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Retail</shortDescription>
+        <value>Retail</value>
+    </labels>
+    <labels>
+        <fullName>Label_Rewards</fullName>
+        <categories>Gamification</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Gamification Label: Rewards</shortDescription>
+        <value>Rewards</value>
+    </labels>
+    <labels>
+        <fullName>Label_SMS</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: SMS</shortDescription>
+        <value>SMS</value>
+    </labels>
+    <labels>
+        <fullName>Label_Same_As</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Same as</shortDescription>
+        <value>Same as</value>
+    </labels>
+    <labels>
+        <fullName>Label_Search</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Search</shortDescription>
+        <value>Search</value>
+    </labels>
+    <labels>
+        <fullName>Label_Search_To_Add</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Search To Add</shortDescription>
+        <value>Search to add</value>
+    </labels>
+    <labels>
+        <fullName>Label_Searching</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Searching</shortDescription>
+        <value>Searching</value>
+    </labels>
+    <labels>
+        <fullName>Label_See_Less</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: See Less</shortDescription>
+        <value>See Less</value>
+    </labels>
+    <labels>
+        <fullName>Label_See_More</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: See More</shortDescription>
+        <value>See More</value>
+    </labels>
+    <labels>
+        <fullName>Label_Select</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Select</shortDescription>
+        <value>Select</value>
+    </labels>
+    <labels>
+        <fullName>Label_Send</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Send</shortDescription>
+        <value>Send</value>
+    </labels>
+    <labels>
+        <fullName>Label_September</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: September</shortDescription>
+        <value>September</value>
+    </labels>
+    <labels>
+        <fullName>Label_Services</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Services</shortDescription>
+        <value>Services</value>
+    </labels>
+    <labels>
+        <fullName>Label_Shipping</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Shipping</shortDescription>
+        <value>Shipping</value>
+    </labels>
+    <labels>
+        <fullName>Label_Show</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Show</shortDescription>
+        <value>Show</value>
+    </labels>
+    <labels>
+        <fullName>Label_Show_History</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Show History</shortDescription>
+        <value>Show History</value>
+    </labels>
+    <labels>
+        <fullName>Label_Source</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Source</shortDescription>
+        <value>Source</value>
+    </labels>
+    <labels>
+        <fullName>Label_State</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: State</shortDescription>
+        <value>State/Province</value>
+    </labels>
+    <labels>
+        <fullName>Label_Status</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Status</shortDescription>
+        <value>Status</value>
+    </labels>
+    <labels>
+        <fullName>Label_Stock</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Stock</shortDescription>
+        <value>Stock</value>
+    </labels>
+    <labels>
+        <fullName>Label_Sub_Total</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Sub Total</shortDescription>
+        <value>Sub Total</value>
+    </labels>
+    <labels>
+        <fullName>Label_Submit</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Submit</shortDescription>
+        <value>Submit</value>
+    </labels>
+    <labels>
+        <fullName>Label_Subtotal</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Subtotal</shortDescription>
+        <value>Subtotal</value>
+    </labels>
+    <labels>
+        <fullName>Label_Tax</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Tax</shortDescription>
+        <value>Tax</value>
+    </labels>
+    <labels>
+        <fullName>Label_Tax_Level</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Tax Level</shortDescription>
+        <value>Tax Level</value>
+    </labels>
+    <labels>
+        <fullName>Label_To</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: To</shortDescription>
+        <value>To</value>
+    </labels>
+    <labels>
+        <fullName>Label_Toggle_Dropdown</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label : Toggle Dropdown</shortDescription>
+        <value>Toggle Dropdown</value>
+    </labels>
+    <labels>
+        <fullName>Label_Total</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Total</shortDescription>
+        <value>Total</value>
+    </labels>
+    <labels>
+        <fullName>Label_Twitter</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Twitter</shortDescription>
+        <value>Twitter</value>
+    </labels>
+    <labels>
+        <fullName>Label_Type</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Type</shortDescription>
+        <value>Type</value>
+    </labels>
+    <labels>
+        <fullName>Label_Unit</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Unit</shortDescription>
+        <value>Unit</value>
+    </labels>
+    <labels>
+        <fullName>Label_Unit_Catalog</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Unit Catalog</shortDescription>
+        <value>Unit Catalog</value>
+    </labels>
+    <labels>
+        <fullName>Label_Unreceived</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Unreceived</shortDescription>
+        <value>Unreceived</value>
+    </labels>
+    <labels>
+        <fullName>Label_VIN</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: VIN</shortDescription>
+        <value>VIN</value>
+    </labels>
+    <labels>
+        <fullName>Label_Value</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Value</shortDescription>
+        <value>Value</value>
+    </labels>
+    <labels>
+        <fullName>Label_Visit_Website</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Visit Website</shortDescription>
+        <value>Visit Website</value>
+    </labels>
+    <labels>
+        <fullName>Label_Website</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Website</shortDescription>
+        <value>Website</value>
+    </labels>
+    <labels>
+        <fullName>Label_With</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: With</shortDescription>
+        <value>With</value>
+    </labels>
+    <labels>
+        <fullName>Label_Work</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Work</shortDescription>
+        <value>Work</value>
+    </labels>
+    <labels>
+        <fullName>Label_Year</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Year</shortDescription>
+        <value>Year</value>
+    </labels>
+    <labels>
+        <fullName>Label_Yes</fullName>
+        <categories>General Label</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Label: Yes</shortDescription>
+        <value>Yes</value>
+    </labels>
+    <labels>
+        <fullName>Labour_Object_Display_Label</fullName>
+        <categories>Labour Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Labour : Object Display Label</shortDescription>
+        <value>Labour</value>
+    </labels>
+    <labels>
+        <fullName>Landed_Cost_Adjustment</fullName>
+        <categories>Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Landed Cost Adjustment</shortDescription>
+        <value>Landed Cost Adjustment</value>
+    </labels>
+    <labels>
+        <fullName>Last_Ordered</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Last Ordered</shortDescription>
+        <value>Last Ordered</value>
+    </labels>
+    <labels>
+        <fullName>Last_Sold</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Last Sold</shortDescription>
+        <value>Last Sold</value>
+    </labels>
+    <labels>
+        <fullName>Launch_Application_Heading</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Launch Application Heading</shortDescription>
+        <value>LAUNCH APPLICATION</value>
+    </labels>
+    <labels>
+        <fullName>Launch_Application_Text</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Launch Application Text</shortDescription>
+        <value>Other Text</value>
+    </labels>
+    <labels>
+        <fullName>Lead_Time</fullName>
+        <categories>Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Lead Time</shortDescription>
+        <value>Lead Time</value>
+    </labels>
+    <labels>
+        <fullName>Location_Quantity</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part: Location &amp; Quantity</shortDescription>
+        <value>Location &amp; Quantity</value>
+    </labels>
+    <labels>
+        <fullName>Make_Object_Display_Label</fullName>
+        <categories>Make Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Make : Object Display Label</shortDescription>
+        <value>Make</value>
+    </labels>
+    <labels>
+        <fullName>Max_Length_Should_Be</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: Max Length should be</shortDescription>
+        <value>Max length should be</value>
+    </labels>
+    <labels>
+        <fullName>Max_Value_Should_Be</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: Max value should be</shortDescription>
+        <value>Max value should be</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_chatter</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_chatter</shortDescription>
+        <value>ENGAGE YOUR PEERS</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_chatter_text</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_chatter_text</shortDescription>
+        <value>Other Text Other Text Other Text Other Text Other Text Other Text</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_idea</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_idea</shortDescription>
+        <value>SHARE YOUR IDEAS</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_idea_text</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_idea_text</shortDescription>
+        <value>Other Text Other Text Other Text Other Text Other Text Other Text</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_question</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_question</shortDescription>
+        <value>ASK QUESTIONS</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_question_text</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_question_text</shortDescription>
+        <value>Other Text Other Text Other Text Other Text Other Text Other Text</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_started</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_started</shortDescription>
+        <value>GETTING STARTED</value>
+    </labels>
+    <labels>
+        <fullName>Menu_link_started_text</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu_link_started_text</shortDescription>
+        <value>Other Text Other Text Other Text Other Text Other Text Other Text</value>
+    </labels>
+    <labels>
+        <fullName>Min_Length_Should_Be</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: Min length should be</shortDescription>
+        <value>Min length should be</value>
+    </labels>
+    <labels>
+        <fullName>Min_Value_Should_Be</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: Min value should be</shortDescription>
+        <value>Min value should be</value>
+    </labels>
+    <labels>
+        <fullName>Model_Object_Display_Label</fullName>
+        <categories>Model Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Model : Object Display Label</shortDescription>
+        <value>Model</value>
+    </labels>
+    <labels>
+        <fullName>Modify_Cost_Source</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Modify Cost Source</shortDescription>
+        <value>Modify Cost Source</value>
+    </labels>
+    <labels>
+        <fullName>Modify_Cost_Summary</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Modify Cost Summary</shortDescription>
+        <value>Modify Cost Summary</value>
+    </labels>
+    <labels>
+        <fullName>New_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>New Label</shortDescription>
+        <value>New</value>
+    </labels>
+    <labels>
+        <fullName>New_Schedule_Service</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule Service Label</shortDescription>
+        <value>Schedule Service</value>
+    </labels>
+    <labels>
+        <fullName>No_Results_Found</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: No Results Found</shortDescription>
+        <value>No Results Found</value>
+    </labels>
+    <labels>
+        <fullName>Ok_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Ok</shortDescription>
+        <value>Ok</value>
+    </labels>
+    <labels>
+        <fullName>Order</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Order</shortDescription>
+        <value>Order</value>
+    </labels>
+    <labels>
+        <fullName>Order_In_Lots_Of</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Order In Lots Of</shortDescription>
+        <value>Order In Lots Of</value>
+    </labels>
+    <labels>
+        <fullName>Ordering_Information_Label</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part: Ordering Information Label</shortDescription>
+        <value>Ordering Information</value>
+    </labels>
+    <labels>
+        <fullName>Other_Email</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Other Email</shortDescription>
+        <value>Other Email</value>
+    </labels>
+    <labels>
+        <fullName>Other_Phone</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Other Phone</shortDescription>
+        <value>Other Phone</value>
+    </labels>
+    <labels>
+        <fullName>Oversold_Qty</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Oversold Qty</shortDescription>
+        <value>Oversold Qty</value>
+    </labels>
+    <labels>
+        <fullName>Oversold_Valuation</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Oversold Valuation</shortDescription>
+        <value>Oversold Valuation</value>
+    </labels>
+    <labels>
+        <fullName>PO_Field_Types</fullName>
+        <categories>Purchase Order Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Purchase Order Object Field: PO Types</shortDescription>
+        <value>Purchase Order Types</value>
+    </labels>
+    <labels>
+        <fullName>PO_Object_Short_Display_Label</fullName>
+        <categories>Purchase Order Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Purchase Order Object : Short Display Label</shortDescription>
+        <value>PO</value>
+    </labels>
+    <labels>
+        <fullName>PO_Type_Updated_SucessFully</fullName>
+        <categories>Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: PO Type Updated SucessFully</shortDescription>
+        <value>PO Type Updated Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_ActiveOrder</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Active Order</shortDescription>
+        <value>Active Order</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Active_Vendor_Order</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section:  Active Vendor Order</shortDescription>
+        <value>Active Vendor Order</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_ActivityStream</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Activity Stream</shortDescription>
+        <value>ActivityStream</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_AlternateParts</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Alternate Parts</shortDescription>
+        <value>Alternate Parts</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Cost_Details</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section:  Cost Details</shortDescription>
+        <value>Cost Details</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Cost_Summary</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section:  Cost Summary</shortDescription>
+        <value>Cost Summary</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Cost_Tracking</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section:  Cost Tracking</shortDescription>
+        <value>Cost Tracking</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_General</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: General</shortDescription>
+        <value>General</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Info</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Info</shortDescription>
+        <value>Info</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Price_File_Info</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Price File Info</shortDescription>
+        <value>Price File Info</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Related</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Related</shortDescription>
+        <value>Related</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Statistics</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Statistics</shortDescription>
+        <value>Statistics</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Stocking</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Stocking</shortDescription>
+        <value>Stocking</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_TaxExemptions</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Tax Exemptions</shortDescription>
+        <value>Tax Exemptions</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_Telemetry</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Telemetry</shortDescription>
+        <value>Telemetry</value>
+    </labels>
+    <labels>
+        <fullName>Page_Section_VitalStatistics</fullName>
+        <categories>General Label: Page Section</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Section: Vital Statistics</shortDescription>
+        <value>Vital Statistics</value>
+    </labels>
+    <labels>
+        <fullName>Page_Server_Save_Error</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Page Server Save Error</shortDescription>
+        <value>Some error occured while saving the records. Please refresh the page and try again.</value>
+    </labels>
+    <labels>
+        <fullName>Part_Already_Exits</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Part Already Exits</shortDescription>
+        <value>Part Already Exits</value>
+    </labels>
+    <labels>
+        <fullName>Part_Is_Already_Alternate_Part</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Part is Already Alternate Part</shortDescription>
+        <value>Part is Already Alternate Part.</value>
+    </labels>
+    <labels>
+        <fullName>Part_Not_Added_As_Alternate_Part</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Part Not Added As Alternate Part</shortDescription>
+        <value>Part Not Added As Alternate Part.</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Display_Label</fullName>
+        <categories>Part Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part : Object Display Label</shortDescription>
+        <value>Merchandise</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Item_Description</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Item/Description</shortDescription>
+        <value>Item/Desc</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Pricing_Method</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Pricing Method</shortDescription>
+        <value>Pricing Method</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Quantity_AutoRecorderAt</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Quantity Auto Recorder At</shortDescription>
+        <value>Auto Recorder At</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Quantity_AutoRecorderTo</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Quantity Auto Recorder To</shortDescription>
+        <value>Auto Recorder To</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Quantity_Available</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Available On Hand</shortDescription>
+        <value>Available On Hand</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Quantity_Incoming</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Quantity Incoming</shortDescription>
+        <value>Incoming</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Quantity_Net_Available</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Quantity Net Available</shortDescription>
+        <value>Net Available</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Status_Available</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Status value Available</shortDescription>
+        <value>Available</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Status_Committed</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Status value Committed</shortDescription>
+        <value>Committed</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Status_InStock</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Status value In Stock</shortDescription>
+        <value>In Stock</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Status_OnOrder</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Status value On Order</shortDescription>
+        <value>On Order</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Status_OutofStock</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Status value Out of Stock</shortDescription>
+        <value>Out of Stock</value>
+    </labels>
+    <labels>
+        <fullName>Part_Object_Status_Required</fullName>
+        <categories>Part Object: Field</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Part Object - Field: Status value Required</shortDescription>
+        <value>Required</value>
+    </labels>
+    <labels>
+        <fullName>Part_Purchases</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Part Purchases</shortDescription>
+        <value>Part Purchases</value>
+    </labels>
+    <labels>
+        <fullName>Part_Sales_Tax_Is_Already_Tax_Exemption</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notification: Part Sales Tax Is Already Tax Exemption</shortDescription>
+        <value>Sales tax is already added as Tax Exemption for part</value>
+    </labels>
+    <labels>
+        <fullName>Part_Saved_Successfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Part Saved Sucessfully</shortDescription>
+        <value>Part Saved Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Part_Saved_SucessFully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Part Saved Sucessfully</shortDescription>
+        <value>Part Saved Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Part_Updated_Successfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Part Updated SucessFully</shortDescription>
+        <value>Part Updated Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Part_Updated_SucessFully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Part Updated SucessFully</shortDescription>
+        <value>Part Updated Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Payment_Section_Display_Label</fullName>
+        <categories>Payment Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Payment Section: Section Display Label</shortDescription>
+        <value>Payment</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_Active</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : Active</shortDescription>
+        <value>Active</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_Default</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : Default</shortDescription>
+        <value>Default</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_Description</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : Description</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_LabourRate</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : LabourRate</shortDescription>
+        <value>Labour Rate</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_Name</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : Name</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_PartPriceIsBasedOn</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : PartPriceIsBasedOn</shortDescription>
+        <value>Part Price Is Based On</value>
+    </labels>
+    <labels>
+        <fullName>PriceLevelGrid_RateApplied</fullName>
+        <categories>Price Level Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>PriceLevelGrid : RateApplied</shortDescription>
+        <value>Rate Applied</value>
+    </labels>
+    <labels>
+        <fullName>Price_Cost</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part: Price &amp; Cost</shortDescription>
+        <value>Price &amp; Cost</value>
+    </labels>
+    <labels>
+        <fullName>Print_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Print Label</shortDescription>
+        <value>Print</value>
+    </labels>
+    <labels>
+        <fullName>Profitability_Label</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Profitability Label</shortDescription>
+        <value>PROFITABLITY</value>
+    </labels>
+    <labels>
+        <fullName>Projected_Delivery</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Projected Delivery</shortDescription>
+        <value>Projected Delivery</value>
+    </labels>
+    <labels>
+        <fullName>Purchase_Tax_Level</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Purchase Tax Level</shortDescription>
+        <value>Purchase Tax Level</value>
+    </labels>
+    <labels>
+        <fullName>Qty_In_Stock</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Qty In Stock</shortDescription>
+        <value>Qty In Stock</value>
+    </labels>
+    <labels>
+        <fullName>Receiving_History</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Receiving History</shortDescription>
+        <value>Receiving History</value>
+    </labels>
+    <labels>
+        <fullName>Related_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Related Help Text</shortDescription>
+        <value>Lists related to Part</value>
+    </labels>
+    <labels>
+        <fullName>Relation</fullName>
+        <categories>Contact Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Contact: Relation</shortDescription>
+        <value>Relation</value>
+    </labels>
+    <labels>
+        <fullName>ReorderTo_Must_Gretaer_Than_ReOrderAt</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: ReorderTo Must Gretaer Than ReOrder At</shortDescription>
+        <value>ReorderTo Must Gretaer Than ReOrder At</value>
+    </labels>
+    <labels>
+        <fullName>Required_For_Customer</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order:  Required For Customer</shortDescription>
+        <value>Required For Customer</value>
+    </labels>
+    <labels>
+        <fullName>Required_For_Stock</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order:  Required For Stock</shortDescription>
+        <value>Required For Stock</value>
+    </labels>
+    <labels>
+        <fullName>Resolve_Oversold</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Resolve Oversold</shortDescription>
+        <value>Resolve Oversold</value>
+    </labels>
+    <labels>
+        <fullName>Revenue_Lifetime</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Revenue Lifetime</shortDescription>
+        <value>Revenue Lifetime</value>
+    </labels>
+    <labels>
+        <fullName>Review_Errors_Notification</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notification: Review Error Notification</shortDescription>
+        <value>Please Review Error(s) before saving form</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Active</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Active</shortDescription>
+        <value>Active</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Category</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Category</shortDescription>
+        <value>Category</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_FormsLabel</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : FormsLabel</shortDescription>
+        <value>Forms Label</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Labour</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Labour</shortDescription>
+        <value>Labour</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Misc</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Misc</shortDescription>
+        <value>Misc</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Parts</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Parts</shortDescription>
+        <value>Taxes : Parts</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Rate</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Rate</shortDescription>
+        <value>Rate</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Selected</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Selected</shortDescription>
+        <value>Selected</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_TaxName</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : TaxName</shortDescription>
+        <value>Tax Name</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGridItem_Units</fullName>
+        <categories>Sales Tax Item Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGridItem : Units</shortDescription>
+        <value>Units</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGrid_Active</fullName>
+        <categories>Sales Tax Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGrid : Active</shortDescription>
+        <value>Active</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGrid_Default</fullName>
+        <categories>Sales Tax Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGrid : Default</shortDescription>
+        <value>Default</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGrid_FormsLabel</fullName>
+        <categories>Sales Tax Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGrid : FormsLabel</shortDescription>
+        <value>Forms Label</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGrid_ListTaxItemsOnForms</fullName>
+        <categories>Sales Tax Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGrid : ListTaxItemsOnForms</shortDescription>
+        <value>List Tax Items On Forms</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGrid_Rate</fullName>
+        <categories>Sales Tax Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGrid : Rate</shortDescription>
+        <value>Rate</value>
+    </labels>
+    <labels>
+        <fullName>SalesTaxGrid_SalesTaxName</fullName>
+        <categories>Sales Tax Grid</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>SalesTaxGrid : Sales Tax Name</shortDescription>
+        <value>Sales Tax Name</value>
+    </labels>
+    <labels>
+        <fullName>Sales_Tax_Item_Object_Display_Label</fullName>
+        <categories>Sales Tax Item Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sales Tax Item: Object Display Label</shortDescription>
+        <value>Sales Tax Item</value>
+    </labels>
+    <labels>
+        <fullName>Sales_Tax_Object_Display_Label</fullName>
+        <categories>Sales Tax Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sales Tax : Object Display Label</shortDescription>
+        <value>Sales Tax</value>
+    </labels>
+    <labels>
+        <fullName>Salse_Price_Level</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Salse Price Level</shortDescription>
+        <value>Sales Price Level</value>
+    </labels>
+    <labels>
+        <fullName>Salse_Tax_Level</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Salse Tax Level</shortDescription>
+        <value>Salse Tax Level</value>
+    </labels>
+    <labels>
+        <fullName>Save_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Save Label</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>Saved_Successfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notification: Saved Sucessfully</shortDescription>
+        <value>Saved Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Saved_Sucessfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notification: Saved Sucessfully</shortDescription>
+        <value>Saved Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Schedule_Service</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule Service Label</shortDescription>
+        <value>Schedule Service</value>
+    </labels>
+    <labels>
+        <fullName>SetAsCompleteErrorMessage</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status: Should only change when requirements are Completed</shortDescription>
+        <value>Work Status cannot be set as Complete since Service Order Line Item is in Required Status.</value>
+    </labels>
+    <labels>
+        <fullName>SignedOutErrorMessage</fullName>
+        <categories>Customer Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Status: Should only change when requirements are Completed</shortDescription>
+        <value>Work Status cannot be set to Signed Out since Service Order Line Item is in Required Status.</value>
+    </labels>
+    <labels>
+        <fullName>Slider_Image_1_Description</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slider_Image_1_Description</shortDescription>
+        <value>Welcome to our Design Partners</value>
+    </labels>
+    <labels>
+        <fullName>Slider_Image_1_Heading</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slider Image 1 Heading</shortDescription>
+        <value>MEMBER COMMUNITY</value>
+    </labels>
+    <labels>
+        <fullName>Slider_Image_2_Description</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slider_Image_2_Description</shortDescription>
+        <value>Description 2</value>
+    </labels>
+    <labels>
+        <fullName>Slider_Image_2_Heading</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slider_Image_2_Heading</shortDescription>
+        <value>Heading 2</value>
+    </labels>
+    <labels>
+        <fullName>Slider_Image_3_Description</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slider_Image_3_Description</shortDescription>
+        <value>Description 3</value>
+    </labels>
+    <labels>
+        <fullName>Slider_Image_3_Heading</fullName>
+        <categories>Community</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Slider_Image_3_Heading</shortDescription>
+        <value>Heading 3</value>
+    </labels>
+    <labels>
+        <fullName>Sold_Lifetime</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Sold Lifetime</shortDescription>
+        <value>Sold Lifetime</value>
+    </labels>
+    <labels>
+        <fullName>Special_Order</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Special Order</shortDescription>
+        <value>Special Order</value>
+    </labels>
+    <labels>
+        <fullName>StateGrid_Default</fullName>
+        <categories>State Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>StateGrid : Default</shortDescription>
+        <value>Default</value>
+    </labels>
+    <labels>
+        <fullName>StateGrid_Name</fullName>
+        <categories>State Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>StateGrid : Name</shortDescription>
+        <value>Name</value>
+    </labels>
+    <labels>
+        <fullName>Statistics_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Statistics Help Text</shortDescription>
+        <value>Part Statistics</value>
+    </labels>
+    <labels>
+        <fullName>Stock_Excess</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Stock Excess</shortDescription>
+        <value>Stock Excess</value>
+    </labels>
+    <labels>
+        <fullName>Stocking_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Stocking Help Text</shortDescription>
+        <value>Stocking Information</value>
+    </labels>
+    <labels>
+        <fullName>Sub_Model_Object_Display_Label</fullName>
+        <categories>Model Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sub Model : Object Display Label</shortDescription>
+        <value>Sub Model</value>
+    </labels>
+    <labels>
+        <fullName>Sublet_Purchases</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Sublet Purchases</shortDescription>
+        <value>Sublet Purchases</value>
+    </labels>
+    <labels>
+        <fullName>Suggested_Items_Section_Display_Label</fullName>
+        <categories>Suggested Items Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Suggested Items : Section Display Label</shortDescription>
+        <value>Suggested Items</value>
+    </labels>
+    <labels>
+        <fullName>SystemWideSetting_CountryLabel</fullName>
+        <categories>System Wide Setting</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>System Wide Setting: Country Label</shortDescription>
+        <value>Country &amp; State/Province</value>
+    </labels>
+    <labels>
+        <fullName>SystemWideSetting_PriceLevelsLabel</fullName>
+        <categories>System Wide Setting</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>System Wide Setting: Price Levels Label</shortDescription>
+        <value>Price Levels</value>
+    </labels>
+    <labels>
+        <fullName>SystemWideSetting_SalesTaxesLabel</fullName>
+        <categories>System Wide Setting</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>System Wide Setting: Sales Taxes Label</shortDescription>
+        <value>Sales Taxes</value>
+    </labels>
+    <labels>
+        <fullName>Tab_Leave_Confirm_box_No_text</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tab Leave - Confirm box - No text</shortDescription>
+        <value>Stay</value>
+    </labels>
+    <labels>
+        <fullName>Tab_Leave_Confirm_box_Yes_text</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tab Leave - Confirm box - Yes text</shortDescription>
+        <value>Leave</value>
+    </labels>
+    <labels>
+        <fullName>TaxExemptions_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: TaxExemptions Help Text</shortDescription>
+        <value>Taxes exempted on the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tax_Exemption_Saved_Successfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Tax Exemption Saved SucessFully</shortDescription>
+        <value>Tax Exemption Saved Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Tax_Exemption_Saved_SucessFully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Tax Exemption Saved SucessFully</shortDescription>
+        <value>Tax Exemption Saved Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Tax_Exemption_Updated_Successfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Tax Exemption Updated SucessFully</shortDescription>
+        <value>Tax Exemption Updated Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Tax_Exemption_Updated_SucessFully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Tax Exemption Updated SucessFully</shortDescription>
+        <value>Tax Exemption Updated Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Telemetry_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Telemetry Help Text</shortDescription>
+        <value>Telemetric Information</value>
+    </labels>
+    <labels>
+        <fullName>Text_Deactivate_Customer</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: Deactivate Customer</shortDescription>
+        <value>This will deactive the customer. It will be impossible to complete customer orders against this customer, or book them for appointments. 
+Are you sure, you want to continue?</value>
+    </labels>
+    <labels>
+        <fullName>Time_Spent_Cannot_Be_Zero</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Time Spent cannot be zero</shortDescription>
+        <value>Time Spent cannot be zero</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Active_Orders</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Active Orders</shortDescription>
+        <value>Active Vendor Orders</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Active_Orders_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Active Orders Settings</shortDescription>
+        <value>Active Orders Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Active_Sales_Orders</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Active Sales Orders</shortDescription>
+        <value>Active Sales Orders</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Active_Sales_Orders_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Active Sales Orders Settings</shortDescription>
+        <value>Active Sales Orders Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_AutoRecorderAt</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Auto Recorder At</shortDescription>
+        <value>Qty when automatic reordering should trigger</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_AutoRecorderTo</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Auto Recorder To</shortDescription>
+        <value>Max Qty to be reordered for Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Category</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Category</shortDescription>
+        <value>Part Category</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Cost</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Cost</shortDescription>
+        <value>To modify this value go to the Cost Tracking section of the part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_CostForNewPart</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tooltip Add_Part : CostForNewPart</shortDescription>
+        <value>Part Cost</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Description</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Description</shortDescription>
+        <value>Part Description</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Enviro</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Enviro</shortDescription>
+        <value>Environment Fee</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_GeneralInfo</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: General Info</shortDescription>
+        <value>General information for the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_InStockQuantity</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: In Stock Quantity</shortDescription>
+        <value>Quantity in stock</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Location</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Location</shortDescription>
+        <value>Physical location of the Part in store</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_LocationAndQty</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Location And Qty</shortDescription>
+        <value>Location and Quantity infomation for the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_MSRP</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: MSRP</shortDescription>
+        <value>MSRP of the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Number</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Part Number</shortDescription>
+        <value>Part Number</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_OrderLots</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Order Lots</shortDescription>
+        <value>Number of lots to be ordered</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_OrderingInfo</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Ordering Info</shortDescription>
+        <value>Ordering Info for the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_PackagedCost</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Packaged Cost</shortDescription>
+        <value>Cost of Part Package</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_PriceAndCost</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Price And Cost</shortDescription>
+        <value>Pricing details for the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_PriceMethod</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Price Method</shortDescription>
+        <value>Pricing method for the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_ReplaceBy</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Replace By</shortDescription>
+        <value>Superceding Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Retail</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Retail</shortDescription>
+        <value>Retail cost of the Part</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Add_Part_Vendor</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Vendor</shortDescription>
+        <value>Part Vendor information</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Alternate_Parts</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Alternate Parts</shortDescription>
+        <value>Alternate Parts</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Alternate_Parts_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Alternate Parts Settings</shortDescription>
+        <value>Alternate Parts Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Contacts</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Contacts</shortDescription>
+        <value>Contacts</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Contacts_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Contact Settings</shortDescription>
+        <value>Contact Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Part_Number</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Part - Tooltip: Part Number</shortDescription>
+        <value>Part Number</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Products</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Products</shortDescription>
+        <value>Products</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Products_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Product Settings</shortDescription>
+        <value>Product Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Purchase_Orders</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Purchase Orders</shortDescription>
+        <value>Purchase Orders</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Purchase_Orders_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Purchase Orders Settings</shortDescription>
+        <value>Purchase Orders Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Tax_Exemptions</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Tax Exemptions</shortDescription>
+        <value>Tax Exemptions</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_Tax_Exemptions_Settings</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: Tax Exemptions Settings</shortDescription>
+        <value>Tax Exemptions Options</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_COU</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: COU</shortDescription>
+        <value>Customer Owned Units</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Contacts</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Contacts</shortDescription>
+        <value>List of contacts related to the Customer</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Customers</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Customers</shortDescription>
+        <value>List of other customers related to the Customer</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Info</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Info</shortDescription>
+        <value>Basic information of Vendor</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Related</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Related</shortDescription>
+        <value>Records related to the Customer</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Statistics</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Statistics</shortDescription>
+        <value>All statistics for the Vendor</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Telemetry</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Telemetry</shortDescription>
+        <value>Metrics and Measurement</value>
+    </labels>
+    <labels>
+        <fullName>Tooltip_View_Vendor_Vital_Statistics</fullName>
+        <categories>Tooltip: View Vendor</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor - Tooltip: Vital Statistics</shortDescription>
+        <value>Vital statistics for the Vendor</value>
+    </labels>
+    <labels>
+        <fullName>Total_Deposit</fullName>
+        <categories>ViewCustomer</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total Deposit</shortDescription>
+        <value>Total Deposit</value>
+    </labels>
+    <labels>
+        <fullName>Total_Valuation</fullName>
+        <categories>View Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Total Valuation</shortDescription>
+        <value>Total Valuation</value>
+    </labels>
+    <labels>
+        <fullName>Transfer_To_Customer</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Transfer to another customer Label</shortDescription>
+        <value>Transfer to another customer</value>
+    </labels>
+    <labels>
+        <fullName>Trigger_Exception_Message</fullName>
+        <categories>Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Exception Messages: Trigger Exception</shortDescription>
+        <value>Trigger error :</value>
+    </labels>
+    <labels>
+        <fullName>Unable_To_Perform_Update</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Success: Unable To Perform Update</shortDescription>
+        <value>Unable to update record.</value>
+    </labels>
+    <labels>
+        <fullName>Unit_Make_Object_Display_Label</fullName>
+        <categories>Unit Make Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unit Make : Object Display Label</shortDescription>
+        <value>Unit</value>
+    </labels>
+    <labels>
+        <fullName>Unit_Purchases</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Unit Purchases</shortDescription>
+        <value>Unit Purchases</value>
+    </labels>
+    <labels>
+        <fullName>Updated_Sucessfully</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Notification: Updated Sucessfully</shortDescription>
+        <value>Updated Successfully</value>
+    </labels>
+    <labels>
+        <fullName>Usage</fullName>
+        <categories>Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Usage</shortDescription>
+        <value>Usage</value>
+    </labels>
+    <labels>
+        <fullName>User_Object_Display_Label</fullName>
+        <categories>User Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>User : Object Display Label</shortDescription>
+        <value>User</value>
+    </labels>
+    <labels>
+        <fullName>VIN_Is_Already_Present</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Warning: VIN is already present</shortDescription>
+        <value>VIN is already present</value>
+    </labels>
+    <labels>
+        <fullName>VIP_Level</fullName>
+        <categories>Customer Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Add Customer: VIP Level</shortDescription>
+        <value>VIP Level</value>
+    </labels>
+    <labels>
+        <fullName>Validation_Exception_Message</fullName>
+        <categories>Exception Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Exception Messages: Validation Exception</shortDescription>
+        <value>Validation Error :</value>
+    </labels>
+    <labels>
+        <fullName>Value_must_be_greater_than</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Value must be greater than</shortDescription>
+        <value>Value must be greater than</value>
+    </labels>
+    <labels>
+        <fullName>Value_must_be_lesser_than</fullName>
+        <categories>Page Messages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error: Value must be lesser than</shortDescription>
+        <value>Value must be lesser than</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Home_Email</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Home Email</shortDescription>
+        <value>Home Email</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Home_Number</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Home Number</shortDescription>
+        <value>Home Number</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Home_Number_SMS</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Home Number SMS</shortDescription>
+        <value>Home Number SMS</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Invoicing_Taxes</fullName>
+        <categories>Vendor Invoicing Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Invoicing: Section Totals</shortDescription>
+        <value>Taxes</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Invoicing_Total_Due</fullName>
+        <categories>Vendor Invoicing Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Invoicing: Section Totals</shortDescription>
+        <value>Total Due</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Object_Display_Label</fullName>
+        <categories>Vendor Object</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor : Object Display Label</shortDescription>
+        <value>Vendor</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Order</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title:</shortDescription>
+        <value>Vendor Order</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Order_Invoicing</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: Vendor Invoicing</shortDescription>
+        <value>Vendor Invoicing</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Order_Receiving</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: Vendor Receiving</shortDescription>
+        <value>Vendor Receiving</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Order_Types</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order:  Vendor Order Types</shortDescription>
+        <value>Vendor Order Types</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Other_Email</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Other Email</shortDescription>
+        <value>Other Email</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Other_Number_SMS</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Other Number SMS</shortDescription>
+        <value>Other Number SMS</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Other_Phone</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Other Phone</shortDescription>
+        <value>Other Phone</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Confirmation_Deselection</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Confirmation Deselection Label</shortDescription>
+        <value>Confirmation Deselection</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Confirmation_Stock_Excess</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Confirmation Stock Excess Label</shortDescription>
+        <value>Confirmation Stock Excess</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Delete_Vendor_Receiving</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Delete Vendor Receiving Label</shortDescription>
+        <value>Delete Vendor Receiving</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_For_Vendor_Order</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Receiving Section</shortDescription>
+        <value>Receiving For Vendor Order</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Outstanding_Items_for</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Outstanding Items block</shortDescription>
+        <value>Outstanding Items for</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Receive_All</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Receive All Label</shortDescription>
+        <value>Receive All</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Receive_Item</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Receive Item Label</shortDescription>
+        <value>Receive Item</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Receiving_Remove_From_Receiving</fullName>
+        <categories>Vendor Receiving Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Receiving: Remove From Receiving Label</shortDescription>
+        <value>Remove From Receiving</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Work_Email</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Work Email</shortDescription>
+        <value>Work Email</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Work_Number</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Work Number</shortDescription>
+        <value>Work Number</value>
+    </labels>
+    <labels>
+        <fullName>Vendor_Work_Number_SMS</fullName>
+        <categories>View Vendor Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Vendor: Work Number SMS</shortDescription>
+        <value>Work Number SMS</value>
+    </labels>
+    <labels>
+        <fullName>View_Customer</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: View Customer</shortDescription>
+        <value>View Customer</value>
+    </labels>
+    <labels>
+        <fullName>View_Fee</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: View Fee</shortDescription>
+        <value>View Fee</value>
+    </labels>
+    <labels>
+        <fullName>View_Kit</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: View Kit</shortDescription>
+        <value>View Kit</value>
+    </labels>
+    <labels>
+        <fullName>View_Label</fullName>
+        <categories>Button Labels</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Label</shortDescription>
+        <value>View</value>
+    </labels>
+    <labels>
+        <fullName>View_Labour</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: View Labour</shortDescription>
+        <value>View Labour</value>
+    </labels>
+    <labels>
+        <fullName>View_Part</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: View Part</shortDescription>
+        <value>View Part</value>
+    </labels>
+    <labels>
+        <fullName>View_Part_Page_Title</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Page Title</shortDescription>
+        <value>View Part</value>
+    </labels>
+    <labels>
+        <fullName>View_Part_Part_Category</fullName>
+        <categories>Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part: Part Category</shortDescription>
+        <value>Part Category</value>
+    </labels>
+    <labels>
+        <fullName>View_Vendor</fullName>
+        <categories>Page Title</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Page Title: View Vendor</shortDescription>
+        <value>View Vendor</value>
+    </labels>
+    <labels>
+        <fullName>VitalStatistics_Help_Text</fullName>
+        <categories>Tooltip: Part Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>View Part - Tooltip: VitalStatistics Help Text</shortDescription>
+        <value>Statistical Information</value>
+    </labels>
+    <labels>
+        <fullName>Warranty_Plan_Sales_on_Unit_Deals</fullName>
+        <categories>Vendor Order Page</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Vendor Order: Warranty Plan Sales on Unit Deals</shortDescription>
+        <value>Warranty Plan Sales on Unit Deals</value>
+    </labels>
+</CustomLabels>

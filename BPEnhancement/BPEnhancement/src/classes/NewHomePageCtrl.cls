@@ -13,6 +13,7 @@
  	public Boolean IsSystemSettingVisited{get{return GeneralConfiguration.isSystemSettingVisited();} private set;}
  	
  	public Boolean IsSampleDataAvailable { get{
+ 												if(AccessControl.ifObjectFieldIsAccessible('Category__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
  												List<Category__c> categoryList = [select id from Category__c limit : Limits.getLimitDMLRows()];
  												if(categoryList.size() == 0){
  													return false;

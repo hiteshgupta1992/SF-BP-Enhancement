@@ -117,6 +117,7 @@ public with sharing class CustomerDetail {
     	}
     	
     	Map<Id, List<String>> salesTaxItemIdToAppliesToList = new Map<Id, List<String>>(); 
+    	if(AccessControl.ifObjectIsAccessible('Applicable_Taxes__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
     	List<Applicable_Taxes__c> appTaxList = [select Sales_Tax_Item__c, Sales_Tax__c, Sales_Tax__r.Name__c from Applicable_Taxes__c
     												where Sales_Tax_Item__c IN: salesTaxItemIdSet];
     	

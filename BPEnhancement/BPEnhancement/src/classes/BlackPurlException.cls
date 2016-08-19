@@ -60,7 +60,7 @@ public with sharing class BlackPurlException extends Exception{
         String remainingString = subErrorString.substring(0, secondIndex);
         
         String sObjName = Id.valueOf(errorRecordId).getSObjectType().getDescribe().getName();
-        
+        if(AccessControl.ifObjectFieldIsAccessible(sObjName) == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         String query = 'Select Name from ' + sObjName + ' Where Id = :errorRecordId';
         
         List<Sobject> sObjects = Database.query(query);     

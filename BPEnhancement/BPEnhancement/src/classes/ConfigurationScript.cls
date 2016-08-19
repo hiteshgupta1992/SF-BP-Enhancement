@@ -56,6 +56,7 @@ global without sharing class ConfigurationScript {
     global static void deleteConfigurations() {
         isPostInstallRunning = true;
         List<String> objNamesList = new List<String>{'General_Configurations__c', 'Configurations__c', 'SearchConfigurations__c', 'Australian_Market__c'};
+        if(AccessControl.ifObjectFieldIsAccessible(objNamesList) == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         if(AccessControl.ifObjectIsDeletable(objNamesList) == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE); }
         
         List<Configurations__c> config = [Select Id from Configurations__c where Sent_From_Email_Id__c != null];
@@ -78,6 +79,8 @@ global without sharing class ConfigurationScript {
             delete ausMarket ;
         }
         
+        if(AccessControl.ifObjectFieldIsAccessible('Reporting__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+        if(AccessControl.ifObjectIsDeletable('Reporting__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE); }
         List<Reporting__c> emailReport = [Select Id from Reporting__c where Reporting_Objects__c != null];
         if(emailReport.size() > 0) {
             delete emailReport ;

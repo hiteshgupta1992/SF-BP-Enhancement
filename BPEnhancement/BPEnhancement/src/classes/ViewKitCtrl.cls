@@ -282,7 +282,7 @@ global with sharing class ViewKitCtrl {
 	        kitHeaderRec.Fixed_Price_Flag__c = kitHeaderObj.IsFixedPrice;
 	        Errorhandler error = validateKitHeader(kitHeaderObj);
 	        if (kitHeaderRec.Id != null && error.ResponseCode == '200') {
-	        	if(AccessControl.ifObjectIsAccessible('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
+	        	//if(AccessControl.ifObjectIsAccessible('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE);}
 	        	if(AccessControl.ifObjectIsUpdateable('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE);}
 	            update kitHeaderRec;
 	        }
@@ -333,8 +333,8 @@ global with sharing class ViewKitCtrl {
 	        
 	        Errorhandler error = validateKitLineItemOnInsert(kitHeaderId, kitLineItemToInsert);
 	        if (kitLineItemToInsert.Kit_Header__c != null && error.ResponseCode == '200') {
-	        	if(AccessControl.ifObjectIsAccessible('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
-	        	if(AccessControl.ifObjectIsCreateable('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
+	        	//if(AccessControl.ifObjectIsAccessible('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
+	        	//if(AccessControl.ifObjectIsCreateable('Kit_Header__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	        	if(AccessControl.ifObjectIsCreateable('Kit_Header_Line_Item__c') == false ){throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE);}
 	        	
 	            insert kitLineItemToInsert;

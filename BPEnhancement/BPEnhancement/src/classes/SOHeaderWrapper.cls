@@ -11,7 +11,7 @@ public with sharing class SOHeaderWrapper {
 	public SO_KLI_Recalculation.Errorhandler error;
 	
     // List of CO Invoice Items
-    public List<COInvoiceItem> coInvoiceItemRecs;
+    public List<COInvoiceItem> coInvoiceItemRecs; 
     
     // List of CO Line Items
     public List<SpecialOrder> specialOrderList;
@@ -284,6 +284,19 @@ public with sharing class SOHeaderWrapper {
     }
     
     /**
+     * Name: getCOInvoiceItemList
+     * Desc: Method Which contains all the field list to be quried
+     * @param:  
+     * @return: List<String> - Fields List
+    **/
+ 	 public static List<String> getCOInvoiceItemList(){
+        List<String> coInvoiceItemList = new List<String>{ 'Id',
+                                                        'Invoice_Header_Status__c'
+                                                };
+        return coInvoiceItemList;
+    }
+    
+    /**
      * Name: getTTFieldsList
      * Desc: Method Which contains all the field list to be quried
      * @param:  
@@ -432,6 +445,7 @@ public with sharing class SOHeaderWrapper {
 		public List<AvailableStatus> AvailableWorkStatusList;
 		public String ClaimStatus;
 		public List<AvailableStatus> AvailableClaimStatusList;
+		public String InvoiceStatus;
 		
 		/**
      	* Name: SOHeader
@@ -512,12 +526,17 @@ public with sharing class SOHeaderWrapper {
 			} else {
 				this.AvailableClaimStatusList = new List<AvailableStatus>();
 			}
+			
+			// Invoice Status based on CO Invoice Item of SOHeader
+			if(soHeaderRec.CO_Invoice_Items__r.size() > 0) {
+				this.InvoiceStatus = soHeaderRec.CO_Invoice_Items__r[0].Invoice_Header_Status__c;
+			}
 		}
 	}
 	
 	public class AvailableStatus {
     	public String AvailableStatus;
-    	public String StatusUniqueKey;
+    	public String StatusUniqueKey; 
     	
     	public AvailableStatus(String status) {
     		this.AvailableStatus = status;

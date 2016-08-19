@@ -680,6 +680,7 @@
                     $scope.ViewVendor.VendorInfo = vendorInfo;
                     $scope.ViewVendor.ShowContent = true;
                     $scope.ViewVendor.changeActiveAddress('BillingAddress');
+                    debug("Vendor Info:-------");
                     debug($scope.ViewVendor.VendorInfo);
                     
                     // resize left side panel   

@@ -106,7 +106,7 @@ global with sharing class AccountingDataMigrationSalesInvoice implements Databas
     **/
 	global void execute(Database.BatchableContext BC, List<sObject> scope) {
 		List<CO_Invoice_Item__c> coInvoiceItemsList = (List<CO_Invoice_Item__c>) scope;
-		
+		if(AccessControl.ifObjectFieldIsAccessible('GL_Account__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
 		if(coInvoiceItemsList.size() > 0){
 	    	// Map of MiscellaneousSales records for all applicable saleforce CODeposit records (a map of CODeposit sf fields to equivalent values)
 	    	Map<Integer, Map<String,String>> coDepositRecords = new Map<Integer, Map<String, String>>();

@@ -200,6 +200,7 @@ global with sharing class ViewCustomerCtrl {
 		if(AccessControl.ifObjectFieldIsCreateable('Account') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
 		if(AccessControl.ifObjectFieldIsUpdateable('Account') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_UPDATEABLE); }
     	if(AccessControl.ifObjectIsDeletable('People__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE); }
+    	if(AccessControl.ifObjectFieldIsAccessible('People__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
     	relatedCustomerString = BPUtility.getDecodedString(relatedCustomerString);
     	
         List<RelatedCustomer> relatedCustomerObjList = RelatedCustomer.parse(relatedCustomerString);

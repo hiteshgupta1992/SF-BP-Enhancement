@@ -1,0 +1,3 @@
+Name;Description;RateApplied;PartPriceBase;LabourRate;DefaultValue;Active
+ Test 1; for Testing of csv;5;Price;50;FALSE;TRUE
+ Test 2; for Testing of csv;2;Price;50;FALSE;TRUE

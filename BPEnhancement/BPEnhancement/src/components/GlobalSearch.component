@@ -20,6 +20,43 @@
 		.divObjectName	{
 			text-align: right;
 		}
+		
+		.globalSearchResultGrid	{
+			width: 100%;
+			word-break: break-all;
+		}
+		
+		.globalSearchKeywordSuggestions.angucomplete-dropdown{
+			padding : 0;
+		}
+		
+		.globalSearchKeywordSuggestions .angucomplete-selected-row, 
+		.globalSearchKeywordSuggestions .angucomplete-row:hover	{
+			background: #eee;
+			color : #000;
+		} 
+		
+		tbody.globalSearchResultGridBody:not(:last-child) {
+  			border-bottom: 1px solid #eee;
+		}
+		
+		.AdditionalInfoLabel	{
+			font-size: 12px;
+			font-weight: bold;
+			color: grey;
+		}
+		
+		.AdditionalInfo	{
+			font-size: 12px;
+		    color: #acacac;;
+		    font-style: italic;
+		}
+		
+		.SearchItemName	{
+			font-size: 16px;
+		    /* font-weight: bold; */
+		    color: grey;
+		}
 	</style>
 	<script>
 		var globalSearchModule = angular.module('globalSearchModule', []);
@@ -97,7 +134,8 @@
 			   // check that your clicked
 			   // element has no id=globalSearchElement
 			   // and is not child of globalSearchElement
-			   if (e.target.id != 'globalSearchElement')	{
+			   if (e.target.id != 'globalSearchStrInput')	{
+			   		debug("e.target.id="+e.target.id)
 			       $scope.globalSearchModal.hideTimer = $timeout(function () {
 	                        $scope.globalSearchModal.showDropdown = false;
 				           	$scope.globalSearchModal.results = [];
@@ -123,6 +161,7 @@
 	        $scope.globalSearchModal.keywordValue = "";
 	        $scope.globalSearchModal.isKeyword = false;
 	        var isGlobalSearchStrBlank = "";
+	        $scope.globalSearchModal.totalGlobalSearchRecords = 0;
 	        $scope.globalSearchModal.keywordsList = [
 	        					"User",
 								"Customer",
@@ -155,20 +194,19 @@
 	        }
 	        
 	         $scope.globalSearchModal.GetIntialdata = function () {
-	         	if ($scope.globalSearchModal.hideTimer) {
+	         	/* if ($scope.globalSearchModal.hideTimer) {
                     $timeout.cancel($scope.hideTimer);
-                } 
+                }  */
 	            if (!$scope.globalSearchModal.globalSearchStr) {
 	                $scope.globalSearchModal.globalSearchStr = null;
 	            }
 	        }
 	        
         	$scope.globalSearchModal.processResults = function (responseData) {
-        		debug("responseData..........................................");
+        		debug("processResults responseData");
 	        	debug(responseData);
-	        	debug(responseData.length);
 	            if (responseData && responseData.length > 0) {
-	           		debug("responseData");
+	           		//debug("responseData");
 	                $scope.globalSearchModal.results = [];
 	               	
 	               	for (var i = 0; i < responseData.length; i++) {
@@ -181,7 +219,9 @@
 	                        ItemName : responseData[i].ItemName,
 	                        AdditionalInfo1: responseData[i].AdditionalInfo1,
 	                        AdditionalInfo2: responseData[i].AdditionalInfo2,
-	                        ObjectName: responseData[i].ObjectName
+	                        ObjectName: responseData[i].ObjectName,
+	                        AdditionalInfoLabel1: responseData[i].AdditionalInfoLabel1,
+	                        AdditionalInfoLabel2: responseData[i].AdditionalInfoLabel2
 	                    }
 	                    
 	                   
@@ -218,8 +258,10 @@
 	            globalSearchservice.getGlobalSearchResult(globalSearchQueryJson)
 	            .then(function (successfulGlobalSearchResult) {
 	                responseData = successfulGlobalSearchResult.searchRecords;
+	                $scope.globalSearchModal.totalGlobalSearchRecords = successfulGlobalSearchResult.TotalRecords;
 	                $scope.globalSearchModal.searching = false;
-	                $scope.globalSearchModal.processResults((($scope.dataField) ? responseData[$scope.dataField] : responseData));
+	                /* $scope.globalSearchModal.processResults((($scope.dataField) ? responseData[$scope.dataField] : responseData)); */
+	                $scope.globalSearchModal.processResults(responseData);
 	            },
 	            function (errorSearchResult) {
 	                responseData = errorSearchResult;
@@ -272,7 +314,7 @@
 	                    $scope.globalSearchModal.showDropdown = false;
 	                    $scope.globalSearchModal.lastSearchTerm = null
 	                } else if ($scope.globalSearchModal.isNewSearchNeeded($scope.globalSearchModal.globalSearchStr, $scope.globalSearchModal.lastSearchTerm)) {
-	                	
+	                	$scope.globalSearchModal.totalGlobalSearchRecords = 0;
 	                	isGlobalSearchStrBlank = $scope.globalSearchModal.globalSearchStr;
 	                    $scope.globalSearchModal.lastSearchTerm = $scope.globalSearchModal.globalSearchStr;
 	                    $scope.globalSearchModal.showDropdown = true;
@@ -379,64 +421,85 @@
 	                $scope.$apply();
 	            }
 	        });
-	        	
+	        
+	        $scope.NavigateToHomeSearch = function()	{
+	        	location.href = '{!$Page.HomeSearch}?q='+($scope.globalSearchModal.globalSearchStr);
+	        }	
+	        
 			$scope.globalSearchModal.selectResult = function (result) {
-				debug("!$Page.newViewCustomer.................................")
+				debug("selectResult")
 				$scope.globalSearchModal.showDropdown = false;
 	            $scope.globalSearchModal.results = [];
 	            $scope.globalSearchModal.globalSearchStr = "";
 	            $scope.globalSearchModal.keywordValue = "";
 	            if(result.Type == 1)	{
 	            	debug("!$Page.newViewCustomer")
-	            	window.open("{!$Page.newViewCustomer}?id="+result.Id);
+	            	/* window.open("{!$Page.newViewCustomer}?id="+result.Id); */
+	            	location.href = '{!$Page.newViewCustomer}?id='+result.Id;
 	            } else if(result.Type == 2)	{
 	            	debug("!$Page.NewViewVendor")
-	            	window.open("{!$Page.NewViewVendor}?id="+result.Id);
+	            	/* window.open("{!$Page.NewViewVendor}?id="+result.Id); */
+	            	location.href = '{!$Page.NewViewVendor}?id='+result.Id;
 	            } else if(result.Type == 3)	{
 	            	debug("!$Page.newviewPart")
-	            	window.open("{!$Page.newviewPart}?id="+result.Id);
+	            	/* window.open("{!$Page.newviewPart}?id="+result.Id); */
+	            	location.href = '{!$Page.newviewPart}?id='+result.Id;
 	            } else if(result.Type == 4)	{
 	            	debug("!$Page.viewKit")
-	            	window.open("{!$Page.viewKit}?id="+result.Id);
+	            	/* window.open("{!$Page.viewKit}?id="+result.Id); */
+	            	location.href = '{!$Page.viewKit}?id='+result.Id;
 	            } else if(result.Type == 5)	{
 	            	debug("!$Page.viewFee")
-	            	window.open("{!$Page.viewFee}?id="+result.Id);
+	            	/* window.open("{!$Page.viewFee}?id="+result.Id); */
+	            	location.href = '{!$Page.viewFee}?id='+result.Id;
 	            } else if(result.Type == 6)	{
 	            	debug("!$Page.viewLabour")
-	            	window.open("{!$Page.viewLabour}?id="+result.Id);
+	            	/* window.open("{!$Page.viewLabour}?id="+result.Id); */
+	            	location.href = '{!$Page.viewLabour}?id='+result.Id;
 	            } else if(result.Type == 7)	{
 	            	//debug("!$Page.viewFee")
 	            	//window.open("{!$Page.newViewCustomer}?id="+feeInfo.FeeRec.Id);
+	            	//location.href = '{!$Page.newViewCustomer}?id='+result.Id;
 	            } else if(result.Type == 8)	{
 	            	debug("!$Page.NewCustomerOrder")
-	            	window.open("{!$Page.NewCustomerOrder}?id="+result.Id);
+	            	/* window.open("{!$Page.NewCustomerOrder}?id="+result.Id); */
+	            	location.href = '{!$Page.NewCustomerOrder}?id='+result.Id;
 	            } else if(result.Type == 9)	{
 	            	debug("!$Page.NewCustomerOrder")
-	            	window.open("{!$Page.NewCustomerOrder}?id="+result.Id);
+	            	/* window.open("{!$Page.NewCustomerOrder}?id="+result.Id); */
+	            	location.href = '{!$Page.NewCustomerOrder}?id='+result.Id;
 	            } else if(result.Type == 10)	{
 	            	debug("!$Page.NewVendorOrder")
-	            	window.open("{!$Page.NewVendorOrder}?id="+result.Id);
+	            	/* window.open("{!$Page.NewVendorOrder}?id="+result.Id); */
+	            	location.href = '{!$Page.NewVendorOrder}?id='+result.Id;
 	            } else if(result.Type == 11)	{
 	            	debug("!$Page.NewVendorOrderReceiving")
-	            	window.open("{!$Page.NewVendorOrderReceiving}?id="+result.Id);
+	            	/* window.open("{!$Page.NewVendorOrderReceiving}?id="+result.Id); */
+	            	location.href = '{!$Page.NewVendorOrderReceiving}?id='+result.Id;
 	            } else if(result.Type == 12)	{
 	            	debug("!$Page.NewVendorOrderInvoicing")
-	            	window.open("{!$Page.NewVendorOrderInvoicing}?id="+result.Id);
+	            	/* window.open("{!$Page.NewVendorOrderInvoicing}?id="+result.Id); */
+	            	location.href = '{!$Page.NewVendorOrderInvoicing}?id='+result.Id;
 	            } else if(result.Type == 13)	{
 	            	debug("!$Page.BlackPurlHome")
-	            	window.open("{!$Page.BlackPurlHome}?pageName=CategoryMgmt");
+	            	/* window.open("{!$Page.BlackPurlHome}?pageName=CategoryMgmt"); */
+	            	location.href = '{!$Page.BlackPurlHome}?pageName=CategoryMgmt';
 	            } else if(result.Type == 14)	{
 	            	debug("!$Page.BlackPurlHome")
-	            	window.open("{!$Page.BlackPurlHome}?pageName=SystemSettings");
+	            	/* window.open("{!$Page.BlackPurlHome}?pageName=SystemSettings"); */
+	            	location.href = '{!$Page.BlackPurlHome}?pageName=SystemSettings';
 	            } else if(result.Type == 15)	{
 	            	debug("!$Page.BlackPurlHome")
-	            	window.open("{!$Page.BlackPurlHome}?pageName=SystemSettings");
+	            	/* window.open("{!$Page.BlackPurlHome}?pageName=SystemSettings"); */
+	            	location.href = '{!$Page.BlackPurlHome}?pageName=SystemSettings';
 	            } else if(result.Type == 16)	{
 	            	//debug("!$Page.viewFee")
 	            	//window.open("{!$Page.newViewCustomer}?id="+feeInfo.FeeRec.Id);
+	            	//location.href = '{!$Page.newViewCustomer}?id='+result.Id;
 	            } else if(result.Type == 17)	{
 	            	debug("!$Page.newCustomerOrder")
-	            	window.open("{!$Page.newCustomerOrder}?id="+result.Id);
+	            	/* window.open("{!$Page.newCustomerOrder}?id="+result.Id); */
+	            	location.href = '{!$Page.newCustomerOrder}?id='+result.Id;
 	            } 
 	        }
 	        
@@ -493,20 +556,63 @@
         	<div class="angucomplete-searching" ng-show="!globalSearchModal.searching && (!globalSearchModal.results || globalSearchModal.results.length == 0)">No results found</div>
         	
         	
-        	<div  class="angucomplete-row" ng-repeat="result in globalSearchModal.results" id="globalSearchSelectedResult" ng-click="globalSearchModal.selectResult(result)" 
+        	<table id="globalSearchResultGrid" class="globalSearchResultGrid">
+        		<col width="2%"  />
+        		<col width="8%"  />
+                <col width="74%"  />
+                <col width="2%"  />
+                <col width="12%"  />
+                <col width="2%"  />
+        		<tbody class="angucomplete-row globalSearchResultGridBody" ng-repeat="result in globalSearchModal.results" ng-click="globalSearchModal.selectResult(result)"
+        			ng-class="{'angucomplete-selected-row': $index == globalSearchModal.currentIndex}"
+        			ng-if="globalSearchModal.results.length > 0"><!-- ng-mouseover="globalSearchModal.hoverRow($index)"> -->
+        			<tr id="SearchResult_{{$index}}" class="angucomplete-title titlestyle">
+        				<td></td>
+        				<td style="padding-top: 10px; padding-bottom: 10px;">
+        					<img style="height: 26px; width: 26px;" src="{!URLFOR($Resource.Images, 'sparkplug.png')}" />
+        				</td>
+        				<td>
+        					<div class="row">
+	        					<div class="col-md-12 SearchItemName">{{result.ItemName}}</div>
+	        				</div> 
+	        				<div class="row">	
+	        					<div class="col-md-12">
+	        						<span ng-if="result.AdditionalInfo1">
+	        							<span class="AdditionalInfoLabel">{{result.AdditionalInfoLabel1}}:</span>
+	        							<span class="AdditionalInfo"> {{result.AdditionalInfo1}}</span>
+	        						</span>
+	        						<span ng-if="result.AdditionalInfo1 && result.AdditionalInfo2">, </span>
+	        							<span ng-if="result.AdditionalInfo2"><span class="AdditionalInfoLabel">{{result.AdditionalInfoLabel2}}:</span>
+	        							<span class="AdditionalInfo"> {{result.AdditionalInfo2}}</span>
+	        						</span>
+	        					</div>
+	        					
+	        				</div>
+        				</td>
+        				<td></td>
+        				<td>
+        					<div class="divObjectName">{{result.ObjectName}}</div>
+        				</td>
+        				<td></td>
+        			</tr>	
+        		</tbody>
+        	</table>
+        	<!-- <div  class="angucomplete-row" ng-repeat="result in globalSearchModal.results" id="globalSearchSelectedResult" ng-click="globalSearchModal.selectResult(result)" 
                  ng-class="{'angucomplete-selected-row': $index == globalSearchModal.currentIndex}"
-                 ng-if="globalSearchModal.results.length > 0"><!-- ng-mouseover="globalSearchModal.hoverRow($index)" -->
+                 ng-if="globalSearchModal.results.length > 0">ng-mouseover="globalSearchModal.hoverRow($index)"
                 <div id="SearchResult_{{$index}}" class="angucomplete-title titlestyle" >
                 	<div class="row">
 		               	<div class="col-md-6">{{result.ItemName}}</div> 
-		                <div class="col-md-6 divObjectName">> {{result.ObjectName}}</div>
+		                <div class="col-md-6 divObjectName">{{result.ObjectName}}</div>
 	                </div>
 	                <div class="row">
-	                	<div class="col-md-6" ng-if="result.AdditionalInfo1">({{result.AdditionalInfo1}})</div>
-	                	<div class="col-md-6" ng-if="result.AdditionalInfo2">({{result.AdditionalInfo2}})</div>
+	                	<div class="col-md-3" ng-if="result.AdditionalInfo1">({{result.AdditionalInfo1}})</div>
+	                	<div class="col-md-3" ng-if="result.AdditionalInfo2">({{result.AdditionalInfo2}})</div>
                 	</div>
                 </div>
-            </div>
+            </div> -->
+            <div ng-if="globalSearchModal.totalGlobalSearchRecords > 0" ng-click="NavigateToHomeSearch()">{{globalSearchModal.totalGlobalSearchRecords}} Records</div>
+            
         </div>   
 	</div>
 </apex:component>

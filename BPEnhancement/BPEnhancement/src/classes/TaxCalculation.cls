@@ -140,7 +140,7 @@ public with sharing class TaxCalculation {
      * @return: List<CO_Line_Item__c>
     **/
 	public static List<CO_Line_Item__c> salesTaxCalculation(List<Id> salesTaxIdList, Map<Id, Set<Id>> partIdToSalesTaxItemIdsMap, List<CO_Header__c> COHeaderList, Map<Id, List<Sobject>> COHeaderIdToCOLineItemRecordsMap, List<Sales_Tax__c> defaultSalesTax ) {
-		
+		if(AccessControl.ifObjectFieldIsAccessible('Applicable_Taxes__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
     	List<Applicable_Taxes__c> applicableTaxList = [select Sales_Tax_Item__c, Sales_Tax__c, Sales_Tax_Item__r.Tax_Parts__c, Sales_Tax_Item__r.Rate__c from Applicable_Taxes__c where Sales_Tax__c IN : salesTaxIdList];
     	Map<Id, List<Applicable_Taxes__c>> salesTaxIdToAppTaxRecordsMap = new Map<Id, List<Applicable_Taxes__c>>();
     	
@@ -200,7 +200,7 @@ public with sharing class TaxCalculation {
     	return coLineItemToUpdate;
 	}
     public static List<CO_Line_Item__c> salesTaxCalculation2(List<Id> salesTaxIdList, Map<Id, Set<Id>> customerIdToSalesTaxItemIdsMap, List<CO_Line_Item__c> coLineItemList) {
-        
+        if(AccessControl.ifObjectFieldIsAccessible('Applicable_Taxes__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         List<Applicable_Taxes__c> applicableTaxList = [SELECT Sales_Tax_Item__c, Sales_Tax__c, Sales_Tax_Item__r.Name__c, 
                                                             Sales_Tax_Item__r.Rate__c from Applicable_Taxes__c where Sales_Tax__c IN : salesTaxIdList];
         

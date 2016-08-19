@@ -495,6 +495,7 @@ global with sharing class ViewVendorRelatedListCtrl {
 		productCode = BPUtility.escapeSingleQuotes(productCode);
 		vendorId = BPUtility.escapeSingleQuotes(vendorId);
 		productId = BPUtility.escapeSingleQuotes(productId);
+		if(AccessControl.ifObjectFieldIsAccessible('Product__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
 		List<Product__c> productList = [select Id from Product__c where Code__c =: productCode AND Vendor__c =: vendorId AND Id != :productId];
     	String isSimilarPresent;
     	if(productList.size() > 0) {
@@ -664,10 +665,12 @@ global with sharing class ViewVendorRelatedListCtrl {
         }
         
         if(taxExemptionListToInsert.size() > 0) {
+        	if(AccessControl.ifObjectFieldIsCreateable('Tax_Exemption__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
         	insert taxExemptionListToInsert;
         }
         
         if(taxExemptionListToDelete.size() > 0) {
+        	if(AccessControl.ifObjectIsDeletable('Tax_Exemption__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_DELETABLE); }
         	delete taxExemptionListToDelete;
         }
         

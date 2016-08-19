@@ -162,8 +162,8 @@ public with sharing class UserTriggerHelper {
   
   @future
   public static void createWidgetJunction(List<Id> usersNewList ) {
-     
-    
+    if(AccessControl.ifObjectFieldIsCreateable('Widget_User_Junction__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_CREATEABLE); }
+    if(AccessControl.ifObjectFieldIsAccessible('Widget__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
     List<Widget__c> widgetList = [Select Id, Order_Number__c From Widget__c order by Order_Number__c ASC limit : SOQLUtil.getAvailableQueryRowsLimit()];
     List<Widget_User_Junction__c> widgetUserListToInsert =  new List<Widget_User_Junction__c>();
     for(Id userRec : usersNewList) {

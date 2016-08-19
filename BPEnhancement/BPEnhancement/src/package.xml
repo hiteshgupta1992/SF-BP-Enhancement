@@ -17,8 +17,54 @@
         <name>ApexTrigger</name>
     </types>
     <types>
+        <members>BlackPurl</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomLabels</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>MasterDataTemplateFolder</members>
+        <members>MasterDataTemplateFolder/Category_Template.csv</members>
+        <members>MasterDataTemplateFolder/Country_State_Template.csv</members>
+        <members>MasterDataTemplateFolder/Country_Template.csv</members>
+        <members>MasterDataTemplateFolder/Make_Model_Template.csv</members>
+        <members>MasterDataTemplateFolder/Make_Template.csv</members>
+        <members>MasterDataTemplateFolder/Model_Template.csv</members>
+        <members>MasterDataTemplateFolder/Price_Level_Template.csv</members>
+        <members>MasterDataTemplateFolder/Sales_Tax_Item_Template.csv</members>
+        <members>MasterDataTemplateFolder/Sales_Tax_Template.csv</members>
+        <members>MasterDataTemplateFolder/State_Template.csv</members>
+        <members>SharedDocuments</members>
+        <name>Document</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Admin</members>
+        <name>Profile</name>
+    </types>
+    <types>
         <members>*</members>
         <name>StaticResource</name>
+    </types>
+    <types>
+        <members>Account</members>
+        <members>CO_Invoice_Header__c</members>
+        <members>CO_Line_Item__c</members>
+        <members>Labour_Code__c</members>
+        <name>Workflow</name>
     </types>
     <version>36.0</version>
 </Package>

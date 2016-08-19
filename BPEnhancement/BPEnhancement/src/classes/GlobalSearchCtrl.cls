@@ -54,6 +54,7 @@ global with sharing class GlobalSearchCtrl {
 	        	query += 'AND (Is_Vendor__c = true) '; 
 	        }
 	        /*query += ' ORDER BY Default__c DESC, Name__c ASC';*/
+	        if(AccessControl.ifObjectFieldIsAccessible(objectAPIName) == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
 	        searchedResultsList.addAll((List<Sobject>)Database.query(query));
     	}
     	

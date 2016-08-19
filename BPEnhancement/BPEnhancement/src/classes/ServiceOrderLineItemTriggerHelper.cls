@@ -86,6 +86,7 @@ public class ServiceOrderLineItemTriggerHelper {
         }
         
         if(AccessControl.ifObjectFieldIsAccessible('Service_Order_Header__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+        if(AccessControl.ifObjectFieldIsAccessible('Service_Order_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         List<Service_Order_Header__c> soHeaderList = [select Total__c, Tax_Amount__c, (select Total__c, Tax_Percent__c from Service_Order_Line_Items__r) 
                                                                     from Service_Order_Header__c
                                                                     where Id IN : soHeaderIdSet];
@@ -182,7 +183,7 @@ public class ServiceOrderLineItemTriggerHelper {
                 populateSOLIsFieldBeforeUpdate();
             }
         }
-        if(AccessControl.ifObjectFieldIsAccessible('Service_Order_Line_Item__c') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
+        
         List<Service_Order_Line_Item__c> soliList = [select Qty_To_Order__c, Service_Order_Header__c, Service_Order_Header__r.CO_Header__c from Service_Order_Line_Item__c where Id IN :trigger.New];
         
         List<Id> soHeaderIdList = new List<Id>();
@@ -481,6 +482,7 @@ public class ServiceOrderLineItemTriggerHelper {
                 customerIdSet.add(soliRec.Service_Order_Header__r.CO_Header__r.Customer__c);
             }
         }
+        if(AccessControl.ifObjectFieldIsAccessible('Account') == false) { throw new BlackPurlException(Constants.OBJIECT_NOT_ACCESSIBLE); }
         List<Account> customerList = [SELECT Id, (SELECT Sales_Tax_Item__r.Rate__c from Tax_Exemptions__r) from Account where Id IN: customerIdSet];
         
         Map<Id, Set<Id>> customerIdToSalesTaxItemIdsMap = new Map<Id, Set<Id>>();
