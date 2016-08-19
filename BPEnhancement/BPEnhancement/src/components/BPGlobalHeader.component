@@ -1,3 +1,4 @@
+// Global Header Component
 <apex:component controller="BPGlobalHeaderCtrl">
     <!-- Parts Component -->
     <c:NewAddEditparts />
